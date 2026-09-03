@@ -1,0 +1,42 @@
+<%- include('../../partials/header') %>
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h3>Quản lý khóa học</h3>
+  <a href="/admin/courses/new" class="btn btn-primary">+ Thêm khóa học</a>
+</div>
+
+<% if (courses.length === 0) { %>
+  <p class="text-muted">Chưa có khóa học nào. Bấm "Thêm khóa học" để tạo mới.</p>
+<% } else { %>
+  <table class="table table-bordered bg-white">
+    <thead class="table-light">
+      <tr>
+        <th>#</th>
+        <th>Tên khóa học</th>
+        <th>Mô tả</th>
+        <th>Ngày tạo</th>
+        <th style="width: 260px;">Hành động</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% courses.forEach((course, i) => { %>
+        <tr>
+          <td><%= i + 1 %></td>
+          <td><%= course.title %></td>
+          <td><%= course.description ? course.description.substring(0, 80) : '' %></td>
+          <td><%= new Date(course.created_at).toLocaleDateString('vi-VN') %></td>
+          <td>
+            <a href="/admin/courses/<%= course.id %>/lessons" class="btn btn-sm btn-info">Bài học</a>
+            <a href="/admin/courses/<%= course.id %>/edit" class="btn btn-sm btn-warning">Sửa</a>
+            <form action="/admin/courses/<%= course.id %>?_method=DELETE" method="POST" class="d-inline"
+                  onsubmit="return confirm('Xóa khóa học này? Toàn bộ bài học và bài kiểm tra liên quan cũng sẽ bị xóa.');">
+              <button type="submit" class="btn btn-sm btn-danger">Xóa</button>
+            </form>
+          </td>
+        </tr>
+      <% }) %>
+    </tbody>
+  </table>
+<% } %>
+
+<%- include('../../partials/footer') %>

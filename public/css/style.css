@@ -1,0 +1,10 @@
+/* public/css/style.css */
+/* File này để bạn thêm các tùy chỉnh giao diện riêng, ngoài Bootstrap */
+
+body {
+  background-color: #f5f7fa;
+}
+
+.card {
+  border-radius: 12px;
+}

@@ -1,0 +1,30 @@
+<%- include('../../partials/header') %>
+
+<h3 class="mb-4">Sửa khóa học</h3>
+
+<% if (error) { %>
+  <div class="alert alert-danger"><%= error %></div>
+<% } %>
+
+<div class="card shadow-sm">
+  <div class="card-body">
+    <form method="POST" action="/admin/courses/<%= course.id %>?_method=PUT">
+      <div class="mb-3">
+        <label class="form-label">Tên khóa học</label>
+        <input type="text" name="title" class="form-control" value="<%= course.title %>" required>
+      </div>
+      <div class="mb-3">
+        <label class="form-label">Mô tả</label>
+        <textarea name="description" class="form-control" rows="4"><%= course.description || '' %></textarea>
+      </div>
+      <div class="mb-3">
+        <label class="form-label">Đường dẫn ảnh đại diện (tùy chọn)</label>
+        <input type="text" name="image" class="form-control" value="<%= course.image || '' %>">
+      </div>
+      <button type="submit" class="btn btn-primary">Cập nhật</button>
+      <a href="/admin/courses" class="btn btn-secondary">Hủy</a>
+    </form>
+  </div>
+</div>
+
+<%- include('../../partials/footer') %>

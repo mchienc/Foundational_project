@@ -1,0 +1,18 @@
+<%- include('partials/header') %>
+
+<div class="card shadow-sm mt-3">
+  <div class="card-body">
+    <h3>Chào mừng, <%= user.full_name %>!</h3>
+    <p>Vai trò của bạn: <strong><%= user.role === 'admin' ? 'Quản trị viên' : 'Người học' %></strong></p>
+    <p class="text-muted">
+      Đây là trang tạm để xác nhận đăng nhập thành công. Ở bước tiếp theo,
+      chúng ta sẽ xây dựng trang danh sách khóa học thật (cho học viên)
+      và dashboard quản trị thật (cho admin) tại đây.
+    </p>
+    <% if (user.role === 'admin') { %>
+      <a href="/admin/courses" class="btn btn-primary">Quản lý khóa học</a>
+    <% } %>
+  </div>
+</div>
+
+<%- include('partials/footer') %>
