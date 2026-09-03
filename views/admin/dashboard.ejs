@@ -1,0 +1,247 @@
+<%- include('../../partials/header') %>
+
+<div class="space-y-8">
+
+  <!-- Dashboard Header -->
+  <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-[#e5e5e5]">
+    <div>
+      <div class="text-xs font-mono text-neutral-400 mb-1">admin / system overview</div>
+      <h1 class="text-2xl sm:text-3xl font-semibold tracking-tight text-black">Tổng quan hệ thống</h1>
+      <p class="text-xs text-neutral-500 mt-1 font-mono">eduflow · <%= new Date().toLocaleDateString('vi-VN', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) %></p>
+    </div>
+    <a href="/admin/users" class="self-start sm:self-auto inline-flex items-center gap-2 px-4 py-2 rounded-full border border-[#e5e5e5] hover:bg-[#fafafa] text-xs font-medium text-black transition">
+      <i class="fa-solid fa-users text-[10px]"></i>
+      <span>Quản lý người dùng</span>
+    </a>
+  </div>
+
+  <!-- Stats Grid (6 metrics) -->
+  <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+    
+    <!-- Khóa học -->
+    <div class="bg-white border border-[#e5e5e5] rounded-2xl p-4 hover:border-neutral-300 transition">
+      <div class="w-7 h-7 rounded-full bg-[#fafafa] border border-[#e5e5e5] flex items-center justify-center text-black text-[10px] mb-3">
+        <i class="fa-solid fa-book-open"></i>
+      </div>
+      <div class="text-2xl font-semibold text-black tracking-tight"><%= stats.totalCourses %></div>
+      <div class="text-[11px] font-mono text-neutral-400 mt-0.5">khóa học</div>
+    </div>
+
+    <!-- Bài học -->
+    <div class="bg-white border border-[#e5e5e5] rounded-2xl p-4 hover:border-neutral-300 transition">
+      <div class="w-7 h-7 rounded-full bg-[#fafafa] border border-[#e5e5e5] flex items-center justify-center text-black text-[10px] mb-3">
+        <i class="fa-solid fa-file-lines"></i>
+      </div>
+      <div class="text-2xl font-semibold text-black tracking-tight"><%= stats.totalLessons %></div>
+      <div class="text-[11px] font-mono text-neutral-400 mt-0.5">bài giảng</div>
+    </div>
+
+    <!-- Học viên -->
+    <div class="bg-white border border-[#e5e5e5] rounded-2xl p-4 hover:border-neutral-300 transition">
+      <div class="w-7 h-7 rounded-full bg-[#fafafa] border border-[#e5e5e5] flex items-center justify-center text-black text-[10px] mb-3">
+        <i class="fa-solid fa-user-graduate"></i>
+      </div>
+      <div class="text-2xl font-semibold text-black tracking-tight"><%= stats.totalStudents %></div>
+      <div class="text-[11px] font-mono text-neutral-400 mt-0.5">học viên</div>
+    </div>
+
+    <!-- Lượt ghi danh -->
+    <div class="bg-white border border-[#e5e5e5] rounded-2xl p-4 hover:border-neutral-300 transition">
+      <div class="w-7 h-7 rounded-full bg-[#fafafa] border border-[#e5e5e5] flex items-center justify-center text-black text-[10px] mb-3">
+        <i class="fa-solid fa-circle-check"></i>
+      </div>
+      <div class="text-2xl font-semibold text-black tracking-tight"><%= stats.totalEnrollments %></div>
+      <div class="text-[11px] font-mono text-neutral-400 mt-0.5">lượt ghi danh</div>
+    </div>
+
+    <!-- Lượt làm quiz -->
+    <div class="bg-white border border-[#e5e5e5] rounded-2xl p-4 hover:border-neutral-300 transition">
+      <div class="w-7 h-7 rounded-full bg-[#fafafa] border border-[#e5e5e5] flex items-center justify-center text-black text-[10px] mb-3">
+        <i class="fa-solid fa-clipboard-question"></i>
+      </div>
+      <div class="text-2xl font-semibold text-black tracking-tight"><%= stats.totalQuizResults %></div>
+      <div class="text-[11px] font-mono text-neutral-400 mt-0.5">lượt làm quiz</div>
+    </div>
+
+    <!-- Bình luận -->
+    <div class="bg-white border border-[#e5e5e5] rounded-2xl p-4 hover:border-neutral-300 transition">
+      <div class="w-7 h-7 rounded-full bg-[#fafafa] border border-[#e5e5e5] flex items-center justify-center text-black text-[10px] mb-3">
+        <i class="fa-regular fa-comment"></i>
+      </div>
+      <div class="text-2xl font-semibold text-black tracking-tight"><%= stats.totalComments %></div>
+      <div class="text-[11px] font-mono text-neutral-400 mt-0.5">thảo luận</div>
+    </div>
+
+  </div>
+
+  <!-- Completion Rate Wide Card (Inverted Dark Card – Ollama style) -->
+  <div class="bg-[#171717] rounded-2xl p-6 flex flex-col sm:flex-row items-center justify-between gap-6">
+    <div class="text-white space-y-1">
+      <div class="text-xs font-mono text-neutral-400">progress engine / completion</div>
+      <div class="text-lg font-semibold">Tỷ lệ hoàn thành khóa học</div>
+      <p class="text-xs text-neutral-400 font-mono">
+        <%= stats.completedCount %> / <%= stats.totalEnrollments %> lượt ghi danh đạt 100%
+      </p>
+    </div>
+    <div class="flex items-center gap-6">
+      <div class="text-center">
+        <div class="text-4xl font-bold text-white tracking-tight"><%= stats.completionRate %>%</div>
+        <div class="text-[11px] font-mono text-neutral-500 mt-1">completion rate</div>
+      </div>
+      <!-- Circular-ish progress bar using border trick -->
+      <div class="relative w-16 h-16">
+        <svg class="w-full h-full -rotate-90" viewBox="0 0 36 36">
+          <circle cx="18" cy="18" r="15.9" fill="none" stroke="#333" stroke-width="2.5"/>
+          <circle cx="18" cy="18" r="15.9" fill="none" stroke="#27c93f" stroke-width="2.5"
+            stroke-dasharray="<%= stats.completionRate %> <%= 100 - stats.completionRate %>"
+            stroke-linecap="round"/>
+        </svg>
+        <span class="absolute inset-0 flex items-center justify-center text-[10px] font-mono text-[#27c93f] font-bold">
+          <%= stats.completionRate %>%
+        </span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bottom 2-column Grid -->
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+    <!-- Top Courses Table -->
+    <div class="bg-white border border-[#e5e5e5] rounded-2xl overflow-hidden">
+      <div class="p-4 border-b border-[#e5e5e5] bg-[#fafafa] flex items-center justify-between">
+        <div>
+          <div class="text-xs font-mono text-neutral-400">top 5</div>
+          <h2 class="text-sm font-semibold text-black">Khóa học phổ biến nhất</h2>
+        </div>
+        <a href="/admin/courses" class="text-[11px] font-mono text-neutral-500 hover:text-black transition">xem tất cả →</a>
+      </div>
+
+      <div class="divide-y divide-[#e5e5e5]">
+        <% if (topCourses.length === 0) { %>
+          <div class="p-6 text-center text-xs text-neutral-400 font-mono">Chưa có dữ liệu ghi danh.</div>
+        <% } else { %>
+          <% topCourses.forEach((course, i) => { %>
+            <div class="p-4 flex items-center justify-between gap-3 hover:bg-[#fafafa] transition group">
+              <div class="flex items-center gap-3 min-w-0">
+                <span class="w-5 h-5 rounded-full bg-[#fafafa] border border-[#e5e5e5] text-neutral-600 font-mono text-[9px] flex items-center justify-center font-bold shrink-0">
+                  <%= i + 1 %>
+                </span>
+                <div class="min-w-0">
+                  <a href="/admin/courses/<%= course.id %>/lessons" class="text-xs font-semibold text-black group-hover:underline truncate block">
+                    <%= course.title %>
+                  </a>
+                  <div class="flex items-center gap-2 mt-1">
+                    <div class="w-16 h-1 rounded-full bg-[#e5e5e5] overflow-hidden">
+                      <div class="h-full bg-black rounded-full" style="width: <%= course.avg_progress || 0 %>%"></div>
+                    </div>
+                    <span class="text-[10px] font-mono text-neutral-400">avg <%= course.avg_progress || 0 %>%</span>
+                  </div>
+                </div>
+              </div>
+              <span class="shrink-0 inline-flex items-center gap-1 text-[11px] font-mono text-neutral-600 px-2 py-0.5 rounded-full bg-[#fafafa] border border-[#e5e5e5]">
+                <span class="w-1.5 h-1.5 rounded-full bg-black"></span>
+                <%= course.enrollment_count %> học viên
+              </span>
+            </div>
+          <% }) %>
+        <% } %>
+      </div>
+    </div>
+
+    <!-- Recent Comments (Q&A Activity) -->
+    <div class="bg-white border border-[#e5e5e5] rounded-2xl overflow-hidden">
+      <div class="p-4 border-b border-[#e5e5e5] bg-[#fafafa] flex items-center justify-between">
+        <div>
+          <div class="text-xs font-mono text-neutral-400">q&a feed</div>
+          <h2 class="text-sm font-semibold text-black">Hoạt động thảo luận gần đây</h2>
+        </div>
+        <span class="text-[11px] font-mono text-neutral-400"><%= stats.totalComments %> tổng</span>
+      </div>
+
+      <div class="divide-y divide-[#e5e5e5]">
+        <% if (recentComments.length === 0) { %>
+          <div class="p-6 text-center text-xs text-neutral-400 font-mono">Chưa có bình luận nào.</div>
+        <% } else { %>
+          <% recentComments.forEach((c) => { %>
+            <div class="p-4 space-y-1.5 hover:bg-[#fafafa] transition">
+              <div class="flex items-center gap-2">
+                <span class="w-5 h-5 rounded-full bg-black text-white text-[9px] font-bold flex items-center justify-center uppercase shrink-0">
+                  <%= c.full_name ? c.full_name.charAt(0) : 'U' %>
+                </span>
+                <span class="text-xs font-semibold text-black"><%= c.full_name %></span>
+                <% if (c.user_role === 'admin') { %>
+                  <span class="px-1.5 py-0.5 rounded-full bg-[#fafafa] border border-[#e5e5e5] text-[10px] font-mono text-neutral-600">admin</span>
+                <% } %>
+                <span class="text-[10px] font-mono text-neutral-400 ml-auto">
+                  <%= new Date(c.created_at).toLocaleDateString('vi-VN') %>
+                </span>
+              </div>
+              <p class="text-xs text-neutral-600 line-clamp-2 pl-7"><%= c.content %></p>
+              <p class="text-[10px] font-mono text-neutral-400 pl-7">
+                <a href="/courses/<%= c.course_id %>/lessons/<%= c.lesson_id %>#discussion" class="hover:text-black transition">
+                  <i class="fa-solid fa-arrow-up-right-from-square text-[9px]"></i>
+                  <%= c.lesson_title %>
+                </a>
+              </p>
+            </div>
+          <% }) %>
+        <% } %>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Recent Students Table -->
+  <div class="bg-white border border-[#e5e5e5] rounded-2xl overflow-hidden">
+    <div class="p-4 border-b border-[#e5e5e5] bg-[#fafafa] flex items-center justify-between">
+      <div>
+        <div class="text-xs font-mono text-neutral-400">latest registrations</div>
+        <h2 class="text-sm font-semibold text-black">Học viên đăng ký gần đây</h2>
+      </div>
+      <a href="/admin/users" class="text-[11px] font-mono text-neutral-500 hover:text-black transition">quản lý →</a>
+    </div>
+    
+    <% if (recentStudents.length === 0) { %>
+      <div class="p-8 text-center text-xs font-mono text-neutral-400">Chưa có học viên nào.</div>
+    <% } else { %>
+      <div class="overflow-x-auto">
+        <table class="w-full text-left">
+          <thead>
+            <tr class="text-[11px] font-mono text-neutral-400 border-b border-[#e5e5e5]">
+              <th class="py-2.5 px-4">học viên</th>
+              <th class="py-2.5 px-4 hidden sm:table-cell">email</th>
+              <th class="py-2.5 px-4 text-center hidden md:table-cell">khóa đã đăng ký</th>
+              <th class="py-2.5 px-4 hidden lg:table-cell">ngày tham gia</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-[#e5e5e5]">
+            <% recentStudents.forEach((student) => { %>
+              <tr class="hover:bg-[#fafafa] transition text-sm">
+                <td class="py-3 px-4">
+                  <div class="flex items-center gap-2.5">
+                    <span class="w-6 h-6 rounded-full bg-black text-white text-[10px] font-bold flex items-center justify-center uppercase shrink-0">
+                      <%= student.full_name ? student.full_name.charAt(0) : 'U' %>
+                    </span>
+                    <span class="font-medium text-black text-xs"><%= student.full_name %></span>
+                  </div>
+                </td>
+                <td class="py-3 px-4 hidden sm:table-cell text-xs font-mono text-neutral-500"><%= student.email %></td>
+                <td class="py-3 px-4 text-center hidden md:table-cell">
+                  <span class="inline-flex items-center gap-1 text-[11px] font-mono px-2 py-0.5 rounded-full bg-[#fafafa] border border-[#e5e5e5] text-neutral-700">
+                    <%= student.enrolled_courses %>
+                  </span>
+                </td>
+                <td class="py-3 px-4 hidden lg:table-cell text-[11px] font-mono text-neutral-400">
+                  <%= new Date(student.created_at).toLocaleDateString('vi-VN') %>
+                </td>
+              </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      </div>
+    <% } %>
+  </div>
+
+</div>
+
+<%- include('../../partials/footer') %>

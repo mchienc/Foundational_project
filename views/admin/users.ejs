@@ -1,0 +1,135 @@
+<%- include('../../partials/header') %>
+
+<div class="space-y-6">
+
+  <!-- Header -->
+  <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-[#e5e5e5]">
+    <div>
+      <div class="text-xs font-mono text-neutral-400 mb-1">admin / user management</div>
+      <h1 class="text-2xl sm:text-3xl font-semibold tracking-tight text-black">Quản lý Người dùng</h1>
+      <p class="text-sm text-neutral-500 mt-1">
+        Xem, phân quyền và quản lý toàn bộ tài khoản trên hệ thống.
+      </p>
+    </div>
+    <a href="/admin/dashboard" class="self-start sm:self-auto inline-flex items-center gap-2 px-4 py-2 rounded-full border border-[#e5e5e5] hover:bg-[#fafafa] text-xs font-medium text-black transition">
+      <i class="fa-solid fa-arrow-left text-[9px]"></i>
+      <span>Về Dashboard</span>
+    </a>
+  </div>
+
+  <!-- Feedback Alerts -->
+  <% if (typeof query !== 'undefined' && query && query.error) { %>
+    <div class="flex items-center gap-2 p-3.5 rounded-xl bg-red-50 border border-red-200 text-red-700 text-xs font-mono">
+      <span class="w-1.5 h-1.5 rounded-full bg-red-500"></span>
+      <span><%= query.error %></span>
+    </div>
+  <% } %>
+
+  <!-- Users Table -->
+  <% if (userList.length === 0) { %>
+    <div class="border border-dashed border-[#e5e5e5] bg-white p-12 text-center rounded-2xl">
+      <p class="text-xs text-neutral-500 font-mono">Không có người dùng nào.</p>
+    </div>
+  <% } else { %>
+    <div class="bg-white border border-[#e5e5e5] rounded-2xl overflow-hidden">
+      <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse">
+          <thead>
+            <tr class="border-b border-[#e5e5e5] bg-[#fafafa] text-[11px] font-mono text-neutral-500">
+              <th class="py-3 px-4 w-10 text-center">#</th>
+              <th class="py-3 px-4">người dùng</th>
+              <th class="py-3 px-4 hidden sm:table-cell">email</th>
+              <th class="py-3 px-4 text-center hidden md:table-cell">vai trò</th>
+              <th class="py-3 px-4 text-center hidden md:table-cell">khóa đăng ký</th>
+              <th class="py-3 px-4 hidden lg:table-cell">ngày tham gia</th>
+              <th class="py-3 px-4 text-right">thao tác</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-[#e5e5e5]">
+            <% userList.forEach((u, i) => { %>
+              <tr class="hover:bg-[#fafafa] transition group">
+                <td class="py-3.5 px-4 text-center text-[11px] font-mono text-neutral-400">
+                  <%= (i + 1) < 10 ? '0' + (i + 1) : (i + 1) %>
+                </td>
+
+                <td class="py-3.5 px-4">
+                  <div class="flex items-center gap-2.5">
+                    <span class="w-7 h-7 rounded-full bg-black text-white text-[10px] font-bold flex items-center justify-center uppercase shrink-0">
+                      <%= u.full_name ? u.full_name.charAt(0) : 'U' %>
+                    </span>
+                    <div>
+                      <span class="font-medium text-black text-sm block"><%= u.full_name %></span>
+                      <span class="text-[10px] font-mono text-neutral-400 sm:hidden"><%= u.email %></span>
+                    </div>
+                  </div>
+                </td>
+
+                <td class="py-3.5 px-4 hidden sm:table-cell text-xs font-mono text-neutral-500"><%= u.email %></td>
+
+                <td class="py-3.5 px-4 text-center hidden md:table-cell">
+                  <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-mono <%= u.role === 'admin' ? 'bg-black text-white' : 'bg-[#fafafa] border border-[#e5e5e5] text-neutral-700' %>">
+                    <% if (u.role === 'admin') { %>
+                      <span class="w-1.5 h-1.5 rounded-full bg-[#27c93f]"></span>
+                    <% } %>
+                    <%= u.role %>
+                  </span>
+                </td>
+
+                <td class="py-3.5 px-4 text-center hidden md:table-cell text-xs font-mono text-neutral-500">
+                  <%= u.enrolled_courses %>
+                </td>
+
+                <td class="py-3.5 px-4 hidden lg:table-cell text-[11px] font-mono text-neutral-400">
+                  <%= new Date(u.created_at).toLocaleDateString('vi-VN') %>
+                </td>
+
+                <td class="py-3.5 px-4 text-right whitespace-nowrap">
+                  <div class="inline-flex items-center gap-1.5">
+
+                    <!-- Role Toggle Form -->
+                    <% if (u.id !== (typeof currentUser !== 'undefined' && currentUser ? currentUser.id : -1)) { %>
+                      <form action="/admin/users/<%= u.id %>/role?_method=POST" method="POST" class="inline-block">
+                        <input type="hidden" name="_method" value="POST">
+                        <input type="hidden" name="role" value="<%= u.role === 'admin' ? 'student' : 'admin' %>">
+                        <button 
+                          type="submit" 
+                          title="Chuyển vai trò" 
+                          class="px-3 py-1 rounded-full text-[11px] font-medium transition border border-[#e5e5e5] bg-[#fafafa] hover:bg-neutral-200 text-black"
+                          onclick="return confirm('Đổi vai trò của <%= u.full_name %> thành <%= u.role === 'admin' ? 'student' : 'admin' %>?')"
+                        >
+                          → <%= u.role === 'admin' ? 'student' : 'admin' %>
+                        </button>
+                      </form>
+
+                      <!-- Delete User Form -->
+                      <form 
+                        action="/admin/users/<%= u.id %>?_method=DELETE" 
+                        method="POST" 
+                        class="inline-block"
+                        onsubmit="return confirm('Xác nhận xóa tài khoản <%= u.full_name %>? Toàn bộ dữ liệu học tập của người này cũng sẽ bị xóa.');"
+                      >
+                        <button 
+                          type="submit" 
+                          title="Xóa người dùng"
+                          class="px-3 py-1 rounded-full bg-red-50 border border-red-200 hover:bg-red-100 text-red-600 text-[11px] font-medium transition"
+                        >
+                          xóa
+                        </button>
+                      </form>
+                    <% } else { %>
+                      <span class="text-[10px] font-mono text-neutral-300 px-2">tài khoản của bạn</span>
+                    <% } %>
+
+                  </div>
+                </td>
+              </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  <% } %>
+
+</div>
+
+<%- include('../../partials/footer') %>

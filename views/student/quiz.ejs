@@ -1,31 +1,87 @@
 <%- include('../partials/header') %>
 
-<h3 class="mb-4"><%= quiz.title %></h3>
+<div class="max-w-2xl mx-auto space-y-6">
 
-<% if (questions.length === 0) { %>
-  <p class="text-muted">Bài kiểm tra này chưa có câu hỏi nào.</p>
-<% } else { %>
-  <form method="POST" action="/quizzes/<%= quiz.id %>/submit">
-    <% questions.forEach((q, i) => { %>
-      <div class="card shadow-sm mb-3">
-        <div class="card-body">
-          <p class="fw-bold">Câu <%= i + 1 %>: <%= q.question_text %></p>
-          <% q.answers.forEach((a) => { %>
-            <div class="form-check">
-              <input class="form-check-input" type="radio"
-                     name="q_<%= q.id %>" value="<%= a.id %>"
-                     id="answer_<%= a.id %>" required>
-              <label class="form-check-label" for="answer_<%= a.id %>">
-                <%= a.answer_text %>
+  <!-- Header Card -->
+  <div class="bg-white border border-[#e5e5e5] rounded-2xl p-6 sm:p-8 space-y-2">
+    <div class="text-xs font-mono text-neutral-500">
+      assessment / kiểm tra trắc nghiệm
+    </div>
+    <h1 class="text-2xl sm:text-3xl font-semibold tracking-tight text-black">
+      <%= quiz.title %>
+    </h1>
+    <p class="text-xs sm:text-sm text-neutral-500">
+      Tổng cộng <%= questions.length %> câu hỏi. Chọn một đáp án cho mỗi câu và nhấn nộp bài.
+    </p>
+  </div>
+
+  <% if (questions.length === 0) { %>
+    <div class="border border-dashed border-[#e5e5e5] bg-white p-10 text-center rounded-2xl">
+      <p class="text-xs text-neutral-500">Bài kiểm tra này chưa có câu hỏi.</p>
+    </div>
+  <% } else { %>
+    <form method="POST" action="/quizzes/<%= quiz.id %>/submit" class="space-y-4">
+      
+      <% questions.forEach((q, i) => { %>
+        <div class="bg-white border border-[#e5e5e5] rounded-2xl p-5 sm:p-6 space-y-3">
+          
+          <!-- Question Title -->
+          <div class="flex items-start gap-3">
+            <span class="w-6 h-6 rounded-full bg-[#fafafa] border border-[#e5e5e5] text-neutral-700 flex items-center justify-center font-mono font-bold text-xs shrink-0 mt-0.5">
+              <%= i + 1 %>
+            </span>
+            <h3 class="text-sm sm:text-base font-semibold text-black leading-snug">
+              <%= q.question_text %>
+            </h3>
+          </div>
+
+          <!-- Answer Options as Pill Labels -->
+          <div class="space-y-2 pt-1">
+            <% q.answers.forEach((a) => { %>
+              <label 
+                for="answer_<%= a.id %>" 
+                class="group flex items-center gap-3 p-3 rounded-full border border-[#e5e5e5] bg-white hover:bg-[#fafafa] cursor-pointer transition has-[:checked]:border-black has-[:checked]:bg-[#fafafa]"
+              >
+                <input 
+                  class="sr-only" 
+                  type="radio"
+                  name="q_<%= q.id %>" 
+                  value="<%= a.id %>"
+                  id="answer_<%= a.id %>" 
+                  required
+                >
+                <div class="w-4 h-4 rounded-full border border-neutral-300 group-hover:border-black flex items-center justify-center shrink-0 transition group-has-[:checked]:border-black group-has-[:checked]:bg-black">
+                  <div class="w-1.5 h-1.5 rounded-full bg-white opacity-0 group-has-[:checked]:opacity-100"></div>
+                </div>
+
+                <span class="text-xs sm:text-sm text-neutral-700 group-has-[:checked]:text-black group-has-[:checked]:font-medium select-none">
+                  <%= a.answer_text %>
+                </span>
               </label>
-            </div>
-          <% }) %>
-        </div>
-      </div>
-    <% }) %>
+            <% }) %>
+          </div>
 
-    <button type="submit" class="btn btn-success">Nộp bài</button>
-  </form>
-<% } %>
+        </div>
+      <% }) %>
+
+      <!-- Submit Footer -->
+      <div class="bg-white border border-[#e5e5e5] rounded-2xl p-4 sm:p-5 flex flex-col sm:flex-row items-center justify-between gap-4">
+        <span class="text-xs font-mono text-neutral-400">
+          [i] hãy chắc chắn bạn đã chọn đủ <%= questions.length %> câu hỏi
+        </span>
+        
+        <button 
+          type="submit" 
+          class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-7 py-2.5 rounded-full bg-black text-white hover:bg-neutral-800 text-xs font-medium shadow-sm transition active:scale-95"
+        >
+          <span>Nộp bài thi</span>
+          <i class="fa-solid fa-arrow-right text-[10px]"></i>
+        </button>
+      </div>
+
+    </form>
+  <% } %>
+
+</div>
 
 <%- include('../partials/footer') %>

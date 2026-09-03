@@ -1,32 +1,72 @@
 <%- include('partials/header') %>
 
-<div class="row justify-content-center">
-  <div class="col-md-5">
-    <div class="card shadow-sm mt-5">
-      <div class="card-body p-4">
-        <h3 class="card-title mb-4 text-center">Đăng nhập</h3>
-
-        <% if (error) { %>
-          <div class="alert alert-danger"><%= error %></div>
-        <% } %>
-
-        <form method="POST" action="/login">
-          <div class="mb-3">
-            <label class="form-label">Email</label>
-            <input type="email" name="email" class="form-control" required>
-          </div>
-          <div class="mb-3">
-            <label class="form-label">Mật khẩu</label>
-            <input type="password" name="password" class="form-control" required>
-          </div>
-          <button type="submit" class="btn btn-primary w-100">Đăng nhập</button>
-        </form>
-
-        <p class="text-center mt-3 mb-0">
-          Chưa có tài khoản? <a href="/register">Đăng ký ngay</a>
-        </p>
+<div class="min-h-[70vh] flex flex-col justify-center items-center py-6 px-4">
+  <div class="w-full max-w-sm">
+    
+    <!-- Top Header -->
+    <div class="text-center mb-6">
+      <div class="w-8 h-8 rounded-full bg-black text-white flex items-center justify-center mx-auto mb-3 text-xs">
+        <i class="fa-solid fa-lock"></i>
       </div>
+      <h2 class="text-2xl font-semibold tracking-tight text-black">
+        Đăng nhập
+      </h2>
+      <p class="text-xs text-neutral-500 mt-1">Truy cập không gian học tập eduflow</p>
     </div>
+
+    <!-- Minimal Card -->
+    <div class="bg-white rounded-2xl border border-[#e5e5e5] p-6 sm:p-7">
+      
+      <% if (error) { %>
+        <div class="mb-5 flex items-center gap-2 p-3 rounded-xl bg-red-50 border border-red-200 text-red-700 text-xs font-mono">
+          <span class="w-1.5 h-1.5 rounded-full bg-red-500"></span>
+          <span><%= error %></span>
+        </div>
+      <% } %>
+
+      <form method="POST" action="/login" class="space-y-4">
+        <div>
+          <label class="block text-xs font-medium text-neutral-700 mb-1.5 ml-1">
+            Email
+          </label>
+          <input 
+            type="email" 
+            name="email" 
+            placeholder="name@example.com" 
+            class="w-full px-4 py-2 rounded-full border border-[#e5e5e5] text-black placeholder-neutral-400 text-sm focus:outline-none focus:border-black transition bg-white"
+            required
+          >
+        </div>
+
+        <div>
+          <label class="block text-xs font-medium text-neutral-700 mb-1.5 ml-1">
+            Mật khẩu
+          </label>
+          <input 
+            type="password" 
+            name="password" 
+            placeholder="••••••••" 
+            class="w-full px-4 py-2 rounded-full border border-[#e5e5e5] text-black placeholder-neutral-400 text-sm focus:outline-none focus:border-black transition bg-white"
+            required
+          >
+        </div>
+
+        <button 
+          type="submit" 
+          class="w-full !mt-5 py-2.5 px-4 bg-black hover:bg-neutral-800 text-white text-xs font-medium rounded-full transition active:scale-[0.99] flex items-center justify-center gap-2 shadow-sm"
+        >
+          <span>Đăng nhập</span>
+          <i class="fa-solid fa-arrow-right text-[10px]"></i>
+        </button>
+      </form>
+
+      <div class="mt-6 pt-5 border-t border-[#e5e5e5] text-center text-xs text-neutral-500">
+        <span>Chưa có tài khoản?</span>
+        <a href="/register" class="font-medium text-black hover:underline ml-1">Đăng ký</a>
+      </div>
+
+    </div>
+
   </div>
 </div>
 

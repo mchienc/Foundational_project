@@ -1,27 +1,159 @@
 <!DOCTYPE html>
-<html lang="vi">
+<html lang="vi" class="h-full bg-white">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title><%= typeof title !== 'undefined' ? title : 'Website Học Trực Tuyến' %></title>
-  <!-- Dùng Bootstrap qua CDN để có giao diện đẹp nhanh, không cần cài đặt -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <title><%= typeof title !== 'undefined' ? title : 'EduFlow' %></title>
+  
+  <!-- Google Fonts: Plus Jakarta Sans for rounded headlines & Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome 6 CDN -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+  <!-- Tailwind CSS CDN configured for Ollama DESIGN.md System -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'ui-sans-serif', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
+            mono: ['ui-monospace', 'SFMono-Regular', 'Menlo', 'Monaco', 'Consolas', 'monospace'],
+          },
+          colors: {
+            canvas: '#ffffff',
+            surface: {
+              soft: '#fafafa',
+              dark: '#171717',
+            },
+            hairline: '#e5e5e5',
+            'hairline-strong': '#d4d4d4',
+            traffic: {
+              red: '#ff5f56',
+              yellow: '#ffbd2e',
+              green: '#27c93f',
+            }
+          }
+        }
+      }
+    }
+  </script>
   <link rel="stylesheet" href="/css/style.css">
 </head>
-<body>
-  <nav class="navbar navbar-expand-lg navbar-dark bg-primary mb-4">
-    <div class="container">
-      <a class="navbar-brand" href="/">Học Trực Tuyến</a>
-      <div class="d-flex">
-        <% if (typeof currentUser !== 'undefined' && currentUser) { %>
-          <% if (currentUser.role === 'student') { %>
-            <a href="/courses" class="btn btn-outline-light btn-sm me-2">Khóa học</a>
-            <a href="/my-results" class="btn btn-outline-light btn-sm me-2">Lịch sử kết quả</a>
+<body class="min-h-full flex flex-col font-sans text-neutral-900 bg-white antialiased selection:bg-black selection:text-white">
+
+  <!-- Ollama-inspired Minimal Header -->
+  <header class="sticky top-0 z-50 bg-white/90 backdrop-blur-sm border-b border-[#e5e5e5]">
+    <div class="max-w-5xl mx-auto px-4 sm:px-6">
+      <div class="flex items-center justify-between h-14">
+        
+        <!-- Logo & Navigation -->
+        <div class="flex items-center gap-6 sm:gap-8">
+          <a href="<%= (typeof currentUser !== 'undefined' && currentUser && currentUser.role === 'admin') ? '/admin/dashboard' : '/courses' %>" class="flex items-center gap-2 group">
+            <!-- Ollama-like Minimal Icon -->
+            <div class="w-7 h-7 rounded-full bg-black text-white flex items-center justify-center font-bold text-xs group-hover:scale-105 transition">
+              <i class="fa-solid fa-graduation-cap text-[11px]"></i>
+            </div>
+            <span class="text-base font-semibold tracking-tight text-black">
+              eduflow
+            </span>
+          </a>
+
+          <!-- Nav links as soft pills -->
+          <% if (typeof currentUser !== 'undefined' && currentUser) { %>
+            <nav class="hidden md:flex items-center gap-1 text-sm">
+              <% if (currentUser.role === 'student') { %>
+                <a href="/courses" class="px-3.5 py-1 rounded-full text-neutral-600 hover:text-black hover:bg-[#fafafa] transition font-medium">
+                  Khóa học
+                </a>
+                <a href="/my-results" class="px-3.5 py-1 rounded-full text-neutral-600 hover:text-black hover:bg-[#fafafa] transition font-medium">
+                  Lịch sử kết quả
+                </a>
+              <% } else if (currentUser.role === 'admin') { %>
+                <a href="/admin/dashboard" class="px-3.5 py-1 rounded-full text-neutral-600 hover:text-black hover:bg-[#fafafa] transition font-medium">
+                  Tổng quan
+                </a>
+                <a href="/admin/courses" class="px-3.5 py-1 rounded-full text-neutral-600 hover:text-black hover:bg-[#fafafa] transition font-medium">
+                  Khóa học
+                </a>
+                <a href="/admin/users" class="px-3.5 py-1 rounded-full text-neutral-600 hover:text-black hover:bg-[#fafafa] transition font-medium">
+                  Người dùng
+                </a>
+              <% } %>
+            </nav>
           <% } %>
-          <span class="navbar-text text-white me-3">Xin chào, <%= currentUser.full_name %></span>
-          <a href="/logout" class="btn btn-outline-light btn-sm">Đăng xuất</a>
-        <% } %>
+        </div>
+
+        <!-- Right Side: User Profile & Actions -->
+        <div class="flex items-center gap-2.5">
+          <% if (typeof currentUser !== 'undefined' && currentUser) { %>
+            <!-- User Pill -->
+            <div class="flex items-center gap-2 py-1 px-3 rounded-full bg-[#fafafa] border border-[#e5e5e5] text-xs text-neutral-800">
+              <span class="w-4 h-4 rounded-full bg-black text-white text-[9px] font-bold flex items-center justify-center">
+                <%= currentUser.full_name ? currentUser.full_name.charAt(0).toUpperCase() : 'U' %>
+              </span>
+              <span class="font-medium hidden sm:inline"><%= currentUser.full_name %></span>
+              <span class="text-[10px] text-neutral-500 font-mono">
+                <%= currentUser.role === 'admin' ? 'admin' : 'student' %>
+              </span>
+            </div>
+
+            <!-- Logout Pill -->
+            <a href="/logout" title="Đăng xuất" class="px-3 py-1 rounded-full text-xs font-medium text-neutral-500 hover:text-black hover:bg-[#fafafa] border border-transparent hover:border-[#e5e5e5] transition">
+              <i class="fa-solid fa-arrow-right-from-bracket text-[10px]"></i>
+              <span class="hidden sm:inline ml-1">Thoát</span>
+            </a>
+
+            <!-- Mobile Menu Toggle Button -->
+            <button id="mobile-menu-btn" type="button" class="md:hidden p-1.5 text-neutral-600 hover:bg-[#fafafa] rounded-full">
+              <i class="fa-solid fa-bars text-sm"></i>
+            </button>
+          <% } else { %>
+            <div class="flex items-center gap-2 text-sm">
+              <a href="/login" class="px-4 py-1.5 rounded-full text-neutral-600 hover:text-black transition font-medium">
+                Đăng nhập
+              </a>
+              <a href="/register" class="px-4 py-1.5 rounded-full bg-black text-white hover:bg-neutral-800 transition font-medium text-xs">
+                Đăng ký
+              </a>
+            </div>
+          <% } %>
+        </div>
+
       </div>
+
+      <!-- Mobile Menu -->
+      <% if (typeof currentUser !== 'undefined' && currentUser) { %>
+        <div id="mobile-menu" class="hidden md:hidden py-2 border-t border-[#e5e5e5] space-y-1 text-sm font-medium">
+          <% if (currentUser.role === 'student') { %>
+            <a href="/courses" class="block px-3 py-1.5 rounded-lg text-neutral-700 hover:bg-[#fafafa]">
+              Khóa học
+            </a>
+            <a href="/my-results" class="block px-3 py-1.5 rounded-lg text-neutral-700 hover:bg-[#fafafa]">
+              Lịch sử kết quả
+            </a>
+          <% } else if (currentUser.role === 'admin') { %>
+            <a href="/admin/dashboard" class="block px-3 py-1.5 rounded-lg text-neutral-700 hover:bg-[#fafafa]">
+              Tổng quan
+            </a>
+            <a href="/admin/courses" class="block px-3 py-1.5 rounded-lg text-neutral-700 hover:bg-[#fafafa]">
+              Quản lý khóa học
+            </a>
+            <a href="/admin/users" class="block px-3 py-1.5 rounded-lg text-neutral-700 hover:bg-[#fafafa]">
+              Quản lý người dùng
+            </a>
+          <% } %>
+          <div class="pt-2 border-t border-[#e5e5e5] flex items-center justify-between px-3 text-xs">
+            <span class="text-neutral-500"><%= currentUser.full_name %></span>
+            <a href="/logout" class="text-neutral-900 font-semibold hover:underline">Đăng xuất</a>
+          </div>
+        </div>
+      <% } %>
     </div>
-  </nav>
-  <div class="container">
+  </header>
+
+  <!-- Main Container (Ollama clean max-w-5xl) -->
+  <main class="flex-1 max-w-5xl w-full mx-auto px-4 sm:px-6 py-10 sm:py-14">

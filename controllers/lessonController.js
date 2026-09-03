@@ -12,7 +12,14 @@ async function index(req, res) {
       return res.status(404).send('Không tìm thấy khóa học.');
     }
     const [lessons] = await db.query(
-      'SELECT * FROM lessons WHERE course_id = ? ORDER BY order_index ASC',
+      `SELECT l.*,
+              q.id AS quiz_id,
+              q.title AS quiz_title,
+              (SELECT COUNT(*) FROM questions WHERE quiz_id = q.id) AS question_count
+       FROM lessons l
+       LEFT JOIN quizzes q ON q.lesson_id = l.id
+       WHERE l.course_id = ?
+       ORDER BY l.order_index ASC`,
       [courseId]
     );
     res.render('admin/lessons/index', { course: courses[0], lessons });
@@ -41,7 +48,7 @@ async function showCreateForm(req, res) {
 async function create(req, res) {
   try {
     const { courseId } = req.params;
-    const { title, content, order_index } = req.body;
+    const { title, content, video_url, attachment_url, order_index } = req.body;
 
     if (!title || title.trim() === '') {
       const [courses] = await db.query('SELECT * FROM courses WHERE id = ?', [courseId]);
@@ -52,8 +59,8 @@ async function create(req, res) {
     }
 
     await db.query(
-      'INSERT INTO lessons (course_id, title, content, order_index) VALUES (?, ?, ?, ?)',
-      [courseId, title, content || null, order_index || 0]
+      'INSERT INTO lessons (course_id, title, content, video_url, attachment_url, order_index) VALUES (?, ?, ?, ?, ?, ?)',
+      [courseId, title.trim(), content || null, video_url ? video_url.trim() : null, attachment_url ? attachment_url.trim() : null, order_index || 0]
     );
 
     res.redirect(`/admin/courses/${courseId}/lessons`);
@@ -83,7 +90,7 @@ async function showEditForm(req, res) {
 async function update(req, res) {
   try {
     const { courseId, id } = req.params;
-    const { title, content, order_index } = req.body;
+    const { title, content, video_url, attachment_url, order_index } = req.body;
 
     if (!title || title.trim() === '') {
       const [courses] = await db.query('SELECT * FROM courses WHERE id = ?', [courseId]);
@@ -96,8 +103,8 @@ async function update(req, res) {
     }
 
     await db.query(
-      'UPDATE lessons SET title = ?, content = ?, order_index = ? WHERE id = ?',
-      [title, content || null, order_index || 0, id]
+      'UPDATE lessons SET title = ?, content = ?, video_url = ?, attachment_url = ?, order_index = ? WHERE id = ?',
+      [title.trim(), content || null, video_url ? video_url.trim() : null, attachment_url ? attachment_url.trim() : null, order_index || 0, id]
     );
 
     res.redirect(`/admin/courses/${courseId}/lessons`);

@@ -1,37 +1,324 @@
 <%- include('../partials/header') %>
 
-<div class="mb-3">
-  <a href="/courses/<%= course.id %>" class="text-decoration-none">&larr; Quay lại khóa học: <%= course.title %></a>
-</div>
+<div class="space-y-6">
 
-<div class="row">
-  <!-- Menu bên trái: danh sách bài học để chuyển qua lại -->
-  <div class="col-md-3">
-    <div class="list-group">
-      <% allLessons.forEach((l) => { %>
-        <a href="/courses/<%= course.id %>/lessons/<%= l.id %>"
-           class="list-group-item list-group-item-action <%= l.id === lesson.id ? 'active' : '' %>">
-          <%= l.title %>
-        </a>
-      <% }) %>
-    </div>
-  </div>
+  <!-- Breadcrumbs -->
+  <nav class="text-xs font-mono text-neutral-500 flex items-center gap-2">
+    <a href="/courses" class="hover:text-black transition">khóa học</a>
+    <span>/</span>
+    <a href="/courses/<%= course.id %>" class="hover:text-black transition truncate max-w-xs"><%= course.title %></a>
+    <span>/</span>
+    <span class="text-black truncate max-w-xs"><%= lesson.title %></span>
+  </nav>
 
-  <!-- Nội dung bài học bên phải -->
-  <div class="col-md-9">
-    <div class="card shadow-sm">
-      <div class="card-body">
-        <h3><%= lesson.title %></h3>
-        <hr>
-        <div><%- lesson.content %></div>
+  <!-- Layout Grid -->
+  <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+    
+    <!-- Left Navigation Sidebar: Lesson Index & Progress -->
+    <aside class="lg:col-span-4 order-2 lg:order-1">
+      <div class="bg-white border border-[#e5e5e5] rounded-2xl overflow-hidden sticky top-20">
+        
+        <!-- Sidebar Header with Course Progress -->
+        <div class="p-4 border-b border-[#e5e5e5] bg-[#fafafa] space-y-2">
+          <div class="flex items-center justify-between">
+            <h3 class="text-xs font-semibold text-black uppercase font-mono tracking-wider">
+              Tiến độ khóa học
+            </h3>
+            <span class="text-xs font-mono font-medium text-black">
+              <%= typeof progress !== 'undefined' ? progress : 0 %>%
+            </span>
+          </div>
 
-        <% if (quiz) { %>
-          <hr>
-          <a href="/quizzes/<%= quiz.id %>" class="btn btn-success">Làm bài kiểm tra</a>
-        <% } %>
+          <!-- Slim Progress Bar (Ollama style) -->
+          <div class="w-full bg-white border border-[#e5e5e5] h-2 rounded-full overflow-hidden p-0.5">
+            <div class="bg-black h-full rounded-full transition-all duration-300" style="width: <%= typeof progress !== 'undefined' ? progress : 0 %>%"></div>
+          </div>
+
+          <div class="flex items-center justify-between text-[11px] font-mono text-neutral-400 pt-0.5">
+            <span>đã học <%= (typeof completedLessonIds !== 'undefined' ? completedLessonIds.length : 0) %> / <%= allLessons.length %> bài</span>
+            <span><%= (typeof completedLessonIds !== 'undefined' && completedLessonIds.length === allLessons.length) ? 'hoàn thành' : 'đang học' %></span>
+          </div>
+        </div>
+
+        <!-- Lessons Scrollable List -->
+        <div class="max-h-[60vh] overflow-y-auto p-2 space-y-1">
+          <% allLessons.forEach((l, idx) => { %>
+            <% 
+              const isActive = (l.id === lesson.id); 
+              const isLCompleted = (typeof completedLessonIds !== 'undefined' && completedLessonIds.includes(l.id));
+            %>
+            <a 
+              href="/courses/<%= course.id %>/lessons/<%= l.id %>"
+              class="flex items-center gap-2.5 p-2 rounded-full text-xs transition duration-150 group <%= isActive ? 'bg-black text-white font-medium shadow-sm' : 'text-neutral-700 hover:bg-[#fafafa] hover:text-black' %>"
+            >
+              <!-- Index / Checkmark Pill -->
+              <% if (isLCompleted) { %>
+                <span class="w-5 h-5 rounded-full <%= isActive ? 'bg-[#27c93f] text-black' : 'bg-[#27c93f]/20 text-[#27c93f]' %> flex items-center justify-center text-[10px] font-bold shrink-0">
+                  <i class="fa-solid fa-check"></i>
+                </span>
+              <% } else { %>
+                <span class="w-5 h-5 rounded-full <%= isActive ? 'bg-neutral-800 text-white' : 'bg-[#fafafa] border border-[#e5e5e5] text-neutral-600' %> flex items-center justify-center font-mono text-[10px] shrink-0">
+                  <%= idx + 1 %>
+                </span>
+              <% } %>
+
+              <span class="flex-1 truncate <%= isLCompleted && !isActive ? 'text-neutral-500' : '' %>">
+                <%= l.title %>
+              </span>
+
+              <% if (isActive) { %>
+                <span class="w-1.5 h-1.5 rounded-full bg-[#27c93f] mr-1 shrink-0"></span>
+              <% } %>
+            </a>
+          <% }) %>
+        </div>
+
       </div>
-    </div>
+    </aside>
+
+    <!-- Right Main Area: Reader -->
+    <section class="lg:col-span-8 order-1 lg:order-2 space-y-6">
+      
+      <article class="bg-white border border-[#e5e5e5] rounded-2xl p-6 sm:p-10">
+        
+        <!-- Header -->
+        <div class="pb-6 border-b border-[#e5e5e5] flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div>
+            <div class="text-xs font-mono text-neutral-400 mb-2">
+              module <%= lesson.order_index || 1 %>
+            </div>
+            <h1 class="text-2xl sm:text-3xl font-semibold text-black tracking-tight leading-snug">
+              <%= lesson.title %>
+            </h1>
+          </div>
+
+          <!-- Lesson Completion Status Badge Pill -->
+          <% if (typeof isCompleted !== 'undefined' && isCompleted) { %>
+            <div class="self-start sm:self-auto shrink-0 inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#fafafa] border border-[#e5e5e5] text-xs font-mono text-black">
+              <span class="w-2 h-2 rounded-full bg-[#27c93f]"></span>
+              <span>đã hoàn thành</span>
+            </div>
+          <% } %>
+        </div>
+
+        <!-- Video Player (if videoEmbedUrl exists) -->
+        <% if (typeof videoEmbedUrl !== 'undefined' && videoEmbedUrl) { %>
+          <div class="my-6 rounded-2xl overflow-hidden border border-[#e5e5e5] bg-black aspect-video shadow-sm">
+            <iframe 
+              src="<%= videoEmbedUrl %>" 
+              title="<%= lesson.title %>" 
+              class="w-full h-full border-0" 
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+              allowfullscreen
+            ></iframe>
+          </div>
+        <% } %>
+
+        <!-- Content -->
+        <div class="py-6 lesson-content">
+          <%- lesson.content %>
+        </div>
+
+        <!-- Attachments Download Card (if attachment_url exists) -->
+        <% if (lesson.attachment_url) { %>
+          <div class="my-6 p-4 rounded-2xl border border-[#e5e5e5] bg-[#fafafa] flex items-center justify-between gap-4">
+            <div class="flex items-center gap-3 min-w-0">
+              <div class="w-8 h-8 rounded-full bg-white border border-[#e5e5e5] flex items-center justify-center text-black text-xs shrink-0">
+                <i class="fa-solid fa-paperclip"></i>
+              </div>
+              <div class="min-w-0">
+                <span class="text-xs font-semibold text-black block truncate">Tài liệu đính kèm bài giảng</span>
+                <span class="text-[11px] font-mono text-neutral-400 block truncate"><%= lesson.attachment_url %></span>
+              </div>
+            </div>
+            <a 
+              href="<%= lesson.attachment_url %>" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              class="shrink-0 inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-black text-white hover:bg-neutral-800 text-xs font-medium transition"
+            >
+              <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i>
+              <span>Mở tài liệu</span>
+            </a>
+          </div>
+        <% } %>
+
+        <!-- Lesson Bottom Action Bar (Navigation & Completion Toggle) -->
+        <div class="mt-8 pt-6 border-t border-[#e5e5e5] flex flex-col sm:flex-row items-center justify-between gap-4">
+          
+          <!-- Previous Lesson Button -->
+          <div>
+            <% if (typeof prevLesson !== 'undefined' && prevLesson) { %>
+              <a 
+                href="/courses/<%= course.id %>/lessons/<%= prevLesson.id %>" 
+                class="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-[#e5e5e5] bg-white hover:bg-[#fafafa] text-xs font-medium text-black transition"
+              >
+                <i class="fa-solid fa-arrow-left text-[9px]"></i>
+                <span>Bài trước</span>
+              </a>
+            <% } else { %>
+              <span class="text-xs font-mono text-neutral-300">bài đầu tiên</span>
+            <% } %>
+          </div>
+
+          <!-- Mark Completed / Unmark Toggle Form -->
+          <div class="flex items-center gap-2">
+            <form action="/courses/<%= course.id %>/lessons/<%= lesson.id %>/toggle-complete<%= (typeof nextLesson !== 'undefined' && nextLesson) ? '?next=1' : '' %>" method="POST">
+              <% if (typeof isCompleted !== 'undefined' && isCompleted) { %>
+                <button 
+                  type="submit" 
+                  title="Bấm để hủy hoàn thành bài học này"
+                  class="inline-flex items-center gap-2 px-5 py-2 rounded-full border border-[#e5e5e5] bg-[#fafafa] hover:bg-neutral-200 text-neutral-800 text-xs font-medium transition"
+                >
+                  <span class="w-2 h-2 rounded-full bg-[#27c93f]"></span>
+                  <span>Đã học xong (Bỏ chọn)</span>
+                </button>
+              <% } else { %>
+                <button 
+                  type="submit" 
+                  class="inline-flex items-center gap-2 px-5 py-2 rounded-full bg-black text-white hover:bg-neutral-800 text-xs font-medium transition shadow-sm active:scale-95"
+                >
+                  <i class="fa-solid fa-check text-[10px]"></i>
+                  <span><%= (typeof nextLesson !== 'undefined' && nextLesson) ? 'Hoàn thành & Bài tiếp theo' : 'Hoàn thành bài học' %></span>
+                </button>
+              <% } %>
+            </form>
+          </div>
+
+          <!-- Next Lesson Button -->
+          <div>
+            <% if (typeof nextLesson !== 'undefined' && nextLesson) { %>
+              <a 
+                href="/courses/<%= course.id %>/lessons/<%= nextLesson.id %>" 
+                class="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-[#e5e5e5] bg-white hover:bg-[#fafafa] text-xs font-medium text-black transition"
+              >
+                <span>Bài sau</span>
+                <i class="fa-solid fa-arrow-right text-[9px]"></i>
+              </a>
+            <% } else { %>
+              <a 
+                href="/courses/<%= course.id %>" 
+                class="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-[#e5e5e5] bg-[#fafafa] hover:bg-neutral-200 text-xs font-medium text-black transition"
+              >
+                <span>Về khóa học</span>
+                <i class="fa-solid fa-check text-[9px]"></i>
+              </a>
+            <% } %>
+          </div>
+
+        </div>
+
+        <!-- Attached Quiz CTA Card -->
+        <% if (quiz) { %>
+          <div class="mt-8 pt-8 border-t border-[#e5e5e5]">
+            <div class="rounded-2xl border border-[#e5e5e5] bg-[#fafafa] p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+              <div>
+                <span class="text-xs font-mono text-neutral-500 block mb-1">
+                  assessment / trắc nghiệm
+                </span>
+                <h3 class="text-base font-semibold text-black">
+                  <%= quiz.title %>
+                </h3>
+                <p class="text-xs text-neutral-500 mt-0.5">
+                  Kiểm tra nhanh mức độ tiếp thu nội dung bài học.
+                </p>
+              </div>
+
+              <a 
+                href="/quizzes/<%= quiz.id %>" 
+                class="shrink-0 inline-flex items-center gap-2 px-6 py-2.5 rounded-full bg-black text-white hover:bg-neutral-800 text-xs font-medium shadow-sm transition active:scale-95"
+              >
+                <span>Làm bài kiểm tra</span>
+                <i class="fa-solid fa-arrow-right text-[9px]"></i>
+              </a>
+            </div>
+          </div>
+        <% } %>
+
+        <!-- Lesson Discussion & Q&A Section -->
+        <div id="discussion" class="mt-10 pt-8 border-t border-[#e5e5e5] space-y-6">
+          <div class="flex items-center justify-between">
+            <div>
+              <span class="text-xs font-mono text-neutral-400 block mb-0.5">q&a / trao đổi bài học</span>
+              <h3 class="text-base font-semibold text-black">Hỏi đáp & Thảo luận</h3>
+            </div>
+            <span class="text-xs font-mono text-neutral-500 bg-[#fafafa] border border-[#e5e5e5] px-3 py-1 rounded-full">
+              <%= (typeof comments !== 'undefined' ? comments.length : 0) %> bình luận
+            </span>
+          </div>
+
+          <!-- Post Comment Form -->
+          <form action="/courses/<%= course.id %>/lessons/<%= lesson.id %>/comments" method="POST" class="space-y-3">
+            <textarea 
+              name="content" 
+              rows="3" 
+              placeholder="Đặt câu hỏi hoặc chia sẻ thắc mắc của bạn về bài giảng..." 
+              class="w-full px-4 py-3 rounded-2xl border border-[#e5e5e5] text-black placeholder-neutral-400 text-xs sm:text-sm focus:outline-none focus:border-black transition bg-[#fafafa] focus:bg-white leading-relaxed"
+              required
+            ></textarea>
+            <div class="flex items-center justify-end">
+              <button 
+                type="submit" 
+                class="inline-flex items-center gap-2 px-6 py-2 rounded-full bg-black text-white hover:bg-neutral-800 text-xs font-medium transition shadow-sm active:scale-95"
+              >
+                <i class="fa-regular fa-paper-plane text-[10px]"></i>
+                <span>Gửi bình luận</span>
+              </button>
+            </div>
+          </form>
+
+          <!-- Comments List -->
+          <% if (typeof comments !== 'undefined' && comments.length > 0) { %>
+            <div class="space-y-3 pt-2">
+              <% comments.forEach((c) => { %>
+                <div class="p-4 rounded-2xl border border-[#e5e5e5] bg-[#fafafa] space-y-2 group hover:border-neutral-300 transition">
+                  <div class="flex items-center justify-between gap-3">
+                    <div class="flex items-center gap-2">
+                      <span class="w-6 h-6 rounded-full bg-black text-white text-[10px] font-bold flex items-center justify-center uppercase shrink-0">
+                        <%= c.full_name ? c.full_name.charAt(0) : 'U' %>
+                      </span>
+                      <span class="text-xs font-semibold text-black"><%= c.full_name %></span>
+                      <% if (c.role === 'admin') { %>
+                        <span class="px-2 py-0.5 rounded-full bg-white border border-[#e5e5e5] text-[10px] font-mono text-neutral-700">giảng viên</span>
+                      <% } %>
+                      <span class="text-[11px] font-mono text-neutral-400 hidden sm:inline">
+                        &bull; <%= new Date(c.created_at).toLocaleString('vi-VN') %>
+                      </span>
+                    </div>
+
+                    <!-- Delete Comment button (if author or admin) -->
+                    <% if (typeof currentUser !== 'undefined' && currentUser && (currentUser.id === c.user_id || currentUser.role === 'admin')) { %>
+                      <form 
+                        action="/courses/<%= course.id %>/lessons/<%= lesson.id %>/comments/<%= c.id %>?_method=DELETE" 
+                        method="POST" 
+                        onsubmit="return confirm('Xác nhận xóa bình luận này?');"
+                      >
+                        <button type="submit" class="text-neutral-400 hover:text-red-600 text-xs transition p-1" title="Xóa bình luận">
+                          <i class="fa-regular fa-trash-can text-[11px]"></i>
+                        </button>
+                      </form>
+                    <% } %>
+                  </div>
+                  
+                  <p class="text-xs sm:text-sm text-neutral-700 leading-relaxed pl-8">
+                    <%= c.content %>
+                  </p>
+                </div>
+              <% }) %>
+            </div>
+          <% } else { %>
+            <div class="p-6 rounded-2xl border border-dashed border-[#e5e5e5] bg-[#fafafa] text-center">
+              <p class="text-xs text-neutral-500 font-mono">Chưa có câu hỏi nào. Hãy là người đầu tiên đặt câu hỏi cho bài giảng này!</p>
+            </div>
+          <% } %>
+        </div>
+
+      </article>
+
+    </section>
+
   </div>
+
 </div>
 
 <%- include('../partials/footer') %>

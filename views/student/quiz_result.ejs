@@ -1,44 +1,107 @@
 <%- include('../partials/header') %>
 
-<div class="card shadow-sm mb-4">
-  <div class="card-body text-center">
-    <h3><%= result.quiz_title %></h3>
-    <p class="display-6 fw-bold <%= result.score >= 5 ? 'text-success' : 'text-danger' %>">
-      Điểm: <%= result.score %> / 10
-    </p>
-    <p class="text-muted">Làm lúc: <%= new Date(result.taken_at).toLocaleString('vi-VN') %></p>
-  </div>
-</div>
+<div class="max-w-2xl mx-auto space-y-8">
 
-<h4 class="mb-3">Chi tiết từng câu</h4>
+  <!-- Score Summary Card -->
+  <div class="bg-white border border-[#e5e5e5] rounded-2xl p-6 sm:p-8 text-center space-y-4">
+    <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-mono border border-[#e5e5e5] bg-[#fafafa]">
+      <span class="w-2 h-2 rounded-full <%= result.score >= 5 ? 'bg-[#27c93f]' : 'bg-[#ff5f56]' %>"></span>
+      <span><%= result.score >= 8 ? 'kết quả: xuất sắc' : (result.score >= 5 ? 'kết quả: đạt' : 'kết quả: cần ôn tập') %></span>
+    </div>
 
-<% details.forEach((d, i) => { %>
-  <div class="card mb-3 <%= d.is_correct ? 'border-success' : 'border-danger' %>">
-    <div class="card-body">
-      <p class="fw-bold">
-        Câu <%= i + 1 %>: <%= d.question_text %>
-        <% if (d.is_correct) { %>
-          <span class="badge bg-success">Đúng</span>
-        <% } else { %>
-          <span class="badge bg-danger">Sai</span>
-        <% } %>
+    <h1 class="text-xl sm:text-2xl font-semibold tracking-tight text-black">
+      <%= result.quiz_title %>
+    </h1>
+
+    <!-- Score Display -->
+    <div class="py-2">
+      <div class="text-6xl font-semibold text-black tracking-tight font-mono">
+        <%= result.score %><span class="text-2xl text-neutral-400 font-normal">/10</span>
+      </div>
+      <p class="text-xs text-neutral-400 font-mono mt-2">
+        hoàn thành lúc: <%= new Date(result.taken_at).toLocaleString('vi-VN') %>
       </p>
-      <ul class="list-unstyled mb-0">
-        <% d.answers.forEach((a) => { %>
-          <li class="
-            <%= a.is_correct ? 'text-success fw-bold' : '' %>
-            <%= (a.id === d.selected_answer_id && !a.is_correct) ? 'text-danger text-decoration-line-through' : '' %>
-          ">
-            <%= a.answer_text %>
-            <% if (a.is_correct) { %> (đáp án đúng)<% } %>
-            <% if (a.id === d.selected_answer_id && !a.is_correct) { %> (bạn đã chọn)<% } %>
-          </li>
-        <% }) %>
-      </ul>
+    </div>
+
+    <!-- Actions -->
+    <div class="flex flex-wrap items-center justify-center gap-3 pt-2">
+      <a 
+        href="/my-results" 
+        class="px-5 py-2 rounded-full bg-black text-white hover:bg-neutral-800 text-xs font-medium transition"
+      >
+        Xem lịch sử
+      </a>
+      <a 
+        href="/courses" 
+        class="px-5 py-2 rounded-full border border-[#e5e5e5] bg-white hover:bg-[#fafafa] text-black text-xs font-medium transition"
+      >
+        Về danh sách khóa học
+      </a>
     </div>
   </div>
-<% }) %>
 
-<a href="/my-results" class="btn btn-secondary">Xem lịch sử kết quả</a>
+  <!-- Detailed Questions Breakdown -->
+  <div class="space-y-4">
+    <div class="flex items-center justify-between">
+      <h2 class="text-sm font-semibold text-black font-mono uppercase tracking-wider">Chi tiết câu hỏi & đáp án</h2>
+      <span class="text-xs font-mono text-neutral-400"><%= details.length %> câu hỏi</span>
+    </div>
+
+    <% details.forEach((d, i) => { %>
+      <div class="bg-white border border-[#e5e5e5] rounded-2xl p-5 space-y-3">
+        
+        <!-- Question Title & Result Status -->
+        <div class="flex items-start justify-between gap-3">
+          <div class="flex items-start gap-2.5">
+            <span class="w-6 h-6 rounded-full bg-[#fafafa] border border-[#e5e5e5] text-neutral-700 flex items-center justify-center font-mono font-bold text-xs shrink-0 mt-0.5">
+              <%= i + 1 %>
+            </span>
+            <h3 class="text-sm sm:text-base font-semibold text-black leading-snug">
+              <%= d.question_text %>
+            </h3>
+          </div>
+
+          <span class="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full text-xs font-mono shrink-0 <%= d.is_correct ? 'bg-[#fafafa] border border-[#e5e5e5] text-black' : 'bg-red-50 border border-red-200 text-red-700' %>">
+            <span class="w-1.5 h-1.5 rounded-full <%= d.is_correct ? 'bg-[#27c93f]' : 'bg-[#ff5f56]' %>"></span>
+            <%= d.is_correct ? 'đúng' : 'sai' %>
+          </span>
+        </div>
+
+        <!-- Answers List -->
+        <div class="space-y-1.5 pt-1">
+          <% d.answers.forEach((a) => { %>
+            <% 
+              const isUserChoice = (a.id === d.selected_answer_id);
+              const isCorrectAnswer = a.is_correct;
+            %>
+            <div class="flex items-center justify-between gap-3 p-2.5 rounded-xl border text-xs sm:text-sm transition <%= 
+              isCorrectAnswer 
+                ? 'border-emerald-300 bg-emerald-50/50 text-neutral-900 font-medium' 
+                : (isUserChoice && !isCorrectAnswer ? 'border-red-200 bg-red-50/40 text-red-800' : 'border-[#e5e5e5] bg-white text-neutral-600') 
+            %>">
+              <div class="flex items-center gap-2.5">
+                <span class="w-1.5 h-1.5 rounded-full <%= isCorrectAnswer ? 'bg-[#27c93f]' : (isUserChoice ? 'bg-[#ff5f56]' : 'bg-neutral-300') %>"></span>
+                <span class="<%= (isUserChoice && !isCorrectAnswer) ? 'line-through decoration-red-400' : '' %>">
+                  <%= a.answer_text %>
+                </span>
+              </div>
+
+              <div class="text-[10px] font-mono shrink-0">
+                <% if (isCorrectAnswer) { %>
+                  <span class="text-emerald-700 font-medium">[đáp án đúng]</span>
+                <% } %>
+                <% if (isUserChoice) { %>
+                  <span class="ml-1 <%= isCorrectAnswer ? 'text-emerald-700 font-medium' : 'text-red-700 font-medium' %>">[bạn chọn]</span>
+                <% } %>
+              </div>
+            </div>
+          <% }) %>
+        </div>
+
+      </div>
+    <% }) %>
+  </div>
+
+</div>
 
 <%- include('../partials/footer') %>

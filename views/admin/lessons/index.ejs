@@ -1,41 +1,150 @@
 <%- include('../../partials/header') %>
 
-<div class="mb-3">
-  <a href="/admin/courses" class="text-decoration-none">&larr; Quay lại danh sách khóa học</a>
-</div>
+<div class="space-y-6">
 
-<div class="d-flex justify-content-between align-items-center mb-3">
-  <h3>Bài học của khóa: <%= course.title %></h3>
-  <a href="/admin/courses/<%= course.id %>/lessons/new" class="btn btn-primary">+ Thêm bài học</a>
-</div>
+  <!-- Breadcrumb -->
+  <nav class="text-xs font-mono text-neutral-500 flex items-center gap-2">
+    <a href="/admin/courses" class="hover:text-black transition">&larr; quay lại quản lý khóa học</a>
+    <span>/</span>
+    <span class="text-black truncate max-w-sm"><%= course.title %></span>
+    <span>/</span>
+    <span class="text-neutral-400">bài học</span>
+  </nav>
 
-<% if (lessons.length === 0) { %>
-  <p class="text-muted">Chưa có bài học nào trong khóa học này.</p>
-<% } else { %>
-  <table class="table table-bordered bg-white">
-    <thead class="table-light">
-      <tr>
-        <th style="width: 80px;">Thứ tự</th>
-        <th>Tên bài học</th>
-        <th style="width: 260px;">Hành động</th>
-      </tr>
-    </thead>
-    <tbody>
-      <% lessons.forEach((lesson) => { %>
-        <tr>
-          <td><%= lesson.order_index %></td>
-          <td><%= lesson.title %></td>
-          <td>
-            <a href="/admin/courses/<%= course.id %>/lessons/<%= lesson.id %>/edit" class="btn btn-sm btn-warning">Sửa</a>
-            <form action="/admin/courses/<%= course.id %>/lessons/<%= lesson.id %>?_method=DELETE" method="POST" class="d-inline"
-                  onsubmit="return confirm('Xóa bài học này?');">
-              <button type="submit" class="btn btn-sm btn-danger">Xóa</button>
-            </form>
-          </td>
-        </tr>
-      <% }) %>
-    </tbody>
-  </table>
-<% } %>
+  <!-- Header -->
+  <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-[#e5e5e5]">
+    <div>
+      <h1 class="text-2xl sm:text-3xl font-semibold tracking-tight text-black">
+        Quản lý bài học
+      </h1>
+      <p class="text-sm text-neutral-500 mt-1">
+        Khóa học: <strong class="text-black"><%= course.title %></strong>
+      </p>
+    </div>
+
+    <a 
+      href="/admin/courses/<%= course.id %>/lessons/new" 
+      class="inline-flex items-center gap-2 px-5 py-2 rounded-full bg-black text-white hover:bg-neutral-800 text-xs font-medium shadow-sm transition active:scale-95 self-start sm:self-auto"
+    >
+      <i class="fa-solid fa-plus text-[10px]"></i>
+      <span>Thêm bài học</span>
+    </a>
+  </div>
+
+  <% if (lessons.length === 0) { %>
+    <!-- Empty State -->
+    <div class="border border-dashed border-[#e5e5e5] bg-white p-12 text-center max-w-md mx-auto rounded-2xl">
+      <div class="w-10 h-10 rounded-full bg-[#fafafa] border border-[#e5e5e5] text-neutral-400 flex items-center justify-center mx-auto mb-3 text-sm font-mono">
+        <i class="fa-solid fa-book-open"></i>
+      </div>
+      <h3 class="text-sm font-semibold text-black mb-1">Chưa có bài học nào</h3>
+      <p class="text-xs text-neutral-500 mb-4">Hãy tạo bài học đầu tiên cho khóa học này.</p>
+      <a href="/admin/courses/<%= course.id %>/lessons/new" class="inline-flex items-center gap-2 px-5 py-2 rounded-full bg-black text-white text-xs font-medium hover:bg-neutral-800 transition">
+        <span>Thêm bài học mới</span>
+        <i class="fa-solid fa-arrow-right text-[9px]"></i>
+      </a>
+    </div>
+  <% } else { %>
+    <!-- Ollama-style Table -->
+    <div class="bg-white border border-[#e5e5e5] rounded-2xl overflow-hidden">
+      <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse">
+          <thead>
+            <tr class="border-b border-[#e5e5e5] bg-[#fafafa] text-xs font-mono text-neutral-500">
+              <th class="py-3 px-4 text-center w-14">thứ tự</th>
+              <th class="py-3 px-5">tiêu đề bài giảng</th>
+              <th class="py-3 px-4 text-center hidden md:table-cell">bài trắc nghiệm</th>
+              <th class="py-3 px-4 hidden sm:table-cell">ngày tạo</th>
+              <th class="py-3 px-5 text-right w-52">thao tác</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-[#e5e5e5] text-sm">
+            <% lessons.forEach((lesson) => { %>
+              <tr class="hover:bg-[#fafafa] transition duration-150 group">
+                
+                <td class="py-3.5 px-4 text-center">
+                  <span class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-[#fafafa] border border-[#e5e5e5] text-neutral-700 font-mono text-xs font-medium">
+                    <%= lesson.order_index %>
+                  </span>
+                </td>
+
+                <td class="py-3.5 px-5">
+                  <span class="font-medium text-black group-hover:underline transition block">
+                    <%= lesson.title %>
+                  </span>
+                </td>
+
+                <!-- Quiz Status Column -->
+                <td class="py-3.5 px-4 text-center hidden md:table-cell text-xs font-mono">
+                  <% if (lesson.quiz_id) { %>
+                    <a 
+                      href="/admin/courses/<%= course.id %>/lessons/<%= lesson.id %>/quiz" 
+                      class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#fafafa] border border-[#e5e5e5] hover:border-black text-black text-[11px] font-medium transition"
+                      title="Quản lý câu hỏi trắc nghiệm"
+                    >
+                      <span class="w-1.5 h-1.5 rounded-full bg-[#27c93f]"></span>
+                      <span>quiz (<%= lesson.question_count || 0 %> câu)</span>
+                    </a>
+                  <% } else { %>
+                    <a 
+                      href="/admin/courses/<%= course.id %>/lessons/<%= lesson.id %>/quiz" 
+                      class="inline-flex items-center gap-1 px-3 py-1 rounded-full border border-dashed border-[#e5e5e5] hover:border-neutral-400 text-neutral-500 hover:text-black text-[11px] font-medium transition"
+                      title="Thêm bài trắc nghiệm cho bài học này"
+                    >
+                      <span>+ tạo quiz</span>
+                    </a>
+                  <% } %>
+                </td>
+
+                <td class="py-3.5 px-4 hidden sm:table-cell text-xs font-mono text-neutral-400">
+                  <%= new Date(lesson.created_at).toLocaleDateString('vi-VN') %>
+                </td>
+
+                <td class="py-3.5 px-5 text-right whitespace-nowrap text-xs font-mono">
+                  <div class="inline-flex items-center gap-1.5">
+                    
+                    <a 
+                      href="/admin/courses/<%= course.id %>/lessons/<%= lesson.id %>/quiz" 
+                      title="Quản lý trắc nghiệm" 
+                      class="md:hidden px-3 py-1 rounded-full bg-[#fafafa] border border-[#e5e5e5] hover:bg-neutral-200 text-black text-[11px] font-medium transition"
+                    >
+                      <span>quiz</span>
+                    </a>
+
+                    <a 
+                      href="/admin/courses/<%= course.id %>/lessons/<%= lesson.id %>/edit" 
+                      title="Chỉnh sửa bài học" 
+                      class="px-3 py-1 rounded-full bg-[#fafafa] border border-[#e5e5e5] hover:bg-neutral-200 text-black text-[11px] font-medium transition"
+                    >
+                      <span>sửa</span>
+                    </a>
+
+                    <form 
+                      action="/admin/courses/<%= course.id %>/lessons/<%= lesson.id %>?_method=DELETE" 
+                      method="POST" 
+                      class="inline-block"
+                      onsubmit="return confirm('Xác nhận xóa bài học này? Bài kiểm tra liên quan cũng sẽ bị xóa.');"
+                    >
+                      <button 
+                        type="submit" 
+                        title="Xóa bài học"
+                        class="px-3 py-1 rounded-full bg-red-50 border border-red-200 hover:bg-red-100 text-red-600 text-[11px] font-medium transition"
+                      >
+                        <span>xóa</span>
+                      </button>
+                    </form>
+
+                  </div>
+                </td>
+
+              </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  <% } %>
+
+</div>
 
 <%- include('../../partials/footer') %>

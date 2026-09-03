@@ -1,30 +1,90 @@
 <%- include('../partials/header') %>
 
-<h3 class="mb-4">Lịch sử làm bài kiểm tra</h3>
+<div class="space-y-6">
 
-<% if (results.length === 0) { %>
-  <p class="text-muted">Bạn chưa làm bài kiểm tra nào.</p>
-<% } else { %>
-  <table class="table table-bordered bg-white">
-    <thead class="table-light">
-      <tr>
-        <th>Bài kiểm tra</th>
-        <th>Điểm</th>
-        <th>Thời gian</th>
-        <th></th>
-      </tr>
-    </thead>
-    <tbody>
-      <% results.forEach((r) => { %>
-        <tr>
-          <td><%= r.quiz_title %></td>
-          <td class="fw-bold <%= r.score >= 5 ? 'text-success' : 'text-danger' %>"><%= r.score %> / 10</td>
-          <td><%= new Date(r.taken_at).toLocaleString('vi-VN') %></td>
-          <td><a href="/results/<%= r.id %>" class="btn btn-sm btn-outline-primary">Xem lại</a></td>
-        </tr>
-      <% }) %>
-    </tbody>
-  </table>
-<% } %>
+  <!-- Header -->
+  <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-[#e5e5e5]">
+    <div>
+      <h1 class="text-2xl sm:text-3xl font-semibold tracking-tight text-black">
+        Lịch sử kết quả
+      </h1>
+      <p class="text-sm text-neutral-500 mt-1">
+        Bản ghi điểm số và các kỳ đánh giá bạn đã hoàn thành.
+      </p>
+    </div>
+
+    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#fafafa] border border-[#e5e5e5] text-xs font-mono text-neutral-600 self-start sm:self-auto">
+      <%= results.length %> bài nộp
+    </span>
+  </div>
+
+  <% if (results.length === 0) { %>
+    <div class="border border-dashed border-[#e5e5e5] bg-white p-12 text-center max-w-md mx-auto rounded-2xl">
+      <div class="w-10 h-10 rounded-full bg-[#fafafa] border border-[#e5e5e5] text-neutral-400 flex items-center justify-center mx-auto mb-3 text-sm font-mono">
+        <i class="fa-solid fa-clipboard-question"></i>
+      </div>
+      <h3 class="text-sm font-semibold text-black mb-1">Chưa có kết quả</h3>
+      <p class="text-xs text-neutral-500 mb-4">Bạn chưa hoàn thành bài kiểm tra nào.</p>
+      <a href="/courses" class="inline-flex items-center gap-2 px-5 py-2 rounded-full bg-black text-white text-xs font-medium hover:bg-neutral-800 transition">
+        <span>Xem khóa học</span>
+        <i class="fa-solid fa-arrow-right text-[9px]"></i>
+      </a>
+    </div>
+  <% } else { %>
+    <!-- Ollama-style Minimalist Table -->
+    <div class="bg-white border border-[#e5e5e5] rounded-2xl overflow-hidden">
+      <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse">
+          <thead>
+            <tr class="border-b border-[#e5e5e5] bg-[#fafafa] text-xs font-mono text-neutral-500">
+              <th class="py-3 px-5">bài kiểm tra</th>
+              <th class="py-3 px-4 text-center">điểm số</th>
+              <th class="py-3 px-4 hidden sm:table-cell">thời gian</th>
+              <th class="py-3 px-5 text-right">thao tác</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-[#e5e5e5] text-sm">
+            <% results.forEach((r) => { %>
+              <tr class="hover:bg-[#fafafa] transition duration-150 group">
+                
+                <td class="py-3.5 px-5">
+                  <span class="font-medium text-black group-hover:underline transition block">
+                    <%= r.quiz_title %>
+                  </span>
+                  <span class="text-xs font-mono text-neutral-400 sm:hidden block mt-0.5">
+                    <%= new Date(r.taken_at).toLocaleString('vi-VN') %>
+                  </span>
+                </td>
+
+                <td class="py-3.5 px-4 text-center">
+                  <span class="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full text-xs font-mono border border-[#e5e5e5] bg-[#fafafa] text-black">
+                    <span class="w-1.5 h-1.5 rounded-full <%= r.score >= 5 ? 'bg-[#27c93f]' : 'bg-[#ff5f56]' %>"></span>
+                    <%= r.score %> / 10
+                  </span>
+                </td>
+
+                <td class="py-3.5 px-4 hidden sm:table-cell text-xs font-mono text-neutral-500">
+                  <%= new Date(r.taken_at).toLocaleString('vi-VN') %>
+                </td>
+
+                <td class="py-3.5 px-5 text-right">
+                  <a 
+                    href="/results/<%= r.id %>" 
+                    class="inline-flex items-center gap-1 text-xs font-medium text-neutral-600 hover:text-black transition"
+                  >
+                    <span>Xem lại</span>
+                    <i class="fa-solid fa-arrow-right text-[9px]"></i>
+                  </a>
+                </td>
+
+              </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  <% } %>
+
+</div>
 
 <%- include('../partials/footer') %>

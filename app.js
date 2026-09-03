@@ -50,11 +50,6 @@ app.use('/', checkAuth, studentRoutes);
 // Toàn bộ trang làm bài kiểm tra, xem kết quả, lịch sử
 app.use('/', checkAuth, quizRoutes);
 
-// Trang tạm cho admin (sẽ thay bằng dashboard thật ở bước sau)
-app.get('/admin/dashboard', checkAuth, (req, res) => {
-  res.render('home', { user: req.session.user });
-});
-
 // Toàn bộ route quản lý khóa học/bài học nằm dưới /admin/*
 // và đều yêu cầu đã đăng nhập (checkAuth) + phải là admin (checkAdmin)
 app.use('/admin', checkAuth, checkAdmin, adminRoutes);

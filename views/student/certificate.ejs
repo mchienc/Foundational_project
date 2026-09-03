@@ -1,0 +1,148 @@
+<%- include('../partials/header') %>
+
+<style>
+  @media print {
+    header, nav, .no-print { display: none !important; }
+    body { background: white !important; }
+    .cert-wrapper { box-shadow: none !important; border: none !important; }
+  }
+</style>
+
+<div class="max-w-2xl mx-auto space-y-6">
+
+  <!-- Action Bar -->
+  <div class="flex items-center justify-between pb-4 border-b border-[#e5e5e5] no-print">
+    <a href="/courses/<%= course.id %>" class="inline-flex items-center gap-2 text-xs font-mono text-neutral-500 hover:text-black transition">
+      <i class="fa-solid fa-arrow-left text-[9px]"></i>
+      <span>Quay lại khóa học</span>
+    </a>
+    <button 
+      onclick="window.print()" 
+      class="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-[#e5e5e5] hover:bg-[#fafafa] text-xs font-medium text-black transition"
+    >
+      <i class="fa-solid fa-print text-[10px]"></i>
+      In / Lưu PDF
+    </button>
+  </div>
+
+  <!-- Certificate Card -->
+  <div class="cert-wrapper bg-white border-2 border-[#e5e5e5] rounded-3xl overflow-hidden shadow-sm">
+    
+    <!-- Certificate Header (Dark Inverted Band) -->
+    <div class="bg-[#171717] px-8 py-6 text-center relative">
+      <!-- macOS traffic dots decoration -->
+      <div class="absolute top-4 left-5 flex items-center gap-1.5">
+        <span class="w-2.5 h-2.5 rounded-full bg-[#ff5f56]"></span>
+        <span class="w-2.5 h-2.5 rounded-full bg-[#ffbd2e]"></span>
+        <span class="w-2.5 h-2.5 rounded-full bg-[#27c93f]"></span>
+      </div>
+
+      <div class="w-10 h-10 rounded-full bg-white/10 border border-white/20 flex items-center justify-center mx-auto mb-3">
+        <i class="fa-solid fa-graduation-cap text-white text-sm"></i>
+      </div>
+      <div class="text-[11px] font-mono text-neutral-400 mb-1 tracking-widest uppercase">Certificate of Completion</div>
+      <div class="text-white font-semibold text-base tracking-tight">EduFlow Learning Platform</div>
+    </div>
+
+    <!-- Certificate Body -->
+    <div class="px-10 py-10 text-center space-y-6">
+
+      <!-- Achievement Text -->
+      <div class="space-y-2">
+        <p class="text-xs text-neutral-400 font-mono">Chứng nhận rằng</p>
+        <h2 class="text-2xl sm:text-3xl font-semibold text-black tracking-tight">
+          <%= user.full_name %>
+        </h2>
+        <p class="text-xs text-neutral-400 font-mono"><%= user.email %></p>
+      </div>
+
+      <!-- Divider with seal -->
+      <div class="flex items-center gap-4">
+        <div class="flex-1 h-px bg-[#e5e5e5]"></div>
+        <div class="w-8 h-8 rounded-full bg-[#fafafa] border border-[#e5e5e5] flex items-center justify-center">
+          <span class="text-[#27c93f] text-sm"><i class="fa-solid fa-star"></i></span>
+        </div>
+        <div class="flex-1 h-px bg-[#e5e5e5]"></div>
+      </div>
+
+      <div class="space-y-1">
+        <p class="text-xs text-neutral-500 font-mono">đã hoàn thành xuất sắc khóa học</p>
+        <h3 class="text-xl font-semibold text-black leading-snug px-4">
+          <%= course.title %>
+        </h3>
+      </div>
+
+      <!-- Stats Row -->
+      <div class="flex justify-center gap-8 py-4">
+        <div class="text-center">
+          <div class="text-2xl font-semibold text-black font-mono"><%= totalLessons %></div>
+          <div class="text-[11px] font-mono text-neutral-400 mt-0.5">bài giảng</div>
+        </div>
+        <div class="w-px bg-[#e5e5e5]"></div>
+        <div class="text-center">
+          <div class="text-2xl font-semibold text-[#27c93f] font-mono">100%</div>
+          <div class="text-[11px] font-mono text-neutral-400 mt-0.5">hoàn thành</div>
+        </div>
+        <div class="w-px bg-[#e5e5e5]"></div>
+        <div class="text-center">
+          <div class="text-2xl font-semibold text-black font-mono">
+            <i class="fa-solid fa-check text-xl"></i>
+          </div>
+          <div class="text-[11px] font-mono text-neutral-400 mt-0.5">đạt chứng chỉ</div>
+        </div>
+      </div>
+
+      <!-- Date & Course ID -->
+      <div class="border-t border-[#e5e5e5] pt-6 flex flex-col sm:flex-row justify-between items-center gap-3 text-[11px] font-mono text-neutral-400">
+        <div class="text-left">
+          <div class="text-[10px] uppercase tracking-wider mb-0.5">Ngày cấp</div>
+          <div class="text-black font-medium">
+            <%= new Date().toLocaleDateString('vi-VN', { year: 'numeric', month: 'long', day: 'numeric' }) %>
+          </div>
+        </div>
+
+        <div class="text-center">
+          <!-- Minimal "seal" -->
+          <div class="w-16 h-16 rounded-full border-2 border-[#e5e5e5] flex flex-col items-center justify-center bg-[#fafafa]">
+            <span class="text-[#27c93f] text-lg"><i class="fa-solid fa-circle-check"></i></span>
+            <span class="text-[9px] font-mono text-neutral-400 mt-0.5">verified</span>
+          </div>
+        </div>
+
+        <div class="text-right">
+          <div class="text-[10px] uppercase tracking-wider mb-0.5">Mã chứng chỉ</div>
+          <div class="text-black font-medium">
+            EF-<%= String(course.id).padStart(3, '0') %>-<%= String(user.full_name ? user.full_name.replace(/\s/g,'').substring(0,4).toUpperCase() : 'USER') %>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Certificate Footer -->
+    <div class="bg-[#fafafa] border-t border-[#e5e5e5] px-8 py-4 flex items-center justify-center gap-2 text-[11px] font-mono text-neutral-400">
+      <span class="w-1.5 h-1.5 rounded-full bg-[#27c93f]"></span>
+      <span>eduflow.local · <%= course.title %> · Certified</span>
+    </div>
+
+  </div>
+
+  <!-- Share/Download Actions -->
+  <div class="flex flex-wrap items-center justify-center gap-3 no-print">
+    <button onclick="window.print()" class="px-6 py-2.5 rounded-full bg-black text-white hover:bg-neutral-800 text-xs font-medium transition flex items-center gap-2">
+      <i class="fa-solid fa-download text-[10px]"></i>
+      Lưu PDF
+    </button>
+    <a href="/courses/<%= course.id %>" class="px-6 py-2.5 rounded-full border border-[#e5e5e5] hover:bg-[#fafafa] text-black text-xs font-medium transition flex items-center gap-2">
+      <i class="fa-solid fa-arrow-left text-[9px]"></i>
+      Về khóa học
+    </a>
+    <a href="/courses" class="px-6 py-2.5 rounded-full border border-[#e5e5e5] hover:bg-[#fafafa] text-black text-xs font-medium transition flex items-center gap-2">
+      Khám phá thêm
+      <i class="fa-solid fa-arrow-right text-[9px]"></i>
+    </a>
+  </div>
+
+</div>
+
+<%- include('../partials/footer') %>

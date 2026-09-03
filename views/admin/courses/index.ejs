@@ -1,42 +1,124 @@
 <%- include('../../partials/header') %>
 
-<div class="d-flex justify-content-between align-items-center mb-3">
-  <h3>Quản lý khóa học</h3>
-  <a href="/admin/courses/new" class="btn btn-primary">+ Thêm khóa học</a>
-</div>
+<div class="space-y-6">
 
-<% if (courses.length === 0) { %>
-  <p class="text-muted">Chưa có khóa học nào. Bấm "Thêm khóa học" để tạo mới.</p>
-<% } else { %>
-  <table class="table table-bordered bg-white">
-    <thead class="table-light">
-      <tr>
-        <th>#</th>
-        <th>Tên khóa học</th>
-        <th>Mô tả</th>
-        <th>Ngày tạo</th>
-        <th style="width: 260px;">Hành động</th>
-      </tr>
-    </thead>
-    <tbody>
-      <% courses.forEach((course, i) => { %>
-        <tr>
-          <td><%= i + 1 %></td>
-          <td><%= course.title %></td>
-          <td><%= course.description ? course.description.substring(0, 80) : '' %></td>
-          <td><%= new Date(course.created_at).toLocaleDateString('vi-VN') %></td>
-          <td>
-            <a href="/admin/courses/<%= course.id %>/lessons" class="btn btn-sm btn-info">Bài học</a>
-            <a href="/admin/courses/<%= course.id %>/edit" class="btn btn-sm btn-warning">Sửa</a>
-            <form action="/admin/courses/<%= course.id %>?_method=DELETE" method="POST" class="d-inline"
-                  onsubmit="return confirm('Xóa khóa học này? Toàn bộ bài học và bài kiểm tra liên quan cũng sẽ bị xóa.');">
-              <button type="submit" class="btn btn-sm btn-danger">Xóa</button>
-            </form>
-          </td>
-        </tr>
-      <% }) %>
-    </tbody>
-  </table>
-<% } %>
+  <!-- Header -->
+  <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-[#e5e5e5]">
+    <div>
+      <h1 class="text-2xl sm:text-3xl font-semibold tracking-tight text-black">
+        Quản lý khóa học
+      </h1>
+      <p class="text-sm text-neutral-500 mt-1">
+        Tạo, cập nhật và quản lý danh mục bài học trên hệ thống.
+      </p>
+    </div>
+
+    <a 
+      href="/admin/courses/new" 
+      class="inline-flex items-center gap-2 px-5 py-2 rounded-full bg-black text-white hover:bg-neutral-800 text-xs font-medium shadow-sm transition active:scale-95 self-start sm:self-auto"
+    >
+      <i class="fa-solid fa-plus text-[10px]"></i>
+      <span>Thêm khóa học</span>
+    </a>
+  </div>
+
+  <% if (courses.length === 0) { %>
+    <!-- Empty State -->
+    <div class="border border-dashed border-[#e5e5e5] bg-white p-12 text-center max-w-md mx-auto rounded-2xl">
+      <div class="w-10 h-10 rounded-full bg-[#fafafa] border border-[#e5e5e5] text-neutral-400 flex items-center justify-center mx-auto mb-3 text-sm font-mono">
+        <i class="fa-solid fa-folder-open"></i>
+      </div>
+      <h3 class="text-sm font-semibold text-black mb-1">Chưa có khóa học</h3>
+      <p class="text-xs text-neutral-500 mb-4">Hãy bắt đầu bằng việc tạo khóa học đầu tiên.</p>
+      <a href="/admin/courses/new" class="inline-flex items-center gap-2 px-5 py-2 rounded-full bg-black text-white text-xs font-medium hover:bg-neutral-800 transition">
+        <span>Tạo khóa học</span>
+        <i class="fa-solid fa-arrow-right text-[9px]"></i>
+      </a>
+    </div>
+  <% } else { %>
+    <!-- Ollama-style Table -->
+    <div class="bg-white border border-[#e5e5e5] rounded-2xl overflow-hidden">
+      <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse">
+          <thead>
+            <tr class="border-b border-[#e5e5e5] bg-[#fafafa] text-xs font-mono text-neutral-500">
+              <th class="py-3 px-4 text-center w-12">#</th>
+              <th class="py-3 px-5">tên khóa học</th>
+              <th class="py-3 px-5 hidden md:table-cell">mô tả</th>
+              <th class="py-3 px-4 hidden lg:table-cell">ngày tạo</th>
+              <th class="py-3 px-5 text-right w-56">thao tác</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-[#e5e5e5] text-sm">
+            <% courses.forEach((course, i) => { %>
+              <tr class="hover:bg-[#fafafa] transition duration-150 group">
+                
+                <td class="py-3.5 px-4 text-center text-xs font-mono text-neutral-400">
+                  <%= (i + 1) < 10 ? '0' + (i + 1) : (i + 1) %>
+                </td>
+
+                <td class="py-3.5 px-5">
+                  <span class="font-medium text-black group-hover:underline transition block">
+                    <%= course.title %>
+                  </span>
+                  <span class="text-xs text-neutral-400 md:hidden block mt-0.5 line-clamp-1">
+                    <%= course.description || 'Chưa có mô tả' %>
+                  </span>
+                </td>
+
+                <td class="py-3.5 px-5 hidden md:table-cell text-xs text-neutral-500 max-w-xs truncate">
+                  <%= course.description || 'Chưa có mô tả' %>
+                </td>
+
+                <td class="py-3.5 px-4 hidden lg:table-cell text-xs font-mono text-neutral-400">
+                  <%= new Date(course.created_at).toLocaleDateString('vi-VN') %>
+                </td>
+
+                <td class="py-3.5 px-5 text-right whitespace-nowrap text-xs font-mono">
+                  <div class="inline-flex items-center gap-1.5">
+                    
+                    <a 
+                      href="/admin/courses/<%= course.id %>/lessons" 
+                      title="Quản lý bài học" 
+                      class="px-3 py-1 rounded-full bg-[#fafafa] border border-[#e5e5e5] hover:bg-neutral-200 text-black text-[11px] font-medium transition"
+                    >
+                      <span>bài học</span>
+                    </a>
+
+                    <a 
+                      href="/admin/courses/<%= course.id %>/edit" 
+                      title="Chỉnh sửa" 
+                      class="px-3 py-1 rounded-full bg-[#fafafa] border border-[#e5e5e5] hover:bg-neutral-200 text-black text-[11px] font-medium transition"
+                    >
+                      <span>sửa</span>
+                    </a>
+
+                    <form 
+                      action="/admin/courses/<%= course.id %>?_method=DELETE" 
+                      method="POST" 
+                      class="inline-block"
+                      onsubmit="return confirm('Xác nhận xóa khóa học này? Toàn bộ bài học và câu hỏi trắc nghiệm liên quan cũng sẽ bị xóa.');"
+                    >
+                      <button 
+                        type="submit" 
+                        title="Xóa khóa học"
+                        class="px-3 py-1 rounded-full bg-red-50 border border-red-200 hover:bg-red-100 text-red-600 text-[11px] font-medium transition"
+                      >
+                        <span>xóa</span>
+                      </button>
+                    </form>
+
+                  </div>
+                </td>
+
+              </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  <% } %>
+
+</div>
 
 <%- include('../../partials/footer') %>

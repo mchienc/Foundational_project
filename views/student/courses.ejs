@@ -1,28 +1,144 @@
 <%- include('../partials/header') %>
 
-<h3 class="mb-4">Danh sách khóa học</h3>
+<div class="space-y-8">
 
-<% if (courses.length === 0) { %>
-  <p class="text-muted">Hiện chưa có khóa học nào.</p>
-<% } else { %>
-  <div class="row row-cols-1 row-cols-md-3 g-4">
-    <% courses.forEach((course) => { %>
-      <div class="col">
-        <div class="card h-100 shadow-sm">
-          <div class="card-body d-flex flex-column">
-            <h5 class="card-title"><%= course.title %></h5>
-            <p class="card-text text-muted flex-grow-1">
-              <%= course.description ? course.description.substring(0, 100) : '' %>
-            </p>
-            <% if (course.enrollment_id) { %>
-              <span class="badge bg-success mb-2 align-self-start">Đã đăng ký</span>
-            <% } %>
-            <a href="/courses/<%= course.id %>" class="btn btn-primary mt-auto">Xem chi tiết</a>
-          </div>
-        </div>
-      </div>
-    <% }) %>
+  <!-- Header -->
+  <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-[#e5e5e5]">
+    <div>
+      <h1 class="text-2xl sm:text-3xl font-semibold tracking-tight text-black">Khóa học</h1>
+      <p class="text-sm text-neutral-500 mt-1">Khám phá các khóa học để củng cố kiến thức và rèn luyện kỹ năng.</p>
+    </div>
+    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#fafafa] border border-[#e5e5e5] text-xs font-mono text-neutral-600 self-start sm:self-auto">
+      <%= courses.length %>/<%= totalCount %> kết quả
+    </span>
   </div>
-<% } %>
+
+  <!-- Search & Filter Bar -->
+  <form method="GET" action="/courses" class="flex flex-col sm:flex-row gap-3">
+    <!-- Search Input -->
+    <div class="relative flex-1">
+      <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-neutral-400 text-xs"></i>
+      <input
+        type="text"
+        name="search"
+        value="<%= typeof search !== 'undefined' ? search : '' %>"
+        placeholder="Tìm kiếm khóa học theo tên hoặc mô tả..."
+        class="w-full pl-9 pr-4 py-2 rounded-full border border-[#e5e5e5] text-sm text-black placeholder-neutral-400 bg-white focus:outline-none focus:border-black transition"
+      >
+    </div>
+
+    <!-- Filter Pills -->
+    <div class="flex items-center gap-1.5 flex-wrap">
+      <% const filters = [
+        { value: 'all', label: 'Tất cả' },
+        { value: 'enrolled', label: 'Đã đăng ký' },
+        { value: 'in-progress', label: 'Đang học' },
+        { value: 'completed', label: 'Hoàn thành' },
+        { value: 'not-enrolled', label: 'Chưa đăng ký' }
+      ]; %>
+      <% filters.forEach(f => { %>
+        <button
+          type="submit"
+          name="filter"
+          value="<%= f.value %>"
+          class="px-3.5 py-1.5 rounded-full text-xs font-medium transition border <%= (typeof filter !== 'undefined' && filter === f.value) ? 'bg-black text-white border-black' : 'bg-white text-neutral-600 border-[#e5e5e5] hover:border-neutral-400 hover:text-black' %>"
+        ><%= f.label %></button>
+      <% }) %>
+
+      <!-- Clear search if active -->
+      <% if ((typeof search !== 'undefined' && search) || (typeof filter !== 'undefined' && filter && filter !== 'all')) { %>
+        <a href="/courses" class="px-3.5 py-1.5 rounded-full text-xs font-mono text-neutral-400 hover:text-black transition">
+          ✕ xóa lọc
+        </a>
+      <% } %>
+    </div>
+  </form>
+
+  <!-- Results -->
+  <% if (courses.length === 0) { %>
+    <div class="border border-dashed border-[#e5e5e5] bg-white p-12 text-center max-w-md mx-auto rounded-2xl">
+      <div class="w-10 h-10 rounded-full bg-[#fafafa] border border-[#e5e5e5] text-neutral-400 flex items-center justify-center mx-auto mb-3 text-sm">
+        <i class="fa-solid fa-box-open"></i>
+      </div>
+      <h3 class="text-sm font-semibold text-black mb-1">Không tìm thấy kết quả</h3>
+      <p class="text-xs text-neutral-500 mb-4">Thử từ khóa khác hoặc xóa bộ lọc hiện tại.</p>
+      <a href="/courses" class="inline-flex items-center gap-2 px-5 py-2 rounded-full bg-black text-white text-xs font-medium hover:bg-neutral-800 transition">
+        Xem tất cả khóa học
+      </a>
+    </div>
+  <% } else { %>
+    <!-- Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <% courses.forEach((course) => { %>
+        <div class="bg-white border border-[#e5e5e5] rounded-2xl overflow-hidden hover:border-neutral-400 transition duration-200 flex flex-col group">
+          
+          <!-- Image / Cover -->
+          <div class="h-44 bg-[#fafafa] border-b border-[#e5e5e5] relative overflow-hidden flex items-center justify-center">
+            <% if (course.image) { %>
+              <img src="<%= course.image %>" alt="<%= course.title %>" class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
+            <% } else { %>
+              <div class="w-10 h-10 rounded-full bg-white border border-[#e5e5e5] text-neutral-500 flex items-center justify-center text-sm font-mono">
+                <i class="fa-solid fa-code"></i>
+              </div>
+            <% } %>
+
+            <!-- Badges -->
+            <div class="absolute top-3 right-3 flex flex-col gap-1.5 items-end">
+              <% if (course.enrollment_id && course.progress === 100) { %>
+                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-medium bg-white/95 border border-[#27c93f]/40 text-black backdrop-blur-sm shadow-sm">
+                  <span class="w-1.5 h-1.5 rounded-full bg-[#27c93f]"></span>
+                  Hoàn thành
+                </span>
+              <% } else if (course.enrollment_id) { %>
+                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-medium bg-white/95 border border-[#e5e5e5] text-black backdrop-blur-sm shadow-sm">
+                  <span class="w-1.5 h-1.5 rounded-full bg-[#27c93f]"></span>
+                  Đã đăng ký
+                </span>
+              <% } %>
+            </div>
+          </div>
+
+          <!-- Card Body -->
+          <div class="p-5 flex-1 flex flex-col justify-between space-y-4">
+            <div>
+              <h3 class="text-base font-semibold text-black group-hover:underline transition line-clamp-2 leading-snug mb-1.5">
+                <%= course.title %>
+              </h3>
+              <p class="text-xs text-neutral-500 line-clamp-2 leading-relaxed">
+                <%= course.description || 'Chương trình đào tạo tinh gọn với lý thuyết cốt lõi và bài tập thực hành.' %>
+              </p>
+
+              <!-- Progress bar for enrolled courses -->
+              <% if (course.enrollment_id) { %>
+                <div class="mt-3.5 pt-3 border-t border-[#e5e5e5] space-y-1.5">
+                  <div class="flex items-center justify-between text-[11px] font-mono">
+                    <span class="text-neutral-400">tiến độ</span>
+                    <span class="<%= course.progress === 100 ? 'text-[#27c93f] font-semibold' : 'text-black font-medium' %>"><%= course.progress || 0 %>%</span>
+                  </div>
+                  <div class="w-full bg-[#fafafa] border border-[#e5e5e5] h-1.5 rounded-full overflow-hidden p-[1px]">
+                    <div class="<%= course.progress === 100 ? 'bg-[#27c93f]' : 'bg-black' %> h-full rounded-full transition-all duration-300" style="width: <%= course.progress || 0 %>%"></div>
+                  </div>
+                </div>
+              <% } %>
+            </div>
+
+            <!-- CTA Button -->
+            <div class="pt-3 border-t border-[#e5e5e5] mt-auto">
+              <a 
+                href="/courses/<%= course.id %>" 
+                class="w-full py-2 px-4 rounded-full text-xs font-medium flex items-center justify-center gap-2 transition <%= course.enrollment_id ? 'bg-[#fafafa] hover:bg-neutral-200 text-black border border-[#e5e5e5]' : 'bg-black hover:bg-neutral-800 text-white' %>"
+              >
+                <span><%= course.enrollment_id ? (course.progress === 100 ? 'Xem lại' : 'Tiếp tục học') : 'Xem chi tiết' %></span>
+                <i class="fa-solid fa-arrow-right text-[9px]"></i>
+              </a>
+            </div>
+          </div>
+
+        </div>
+      <% }) %>
+    </div>
+  <% } %>
+
+</div>
 
 <%- include('../partials/footer') %>
