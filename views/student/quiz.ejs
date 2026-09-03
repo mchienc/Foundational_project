@@ -1,0 +1,31 @@
+<%- include('../partials/header') %>
+
+<h3 class="mb-4"><%= quiz.title %></h3>
+
+<% if (questions.length === 0) { %>
+  <p class="text-muted">Bài kiểm tra này chưa có câu hỏi nào.</p>
+<% } else { %>
+  <form method="POST" action="/quizzes/<%= quiz.id %>/submit">
+    <% questions.forEach((q, i) => { %>
+      <div class="card shadow-sm mb-3">
+        <div class="card-body">
+          <p class="fw-bold">Câu <%= i + 1 %>: <%= q.question_text %></p>
+          <% q.answers.forEach((a) => { %>
+            <div class="form-check">
+              <input class="form-check-input" type="radio"
+                     name="q_<%= q.id %>" value="<%= a.id %>"
+                     id="answer_<%= a.id %>" required>
+              <label class="form-check-label" for="answer_<%= a.id %>">
+                <%= a.answer_text %>
+              </label>
+            </div>
+          <% }) %>
+        </div>
+      </div>
+    <% }) %>
+
+    <button type="submit" class="btn btn-success">Nộp bài</button>
+  </form>
+<% } %>
+
+<%- include('../partials/footer') %>

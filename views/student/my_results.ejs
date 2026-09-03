@@ -1,0 +1,30 @@
+<%- include('../partials/header') %>
+
+<h3 class="mb-4">Lịch sử làm bài kiểm tra</h3>
+
+<% if (results.length === 0) { %>
+  <p class="text-muted">Bạn chưa làm bài kiểm tra nào.</p>
+<% } else { %>
+  <table class="table table-bordered bg-white">
+    <thead class="table-light">
+      <tr>
+        <th>Bài kiểm tra</th>
+        <th>Điểm</th>
+        <th>Thời gian</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      <% results.forEach((r) => { %>
+        <tr>
+          <td><%= r.quiz_title %></td>
+          <td class="fw-bold <%= r.score >= 5 ? 'text-success' : 'text-danger' %>"><%= r.score %> / 10</td>
+          <td><%= new Date(r.taken_at).toLocaleString('vi-VN') %></td>
+          <td><a href="/results/<%= r.id %>" class="btn btn-sm btn-outline-primary">Xem lại</a></td>
+        </tr>
+      <% }) %>
+    </tbody>
+  </table>
+<% } %>
+
+<%- include('../partials/footer') %>

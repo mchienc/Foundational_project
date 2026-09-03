@@ -14,6 +14,10 @@
       <a class="navbar-brand" href="/">Học Trực Tuyến</a>
       <div class="d-flex">
         <% if (typeof currentUser !== 'undefined' && currentUser) { %>
+          <% if (currentUser.role === 'student') { %>
+            <a href="/courses" class="btn btn-outline-light btn-sm me-2">Khóa học</a>
+            <a href="/my-results" class="btn btn-outline-light btn-sm me-2">Lịch sử kết quả</a>
+          <% } %>
           <span class="navbar-text text-white me-3">Xin chào, <%= currentUser.full_name %></span>
           <a href="/logout" class="btn btn-outline-light btn-sm">Đăng xuất</a>
         <% } %>

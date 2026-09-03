@@ -1,0 +1,37 @@
+<%- include('../partials/header') %>
+
+<div class="mb-3">
+  <a href="/courses/<%= course.id %>" class="text-decoration-none">&larr; Quay lại khóa học: <%= course.title %></a>
+</div>
+
+<div class="row">
+  <!-- Menu bên trái: danh sách bài học để chuyển qua lại -->
+  <div class="col-md-3">
+    <div class="list-group">
+      <% allLessons.forEach((l) => { %>
+        <a href="/courses/<%= course.id %>/lessons/<%= l.id %>"
+           class="list-group-item list-group-item-action <%= l.id === lesson.id ? 'active' : '' %>">
+          <%= l.title %>
+        </a>
+      <% }) %>
+    </div>
+  </div>
+
+  <!-- Nội dung bài học bên phải -->
+  <div class="col-md-9">
+    <div class="card shadow-sm">
+      <div class="card-body">
+        <h3><%= lesson.title %></h3>
+        <hr>
+        <div><%- lesson.content %></div>
+
+        <% if (quiz) { %>
+          <hr>
+          <a href="/quizzes/<%= quiz.id %>" class="btn btn-success">Làm bài kiểm tra</a>
+        <% } %>
+      </div>
+    </div>
+  </div>
+</div>
+
+<%- include('../partials/footer') %>

@@ -9,6 +9,8 @@ const path = require('path');
 
 const authRoutes = require('./routes/authRoutes');
 const adminRoutes = require('./routes/adminRoutes');
+const studentRoutes = require('./routes/studentRoutes');
+const quizRoutes = require('./routes/quizRoutes');
 const { checkAuth, checkAdmin } = require('./middlewares/auth');
 
 const app = express();
@@ -42,10 +44,11 @@ app.get('/', (req, res) => res.redirect('/login'));
 
 app.use('/', authRoutes); // /login, /register, /logout
 
-// Trang tạm sau khi đăng nhập thành công (sẽ thay bằng trang danh sách khóa học thật ở bước sau)
-app.get('/courses', checkAuth, (req, res) => {
-  res.render('home', { user: req.session.user });
-});
+// Toàn bộ trang phía học viên (xem khóa học, đăng ký, học bài) nằm trong studentRoutes
+app.use('/', checkAuth, studentRoutes);
+
+// Toàn bộ trang làm bài kiểm tra, xem kết quả, lịch sử
+app.use('/', checkAuth, quizRoutes);
 
 // Trang tạm cho admin (sẽ thay bằng dashboard thật ở bước sau)
 app.get('/admin/dashboard', checkAuth, (req, res) => {

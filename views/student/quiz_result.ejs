@@ -1,0 +1,44 @@
+<%- include('../partials/header') %>
+
+<div class="card shadow-sm mb-4">
+  <div class="card-body text-center">
+    <h3><%= result.quiz_title %></h3>
+    <p class="display-6 fw-bold <%= result.score >= 5 ? 'text-success' : 'text-danger' %>">
+      Điểm: <%= result.score %> / 10
+    </p>
+    <p class="text-muted">Làm lúc: <%= new Date(result.taken_at).toLocaleString('vi-VN') %></p>
+  </div>
+</div>
+
+<h4 class="mb-3">Chi tiết từng câu</h4>
+
+<% details.forEach((d, i) => { %>
+  <div class="card mb-3 <%= d.is_correct ? 'border-success' : 'border-danger' %>">
+    <div class="card-body">
+      <p class="fw-bold">
+        Câu <%= i + 1 %>: <%= d.question_text %>
+        <% if (d.is_correct) { %>
+          <span class="badge bg-success">Đúng</span>
+        <% } else { %>
+          <span class="badge bg-danger">Sai</span>
+        <% } %>
+      </p>
+      <ul class="list-unstyled mb-0">
+        <% d.answers.forEach((a) => { %>
+          <li class="
+            <%= a.is_correct ? 'text-success fw-bold' : '' %>
+            <%= (a.id === d.selected_answer_id && !a.is_correct) ? 'text-danger text-decoration-line-through' : '' %>
+          ">
+            <%= a.answer_text %>
+            <% if (a.is_correct) { %> (đáp án đúng)<% } %>
+            <% if (a.id === d.selected_answer_id && !a.is_correct) { %> (bạn đã chọn)<% } %>
+          </li>
+        <% }) %>
+      </ul>
+    </div>
+  </div>
+<% }) %>
+
+<a href="/my-results" class="btn btn-secondary">Xem lịch sử kết quả</a>
+
+<%- include('../partials/footer') %>

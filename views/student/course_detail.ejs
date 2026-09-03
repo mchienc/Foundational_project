@@ -1,0 +1,41 @@
+<%- include('../partials/header') %>
+
+<div class="mb-3">
+  <a href="/courses" class="text-decoration-none">&larr; Quay lại danh sách khóa học</a>
+</div>
+
+<div class="card shadow-sm mb-4">
+  <div class="card-body">
+    <h3><%= course.title %></h3>
+    <p class="text-muted"><%= course.description %></p>
+
+    <% if (!isEnrolled) { %>
+      <form action="/courses/<%= course.id %>/enroll" method="POST">
+        <button type="submit" class="btn btn-primary">Đăng ký tham gia khóa học</button>
+      </form>
+    <% } else { %>
+      <span class="badge bg-success">Bạn đã đăng ký khóa học này</span>
+    <% } %>
+  </div>
+</div>
+
+<h4 class="mb-3">Danh sách bài học</h4>
+
+<% if (lessons.length === 0) { %>
+  <p class="text-muted">Khóa học này chưa có bài học nào.</p>
+<% } else { %>
+  <ul class="list-group">
+    <% lessons.forEach((lesson, i) => { %>
+      <li class="list-group-item d-flex justify-content-between align-items-center">
+        <span><%= i + 1 %>. <%= lesson.title %></span>
+        <% if (isEnrolled) { %>
+          <a href="/courses/<%= course.id %>/lessons/<%= lesson.id %>" class="btn btn-sm btn-outline-primary">Học ngay</a>
+        <% } else { %>
+          <span class="text-muted small">Đăng ký để xem</span>
+        <% } %>
+      </li>
+    <% }) %>
+  </ul>
+<% } %>
+
+<%- include('../partials/footer') %>
