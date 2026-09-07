@@ -1,9 +1,18 @@
 <!DOCTYPE html>
-<html lang="vi" class="h-full bg-white">
+<html lang="vi" class="h-full" id="html-root">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title><%= typeof title !== 'undefined' ? title : 'EduFlow' %></title>
+  <!-- Apply theme immediately to prevent flash -->
+  <script>
+    (function() {
+      var t = localStorage.getItem('ef-theme') || 'midnight';
+      var b = localStorage.getItem('ef-bg') || 'clean';
+      document.documentElement.setAttribute('data-theme', t);
+      document.documentElement.setAttribute('data-bg', b);
+    })();
+  </script>
   
   <!-- Google Fonts: Plus Jakarta Sans for rounded headlines & Inter -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -66,11 +75,17 @@
           <% if (typeof currentUser !== 'undefined' && currentUser) { %>
             <nav class="hidden md:flex items-center gap-1 text-sm">
               <% if (currentUser.role === 'student') { %>
-                <a href="/courses" class="px-3.5 py-1 rounded-full text-neutral-600 hover:text-black hover:bg-[#fafafa] transition font-medium">
+                <a href="/courses" class="px-3.5 py-1 rounded-full text-neutral-600 hover:text-black hover:bg-[#fafafa] transition font-medium nav-link" data-path="/courses">
                   Khóa học
                 </a>
-                <a href="/my-results" class="px-3.5 py-1 rounded-full text-neutral-600 hover:text-black hover:bg-[#fafafa] transition font-medium">
-                  Lịch sử kết quả
+                <a href="/my-courses" class="px-3.5 py-1 rounded-full text-neutral-600 hover:text-black hover:bg-[#fafafa] transition font-medium nav-link" data-path="/my-courses">
+                  Của tôi
+                </a>
+                <a href="/my-results" class="px-3.5 py-1 rounded-full text-neutral-600 hover:text-black hover:bg-[#fafafa] transition font-medium nav-link" data-path="/my-results">
+                  Kết quả
+                </a>
+                <a href="/profile" class="px-3.5 py-1 rounded-full text-neutral-600 hover:text-black hover:bg-[#fafafa] transition font-medium nav-link" data-path="/profile">
+                  Hồ sơ
                 </a>
               <% } else if (currentUser.role === 'admin') { %>
                 <a href="/admin/dashboard" class="px-3.5 py-1 rounded-full text-neutral-600 hover:text-black hover:bg-[#fafafa] transition font-medium">
@@ -101,6 +116,16 @@
               </span>
             </div>
 
+            <!-- Theme Picker Button -->
+            <button 
+              id="theme-toggle-btn"
+              title="Tuỳ chỉnh giao diện"
+              class="p-1.5 rounded-full text-neutral-500 hover:text-black hover:bg-[#fafafa] border border-transparent hover:border-[#e5e5e5] transition"
+              onclick="document.getElementById('theme-panel').classList.toggle('hidden')"
+            >
+              <i class="fa-solid fa-palette text-sm"></i>
+            </button>
+
             <!-- Logout Pill -->
             <a href="/logout" title="Đăng xuất" class="px-3 py-1 rounded-full text-xs font-medium text-neutral-500 hover:text-black hover:bg-[#fafafa] border border-transparent hover:border-[#e5e5e5] transition">
               <i class="fa-solid fa-arrow-right-from-bracket text-[10px]"></i>
@@ -113,6 +138,13 @@
             </button>
           <% } else { %>
             <div class="flex items-center gap-2 text-sm">
+              <button 
+                title="Tuỳ chỉnh giao diện"
+                class="theme-toggle-trigger p-1.5 rounded-full text-neutral-500 hover:text-black hover:bg-[#fafafa] border border-transparent hover:border-[#e5e5e5] transition"
+                onclick="document.getElementById('theme-panel').classList.toggle('hidden')"
+              >
+                <i class="fa-solid fa-palette text-sm"></i>
+              </button>
               <a href="/login" class="px-4 py-1.5 rounded-full text-neutral-600 hover:text-black transition font-medium">
                 Đăng nhập
               </a>
@@ -129,12 +161,10 @@
       <% if (typeof currentUser !== 'undefined' && currentUser) { %>
         <div id="mobile-menu" class="hidden md:hidden py-2 border-t border-[#e5e5e5] space-y-1 text-sm font-medium">
           <% if (currentUser.role === 'student') { %>
-            <a href="/courses" class="block px-3 py-1.5 rounded-lg text-neutral-700 hover:bg-[#fafafa]">
-              Khóa học
-            </a>
-            <a href="/my-results" class="block px-3 py-1.5 rounded-lg text-neutral-700 hover:bg-[#fafafa]">
-              Lịch sử kết quả
-            </a>
+            <a href="/courses" class="block px-3 py-1.5 rounded-lg text-neutral-700 hover:bg-[#fafafa]">Khóa học</a>
+            <a href="/my-courses" class="block px-3 py-1.5 rounded-lg text-neutral-700 hover:bg-[#fafafa]">Của tôi</a>
+            <a href="/my-results" class="block px-3 py-1.5 rounded-lg text-neutral-700 hover:bg-[#fafafa]">Kết quả</a>
+            <a href="/profile" class="block px-3 py-1.5 rounded-lg text-neutral-700 hover:bg-[#fafafa]">Hồ sơ</a>
           <% } else if (currentUser.role === 'admin') { %>
             <a href="/admin/dashboard" class="block px-3 py-1.5 rounded-lg text-neutral-700 hover:bg-[#fafafa]">
               Tổng quan

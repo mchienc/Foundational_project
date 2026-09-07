@@ -8,27 +8,62 @@
       <h1 class="text-2xl sm:text-3xl font-semibold tracking-tight text-black">Khóa học</h1>
       <p class="text-sm text-neutral-500 mt-1">Khám phá các khóa học để củng cố kiến thức và rèn luyện kỹ năng.</p>
     </div>
-    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#fafafa] border border-[#e5e5e5] text-xs font-mono text-neutral-600 self-start sm:self-auto">
-      <%= courses.length %>/<%= totalCount %> kết quả
-    </span>
+    <div class="flex items-center gap-2 self-start sm:self-auto">
+      <a href="/my-courses" class="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-[#e5e5e5] hover:bg-[#fafafa] text-xs font-medium text-black transition">
+        <i class="fa-solid fa-book-open text-[9px]"></i>
+        Của tôi
+      </a>
+      <span class="inline-flex items-center gap-1.5 px-3 py-2 rounded-full bg-[#fafafa] border border-[#e5e5e5] text-xs font-mono text-neutral-600">
+        <%= courses.length %>/<%= totalCount %>
+      </span>
+    </div>
   </div>
 
   <!-- Search & Filter Bar -->
-  <form method="GET" action="/courses" class="flex flex-col sm:flex-row gap-3">
-    <!-- Search Input -->
-    <div class="relative flex-1">
-      <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-neutral-400 text-xs"></i>
-      <input
-        type="text"
-        name="search"
-        value="<%= typeof search !== 'undefined' ? search : '' %>"
-        placeholder="Tìm kiếm khóa học theo tên hoặc mô tả..."
-        class="w-full pl-9 pr-4 py-2 rounded-full border border-[#e5e5e5] text-sm text-black placeholder-neutral-400 bg-white focus:outline-none focus:border-black transition"
-      >
+  <form method="GET" action="/courses" class="space-y-3">
+    <!-- Search Row -->
+    <div class="flex gap-3">
+      <div class="relative flex-1">
+        <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-neutral-400 text-xs"></i>
+        <input
+          type="text" name="search"
+          value="<%= typeof search !== 'undefined' ? search : '' %>"
+          placeholder="Tìm kiếm theo tên hoặc mô tả..."
+          class="w-full pl-9 pr-4 py-2 rounded-full border border-[#e5e5e5] text-sm text-black placeholder-neutral-400 bg-white focus:outline-none focus:border-black transition"
+        >
+        <!-- preserve category + filter on search -->
+        <% if (typeof filter !== 'undefined' && filter && filter !== 'all') { %>
+          <input type="hidden" name="filter" value="<%= filter %>">
+        <% } %>
+        <% if (typeof category !== 'undefined' && category) { %>
+          <input type="hidden" name="category" value="<%= category %>">
+        <% } %>
+      </div>
+      <button type="submit" class="px-5 py-2 rounded-full bg-black text-white text-xs font-medium hover:bg-neutral-800 transition">
+        Tìm
+      </button>
     </div>
 
-    <!-- Filter Pills -->
+    <!-- Category Pills -->
+    <% if (typeof categories !== 'undefined' && categories.length > 0) { %>
+      <div class="flex items-center gap-1.5 flex-wrap">
+        <span class="text-[11px] font-mono text-neutral-400 mr-1">Danh mục:</span>
+        <a href="/courses?filter=<%= typeof filter !== 'undefined' ? filter : 'all' %>&search=<%= typeof search !== 'undefined' ? encodeURIComponent(search) : '' %>"
+           class="px-3 py-1 rounded-full text-[11px] font-medium border transition <%= (typeof category === 'undefined' || !category) ? 'bg-black text-white border-black' : 'bg-white text-neutral-600 border-[#e5e5e5] hover:border-neutral-400' %>">
+          Tất cả
+        </a>
+        <% categories.forEach(cat => { %>
+          <a href="/courses?category=<%= encodeURIComponent(cat) %>&filter=<%= typeof filter !== 'undefined' ? filter : 'all' %>&search=<%= typeof search !== 'undefined' ? encodeURIComponent(search) : '' %>"
+             class="px-3 py-1 rounded-full text-[11px] font-medium border transition <%= (typeof category !== 'undefined' && category === cat) ? 'bg-black text-white border-black' : 'bg-white text-neutral-600 border-[#e5e5e5] hover:border-neutral-400' %>">
+            <%= cat %>
+          </a>
+        <% }) %>
+      </div>
+    <% } %>
+
+    <!-- Status Filter Pills -->
     <div class="flex items-center gap-1.5 flex-wrap">
+      <span class="text-[11px] font-mono text-neutral-400 mr-1">Trạng thái:</span>
       <% const filters = [
         { value: 'all', label: 'Tất cả' },
         { value: 'enrolled', label: 'Đã đăng ký' },
@@ -37,19 +72,13 @@
         { value: 'not-enrolled', label: 'Chưa đăng ký' }
       ]; %>
       <% filters.forEach(f => { %>
-        <button
-          type="submit"
-          name="filter"
-          value="<%= f.value %>"
-          class="px-3.5 py-1.5 rounded-full text-xs font-medium transition border <%= (typeof filter !== 'undefined' && filter === f.value) ? 'bg-black text-white border-black' : 'bg-white text-neutral-600 border-[#e5e5e5] hover:border-neutral-400 hover:text-black' %>"
-        ><%= f.label %></button>
+        <button type="submit" name="filter" value="<%= f.value %>"
+          class="px-3 py-1 rounded-full text-[11px] font-medium transition border <%= (typeof filter !== 'undefined' && filter === f.value) ? 'bg-black text-white border-black' : 'bg-white text-neutral-600 border-[#e5e5e5] hover:border-neutral-400 hover:text-black' %>">
+          <%= f.label %>
+        </button>
       <% }) %>
-
-      <!-- Clear search if active -->
-      <% if ((typeof search !== 'undefined' && search) || (typeof filter !== 'undefined' && filter && filter !== 'all')) { %>
-        <a href="/courses" class="px-3.5 py-1.5 rounded-full text-xs font-mono text-neutral-400 hover:text-black transition">
-          ✕ xóa lọc
-        </a>
+      <% if ((typeof search !== 'undefined' && search) || (typeof filter !== 'undefined' && filter && filter !== 'all') || (typeof category !== 'undefined' && category)) { %>
+        <a href="/courses" class="px-3 py-1 rounded-full text-[11px] font-mono text-neutral-400 hover:text-black transition">✕ Xóa lọc</a>
       <% } %>
     </div>
   </form>
@@ -61,16 +90,15 @@
         <i class="fa-solid fa-box-open"></i>
       </div>
       <h3 class="text-sm font-semibold text-black mb-1">Không tìm thấy kết quả</h3>
-      <p class="text-xs text-neutral-500 mb-4">Thử từ khóa khác hoặc xóa bộ lọc hiện tại.</p>
+      <p class="text-xs text-neutral-500 mb-4">Thử từ khóa khác hoặc xóa bộ lọc.</p>
       <a href="/courses" class="inline-flex items-center gap-2 px-5 py-2 rounded-full bg-black text-white text-xs font-medium hover:bg-neutral-800 transition">
         Xem tất cả khóa học
       </a>
     </div>
   <% } else { %>
-    <!-- Grid -->
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
       <% courses.forEach((course) => { %>
-        <div class="bg-white border border-[#e5e5e5] rounded-2xl overflow-hidden hover:border-neutral-400 transition duration-200 flex flex-col group">
+        <div class="bg-white border border-[#e5e5e5] rounded-2xl overflow-hidden hover:border-neutral-400 transition duration-200 flex flex-col group reveal-card">
           
           <!-- Image / Cover -->
           <div class="h-44 bg-[#fafafa] border-b border-[#e5e5e5] relative overflow-hidden flex items-center justify-center">
@@ -81,18 +109,23 @@
                 <i class="fa-solid fa-code"></i>
               </div>
             <% } %>
-
-            <!-- Badges -->
-            <div class="absolute top-3 right-3 flex flex-col gap-1.5 items-end">
+            <!-- Category badge -->
+            <% if (course.category) { %>
+              <div class="absolute top-3 left-3">
+                <span class="inline-flex px-2.5 py-0.5 rounded-full text-[10px] font-mono bg-white/90 border border-[#e5e5e5] text-neutral-700 backdrop-blur-sm">
+                  <%= course.category %>
+                </span>
+              </div>
+            <% } %>
+            <!-- Enrollment badge -->
+            <div class="absolute top-3 right-3">
               <% if (course.enrollment_id && course.progress === 100) { %>
-                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-medium bg-white/95 border border-[#27c93f]/40 text-black backdrop-blur-sm shadow-sm">
-                  <span class="w-1.5 h-1.5 rounded-full bg-[#27c93f]"></span>
-                  Hoàn thành
+                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-medium bg-white/95 border border-[#e5e5e5] text-black backdrop-blur-sm shadow-sm">
+                  <span class="w-1.5 h-1.5 rounded-full bg-[#27c93f]"></span>Hoàn thành
                 </span>
               <% } else if (course.enrollment_id) { %>
                 <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-medium bg-white/95 border border-[#e5e5e5] text-black backdrop-blur-sm shadow-sm">
-                  <span class="w-1.5 h-1.5 rounded-full bg-[#27c93f]"></span>
-                  Đã đăng ký
+                  <span class="w-1.5 h-1.5 rounded-full bg-[#27c93f]"></span>Đã đăng ký
                 </span>
               <% } %>
             </div>
@@ -108,6 +141,18 @@
                 <%= course.description || 'Chương trình đào tạo tinh gọn với lý thuyết cốt lõi và bài tập thực hành.' %>
               </p>
 
+              <!-- Star Rating display -->
+              <% if (parseFloat(course.avg_rating) > 0) { %>
+                <div class="flex items-center gap-1.5 mt-2">
+                  <div class="flex gap-0.5">
+                    <% for (let s=1; s<=5; s++) { %>
+                      <i class="fa-<%= s <= Math.round(course.avg_rating) ? 'solid' : 'regular' %> fa-star text-[10px] <%= s <= Math.round(course.avg_rating) ? 'text-[#ffbd2e]' : 'text-neutral-300' %>"></i>
+                    <% } %>
+                  </div>
+                  <span class="text-[11px] font-mono text-neutral-400"><%= parseFloat(course.avg_rating).toFixed(1) %> (<%= course.rating_count %>)</span>
+                </div>
+              <% } %>
+
               <!-- Progress bar for enrolled courses -->
               <% if (course.enrollment_id) { %>
                 <div class="mt-3.5 pt-3 border-t border-[#e5e5e5] space-y-1.5">
@@ -116,18 +161,16 @@
                     <span class="<%= course.progress === 100 ? 'text-[#27c93f] font-semibold' : 'text-black font-medium' %>"><%= course.progress || 0 %>%</span>
                   </div>
                   <div class="w-full bg-[#fafafa] border border-[#e5e5e5] h-1.5 rounded-full overflow-hidden p-[1px]">
-                    <div class="<%= course.progress === 100 ? 'bg-[#27c93f]' : 'bg-black' %> h-full rounded-full transition-all duration-300" style="width: <%= course.progress || 0 %>%"></div>
+                    <div class="<%= course.progress === 100 ? 'bg-[#27c93f]' : 'bg-black' %> h-full rounded-full transition-all duration-500" style="width:<%= course.progress || 0 %>%"></div>
                   </div>
                 </div>
               <% } %>
             </div>
 
-            <!-- CTA Button -->
+            <!-- CTA -->
             <div class="pt-3 border-t border-[#e5e5e5] mt-auto">
-              <a 
-                href="/courses/<%= course.id %>" 
-                class="w-full py-2 px-4 rounded-full text-xs font-medium flex items-center justify-center gap-2 transition <%= course.enrollment_id ? 'bg-[#fafafa] hover:bg-neutral-200 text-black border border-[#e5e5e5]' : 'bg-black hover:bg-neutral-800 text-white' %>"
-              >
+              <a href="/courses/<%= course.id %>"
+                 class="w-full py-2 px-4 rounded-full text-xs font-medium flex items-center justify-center gap-2 transition <%= course.enrollment_id ? 'bg-[#fafafa] hover:bg-neutral-200 text-black border border-[#e5e5e5]' : 'bg-black hover:bg-neutral-800 text-white' %>">
                 <span><%= course.enrollment_id ? (course.progress === 100 ? 'Xem lại' : 'Tiếp tục học') : 'Xem chi tiết' %></span>
                 <i class="fa-solid fa-arrow-right text-[9px]"></i>
               </a>

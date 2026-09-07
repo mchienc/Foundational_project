@@ -20,6 +20,148 @@
   <!-- ===== TOAST NOTIFICATION SYSTEM ===== -->
   <div id="toast-container" class="fixed bottom-6 right-6 z-[9999] flex flex-col gap-2 items-end pointer-events-none"></div>
 
+  <!-- ===== THEME PICKER PANEL ===== -->
+  <div 
+    id="theme-panel"
+    class="hidden fixed top-16 right-4 z-[9998] w-80 bg-white border border-[#e5e5e5] rounded-2xl shadow-xl overflow-hidden"
+    style="background-color: var(--surface, white);"
+  >
+    <!-- Panel Header -->
+    <div class="flex items-center justify-between px-5 py-3.5 border-b border-[#e5e5e5] bg-[#fafafa]">
+      <div>
+        <div class="text-xs font-mono text-neutral-400">appearance</div>
+        <h3 class="text-sm font-semibold text-black">Tuỳ chỉnh giao diện</h3>
+      </div>
+      <button onclick="document.getElementById('theme-panel').classList.add('hidden')" class="text-neutral-400 hover:text-black transition p-1">
+        <i class="fa-solid fa-xmark text-sm"></i>
+      </button>
+    </div>
+
+    <div class="p-4 space-y-5">
+
+      <!-- Color Themes -->
+      <div>
+        <div class="text-[11px] font-mono text-neutral-400 mb-2.5 uppercase tracking-wider">Màu chủ đạo</div>
+        <div class="grid grid-cols-7 gap-2">
+          <button onclick="setTheme('midnight')" data-color="midnight" title="Midnight" class="theme-color-btn w-9 h-9 rounded-full bg-[#000000] border-2 border-transparent hover:scale-110 transition-transform relative flex items-center justify-center">
+            <i class="fa-solid fa-check text-white text-[9px] theme-check opacity-0"></i>
+          </button>
+          <button onclick="setTheme('ocean')" data-color="ocean" title="Ocean Blue" class="theme-color-btn w-9 h-9 rounded-full bg-[#2563eb] border-2 border-transparent hover:scale-110 transition-transform relative flex items-center justify-center">
+            <i class="fa-solid fa-check text-white text-[9px] theme-check opacity-0"></i>
+          </button>
+          <button onclick="setTheme('forest')" data-color="forest" title="Forest Green" class="theme-color-btn w-9 h-9 rounded-full bg-[#16a34a] border-2 border-transparent hover:scale-110 transition-transform relative flex items-center justify-center">
+            <i class="fa-solid fa-check text-white text-[9px] theme-check opacity-0"></i>
+          </button>
+          <button onclick="setTheme('lavender')" data-color="lavender" title="Lavender" class="theme-color-btn w-9 h-9 rounded-full bg-[#7c3aed] border-2 border-transparent hover:scale-110 transition-transform relative flex items-center justify-center">
+            <i class="fa-solid fa-check text-white text-[9px] theme-check opacity-0"></i>
+          </button>
+          <button onclick="setTheme('rose')" data-color="rose" title="Rose" class="theme-color-btn w-9 h-9 rounded-full bg-[#e11d48] border-2 border-transparent hover:scale-110 transition-transform relative flex items-center justify-center">
+            <i class="fa-solid fa-check text-white text-[9px] theme-check opacity-0"></i>
+          </button>
+          <button onclick="setTheme('amber')" data-color="amber" title="Amber" class="theme-color-btn w-9 h-9 rounded-full bg-[#d97706] border-2 border-transparent hover:scale-110 transition-transform relative flex items-center justify-center">
+            <i class="fa-solid fa-check text-white text-[9px] theme-check opacity-0"></i>
+          </button>
+          <button onclick="setTheme('teal')" data-color="teal" title="Teal" class="theme-color-btn w-9 h-9 rounded-full bg-[#0891b2] border-2 border-transparent hover:scale-110 transition-transform relative flex items-center justify-center">
+            <i class="fa-solid fa-check text-white text-[9px] theme-check opacity-0"></i>
+          </button>
+        </div>
+        <div id="theme-label" class="text-[10px] font-mono text-neutral-400 mt-2 text-center"></div>
+      </div>
+
+      <!-- Divider -->
+      <div class="border-t border-[#e5e5e5]"></div>
+
+      <!-- Background Options -->
+      <div>
+        <div class="text-[11px] font-mono text-neutral-400 mb-2.5 uppercase tracking-wider">Hình nền</div>
+        <div class="grid grid-cols-4 gap-2">
+
+          <button onclick="setBg('clean')" data-bg="clean" title="Trắng tinh" class="bg-btn group flex flex-col items-center gap-1">
+            <div class="w-full h-10 rounded-xl border-2 border-[#e5e5e5] bg-white group-hover:border-neutral-400 transition overflow-hidden relative">
+              <div class="bg-check absolute inset-0 flex items-center justify-center opacity-0">
+                <i class="fa-solid fa-check text-black text-[10px]"></i>
+              </div>
+            </div>
+            <span class="text-[9px] font-mono text-neutral-500">Trắng</span>
+          </button>
+
+          <button onclick="setBg('cream')" data-bg="cream" title="Kem ấm" class="bg-btn group flex flex-col items-center gap-1">
+            <div class="w-full h-10 rounded-xl border-2 border-[#e5e5e5] group-hover:border-neutral-400 transition overflow-hidden relative" style="background:#fdf8f0">
+              <div class="bg-check absolute inset-0 flex items-center justify-center opacity-0">
+                <i class="fa-solid fa-check text-black text-[10px]"></i>
+              </div>
+            </div>
+            <span class="text-[9px] font-mono text-neutral-500">Kem</span>
+          </button>
+
+          <button onclick="setBg('sky')" data-bg="sky" title="Bầu trời" class="bg-btn group flex flex-col items-center gap-1">
+            <div class="w-full h-10 rounded-xl border-2 border-[#e5e5e5] group-hover:border-neutral-400 transition overflow-hidden relative" style="background:#f0f7ff">
+              <div class="bg-check absolute inset-0 flex items-center justify-center opacity-0">
+                <i class="fa-solid fa-check text-black text-[10px]"></i>
+              </div>
+            </div>
+            <span class="text-[9px] font-mono text-neutral-500">Sky</span>
+          </button>
+
+          <button onclick="setBg('aurora')" data-bg="aurora" title="Aurora" class="bg-btn group flex flex-col items-center gap-1">
+            <div class="w-full h-10 rounded-xl border-2 border-[#e5e5e5] group-hover:border-neutral-400 transition overflow-hidden relative" style="background:linear-gradient(135deg,#f0e6ff,#e6f0ff,#ffe6f0)">
+              <div class="bg-check absolute inset-0 flex items-center justify-center opacity-0">
+                <i class="fa-solid fa-check text-black text-[10px]"></i>
+              </div>
+            </div>
+            <span class="text-[9px] font-mono text-neutral-500">Aurora</span>
+          </button>
+
+          <button onclick="setBg('sunset')" data-bg="sunset" title="Hoàng hôn" class="bg-btn group flex flex-col items-center gap-1">
+            <div class="w-full h-10 rounded-xl border-2 border-[#e5e5e5] group-hover:border-neutral-400 transition overflow-hidden relative" style="background:linear-gradient(135deg,#fff7ed,#fde8d8)">
+              <div class="bg-check absolute inset-0 flex items-center justify-center opacity-0">
+                <i class="fa-solid fa-check text-black text-[10px]"></i>
+              </div>
+            </div>
+            <span class="text-[9px] font-mono text-neutral-500">Sunset</span>
+          </button>
+
+          <button onclick="setBg('dots')" data-bg="dots" title="Chấm bi" class="bg-btn group flex flex-col items-center gap-1">
+            <div class="w-full h-10 rounded-xl border-2 border-[#e5e5e5] group-hover:border-neutral-400 transition overflow-hidden relative" style="background-image:radial-gradient(circle,#c0c0c0 1px,transparent 1px);background-size:8px 8px;background-color:white">
+              <div class="bg-check absolute inset-0 flex items-center justify-center opacity-0">
+                <i class="fa-solid fa-check text-black text-[10px]"></i>
+              </div>
+            </div>
+            <span class="text-[9px] font-mono text-neutral-500">Chấm</span>
+          </button>
+
+          <button onclick="setBg('grid')" data-bg="grid" title="Lưới" class="bg-btn group flex flex-col items-center gap-1">
+            <div class="w-full h-10 rounded-xl border-2 border-[#e5e5e5] group-hover:border-neutral-400 transition overflow-hidden relative" style="background-image:linear-gradient(rgba(180,180,180,0.4) 1px,transparent 1px),linear-gradient(90deg,rgba(180,180,180,0.4) 1px,transparent 1px);background-size:10px 10px;background-color:white">
+              <div class="bg-check absolute inset-0 flex items-center justify-center opacity-0">
+                <i class="fa-solid fa-check text-black text-[10px]"></i>
+              </div>
+            </div>
+            <span class="text-[9px] font-mono text-neutral-500">Lưới</span>
+          </button>
+
+          <button onclick="setBg('dark')" data-bg="dark" title="Tối" class="bg-btn group flex flex-col items-center gap-1">
+            <div class="w-full h-10 rounded-xl border-2 border-[#e5e5e5] group-hover:border-neutral-400 transition overflow-hidden relative" style="background:#0f0f0f">
+              <div class="bg-check absolute inset-0 flex items-center justify-center opacity-0">
+                <i class="fa-solid fa-check text-white text-[10px]"></i>
+              </div>
+            </div>
+            <span class="text-[9px] font-mono text-neutral-500">Tối</span>
+          </button>
+
+        </div>
+      </div>
+
+      <!-- Reset -->
+      <button 
+        onclick="setTheme('midnight'); setBg('clean');"
+        class="w-full py-2 rounded-xl border border-[#e5e5e5] text-[11px] font-mono text-neutral-500 hover:text-black hover:bg-[#fafafa] transition"
+      >
+        Đặt lại mặc định
+      </button>
+
+    </div>
+  </div>
+
   <script>
     // ---- Mobile Menu ----
     const mobileBtn = document.getElementById('mobile-menu-btn');
@@ -90,6 +232,155 @@
         window.history.replaceState({}, '', clean.toString());
       }
     })();
+
+    // ---- Active Nav Highlight ----
+    (function() {
+      const path = window.location.pathname;
+      document.querySelectorAll('.nav-link[data-path]').forEach(link => {
+        const lp = link.getAttribute('data-path');
+        if (path === lp || (lp !== '/' && path.startsWith(lp))) {
+          link.classList.remove('text-neutral-600');
+          link.classList.add('text-black', 'bg-[#fafafa]');
+        }
+      });
+    })();
+
+    // ---- Scroll Reveal Animation ----
+    (function() {
+      // Add CSS once
+      if (!document.getElementById('reveal-style')) {
+        const style = document.createElement('style');
+        style.id = 'reveal-style';
+        style.textContent = `
+          .reveal-card {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.5s ease, transform 0.5s ease;
+          }
+          .reveal-card.visible {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        `;
+        document.head.appendChild(style);
+      }
+
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach((entry, i) => {
+          if (entry.isIntersecting) {
+            setTimeout(() => {
+              entry.target.classList.add('visible');
+            }, i * 60);
+            observer.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.08 });
+
+      document.querySelectorAll('.reveal-card').forEach(el => observer.observe(el));
+    })();
+
+    // ---- Progress Bar Animate on load ----
+    document.querySelectorAll('[data-progress]').forEach(bar => {
+      const pct = bar.getAttribute('data-progress');
+      setTimeout(() => { bar.style.width = pct + '%'; }, 200);
+    });
+
+    // ===== THEME MANAGER =====
+    const themeNames = {
+      midnight: 'Midnight (Mặc định)',
+      ocean: 'Ocean Blue (Xanh biển)',
+      forest: 'Forest Green (Xanh lá)',
+      lavender: 'Lavender (Tím oải hương)',
+      rose: 'Sunset Rose (Hồng đỏ)',
+      amber: 'Amber Warm (Hổ phách)',
+      teal: 'Teal Cyan (Xanh ngọc)'
+    };
+
+    const bgNames = {
+      clean: 'Trắng tinh',
+      cream: 'Kem ấm',
+      sky: 'Bầu trời dịu',
+      aurora: 'Cực quang Aurora',
+      sunset: 'Hoàng hôn ấm',
+      dots: 'Họa tiết chấm bi',
+      grid: 'Họa tiết lưới kẻ',
+      dark: 'Giao diện tối'
+    };
+
+    function setTheme(name) {
+      document.documentElement.setAttribute('data-theme', name);
+      localStorage.setItem('ef-theme', name);
+      updateThemeUI();
+      if (typeof showToast === 'function') {
+        showToast('Đã đổi màu: ' + (themeNames[name] || name), 'info', 1800);
+      }
+    }
+
+    function setBg(name) {
+      document.documentElement.setAttribute('data-bg', name);
+      localStorage.setItem('ef-bg', name);
+      updateThemeUI();
+      if (typeof showToast === 'function') {
+        showToast('Đã đổi hình nền: ' + (bgNames[name] || name), 'info', 1800);
+      }
+    }
+
+    function updateThemeUI() {
+      const currentTheme = localStorage.getItem('ef-theme') || 'midnight';
+      const currentBg    = localStorage.getItem('ef-bg') || 'clean';
+
+      // Update color theme checks & ring
+      document.querySelectorAll('.theme-color-btn').forEach(btn => {
+        const c = btn.getAttribute('data-color');
+        const check = btn.querySelector('.theme-check');
+        if (c === currentTheme) {
+          btn.classList.add('ring-2', 'ring-offset-2', 'ring-black');
+          if (check) check.classList.remove('opacity-0');
+        } else {
+          btn.classList.remove('ring-2', 'ring-offset-2', 'ring-black');
+          if (check) check.classList.add('opacity-0');
+        }
+      });
+
+      const labelEl = document.getElementById('theme-label');
+      if (labelEl && themeNames[currentTheme]) {
+        labelEl.textContent = themeNames[currentTheme];
+      }
+
+      // Update background checks & active border
+      document.querySelectorAll('.bg-btn').forEach(btn => {
+        const b = btn.getAttribute('data-bg');
+        const check = btn.querySelector('.bg-check');
+        const box = btn.querySelector('div');
+        if (b === currentBg) {
+          if (box) {
+            box.classList.add('border-black', 'ring-2', 'ring-offset-1', 'ring-black/20');
+            box.classList.remove('border-[#e5e5e5]');
+          }
+          if (check) check.classList.remove('opacity-0');
+        } else {
+          if (box) {
+            box.classList.remove('border-black', 'ring-2', 'ring-offset-1', 'ring-black/20');
+            box.classList.add('border-[#e5e5e5]');
+          }
+          if (check) check.classList.add('opacity-0');
+        }
+      });
+    }
+
+    // Initialize Theme UI on load
+    updateThemeUI();
+
+    // Close theme panel when clicking outside
+    document.addEventListener('click', (e) => {
+      const panel = document.getElementById('theme-panel');
+      if (!panel || panel.classList.contains('hidden')) return;
+      const isToggleBtn = e.target.closest('#theme-toggle-btn') || e.target.closest('.theme-toggle-trigger');
+      const isInsidePanel = e.target.closest('#theme-panel');
+      if (!isToggleBtn && !isInsidePanel) {
+        panel.classList.add('hidden');
+      }
+    });
   </script>
 </body>
 </html>

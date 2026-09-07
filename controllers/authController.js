@@ -84,7 +84,7 @@ async function login(req, res) {
     if (user.role === 'admin') {
       res.redirect('/admin/dashboard');
     } else {
-      res.redirect('/courses');
+      res.redirect('/my-courses');
     }
   } catch (err) {
     console.error(err);

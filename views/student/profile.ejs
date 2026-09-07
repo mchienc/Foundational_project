@@ -1,0 +1,213 @@
+<%- include('../partials/header') %>
+
+<% const activeTab = (typeof query !== 'undefined' && query && query.tab) ? query.tab : 'info'; %>
+
+<div class="space-y-8">
+
+  <!-- Header -->
+  <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-[#e5e5e5]">
+    <div>
+      <div class="text-xs font-mono text-neutral-400 mb-1">student / profile</div>
+      <h1 class="text-2xl sm:text-3xl font-semibold tracking-tight text-black">Hồ sơ cá nhân</h1>
+    </div>
+    <a href="/my-courses" class="self-start sm:self-auto inline-flex items-center gap-2 px-4 py-2 rounded-full border border-[#e5e5e5] hover:bg-[#fafafa] text-xs font-medium text-black transition">
+      <i class="fa-solid fa-book-open text-[10px]"></i>
+      Khóa học của tôi
+    </a>
+  </div>
+
+  <!-- Top: Avatar + Stats -->
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+    <!-- Avatar Card -->
+    <div class="bg-white border border-[#e5e5e5] rounded-2xl p-6 flex flex-col items-center text-center space-y-3 reveal-card">
+      <div class="w-20 h-20 rounded-full bg-[#171717] text-white flex items-center justify-center text-3xl font-bold">
+        <%= user.full_name ? user.full_name.charAt(0).toUpperCase() : 'U' %>
+      </div>
+      <div>
+        <h2 class="text-lg font-semibold text-black"><%= user.full_name %></h2>
+        <p class="text-xs font-mono text-neutral-400"><%= user.email %></p>
+      </div>
+      <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-mono border border-[#e5e5e5] bg-[#fafafa] text-neutral-700">
+        <span class="w-1.5 h-1.5 rounded-full <%= user.role === 'admin' ? 'bg-[#27c93f]' : 'bg-black' %>"></span>
+        <%= user.role %>
+      </span>
+      <p class="text-[11px] font-mono text-neutral-400">
+        Tham gia <%= new Date(user.created_at).toLocaleDateString('vi-VN', {year:'numeric',month:'long'}) %>
+      </p>
+    </div>
+
+    <!-- Stats Grid -->
+    <div class="lg:col-span-2 grid grid-cols-2 sm:grid-cols-3 gap-3 content-start">
+      <div class="bg-white border border-[#e5e5e5] rounded-2xl p-4 space-y-1 hover:border-neutral-300 transition reveal-card">
+        <div class="text-2xl font-semibold text-black tracking-tight"><%= stats.enrolledCount %></div>
+        <div class="text-[11px] font-mono text-neutral-400">khóa đã đăng ký</div>
+      </div>
+      <div class="bg-white border border-[#e5e5e5] rounded-2xl p-4 space-y-1 hover:border-neutral-300 transition reveal-card">
+        <div class="text-2xl font-semibold text-[#27c93f] tracking-tight"><%= stats.completedCount %></div>
+        <div class="text-[11px] font-mono text-neutral-400">khóa hoàn thành</div>
+      </div>
+      <div class="bg-white border border-[#e5e5e5] rounded-2xl p-4 space-y-1 hover:border-neutral-300 transition reveal-card">
+        <div class="text-2xl font-semibold text-black tracking-tight"><%= stats.totalLessonsCompleted %></div>
+        <div class="text-[11px] font-mono text-neutral-400">bài đã học</div>
+      </div>
+      <div class="bg-white border border-[#e5e5e5] rounded-2xl p-4 space-y-1 hover:border-neutral-300 transition reveal-card">
+        <div class="text-2xl font-semibold text-black tracking-tight"><%= stats.quizCount %></div>
+        <div class="text-[11px] font-mono text-neutral-400">lượt làm quiz</div>
+      </div>
+      <div class="bg-white border border-[#e5e5e5] rounded-2xl p-4 space-y-1 hover:border-neutral-300 transition reveal-card">
+        <div class="text-2xl font-semibold text-black tracking-tight"><%= stats.avgScore %><span class="text-base text-neutral-400">/10</span></div>
+        <div class="text-[11px] font-mono text-neutral-400">điểm quiz TB</div>
+      </div>
+      <div class="bg-white border border-[#e5e5e5] rounded-2xl p-4 space-y-1 hover:border-neutral-300 transition reveal-card">
+        <div class="text-2xl font-semibold text-black tracking-tight"><%= stats.commentCount %></div>
+        <div class="text-[11px] font-mono text-neutral-400">bình luận Q&A</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tabs -->
+  <div class="space-y-4">
+    <!-- Tab pills -->
+    <div class="flex gap-2 flex-wrap border-b border-[#e5e5e5] pb-3">
+      <button onclick="switchTab('info')" id="tab-btn-info"
+        class="tab-btn px-4 py-1.5 rounded-full text-xs font-medium transition">
+        <i class="fa-solid fa-user text-[9px] mr-1"></i>Thông tin cá nhân
+      </button>
+      <button onclick="switchTab('security')" id="tab-btn-security"
+        class="tab-btn px-4 py-1.5 rounded-full text-xs font-medium transition">
+        <i class="fa-solid fa-lock text-[9px] mr-1"></i>Đổi mật khẩu
+      </button>
+      <button onclick="switchTab('certs')" id="tab-btn-certs"
+        class="tab-btn px-4 py-1.5 rounded-full text-xs font-medium transition">
+        <i class="fa-solid fa-certificate text-[9px] mr-1"></i>Chứng chỉ (<%= certificates.length %>)
+      </button>
+    </div>
+
+    <!-- Tab: Thông tin cá nhân -->
+    <div id="tab-info" class="tab-panel bg-white border border-[#e5e5e5] rounded-2xl p-6 reveal-card">
+      <h3 class="text-sm font-semibold text-black mb-4">Chỉnh sửa thông tin</h3>
+      <form action="/profile/update" method="POST" class="space-y-4 max-w-md">
+        <div class="space-y-1.5">
+          <label class="text-xs font-mono text-neutral-500">Họ và tên</label>
+          <input type="text" name="full_name" value="<%= user.full_name %>"
+            class="w-full px-4 py-2 rounded-xl border border-[#e5e5e5] text-sm text-black focus:outline-none focus:border-black transition bg-white">
+        </div>
+        <div class="space-y-1.5">
+          <label class="text-xs font-mono text-neutral-500">Email</label>
+          <input type="email" name="email" value="<%= user.email %>"
+            class="w-full px-4 py-2 rounded-xl border border-[#e5e5e5] text-sm text-black focus:outline-none focus:border-black transition bg-white">
+        </div>
+        <button type="submit" class="px-6 py-2 rounded-full bg-black text-white hover:bg-neutral-800 text-xs font-medium transition">
+          Lưu thay đổi
+        </button>
+      </form>
+    </div>
+
+    <!-- Tab: Đổi mật khẩu -->
+    <div id="tab-security" class="tab-panel bg-white border border-[#e5e5e5] rounded-2xl p-6 reveal-card">
+      <h3 class="text-sm font-semibold text-black mb-4">Đổi mật khẩu</h3>
+      <form action="/profile/password" method="POST" class="space-y-4 max-w-md">
+        <div class="space-y-1.5">
+          <label class="text-xs font-mono text-neutral-500">Mật khẩu hiện tại</label>
+          <input type="password" name="current_password" placeholder="••••••••"
+            class="w-full px-4 py-2 rounded-xl border border-[#e5e5e5] text-sm focus:outline-none focus:border-black transition bg-white">
+        </div>
+        <div class="space-y-1.5">
+          <label class="text-xs font-mono text-neutral-500">Mật khẩu mới</label>
+          <input type="password" name="new_password" placeholder="Tối thiểu 6 ký tự"
+            class="w-full px-4 py-2 rounded-xl border border-[#e5e5e5] text-sm focus:outline-none focus:border-black transition bg-white">
+        </div>
+        <div class="space-y-1.5">
+          <label class="text-xs font-mono text-neutral-500">Xác nhận mật khẩu mới</label>
+          <input type="password" name="confirm_password" placeholder="••••••••"
+            class="w-full px-4 py-2 rounded-xl border border-[#e5e5e5] text-sm focus:outline-none focus:border-black transition bg-white">
+        </div>
+        <button type="submit" class="px-6 py-2 rounded-full bg-black text-white hover:bg-neutral-800 text-xs font-medium transition">
+          Đổi mật khẩu
+        </button>
+      </form>
+    </div>
+
+    <!-- Tab: Chứng chỉ -->
+    <div id="tab-certs" class="tab-panel reveal-card">
+      <% if (certificates.length === 0) { %>
+        <div class="border border-dashed border-[#e5e5e5] rounded-2xl p-10 text-center">
+          <div class="w-10 h-10 rounded-full bg-[#fafafa] border border-[#e5e5e5] flex items-center justify-center mx-auto mb-3 text-neutral-400">
+            <i class="fa-solid fa-certificate text-sm"></i>
+          </div>
+          <h3 class="text-sm font-semibold text-black mb-1">Chưa có chứng chỉ</h3>
+          <p class="text-xs text-neutral-500 mb-4">Hoàn thành 100% khóa học để nhận chứng chỉ.</p>
+          <a href="/courses" class="inline-flex items-center gap-2 px-5 py-2 rounded-full bg-black text-white text-xs font-medium hover:bg-neutral-800 transition">
+            Khám phá khóa học
+          </a>
+        </div>
+      <% } else { %>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <% certificates.forEach(cert => { %>
+            <div class="bg-white border border-[#e5e5e5] rounded-2xl p-5 flex items-center justify-between gap-3 hover:border-neutral-300 transition group">
+              <div class="flex items-center gap-3">
+                <div class="w-9 h-9 rounded-full bg-[#fafafa] border border-[#e5e5e5] flex items-center justify-center text-[#27c93f] shrink-0">
+                  <i class="fa-solid fa-circle-check text-sm"></i>
+                </div>
+                <div class="min-w-0">
+                  <div class="text-sm font-semibold text-black group-hover:underline truncate"><%= cert.title %></div>
+                  <div class="text-[11px] font-mono text-neutral-400"><%= new Date(cert.enrolled_at).toLocaleDateString('vi-VN') %></div>
+                </div>
+              </div>
+              <a href="/courses/<%= cert.id %>/certificate" class="shrink-0 px-3 py-1 rounded-full border border-[#e5e5e5] text-[11px] font-medium text-black hover:bg-[#fafafa] transition">Xem</a>
+            </div>
+          <% }) %>
+        </div>
+      <% } %>
+    </div>
+  </div>
+
+  <!-- In-Progress Courses -->
+  <% if (inProgress.length > 0) { %>
+    <div class="space-y-3 reveal-card">
+      <div class="flex items-center justify-between">
+        <h2 class="text-sm font-semibold text-black">Đang học</h2>
+        <a href="/my-courses" class="text-[11px] font-mono text-neutral-400 hover:text-black transition">xem tất cả →</a>
+      </div>
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <% inProgress.forEach(c => { %>
+          <a href="/courses/<%= c.id %>" class="bg-white border border-[#e5e5e5] rounded-2xl p-4 hover:border-neutral-300 transition group block space-y-2">
+            <div class="text-sm font-semibold text-black group-hover:underline line-clamp-2 leading-snug"><%= c.title %></div>
+            <div class="space-y-1">
+              <div class="flex items-center justify-between text-[11px] font-mono text-neutral-400">
+                <span>tiến độ</span><span class="text-black font-medium"><%= c.progress %>%</span>
+              </div>
+              <div class="w-full bg-[#fafafa] border border-[#e5e5e5] h-1.5 rounded-full overflow-hidden p-[1px]">
+                <div class="bg-black h-full rounded-full" style="width:<%= c.progress %>%"></div>
+              </div>
+            </div>
+          </a>
+        <% }) %>
+      </div>
+    </div>
+  <% } %>
+
+</div>
+
+<script>
+  const ACTIVE_TAB = '<%= activeTab %>';
+  function switchTab(name) {
+    document.querySelectorAll('.tab-panel').forEach(p => p.style.display = 'none');
+    document.querySelectorAll('.tab-btn').forEach(b => {
+      b.classList.remove('bg-black', 'text-white');
+      b.classList.add('bg-white', 'text-neutral-600', 'border', 'border-[#e5e5e5]', 'hover:bg-[#fafafa]');
+    });
+    const panel = document.getElementById('tab-' + name);
+    const btn   = document.getElementById('tab-btn-' + name);
+    if (panel) panel.style.display = 'block';
+    if (btn) {
+      btn.classList.add('bg-black', 'text-white');
+      btn.classList.remove('bg-white', 'text-neutral-600', 'border', 'border-[#e5e5e5]', 'hover:bg-[#fafafa]');
+    }
+  }
+  // Init on load
+  document.addEventListener('DOMContentLoaded', () => switchTab(ACTIVE_TAB));
+</script>
+
+<%- include('../partials/footer') %>

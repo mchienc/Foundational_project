@@ -1,0 +1,127 @@
+<%- include('../partials/header') %>
+
+<div class="space-y-8">
+
+  <!-- Header -->
+  <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-[#e5e5e5]">
+    <div>
+      <div class="text-xs font-mono text-neutral-400 mb-1">student / learning</div>
+      <h1 class="text-2xl sm:text-3xl font-semibold tracking-tight text-black">Khóa học của tôi</h1>
+      <p class="text-sm text-neutral-500 mt-1">Tổng hợp tiến độ học tập và thành tích của bạn.</p>
+    </div>
+    <a href="/courses" class="self-start sm:self-auto inline-flex items-center gap-2 px-4 py-2 rounded-full bg-black text-white text-xs font-medium hover:bg-neutral-800 transition">
+      <i class="fa-solid fa-plus text-[9px]"></i>
+      Khám phá thêm
+    </a>
+  </div>
+
+  <% if (inProgress.length === 0 && completed.length === 0) { %>
+    <!-- Empty State -->
+    <div class="border border-dashed border-[#e5e5e5] bg-white p-16 text-center max-w-md mx-auto rounded-2xl">
+      <div class="w-12 h-12 rounded-full bg-[#fafafa] border border-[#e5e5e5] text-neutral-400 flex items-center justify-center mx-auto mb-4 text-base">
+        <i class="fa-solid fa-book-open"></i>
+      </div>
+      <h3 class="text-sm font-semibold text-black mb-1">Bạn chưa đăng ký khóa học nào</h3>
+      <p class="text-xs text-neutral-500 mb-5">Hãy khám phá danh mục và bắt đầu hành trình học tập!</p>
+      <a href="/courses" class="inline-flex items-center gap-2 px-6 py-2.5 rounded-full bg-black text-white text-xs font-medium hover:bg-neutral-800 transition">
+        Xem tất cả khóa học
+        <i class="fa-solid fa-arrow-right text-[9px]"></i>
+      </a>
+    </div>
+
+  <% } else { %>
+
+    <!-- === Đang học === -->
+    <% if (inProgress.length > 0) { %>
+      <div class="space-y-4 reveal-card">
+        <div class="flex items-center justify-between">
+          <div>
+            <h2 class="text-base font-semibold text-black">Đang học</h2>
+            <p class="text-xs font-mono text-neutral-400 mt-0.5"><%= inProgress.length %> khóa học</p>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+          <% inProgress.forEach((course) => { %>
+            <div class="bg-white border border-[#e5e5e5] rounded-2xl overflow-hidden hover:border-neutral-400 transition group flex flex-col reveal-card">
+              <!-- Cover -->
+              <div class="h-36 bg-[#fafafa] border-b border-[#e5e5e5] relative overflow-hidden flex items-center justify-center">
+                <% if (course.image) { %>
+                  <img src="<%= course.image %>" alt="<%= course.title %>" class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
+                <% } else { %>
+                  <i class="fa-solid fa-code text-neutral-300 text-2xl"></i>
+                <% } %>
+              </div>
+              <!-- Body -->
+              <div class="p-4 flex-1 flex flex-col justify-between space-y-3">
+                <div>
+                  <h3 class="text-sm font-semibold text-black group-hover:underline transition line-clamp-2 leading-snug">
+                    <%= course.title %>
+                  </h3>
+                  <p class="text-[11px] font-mono text-neutral-400 mt-1">
+                    <%= course.done_lessons %>/<%= course.total_lessons %> bài đã học
+                  </p>
+                </div>
+                <!-- Progress bar -->
+                <div class="space-y-1.5">
+                  <div class="flex items-center justify-between text-[11px] font-mono">
+                    <span class="text-neutral-400">tiến độ</span>
+                    <span class="font-medium text-black"><%= course.progress %>%</span>
+                  </div>
+                  <div class="w-full bg-[#fafafa] border border-[#e5e5e5] h-1.5 rounded-full overflow-hidden p-[1px]">
+                    <div class="bg-black h-full rounded-full transition-all duration-700" style="width:<%= course.progress %>%"></div>
+                  </div>
+                </div>
+                <a href="/courses/<%= course.id %>" class="w-full py-2 px-4 rounded-full text-xs font-medium flex items-center justify-center gap-2 bg-black text-white hover:bg-neutral-800 transition">
+                  <i class="fa-solid fa-play text-[9px]"></i>
+                  Tiếp tục học
+                </a>
+              </div>
+            </div>
+          <% }) %>
+        </div>
+      </div>
+    <% } %>
+
+    <!-- === Hoàn thành === -->
+    <% if (completed.length > 0) { %>
+      <div class="space-y-4 reveal-card">
+        <div class="flex items-center justify-between">
+          <div>
+            <h2 class="text-base font-semibold text-black">Đã hoàn thành</h2>
+            <p class="text-xs font-mono text-neutral-400 mt-0.5"><%= completed.length %> khóa học · đạt 100%</p>
+          </div>
+        </div>
+
+        <div class="bg-white border border-[#e5e5e5] rounded-2xl overflow-hidden divide-y divide-[#e5e5e5]">
+          <% completed.forEach((course) => { %>
+            <div class="flex items-center justify-between gap-4 p-4 hover:bg-[#fafafa] transition group">
+              <div class="flex items-center gap-3 min-w-0">
+                <div class="w-8 h-8 rounded-full bg-[#fafafa] border border-[#e5e5e5] flex items-center justify-center shrink-0 text-[#27c93f]">
+                  <i class="fa-solid fa-circle-check text-sm"></i>
+                </div>
+                <div class="min-w-0">
+                  <div class="text-sm font-semibold text-black group-hover:underline truncate"><%= course.title %></div>
+                  <div class="text-[11px] font-mono text-neutral-400"><%= course.total_lessons %> bài · 100% hoàn thành</div>
+                </div>
+              </div>
+              <div class="flex items-center gap-2 shrink-0">
+                <a href="/courses/<%= course.id %>/certificate" class="px-3 py-1 rounded-full border border-[#e5e5e5] text-[11px] font-medium text-black hover:bg-[#fafafa] transition flex items-center gap-1.5">
+                  <i class="fa-solid fa-certificate text-[9px]"></i>
+                  Chứng chỉ
+                </a>
+                <a href="/courses/<%= course.id %>" class="px-3 py-1 rounded-full border border-[#e5e5e5] text-[11px] font-medium text-black hover:bg-[#fafafa] transition">
+                  Xem lại
+                </a>
+              </div>
+            </div>
+          <% }) %>
+        </div>
+      </div>
+    <% } %>
+
+  <% } %>
+
+</div>
+
+<%- include('../partials/footer') %>

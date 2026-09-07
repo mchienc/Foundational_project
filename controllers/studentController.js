@@ -8,7 +8,7 @@ const db = require('../config/db');
 async function listCourses(req, res) {
   try {
     const userId = req.session.user.id;
-    const { search = '', filter = 'all' } = req.query;
+    const { search = '', filter = 'all', category = '' } = req.query;
 
     // Xây dựng điều kiện tìm kiếm và lọc động
     let whereClause = '';
@@ -17,6 +17,11 @@ async function listCourses(req, res) {
     if (search.trim()) {
       whereClause += ' AND (c.title LIKE ? OR c.description LIKE ?)';
       queryParams.push(`%${search.trim()}%`, `%${search.trim()}%`);
+    }
+
+    if (category.trim()) {
+      whereClause += ' AND c.category = ?';
+      queryParams.push(category.trim());
     }
 
     if (filter === 'enrolled') {
@@ -32,18 +37,28 @@ async function listCourses(req, res) {
     const [courses] = await db.query(
       `SELECT c.*,
               e.id AS enrollment_id,
-              e.progress
+              e.progress,
+              COALESCE(AVG(r.stars), 0) AS avg_rating,
+              COUNT(DISTINCT r.id) AS rating_count
        FROM courses c
        LEFT JOIN enrollments e ON e.course_id = c.id AND e.user_id = ?
+       LEFT JOIN course_ratings r ON r.course_id = c.id
        WHERE 1=1 ${whereClause}
+       GROUP BY c.id, e.id, e.progress
        ORDER BY c.created_at DESC`,
       queryParams
     );
 
-    // Tổng khóa học không lọc (để hiển thị trên header)
+    // Tổng khóa học không lọc
     const [[{ totalCount }]] = await db.query('SELECT COUNT(*) AS totalCount FROM courses');
 
-    res.render('student/courses', { courses, search, filter, totalCount });
+    // Danh sách categories distinct
+    const [categoryRows] = await db.query(
+      'SELECT DISTINCT category FROM courses WHERE category IS NOT NULL ORDER BY category ASC'
+    );
+    const categories = categoryRows.map(r => r.category).filter(Boolean);
+
+    res.render('student/courses', { courses, search, filter, category, totalCount, categories });
   } catch (err) {
     console.error(err);
     res.status(500).send('Có lỗi xảy ra khi tải danh sách khóa học.');

@@ -1,90 +1,292 @@
-/* public/css/style.css - Ollama Minimalist Style */
+/* ============================================================
+   EduFlow — Theme System & Global Styles
+   ============================================================ */
 
-html {
-  scroll-behavior: smooth;
-}
-
-/* Ollama subtle scrollbar */
-::-webkit-scrollbar {
-  width: 5px;
-  height: 5px;
-}
-::-webkit-scrollbar-track {
-  background: #ffffff;
-}
-::-webkit-scrollbar-thumb {
-  background: #e5e5e5;
-  border-radius: 9999px;
-}
-::-webkit-scrollbar-thumb:hover {
-  background: #a3a3a3;
+/* === CSS Custom Properties (Theme Tokens) === */
+:root {
+  --accent: #000000;
+  --accent-hover: #1a1a1a;
+  --accent-soft: #f5f5f5;
+  --accent-text: #ffffff;
+  --accent-ring: rgba(0,0,0,0.15);
+  --surface: #ffffff;
+  --surface-soft: #fafafa;
+  --border: #e5e5e5;
+  --bg-body: #ffffff;
+  --bg-pattern: none;
 }
 
-/* Ollama-inspired Markdown Reader Typography */
-.lesson-content {
-  line-height: 1.75;
-  color: #525252;
-  font-size: 1rem;
+/* Body applies theme vars */
+body {
+  background-color: var(--bg-body) !important;
+  background-image: var(--bg-pattern) !important;
+  background-attachment: fixed;
 }
-.lesson-content h1, 
-.lesson-content h2, 
-.lesson-content h3, 
-.lesson-content h4 {
-  color: #000000;
-  font-weight: 600;
-  letter-spacing: -0.015em;
-  margin-top: 1.75rem;
-  margin-bottom: 0.75rem;
+
+/* === THEMES: Color Accents === */
+
+/* Midnight (default — black) */
+[data-theme="midnight"] {
+  --accent: #000000;
+  --accent-hover: #1a1a1a;
+  --accent-soft: #f5f5f5;
+  --accent-text: #ffffff;
+  --accent-ring: rgba(0,0,0,0.12);
 }
-.lesson-content h1 { font-size: 1.75rem; line-height: 1.25; }
-.lesson-content h2 { font-size: 1.4rem; line-height: 1.3; }
-.lesson-content h3 { font-size: 1.2rem; line-height: 1.4; }
-.lesson-content p {
-  margin-bottom: 1.25rem;
+
+/* Ocean Blue */
+[data-theme="ocean"] {
+  --accent: #2563eb;
+  --accent-hover: #1d4ed8;
+  --accent-soft: #eff6ff;
+  --accent-text: #ffffff;
+  --accent-ring: rgba(37,99,235,0.15);
 }
-.lesson-content ul, .lesson-content ol {
-  margin-left: 1.5rem;
-  margin-bottom: 1.25rem;
+
+/* Forest Green */
+[data-theme="forest"] {
+  --accent: #16a34a;
+  --accent-hover: #15803d;
+  --accent-soft: #f0fdf4;
+  --accent-text: #ffffff;
+  --accent-ring: rgba(22,163,74,0.15);
 }
-.lesson-content ul { list-style-type: disc; }
-.lesson-content ol { list-style-type: decimal; }
-.lesson-content li { margin-bottom: 0.35rem; }
-.lesson-content blockquote {
-  border-left: 2px solid #000000;
-  padding-left: 1rem;
-  color: #737373;
-  margin: 1.5rem 0;
+
+/* Lavender Purple */
+[data-theme="lavender"] {
+  --accent: #7c3aed;
+  --accent-hover: #6d28d9;
+  --accent-soft: #f5f3ff;
+  --accent-text: #ffffff;
+  --accent-ring: rgba(124,58,237,0.15);
 }
-.lesson-content pre, .lesson-content code {
-  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+
+/* Sunset Rose */
+[data-theme="rose"] {
+  --accent: #e11d48;
+  --accent-hover: #be123c;
+  --accent-soft: #fff1f2;
+  --accent-text: #ffffff;
+  --accent-ring: rgba(225,29,72,0.15);
 }
-.lesson-content code {
-  background-color: #fafafa;
-  color: #000000;
-  padding: 0.15rem 0.4rem;
-  border-radius: 4px;
-  border: 1px solid #e5e5e5;
-  font-size: 0.875em;
+
+/* Amber Warm */
+[data-theme="amber"] {
+  --accent: #d97706;
+  --accent-hover: #b45309;
+  --accent-soft: #fffbeb;
+  --accent-text: #ffffff;
+  --accent-ring: rgba(217,119,6,0.15);
 }
-.lesson-content pre {
-  background-color: #fafafa;
-  color: #000000;
-  padding: 1.25rem 1.5rem;
-  border-radius: 12px;
-  border: 1px solid #e5e5e5;
-  overflow-x: auto;
-  margin: 1.5rem 0;
+
+/* Teal Cyan */
+[data-theme="teal"] {
+  --accent: #0891b2;
+  --accent-hover: #0e7490;
+  --accent-soft: #ecfeff;
+  --accent-text: #ffffff;
+  --accent-ring: rgba(8,145,178,0.15);
 }
-.lesson-content pre code {
-  background-color: transparent;
-  color: inherit;
-  padding: 0;
-  border: none;
+
+/* === BACKGROUNDS === */
+
+/* Clean (default) */
+[data-bg="clean"] {
+  --bg-body: #ffffff;
+  --bg-pattern: none;
 }
-.lesson-content img {
-  border-radius: 12px;
-  max-width: 100%;
-  height: auto;
-  margin: 1.5rem 0;
-  border: 1px solid #e5e5e5;
+
+/* Warm Cream */
+[data-bg="cream"] {
+  --bg-body: #fdf8f0;
+  --bg-pattern: none;
+  --surface: #fffdf7;
+  --surface-soft: #faf5e9;
+}
+
+/* Soft Blue Sky */
+[data-bg="sky"] {
+  --bg-body: #f0f7ff;
+  --bg-pattern: none;
+  --surface: #f8fbff;
+  --surface-soft: #edf4ff;
+}
+
+/* Dot Grid Pattern */
+[data-bg="dots"] {
+  --bg-body: #ffffff;
+  --bg-pattern: radial-gradient(circle, #d4d4d4 1px, transparent 1px);
+  background-size: 20px 20px !important;
+}
+
+/* Grid Lines */
+[data-bg="grid"] {
+  --bg-body: #ffffff;
+  --bg-pattern: 
+    linear-gradient(rgba(200,200,200,0.3) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(200,200,200,0.3) 1px, transparent 1px);
+  background-size: 24px 24px !important;
+}
+
+/* Dark Canvas */
+[data-bg="dark"] {
+  --bg-body: #0f0f0f;
+  --bg-pattern: none;
+  --surface: #1a1a1a;
+  --surface-soft: #141414;
+  --border: #2a2a2a;
+  color: #e5e5e5;
+}
+
+/* Gradient Aurora */
+[data-bg="aurora"] {
+  --bg-body: #f8f4ff;
+  --bg-pattern: 
+    radial-gradient(ellipse at 20% 50%, rgba(139,92,246,0.08) 0%, transparent 60%),
+    radial-gradient(ellipse at 80% 20%, rgba(59,130,246,0.08) 0%, transparent 60%),
+    radial-gradient(ellipse at 50% 80%, rgba(236,72,153,0.06) 0%, transparent 60%);
+}
+
+/* Sunset Gradient */
+[data-bg="sunset"] {
+  --bg-body: #fff7ed;
+  --bg-pattern: 
+    radial-gradient(ellipse at 10% 90%, rgba(251,146,60,0.12) 0%, transparent 50%),
+    radial-gradient(ellipse at 90% 10%, rgba(249,168,212,0.12) 0%, transparent 50%);
+}
+
+/* === THEME-AWARE COMPONENT OVERRIDES === */
+
+/* Buttons using accent */
+.btn-accent {
+  background-color: var(--accent) !important;
+  color: var(--accent-text) !important;
+}
+.btn-accent:hover {
+  background-color: var(--accent-hover) !important;
+}
+
+/* Nav active state */
+.nav-active {
+  color: var(--accent) !important;
+  background-color: var(--accent-soft) !important;
+}
+
+/* Progress bars */
+.progress-accent {
+  background-color: var(--accent) !important;
+}
+
+/* Checkmarks & status dots */
+.dot-accent {
+  background-color: var(--accent) !important;
+}
+
+/* Focus rings */
+input:focus, textarea:focus, select:focus {
+  border-color: var(--accent) !important;
+  box-shadow: 0 0 0 3px var(--accent-ring) !important;
+  outline: none !important;
+}
+
+/* Surface backgrounds use theme var */
+.surface-themed {
+  background-color: var(--surface);
+}
+.surface-soft-themed {
+  background-color: var(--surface-soft);
+}
+
+/* Smooth theme transitions */
+*, *::before, *::after {
+  transition-property: background-color, border-color, color, box-shadow;
+  transition-duration: 0.25s;
+  transition-timing-function: ease;
+}
+
+/* Don't transition layout properties */
+img, video, .no-transition {
+  transition: none !important;
+}
+
+/* === Reveal Card Animations === */
+.reveal-card {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.5s ease, transform 0.5s ease !important;
+}
+.reveal-card.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* === Dark bg text override === */
+[data-bg="dark"] {
+  color-scheme: dark;
+}
+[data-bg="dark"] .text-neutral-900,
+[data-bg="dark"] .text-black {
+  color: #e5e5e5 !important;
+}
+[data-bg="dark"] .text-neutral-700,
+[data-bg="dark"] .text-neutral-800 {
+  color: #d4d4d4 !important;
+}
+[data-bg="dark"] .text-neutral-500,
+[data-bg="dark"] .text-neutral-600 {
+  color: #a3a3a3 !important;
+}
+[data-bg="dark"] .text-neutral-400 {
+  color: #888888 !important;
+}
+[data-bg="dark"] .bg-white {
+  background-color: #1a1a1a !important;
+}
+[data-bg="dark"] .bg-\[#fafafa\] {
+  background-color: #141414 !important;
+}
+[data-bg="dark"] .border-\[#e5e5e5\] {
+  border-color: #2a2a2a !important;
+}
+[data-bg="dark"] header {
+  background-color: rgba(15,15,15,0.9) !important;
+  border-color: #2a2a2a !important;
+}
+[data-bg="dark"] footer {
+  background-color: #121212 !important;
+  border-color: #262626 !important;
+}
+[data-bg="dark"] input,
+[data-bg="dark"] textarea,
+[data-bg="dark"] select {
+  background-color: #161616 !important;
+  color: #f3f4f6 !important;
+  border-color: #333333 !important;
+}
+[data-bg="dark"] input::placeholder,
+[data-bg="dark"] textarea::placeholder {
+  color: #666666 !important;
+}
+
+/* === Dynamic Accent Color Overrides === */
+/* When not using the midnight theme, primary black buttons & active states turn into the chosen accent color */
+[data-theme]:not([data-theme="midnight"]) button.bg-black,
+[data-theme]:not([data-theme="midnight"]) a.bg-black {
+  background-color: var(--accent) !important;
+  color: var(--accent-text) !important;
+}
+[data-theme]:not([data-theme="midnight"]) button.bg-black:hover,
+[data-theme]:not([data-theme="midnight"]) a.bg-black:hover,
+[data-theme]:not([data-theme="midnight"]) .hover\:bg-neutral-800:hover {
+  background-color: var(--accent-hover) !important;
+}
+[data-theme]:not([data-theme="midnight"]) .border-black {
+  border-color: var(--accent) !important;
+}
+[data-theme]:not([data-theme="midnight"]) .nav-link.text-black.bg-\[\#fafafa\] {
+  color: var(--accent) !important;
+  background-color: var(--accent-soft) !important;
+}
+[data-theme]:not([data-theme="midnight"]) div.bg-black.h-full {
+  background-color: var(--accent) !important;
 }

@@ -4,7 +4,15 @@
 const express = require('express');
 const router = express.Router();
 const studentController = require('../controllers/studentController');
+const profileController  = require('../controllers/profileController');
 
+// ----- Profile & My Courses -----
+router.get('/profile',         profileController.showProfile);
+router.post('/profile/update', profileController.updateProfile);
+router.post('/profile/password', profileController.changePassword);
+router.get('/my-courses',      profileController.myCourses);
+
+// ----- Khóa học -----
 router.get('/courses', studentController.listCourses);
 router.get('/courses/:id', studentController.courseDetail);
 router.post('/courses/:id/enroll', studentController.enroll);
