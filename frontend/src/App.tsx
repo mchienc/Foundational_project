@@ -4,7 +4,7 @@ import { Screen, Course, User, ToastMessage } from './types';
 import { sampleCourses, initialUserStats } from './data/mockData';
 import { Navbar } from './components/common/Navbar';
 import { ToastContainer } from './components/common/ToastContainer';
-import { AuthModal } from './components/auth/AuthModal';
+import { AcademicAuthModal } from './components/auth/AcademicAuthModal';
 import { CertificateModal } from './components/common/CertificateModal';
 import { Dashboard } from './components/dashboard/Dashboard';
 import { Profile } from './components/profile/Profile';
@@ -13,16 +13,13 @@ import { FlashcardPlayer } from './components/english/FlashcardPlayer';
 import { PronunciationStudio } from './components/english/PronunciationStudio';
 import { ListeningPlayer } from './components/english/ListeningPlayer';
 import { SentenceBuilder } from './components/english/SentenceBuilder';
+import { AcademicWritingStudio } from './components/english/AcademicWritingStudio';
 import { LeaderboardModal } from './components/english/LeaderboardModal';
+import { AcademicLandingPage } from './components/marketing/AcademicLandingPage';
 import { sampleFlashcards } from './data/englishMockData';
-
-const defaultStudentUser: User = {
-  id: 'user-student-3',
-  email: 'dangchien2005@gmail.com',
-  full_name: 'Minh Chiến Đặng',
-  role: 'student',
-  avatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=120&auto=format&fit=crop&q=80',
-};
+import { englishApi } from './services/englishApi';
+import { AuthProvider, useAuth } from './context/AuthContext';
+import { SoftAtmosphereBackground } from './components/common/SoftAtmosphereBackground';
 
 // Error Boundary to prevent white screen crashes
 interface ErrorBoundaryProps {
@@ -67,13 +64,13 @@ class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundarySta
                 this.setState({ hasError: false, error: null });
                 window.location.reload();
               }}
-              className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-xl text-xs font-bold transition-colors cursor-pointer"
+              className="px-4 py-2 bg-forest-950 hover:bg-forest-900 text-gold-300 rounded-xl text-xs font-bold transition-colors cursor-pointer"
             >
               Tải lại trang web
             </button>
             <button
               onClick={() => this.setState({ hasError: false, error: null })}
-              className="px-4 py-2 bg-white border border-red-300 text-red-700 hover:bg-red-50 rounded-xl text-xs font-semibold transition-colors cursor-pointer"
+              className="px-4 py-2 bg-white border border-stone-300 text-stone-700 hover:bg-stone-50 rounded-xl text-xs font-semibold transition-colors cursor-pointer"
             >
               Thử lại ngay
             </button>
@@ -85,21 +82,27 @@ class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundarySta
   }
 }
 
-export const App: React.FC = () => {
-  // Navigation Screen State
-  const [currentScreen, setCurrentScreen] = useState<Screen>('dashboard');
+const AppContent: React.FC = () => {
+  const {
+    user,
+    isAuthenticated,
+    login,
+    logout,
+    requireAuth,
+    openAuthModal,
+    closeAuthModal,
+    authModalConfig,
+    setNotifyHandler,
+  } = useAuth();
 
-  // English Courses
-  const [courses, setCourses] = useState<Course[]>(sampleCourses);
-
-  // User & Authentication State
-  const [currentUser, setCurrentUser] = useState<User | null>(() => {
+  // Navigation Screen State: Guests land on 'landing', authenticated students go to 'dashboard'
+  const [currentScreen, setCurrentScreen] = useState<Screen>(() => {
     const saved = localStorage.getItem('eduflow_current_user');
-    return saved ? JSON.parse(saved) : defaultStudentUser;
+    return saved ? 'dashboard' : 'landing';
   });
 
-  const [showAuthModal, setShowAuthModal] = useState<boolean>(false);
-  const [authModalTab, setAuthModalTab] = useState<'login' | 'register'>('login');
+  // Courses list
+  const [courses, setCourses] = useState<Course[]>(sampleCourses);
 
   // Certificate Modal State
   const [showCertModal, setShowCertModal] = useState<boolean>(false);
@@ -111,7 +114,7 @@ export const App: React.FC = () => {
   // Gamification XP State & Leaderboard Modal
   const [xp, setXp] = useState<number>(() => {
     const saved = localStorage.getItem('eduflow_xp');
-    return saved ? parseInt(saved, 10) : 1980;
+    return saved ? parseInt(saved, 10) : 2250;
   });
   const [showLeaderboardModal, setShowLeaderboardModal] = useState<boolean>(false);
 
@@ -130,6 +133,11 @@ export const App: React.FC = () => {
     setToasts((prev) => prev.filter((t) => t.id !== id));
   };
 
+  // Register toast notifier with AuthContext
+  useEffect(() => {
+    setNotifyHandler(addToast);
+  }, [setNotifyHandler]);
+
   const handleEarnXp = (amount: number, reason: string) => {
     setXp((prev) => {
       const next = prev + amount;
@@ -143,39 +151,99 @@ export const App: React.FC = () => {
     addToast(reason, 'success');
   };
 
-  // Persist Current User
+  // Sync user learning stats & XP from MySQL Database
   useEffect(() => {
-    if (currentUser) {
-      localStorage.setItem('eduflow_current_user', JSON.stringify(currentUser));
-    } else {
-      localStorage.removeItem('eduflow_current_user');
-    }
-  }, [currentUser]);
+    if (!user) return;
 
-  // Auth Handlers
-  const handleOpenAuth = (tab: 'login' | 'register' = 'login') => {
-    setAuthModalTab(tab);
-    setShowAuthModal(true);
+    let isMounted = true;
+    const userId = 3; // Minh Chiến Đặng
+    englishApi
+      .getUserStats(userId)
+      .then((dbStats) => {
+        if (isMounted && dbStats) {
+          if (dbStats.xp_this_week) {
+            setXp(dbStats.xp_this_week);
+            localStorage.setItem('eduflow_xp', dbStats.xp_this_week.toString());
+          }
+          if (dbStats.streak_days) {
+            setStats((prev) => ({
+              ...prev,
+              streakDays: dbStats.streak_days,
+            }));
+          }
+        }
+      })
+      .catch((err) => console.warn('Could not sync user stats from MySQL:', err));
+
+    return () => {
+      isMounted = false;
+    };
+  }, [user]);
+
+  // Protected screens requiring authentication
+  const protectedScreens: Screen[] = [
+    'dashboard',
+    'vocab-srs',
+    'speaking',
+    'listening',
+    'sentence-builder',
+    'writing',
+    'profile',
+    'admin',
+  ];
+
+  // Auth Guard Navigation Handler
+  const handleScreenNavigate = (screen: Screen) => {
+    if (screen === 'leaderboard') {
+      setShowLeaderboardModal(true);
+      return;
+    }
+
+    if (screen === 'landing') {
+      setCurrentScreen('landing');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      return;
+    }
+
+    // Intercept if guest attempts to access protected screens
+    if (!isAuthenticated && protectedScreens.includes(screen)) {
+      requireAuth(
+        screen === 'dashboard'
+          ? 'Bàn Học Cá Nhân'
+          : screen === 'vocab-srs'
+          ? 'Thẻ Từ Vựng 3D'
+          : screen === 'speaking'
+          ? 'Phòng Thu Phát Âm Waveform AI'
+          : screen === 'listening'
+          ? 'Luyện Nghe Dictation A-B Loop'
+          : screen === 'sentence-builder'
+          ? 'Kiến Trúc Cú Pháp Câu'
+          : screen === 'writing'
+          ? 'Chấm Luận Văn IELTS AI'
+          : 'Phân Hệ Nghiên Cứu'
+      );
+      return;
+    }
+
+    setCurrentScreen(screen);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  const handleAuthSuccess = (user: User, isNewRegistration?: boolean) => {
-    setCurrentUser(user);
-    setShowAuthModal(false);
-    if (isNewRegistration) {
-      addToast(`Đăng ký tài khoản thành công! Chào mừng ${user.full_name}`, 'success');
-    } else {
-      addToast(`Đăng nhập thành công với vai trò: ${user.role === 'admin' ? 'Quản trị viên' : 'Học viên'}!`, 'success');
-    }
+  const handleAuthSuccess = (userData: User, isNewRegistration?: boolean) => {
+    login(userData, isNewRegistration);
 
-    if (user.role === 'admin') {
+    if (userData.role === 'admin') {
       setCurrentScreen('admin');
+    } else {
+      setCurrentScreen('dashboard');
     }
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const handleLogout = () => {
-    setCurrentUser(null);
-    setCurrentScreen('dashboard');
-    addToast('Bạn đã đăng xuất khỏi hệ thống an toàn.', 'info');
+    logout();
+    setCurrentScreen('landing');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const handleViewCertificate = (courseOrTitle: Course | string) => {
@@ -187,10 +255,10 @@ export const App: React.FC = () => {
   const handleAddCourse = (newCourseData: Partial<Course>) => {
     const fullCourse: Course = {
       id: `course-${Date.now()}`,
-      title: newCourseData.title || 'Khóa học mới',
+      title: newCourseData.title || 'Khóa học học thuật mới',
       headline: newCourseData.headline || 'Khóa học chuyên sâu chất lượng cao',
-      description: 'Chương trình đào tạo thực chiến được biên soạn bởi chuyên gia.',
-      category: newCourseData.category || 'Lập trình',
+      description: 'Chương trình đào tạo thực chiến được biên soạn bởi hội đồng khảo thí.',
+      category: newCourseData.category || 'Ngoại ngữ',
       level: 'Mọi cấp độ',
       duration: '18 giờ học',
       updatedAt: '09/2026',
@@ -199,36 +267,37 @@ export const App: React.FC = () => {
       studentsCount: 1,
       price: newCourseData.price || 699000,
       originalPrice: (newCourseData.price || 699000) * 1.5,
-      image: newCourseData.image || 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=800&auto=format&fit=crop&q=80',
+      image:
+        newCourseData.image ||
+        'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=800&auto=format&fit=crop&q=80',
       instructor: {
-        name: currentUser?.full_name || 'Admin',
+        name: user?.full_name || 'Hội đồng Khảo thí',
         role: 'Giảng viên chuyên môn',
-        avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=120&auto=format&fit=crop&q=80',
-        bio: 'Chuyên gia đào tạo với nhiều năm kinh nghiệm.',
+        avatar:
+          'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=120&auto=format&fit=crop&q=80',
+        bio: 'Chuyên gia đào tạo với nhiều năm kinh nghiệm nghiên cứu ngôn ngữ.',
         coursesCount: 1,
         rating: 5.0,
       },
       learningOutcomes: [
-        'Nắm vững kiến thức trọng tâm từ căn bản đến nâng cao.',
-        'Thực hành các dự án bài tập thực tế chuẩn doanh nghiệp.',
+        'Nắm vững cấu trúc câu phức và từ vựng học thuật C1-C2.',
+        'Luyện tập phát âm chuẩn âm vị IPA và phản xạ giao tiếp quốc tế.',
       ],
-      features: [
-        'Truy cập trọn đời',
-        'Chứng chỉ sau khi hoàn thành',
-      ],
+      features: ['Truy cập trọn đời', 'Chứng chỉ chuẩn hóa sau khi hoàn thành'],
       modules: [
         {
           id: `mod-new-${Date.now()}`,
-          title: 'Chương 1: Khởi Động & Kiến Thức Nền Tảng',
+          title: 'Chương 1: Khởi Động & Kiến Trúc Nền Tảng',
           orderIndex: 1,
           lessons: [
             {
               id: `les-new-1`,
               moduleId: `mod-new-${Date.now()}`,
-              title: 'Bài 1: Giới thiệu khóa học',
+              title: 'Bài 1: Tổng quan phương pháp luận',
               duration: '10:00',
               durationSeconds: 600,
-              videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4',
+              videoUrl:
+                'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4',
               completed: false,
               orderIndex: 1,
               preview: true,
@@ -247,79 +316,84 @@ export const App: React.FC = () => {
 
   const renderScreen = () => {
     switch (currentScreen) {
+      case 'landing':
+        return (
+          <AcademicLandingPage
+            currentUser={user}
+            onOpenAuth={openAuthModal}
+            onRequireAuth={(feat) => requireAuth(feat)}
+            onNavigateScreen={handleScreenNavigate}
+          />
+        );
+
       case 'dashboard':
         return (
           <Dashboard
             stats={stats}
-            currentUser={currentUser}
-            onOpenAuth={handleOpenAuth}
-            onNavigateScreen={(screen) => {
-              if (screen === 'leaderboard') {
-                setShowLeaderboardModal(true);
-              } else {
-                setCurrentScreen(screen);
-                window.scrollTo({ top: 0, behavior: 'smooth' });
-              }
-            }}
+            currentUser={user}
+            onOpenAuth={openAuthModal}
+            onNavigateScreen={handleScreenNavigate}
           />
         );
+
       case 'vocab-srs':
         return (
           <FlashcardPlayer
             cards={sampleFlashcards}
             onEarnXp={handleEarnXp}
-            onBackToDashboard={() => {
-              setCurrentScreen('dashboard');
-              window.scrollTo({ top: 0, behavior: 'smooth' });
-            }}
+            onBackToDashboard={() => handleScreenNavigate('dashboard')}
           />
         );
+
       case 'speaking':
         return (
           <PronunciationStudio
             onEarnXp={handleEarnXp}
-            onBackToDashboard={() => {
-              setCurrentScreen('dashboard');
-              window.scrollTo({ top: 0, behavior: 'smooth' });
-            }}
+            onBackToDashboard={() => handleScreenNavigate('dashboard')}
           />
         );
+
       case 'listening':
         return (
           <ListeningPlayer
             onEarnXp={handleEarnXp}
-            onBackToDashboard={() => {
-              setCurrentScreen('dashboard');
-              window.scrollTo({ top: 0, behavior: 'smooth' });
-            }}
+            onBackToDashboard={() => handleScreenNavigate('dashboard')}
           />
         );
+
       case 'sentence-builder':
         return (
           <SentenceBuilder
             onEarnXp={handleEarnXp}
-            onBackToDashboard={() => {
-              setCurrentScreen('dashboard');
-              window.scrollTo({ top: 0, behavior: 'smooth' });
-            }}
+            onBackToDashboard={() => handleScreenNavigate('dashboard')}
           />
         );
+
+      case 'writing':
+        return (
+          <AcademicWritingStudio
+            onEarnXp={handleEarnXp}
+            onBackToDashboard={() => handleScreenNavigate('dashboard')}
+          />
+        );
+
       case 'profile':
-        if (!currentUser) return null;
+        if (!user) return null;
         return (
           <Profile
-            user={currentUser}
+            user={user}
             stats={stats}
             courses={courses}
             onUpdateUser={(updated) => {
-              setCurrentUser({ ...currentUser, ...updated });
+              login({ ...user, ...updated });
             }}
             onViewCertificate={(title) => handleViewCertificate(title)}
             onNotify={addToast}
           />
         );
+
       case 'admin':
-        if (currentUser?.role !== 'admin') return null;
+        if (user?.role !== 'admin') return null;
         return (
           <AdminDashboard
             courses={courses}
@@ -328,45 +402,37 @@ export const App: React.FC = () => {
             onNotify={addToast}
           />
         );
+
       default:
         return (
           <Dashboard
             stats={stats}
-            currentUser={currentUser}
-            onOpenAuth={handleOpenAuth}
-            onNavigateScreen={(screen) => {
-              if (screen === 'leaderboard') {
-                setShowLeaderboardModal(true);
-              } else {
-                setCurrentScreen(screen);
-                window.scrollTo({ top: 0, behavior: 'smooth' });
-              }
-            }}
+            currentUser={user}
+            onOpenAuth={openAuthModal}
+            onNavigateScreen={handleScreenNavigate}
           />
         );
     }
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-slate-50 text-slate-900 selection:bg-blue-600 selection:text-white">
-      {/* Modern Sticky Navigation */}
-      <Navbar
-        currentScreen={currentScreen}
-        onSelectScreen={(screen) => {
-          if (screen === 'leaderboard') {
-            setShowLeaderboardModal(true);
-          } else {
-            setCurrentScreen(screen);
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-          }
-        }}
-        stats={stats}
-        currentUser={currentUser}
-        onOpenAuth={handleOpenAuth}
-        onLogout={handleLogout}
-        xp={xp}
-        onOpenLeaderboard={() => setShowLeaderboardModal(true)}
-      />
+    <div className="min-h-screen flex flex-col bg-[#FAFAF9] text-stone-900 selection:bg-gold-600 selection:text-white font-sans antialiased relative">
+      {/* Dynamic Customizable Soft Atmosphere Background */}
+      <SoftAtmosphereBackground />
+
+      {/* Student LMS Navigation: Only displayed in authenticated workspace */}
+      {currentScreen !== 'landing' && (
+        <Navbar
+          currentScreen={currentScreen}
+          onSelectScreen={handleScreenNavigate}
+          stats={stats}
+          currentUser={user}
+          onOpenAuth={openAuthModal}
+          onLogout={handleLogout}
+          xp={xp}
+          onOpenLeaderboard={() => setShowLeaderboardModal(true)}
+        />
+      )}
 
       {/* Dynamic Screen Routing with ErrorBoundary & AnimatePresence */}
       <main className="flex-1">
@@ -385,51 +451,63 @@ export const App: React.FC = () => {
         </ErrorBoundary>
       </main>
 
-        {/* Authentication Modal */}
-        <AuthModal
-          isOpen={showAuthModal}
-          onClose={() => setShowAuthModal(false)}
-          onSuccess={handleAuthSuccess}
-          initialTab={authModalTab}
-        />
+      {/* Academic European Styled Auth Modal */}
+      <AcademicAuthModal
+        isOpen={authModalConfig.isOpen}
+        onClose={closeAuthModal}
+        onSuccess={handleAuthSuccess}
+        initialTab={authModalConfig.tab}
+        title={authModalConfig.title}
+        subtitle={authModalConfig.subtitle}
+      />
 
-        {/* Formal Certificate Modal with Print / PDF */}
-        <CertificateModal
-          isOpen={showCertModal}
-          onClose={() => setShowCertModal(false)}
-          courseTitle={certCourseTitle}
-          studentName={currentUser?.full_name || 'Đặng Minh Chiến'}
-          studentEmail={currentUser?.email || 'dangchien2005@gmail.com'}
-        />
+      {/* Formal Certificate Modal with Print / PDF */}
+      <CertificateModal
+        isOpen={showCertModal}
+        onClose={() => setShowCertModal(false)}
+        courseTitle={certCourseTitle}
+        studentName={user?.full_name || 'Đặng Minh Chiến'}
+        studentEmail={user?.email || 'dangchien2005@gmail.com'}
+      />
 
-        {/* Weekly Gamification Leaderboard Modal */}
-        <LeaderboardModal
-          isOpen={showLeaderboardModal}
-          onClose={() => setShowLeaderboardModal(false)}
-          currentUserXp={xp}
-        />
+      {/* Weekly Gamification Leaderboard Modal */}
+      <LeaderboardModal
+        isOpen={showLeaderboardModal}
+        onClose={() => setShowLeaderboardModal(false)}
+        currentUserXp={xp}
+      />
 
-        {/* Global Toast Notifications Container */}
-        <ToastContainer toasts={toasts} onDismiss={removeToast} />
+      {/* Global Toast Notifications Container */}
+      <ToastContainer toasts={toasts} onDismiss={removeToast} />
 
-        {/* Modern EdTech Footer */}
-        <footer className="mt-auto border-t border-slate-200/90 bg-white py-8">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500">
-            <div className="flex items-center gap-3">
-              <span className="font-bold text-slate-900">EduFlow LMS</span>
+      {/* Student LMS Workspace Footer */}
+      {currentScreen !== 'landing' && (
+        <footer className="mt-auto border-t border-stone-300 bg-white py-8">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-stone-500">
+            <div className="flex items-center gap-3 font-sans">
+              <span className="font-bold text-forest-950">EduFlow Institute</span>
               <span>•</span>
-              <span>Hệ Thống Quản Lý Học Tập Trực Tuyến Toàn Diện</span>
+              <span className="font-sans">Hệ Thống Quản Lý Bàn Học Nghiên Cứu Toàn Diện</span>
             </div>
 
             <div className="flex items-center gap-4 font-mono text-[11px]">
-              <span className="inline-flex items-center gap-1.5 text-emerald-600 font-medium">
-                <span className="w-2 h-2 rounded-full bg-emerald-500 inline-block animate-ping" />
-                UI/UX Pro Max Motion & Full LMS Engine Active
+              <span className="inline-flex items-center gap-1.5 text-forest-800 font-medium">
+                <span className="w-2 h-2 rounded-full bg-emerald-600 inline-block animate-ping" />
+                Academic Forest &amp; Warm Gold Engine Active
               </span>
             </div>
           </div>
         </footer>
-      </div>
+      )}
+    </div>
+  );
+};
+
+export const App: React.FC = () => {
+  return (
+    <AuthProvider>
+      <AppContent />
+    </AuthProvider>
   );
 };
 

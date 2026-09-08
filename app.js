@@ -11,9 +11,21 @@ const authRoutes = require('./routes/authRoutes');
 const adminRoutes = require('./routes/adminRoutes');
 const studentRoutes = require('./routes/studentRoutes');
 const quizRoutes = require('./routes/quizRoutes');
+const englishRoutes = require('./routes/api/englishRoutes');
 const { checkAuth, checkAdmin } = require('./middlewares/auth');
 
 const app = express();
+
+// ----- Cấu hình CORS cho Frontend React (http://localhost:5173) -----
+app.use((req, res, next) => {
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
+  if (req.method === 'OPTIONS') {
+    return res.sendStatus(200);
+  }
+  next();
+});
 
 // ----- Cấu hình view engine (EJS) -----
 app.set('view engine', 'ejs');
@@ -40,7 +52,11 @@ app.use((req, res, next) => {
 });
 
 // ----- Routes -----
-app.get('/', (req, res) => res.redirect('/login'));
+// Tự động chuyển hướng sang giao diện mới React tại http://localhost:5173
+app.get('/', (req, res) => res.redirect('http://localhost:5173'));
+
+// ----- RESTful API cho Hệ thống Học Tiếng Anh (React Frontend) -----
+app.use('/api/english', englishRoutes);
 
 app.use('/', authRoutes); // /login, /register, /logout
 

@@ -16,6 +16,7 @@ import {
 import { ListeningLesson, TranscriptSegment } from '../../types';
 import { sampleListeningLessons } from '../../data/englishMockData';
 import { playSpeech, soundEffects, triggerConfetti } from '../../utils/audioUtils';
+import { englishApi } from '../../services/englishApi';
 
 interface ListeningPlayerProps {
   onEarnXp: (amount: number, reason: string) => void;
@@ -26,9 +27,25 @@ export const ListeningPlayer: React.FC<ListeningPlayerProps> = ({
   onEarnXp,
   onBackToDashboard,
 }) => {
-  const [lessons] = useState<ListeningLesson[]>(sampleListeningLessons);
+  const [lessons, setLessons] = useState<ListeningLesson[]>(sampleListeningLessons);
   const [currentLessonIndex, setCurrentLessonIndex] = useState<number>(0);
-  const currentLesson = lessons[currentLessonIndex];
+  const currentLesson = lessons[currentLessonIndex] || sampleListeningLessons[0];
+
+  // Fetch listening lessons from MySQL API on mount
+  useEffect(() => {
+    let isMounted = true;
+    englishApi.getListeningLessons()
+      .then((data) => {
+        if (isMounted && data && data.length > 0) {
+          setLessons(data);
+        }
+      })
+      .catch((err) => console.warn('Could not load listening lessons from MySQL:', err));
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   // Playback state
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
@@ -184,6 +201,10 @@ export const ListeningPlayer: React.FC<ListeningPlayerProps> = ({
 
     setDictationScore({ correct, total });
     setDictationChecked(true);
+
+    // Persist dictation results and XP in MySQL via REST API
+    englishApi.submitDictation(correct, total)
+      .catch((err) => console.warn('Could not sync dictation score with MySQL:', err));
 
     if (correct === total && total > 0) {
       soundEffects.playSuccess();

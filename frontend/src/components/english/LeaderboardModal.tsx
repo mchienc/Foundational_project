@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import {
   Trophy,
@@ -7,8 +7,11 @@ import {
   Crown,
   X,
   Shield,
+  Loader2,
 } from 'lucide-react';
+import { LeaderboardItem } from '../../types';
 import { sampleLeaderboard } from '../../data/englishMockData';
+import { englishApi } from '../../services/englishApi';
 
 interface LeaderboardModalProps {
   isOpen: boolean;
@@ -21,11 +24,28 @@ export const LeaderboardModal: React.FC<LeaderboardModalProps> = ({
   onClose,
   currentUserXp = 1980,
 }) => {
+  const [leaderboard, setLeaderboard] = useState<LeaderboardItem[]>(sampleLeaderboard);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+
+  useEffect(() => {
+    if (isOpen) {
+      setIsLoading(true);
+      englishApi.getLeaderboard()
+        .then((data) => {
+          if (data && data.length > 0) {
+            setLeaderboard(data);
+          }
+        })
+        .catch((err) => console.warn('Could not load leaderboard from MySQL:', err))
+        .finally(() => setIsLoading(false));
+    }
+  }, [isOpen]);
+
   if (!isOpen) return null;
 
   // Split Top 3 and Rest
-  const top3 = sampleLeaderboard.slice(0, 3);
-  const restUsers = sampleLeaderboard.slice(3);
+  const top3 = leaderboard.slice(0, 3);
+  const restUsers = leaderboard.slice(3);
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
@@ -42,9 +62,12 @@ export const LeaderboardModal: React.FC<LeaderboardModalProps> = ({
               <Trophy className="w-5 h-5" />
             </div>
             <div>
-              <h3 className="text-lg font-extrabold text-slate-900">
-                Bảng Xếp Hạng Tuần (League Ranking)
-              </h3>
+              <div className="flex items-center gap-2">
+                <h3 className="text-lg font-extrabold text-slate-900">
+                  Bảng Xếp Hạng Tuần (League Ranking)
+                </h3>
+                {isLoading && <Loader2 className="w-4 h-4 animate-spin text-amber-500 inline-block" />}
+              </div>
               <p className="text-xs text-slate-500 font-medium">
                 Mùa giải kết thúc sau: <span className="text-brand-primary font-bold">2 ngày 14 giờ</span>
               </p>

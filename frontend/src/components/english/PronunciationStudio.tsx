@@ -17,6 +17,7 @@ import {
 import { SpeakingLesson, WordPronunciation } from '../../types';
 import { playSpeech, soundEffects, triggerConfetti } from '../../utils/audioUtils';
 import { sampleSpeakingLessons } from '../../data/englishMockData';
+import { englishApi } from '../../services/englishApi';
 
 interface PronunciationStudioProps {
   onEarnXp: (amount: number, reason: string) => void;
@@ -27,9 +28,25 @@ export const PronunciationStudio: React.FC<PronunciationStudioProps> = ({
   onEarnXp,
   onBackToDashboard,
 }) => {
-  const [lessons] = useState<SpeakingLesson[]>(sampleSpeakingLessons);
+  const [lessons, setLessons] = useState<SpeakingLesson[]>(sampleSpeakingLessons);
   const [currentLessonIndex, setCurrentLessonIndex] = useState<number>(0);
-  const currentLesson = lessons[currentLessonIndex];
+  const currentLesson = lessons[currentLessonIndex] || sampleSpeakingLessons[0];
+
+  // Fetch speaking lessons from MySQL API on mount
+  useEffect(() => {
+    let isMounted = true;
+    englishApi.getSpeakingLessons()
+      .then((data) => {
+        if (isMounted && data && data.length > 0) {
+          setLessons(data);
+        }
+      })
+      .catch((err) => console.warn('Could not load speaking lessons from MySQL:', err));
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   // Recording states
   const [isRecording, setIsRecording] = useState<boolean>(false);
@@ -95,6 +112,12 @@ export const PronunciationStudio: React.FC<PronunciationStudioProps> = ({
         setOverallScore(finalScore);
         setHasEvaluated(true);
         setSelectedWord(currentLesson.words[0]);
+
+        // Persist speaking evaluation score and XP in MySQL via REST API
+        if (currentLesson?.id) {
+          englishApi.submitSpeakingResult(currentLesson.id, finalScore)
+            .catch((err) => console.warn('Could not sync speaking score with MySQL:', err));
+        }
 
         if (finalScore >= 80) {
           soundEffects.playSuccess();

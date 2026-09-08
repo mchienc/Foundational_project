@@ -14,6 +14,7 @@ import { Flashcard, SrsRating, QuickWordLookup } from '../../types';
 import { playSpeech, soundEffects, triggerConfetti } from '../../utils/audioUtils';
 import { quickDictionary } from '../../data/englishMockData';
 import { DURATION, EASE_OUT } from '../../styles/motion';
+import { englishApi } from '../../services/englishApi';
 
 interface FlashcardPlayerProps {
   cards: Flashcard[];
@@ -30,6 +31,22 @@ export const FlashcardPlayer: React.FC<FlashcardPlayerProps> = ({
   const [currentIndex, setCurrentIndex] = useState<number>(0);
   const [isFlipped, setIsFlipped] = useState<boolean>(false);
   const [isPlayingAudio, setIsPlayingAudio] = useState<'us' | 'uk' | null>(null);
+
+  // Fetch flashcards from MySQL backend API on mount
+  useEffect(() => {
+    let isMounted = true;
+    englishApi.getFlashcards()
+      .then((cards) => {
+        if (isMounted && cards && cards.length > 0) {
+          setDeck(cards);
+        }
+      })
+      .catch((err) => console.warn('Could not load flashcards from MySQL:', err));
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   // Quick Dictionary Popover State
   const [activeLookup, setActiveLookup] = useState<{
@@ -82,6 +99,12 @@ export const FlashcardPlayer: React.FC<FlashcardPlayerProps> = ({
       xpGained = 20;
       feedback = 'Tuyệt vời! Đã thuộc từ vựng này.';
       setMasteredCount((prev) => prev + 1);
+    }
+
+    // Persist review in MySQL Spaced Repetition table via REST API
+    if (currentCard?.id) {
+      englishApi.reviewFlashcard(currentCard.id, rating)
+        .catch((err) => console.warn('Could not sync SRS review with MySQL:', err));
     }
 
     onEarnXp(xpGained, `${feedback} (+${xpGained} XP)`);

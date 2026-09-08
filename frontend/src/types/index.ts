@@ -116,6 +116,7 @@ export interface QuizResult {
 }
 
 export type Screen =
+  | 'landing'
   | 'dashboard'
   | 'course-details'
   | 'course-player'
@@ -127,6 +128,7 @@ export type Screen =
   | 'speaking'
   | 'listening'
   | 'sentence-builder'
+  | 'writing'
   | 'leaderboard';
 
 export interface ToastMessage {
@@ -240,4 +242,70 @@ export interface QuickWordLookup {
   meaningVi: string;
   meaningEn: string;
 }
+
+export interface WritingPromptIdea {
+  perspective: string;
+  points: string[];
+}
+
+export interface WritingPrompt {
+  id: number;
+  title: string;
+  taskType: 'task_1' | 'task_2' | 'academic_essay';
+  category: string;
+  promptText: string;
+  chartImageUrl?: string | null;
+  targetBand: string;
+  minWords: number;
+  suggestedIdeas: WritingPromptIdea[];
+  sampleBand8Essay?: string;
+}
+
+export interface CollocationSuggestion {
+  matched: string;
+  suggestion: string;
+  reason: string;
+}
+
+export interface WritingEvaluationDetails {
+  wordCount: number;
+  paragraphCount: number;
+  sentenceCount: number;
+  awlWordsUsed: string[];
+  awlRatio: number;
+  cohesiveDevicesFound: string[];
+  collocationSuggestions: CollocationSuggestion[];
+  strengths: string[];
+  improvements: string[];
+}
+
+export interface WritingEvaluationResult {
+  submissionId: number;
+  bandOverall: number;
+  bandTR: number;
+  bandCC: number;
+  bandLR: number;
+  bandGRA: number;
+  cefrLevel: string;
+  xpGained: number;
+  evaluationDetails: WritingEvaluationDetails;
+  sampleBand8Essay?: string;
+}
+
+export interface WritingSubmissionHistory {
+  id: number;
+  promptId: number;
+  promptTitle: string;
+  taskType: string;
+  wordCount: number;
+  timeSpentSeconds: number;
+  bandOverall: number;
+  bandTR: number;
+  bandCC: number;
+  bandLR: number;
+  bandGRA: number;
+  cefrLevel: string;
+  createdAt: string;
+}
+
 

@@ -5,7 +5,9 @@
   "main": "app.js",
   "scripts": {
     "start": "node app.js",
-    "dev": "nodemon app.js",
+    "dev": "concurrently -n \"BACKEND,FRONTEND\" -c \"blue,green\" \"nodemon app.js\" \"npm --prefix frontend run dev\"",
+    "client": "npm --prefix frontend run dev",
+    "server": "nodemon app.js",
     "client:dev": "npm --prefix frontend run dev",
     "client:build": "npm --prefix frontend run build",
     "client:preview": "npm --prefix frontend run preview"
@@ -20,6 +22,7 @@
     "mysql2": "^3.10.0"
   },
   "devDependencies": {
+    "concurrently": "^10.0.5",
     "nodemon": "^3.1.4"
   }
 }

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Sparkles,
@@ -13,6 +13,7 @@ import {
 import { SentenceBuilderItem, SentenceBuilderWord } from '../../types';
 import { sampleSentenceBuilders } from '../../data/englishMockData';
 import { playSpeech, soundEffects, triggerConfetti } from '../../utils/audioUtils';
+import { englishApi } from '../../services/englishApi';
 
 interface SentenceBuilderProps {
   onEarnXp: (amount: number, reason: string) => void;
@@ -23,9 +24,9 @@ export const SentenceBuilder: React.FC<SentenceBuilderProps> = ({
   onEarnXp,
   onBackToDashboard,
 }) => {
-  const [exercises] = useState<SentenceBuilderItem[]>(sampleSentenceBuilders);
+  const [exercises, setExercises] = useState<SentenceBuilderItem[]>(sampleSentenceBuilders);
   const [currentIndex, setCurrentIndex] = useState<number>(0);
-  const currentExercise = exercises[currentIndex];
+  const currentExercise = exercises[currentIndex] || sampleSentenceBuilders[0];
 
   // Selected words in tray
   const [trayWords, setTrayWords] = useState<SentenceBuilderWord[]>([]);
@@ -33,6 +34,23 @@ export const SentenceBuilder: React.FC<SentenceBuilderProps> = ({
   const [bankWords, setBankWords] = useState<SentenceBuilderWord[]>(
     currentExercise.shuffledWords
   );
+
+  // Fetch exercises from MySQL API on mount
+  useEffect(() => {
+    let isMounted = true;
+    englishApi.getSentenceBuilders()
+      .then((data) => {
+        if (isMounted && data && data.length > 0) {
+          setExercises(data);
+          setBankWords(data[0].shuffledWords);
+        }
+      })
+      .catch((err) => console.warn('Could not load sentence builders from MySQL:', err));
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   // Status: 'idle' | 'correct' | 'wrong'
   const [status, setStatus] = useState<'idle' | 'correct' | 'wrong'>('idle');
@@ -74,6 +92,13 @@ export const SentenceBuilder: React.FC<SentenceBuilderProps> = ({
       soundEffects.playSuccess();
       triggerConfetti();
       playSpeech(target, 'en-US', 0.9);
+
+      // Persist completed sentence exercise in MySQL via REST API
+      if (currentExercise?.id) {
+        englishApi.submitSentenceResult(currentExercise.id, currentExercise.points)
+          .catch((err) => console.warn('Could not sync sentence builder with MySQL:', err));
+      }
+
       onEarnXp(
         currentExercise.points,
         `Ghép câu chính xác "${currentExercise.grammarTopic}" (+${currentExercise.points} XP)`
