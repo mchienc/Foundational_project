@@ -13,8 +13,8 @@ export const sampleCourses: Course[] = [
   {
     id: 'course-ielts-vocab',
     title: 'IELTS Academic Vocabulary & Collocations Band 7.5+',
-    headline: 'Làm chủ 300+ từ vựng học thuật tinh tuyển, collocations và sắc thái ngữ nghĩa nâng cao qua Spaced Repetition.',
-    description: 'Chương trình phát triển vốn từ vựng học thuật chuẩn Cambridge và Oxford. Tích hợp công nghệ Spaced Repetition (SRS) giúp ghi nhớ bền vững gấp 3 lần phương pháp truyền thống.',
+    headline: 'Làm chủ 300+ từ vựng Cambridge cốt lõi, collocations và ngữ cảnh thực tế qua Spaced Repetition.',
+    description: 'Chương trình phát triển vốn từ vựng bám sát đề thi Cambridge. Tích hợp Spaced Repetition (SRS) giúp ghi nhớ bền vững gấp 3 lần phương pháp truyền thống.',
     category: 'Ngoại ngữ',
     level: 'Nâng cao',
     duration: '24 giờ học',
@@ -34,7 +34,7 @@ export const sampleCourses: Course[] = [
       rating: 4.98,
     },
     learningOutcomes: [
-      'Làm chủ 300+ từ vựng học thuật cốt lõi thường xuất hiện trong IELTS Reading & Writing Task 2.',
+      'Làm chủ 300+ từ vựng cốt lõi thường xuất hiện trong IELTS Reading & Writing Task 2.',
       'Phát âm chuẩn xác phiên âm quốc tế IPA, nắm vững trọng âm từ và trọng âm câu.',
       'Sử dụng các cụm từ cố định (Collocations) tự nhiên như người bản xứ.',
       'Ứng dụng Spaced Repetition để ôn tập từ vựng đúng thời điểm ngắt quãng tối ưu.',
@@ -43,7 +43,7 @@ export const sampleCourses: Course[] = [
       'Thẻ Flashcard 3D lật mượt mà với âm thanh UK/US bản xứ',
       'Tra từ điển nhanh Popup trên mọi ví dụ song ngữ',
       'Thuật toán Spaced Repetition tự động tính lịch ôn tập',
-      'Cấp Chứng chỉ Hoàn thành tiếng Anh học thuật',
+      'Cấp Chứng chỉ Hoàn thành khóa học',
     ],
     modules: [
       {
@@ -159,7 +159,7 @@ export const sampleCourses: Course[] = [
       name: 'Michael Roberts',
       role: 'Senior IELTS Examiner & Academic Author',
       avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=200&auto=format&fit=crop&q=80',
-      bio: 'Tác giả của nhiều đầu sách ngữ pháp học thuật và giám khảo khảo thí IELTS quốc tế.',
+      bio: 'Tác giả sách ngữ pháp và cựu giám khảo chấm thi IELTS.',
       coursesCount: 4,
       rating: 4.89,
     },
@@ -172,7 +172,7 @@ export const sampleCourses: Course[] = [
       'Ghép câu kéo thả và click chọn pill chips trực quan',
       'Hiệu ứng rung lắc cảnh báo lỗi sai và nổ pháo hoa khi đúng',
       'Giải thích ngữ pháp chi tiết bằng tiếng Việt',
-      'Tích lũy điểm thưởng XP cho mỗi bài tập hoàn thành',
+      'Ghi nhận tiến độ học tập cho mỗi bài tập hoàn thành',
     ],
     modules: [],
   },

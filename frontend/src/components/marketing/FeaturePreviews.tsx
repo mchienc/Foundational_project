@@ -211,7 +211,7 @@ export const FeaturePreviews: React.FC<FeaturePreviewsProps> = ({ onRequireAuth 
               Mở Khóa Toàn Bộ 5 Phân Hệ Với Tài Khoản Học Viên EduFlow
             </h4>
             <p className="text-xs text-slate-600 max-w-xl">
-              Đăng nhập ngay hôm nay để nhận trọn bộ dữ liệu tương tác, lưu trữ chuỗi ngày học Streak 14 ngày và tích lũy 2250 XP leo bảng xếp hạng tuần.
+              Đăng nhập ngay hôm nay để nhận trọn bộ đề thi Cambridge IELTS, luyện nghe Dictation và lưu từ vựng vào kho thẻ Anki.
             </p>
           </div>
 

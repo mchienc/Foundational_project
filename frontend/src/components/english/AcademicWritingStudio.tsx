@@ -14,7 +14,6 @@ import {
   History,
   Copy,
   Check,
-  Zap,
   ArrowRight,
   TrendingUp,
 } from 'lucide-react';
@@ -165,7 +164,7 @@ export const AcademicWritingStudio: React.FC<AcademicWritingStudioProps> = ({
 
       onEarnXp(
         result.xpGained || 50,
-        `Xuất sắc! Bài viết đạt Band ${result.bandOverall} (${result.cefrLevel}) (+${result.xpGained || 50} XP)`
+        `Xuất sắc! Bài viết đạt Band ${result.bandOverall} (${result.cefrLevel})`
       );
     } catch (err) {
       console.error('Lỗi khi chấm điểm bài viết:', err);
@@ -183,7 +182,7 @@ export const AcademicWritingStudio: React.FC<AcademicWritingStudioProps> = ({
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6 relative z-10">
       {/* Top Header & Navigation Bar */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-slate-200">
         <div>
@@ -193,7 +192,7 @@ export const AcademicWritingStudio: React.FC<AcademicWritingStudioProps> = ({
                 onClick={onBackToDashboard}
                 className="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl border border-slate-200 bg-white text-xs font-semibold text-slate-700 hover:bg-slate-50 transition-colors shadow-xs"
               >
-                <ChevronLeft className="w-3.5 h-3.5" /> Lộ trình
+                <ChevronLeft className="w-3.5 h-3.5" /> Quay lại
               </button>
             )}
             <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-indigo-100 text-indigo-700">
@@ -563,9 +562,7 @@ export const AcademicWritingStudio: React.FC<AcademicWritingStudioProps> = ({
                 </div>
 
                 <div className="mt-4 pt-3 border-t border-white/10 flex items-center justify-between text-xs text-blue-200">
-                  <span className="flex items-center gap-1 text-amber-300 font-bold">
-                    <Zap className="w-3.5 h-3.5 fill-current" /> +{evaluationResult.xpGained} XP Thưởng
-                  </span>
+                  <span className="text-emerald-300 font-medium">Đã hoàn thành đánh giá</span>
                   <span>Đã lưu vào CSDL MySQL</span>
                 </div>
               </div>

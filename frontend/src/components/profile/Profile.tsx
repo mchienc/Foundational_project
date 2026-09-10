@@ -7,7 +7,7 @@ import { Card } from '../common/Card';
 interface ProfileProps {
   user: User;
   stats: UserStats;
-  courses: Course[];
+  courses?: Course[];
   onUpdateUser: (updated: Partial<User>) => void;
   onViewCertificate: (courseTitle: string) => void;
   onNotify: (msg: string, type?: 'success' | 'error' | 'info') => void;
@@ -16,7 +16,6 @@ interface ProfileProps {
 export const Profile: React.FC<ProfileProps> = ({
   user,
   stats,
-  courses,
   onUpdateUser,
   onViewCertificate,
   onNotify,
@@ -98,27 +97,27 @@ export const Profile: React.FC<ProfileProps> = ({
         <div className="lg:col-span-2 grid grid-cols-2 sm:grid-cols-4 gap-4">
           <Card className="p-4 space-y-1">
             <div className="text-2xl font-bold font-mono text-slate-900">
-              {stats.coursesEnrolled}
+              {stats.coursesEnrolled || 12}
             </div>
-            <div className="text-xs text-slate-500">Khóa đăng ký</div>
+            <div className="text-xs text-slate-500">Đề đã luyện</div>
           </Card>
           <Card className="p-4 space-y-1">
             <div className="text-2xl font-bold font-mono text-emerald-600">
-              {stats.coursesCompleted}
+              {stats.coursesCompleted || 8}
             </div>
-            <div className="text-xs text-slate-500">Đã hoàn thành</div>
+            <div className="text-xs text-slate-500">Bài nghe xong</div>
           </Card>
           <Card className="p-4 space-y-1">
             <div className="text-2xl font-bold font-mono text-amber-600">
-              {stats.streakDays}
+              186
             </div>
-            <div className="text-xs text-slate-500">Ngày streak</div>
+            <div className="text-xs text-slate-500">Từ vựng Anki</div>
           </Card>
           <Card className="p-4 space-y-1">
             <div className="text-2xl font-bold font-mono text-purple-600">
-              {stats.certificatesEarned}
+              {stats.certificatesEarned || 2}
             </div>
-            <div className="text-xs text-slate-500">Chứng chỉ đạt</div>
+            <div className="text-xs text-slate-500">Chứng nhận đạt</div>
           </Card>
         </div>
       </div>
@@ -157,7 +156,7 @@ export const Profile: React.FC<ProfileProps> = ({
             }`}
           >
             <Award size={14} />
-            Chứng Chỉ Đạt Được ({courses.slice(2, 4).length})
+            Chứng Nhận Hoàn Thành
           </button>
         </div>
 
@@ -246,7 +245,18 @@ export const Profile: React.FC<ProfileProps> = ({
         {/* Tab 3: Certificates */}
         {tab === 'certs' && (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {courses.slice(2, 4).map((c) => (
+            {[
+              {
+                id: 'cert-cambridge-reading',
+                title: 'Cambridge IELTS Academic Reading',
+                subtitle: 'Hoàn thành 28 đề thi Full Tests & 84 Passages',
+              },
+              {
+                id: 'cert-dictation-listening',
+                title: 'IELTS Contextual Dictation & Listening Fluency',
+                subtitle: 'Đạt độ chính xác nghe chép chính tả 95%+',
+              },
+            ].map((c) => (
               <Card key={c.id} className="p-5 flex items-center justify-between gap-4">
                 <div className="flex items-center gap-3 min-w-0">
                   <div className="w-10 h-10 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center shrink-0">
@@ -254,7 +264,7 @@ export const Profile: React.FC<ProfileProps> = ({
                   </div>
                   <div className="min-w-0">
                     <h4 className="text-sm font-bold text-slate-900 truncate">{c.title}</h4>
-                    <span className="text-xs text-slate-400 font-mono">Đạt chuẩn 100%</span>
+                    <span className="text-xs text-slate-500 font-sans">{c.subtitle}</span>
                   </div>
                 </div>
 

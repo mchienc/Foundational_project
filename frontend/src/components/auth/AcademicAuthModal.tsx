@@ -5,11 +5,7 @@ import {
   Mail,
   Lock,
   User as UserIcon,
-  Zap,
-  Flame,
   ArrowRight,
-  BookOpen,
-  Sparkles,
 } from 'lucide-react';
 import { User } from '../../types';
 import { modalScaleVariants } from '../../styles/motion';
@@ -28,8 +24,8 @@ export const AcademicAuthModal: React.FC<AcademicAuthModalProps> = ({
   onClose,
   onSuccess,
   initialTab = 'login',
-  title = 'Đăng nhập để khởi tạo hồ sơ học thuật và bảo lưu tiến độ 14 ngày',
-  subtitle = 'Nhận ngay 2250 XP học bổng nghiên cứu và mở khóa trọn bộ 5 phân hệ tương tác',
+  title = 'Đăng nhập để bắt đầu học và lưu kết quả',
+  subtitle = 'Đăng nhập để lưu tiến độ luyện thi Cambridge IELTS và từ vựng Anki của bạn.',
 }) => {
   const [tab, setTab] = useState<'login' | 'register'>(initialTab);
 
@@ -40,57 +36,30 @@ export const AcademicAuthModal: React.FC<AcademicAuthModalProps> = ({
     }
   }, [isOpen, initialTab]);
 
-  const [loginEmail, setLoginEmail] = useState<string>('dangchien2005@gmail.com');
-  const [loginPassword, setLoginPassword] = useState<string>('123456');
+  const [loginEmail, setLoginEmail] = useState<string>('');
+  const [loginPassword, setLoginPassword] = useState<string>('');
 
   const [regFullName, setRegFullName] = useState<string>('');
   const [regEmail, setRegEmail] = useState<string>('');
   const [regPassword, setRegPassword] = useState<string>('');
   const [regConfirmPassword, setRegConfirmPassword] = useState<string>('');
-  const [regRole, setRegRole] = useState<'student' | 'admin'>('student');
 
   const [error, setError] = useState<string | null>(null);
-
-  const handleQuickLogin = (role: 'student' | 'admin') => {
-    if (role === 'student') {
-      const studentUser: User = {
-        id: 'user-student-3',
-        email: 'dangchien2005@gmail.com',
-        full_name: 'Minh Chiến Đặng',
-        role: 'student',
-        avatar:
-          'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=120&auto=format&fit=crop&q=80',
-      };
-      onSuccess(studentUser);
-      onClose();
-    } else {
-      const adminUser: User = {
-        id: 'user-admin-1',
-        email: 'admin@example.com',
-        full_name: 'GS. Viện Trưởng Khảo Thí (Admin)',
-        role: 'admin',
-        avatar:
-          'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=120&auto=format&fit=crop&q=80',
-      };
-      onSuccess(adminUser);
-      onClose();
-    }
-  };
 
   const handleLoginSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
 
     if (!loginEmail.trim() || !loginPassword.trim()) {
-      setError('Vui lòng cung cấp thư điện tử và mật khẩu bảo mật.');
+      setError('Vui lòng nhập đầy đủ email và mật khẩu.');
       return;
     }
 
-    const isAdmin = loginEmail.includes('admin');
+    const isAdmin = loginEmail.toLowerCase().includes('admin');
     const user: User = {
-      id: `user-${Date.now()}`,
+      id: isAdmin ? 'user-admin-1' : `user-${Date.now()}`,
       email: loginEmail,
-      full_name: isAdmin ? 'GS. Viện Trưởng Khảo Thí' : 'Minh Chiến Đặng',
+      full_name: isAdmin ? 'Quản Trị Viên (Admin)' : (loginEmail.includes('dangchien') ? 'Minh Chiến Đặng' : loginEmail.split('@')[0]),
       role: isAdmin ? 'admin' : 'student',
       avatar: isAdmin
         ? 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=120&auto=format&fit=crop&q=80'
@@ -106,17 +75,17 @@ export const AcademicAuthModal: React.FC<AcademicAuthModalProps> = ({
     setError(null);
 
     if (!regFullName.trim() || !regEmail.trim() || !regPassword.trim()) {
-      setError('Vui lòng điền đầy đủ các trường thông tin học thuật.');
+      setError('Vui lòng điền đầy đủ họ tên, email và mật khẩu.');
       return;
     }
 
     if (regPassword !== regConfirmPassword) {
-      setError('Xác nhận mật khẩu không khớp với bản gốc.');
+      setError('Mật khẩu xác nhận không khớp.');
       return;
     }
 
     if (regPassword.length < 6) {
-      setError('Mật khẩu bảo mật phải tối thiểu 6 ký tự.');
+      setError('Mật khẩu phải có tối thiểu 6 ký tự.');
       return;
     }
 
@@ -124,7 +93,7 @@ export const AcademicAuthModal: React.FC<AcademicAuthModalProps> = ({
       id: `user-${Date.now()}`,
       email: regEmail,
       full_name: regFullName,
-      role: regRole,
+      role: 'student',
       avatar:
         'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=120&auto=format&fit=crop&q=80',
     };
@@ -166,30 +135,23 @@ export const AcademicAuthModal: React.FC<AcademicAuthModalProps> = ({
               <X size={18} />
             </button>
 
-            {/* Header & Scholarly Crest */}
+            {/* Header */}
             <div className="space-y-3 text-center pt-2">
-              <div className="w-12 h-12 rounded-2xl bg-[#064E3B] border border-amber-500/40 text-amber-300 flex items-center justify-center mx-auto shadow-md">
-                <BookOpen size={22} className="text-amber-300" />
-              </div>
-
-              {/* Scholarship Grant Pill */}
-              <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-amber-100/80 border border-amber-300/80 text-amber-900 text-xs font-bold tracking-normal">
-                <Zap className="w-3.5 h-3.5 text-amber-700 fill-amber-700" />
-                <span>+2250 XP Học Bổng</span>
-                <span className="text-amber-400">•</span>
-                <Flame className="w-3.5 h-3.5 text-amber-600 fill-amber-600" />
-                <span>Bảo Lưu Chuỗi 14 Ngày</span>
+              <div className="w-14 h-14 rounded-2xl overflow-hidden bg-white p-0.5 border border-amber-400/60 shadow-md mx-auto">
+                <img src="/logo.jpg" alt="EduFlow Logo" className="w-full h-full object-cover rounded-xl" />
               </div>
 
               <h3 className="text-xl sm:text-2xl font-sans font-bold text-[#064E3B] tracking-normal leading-snug">
-                {title}
+                {tab === 'login' ? (title || 'Đăng Nhập Tài Khoản') : 'Đăng Ký Tài Khoản Học Viên'}
               </h3>
 
               <p className="text-xs text-stone-600 max-w-md mx-auto leading-relaxed font-sans">
-                {subtitle}
+                {tab === 'login'
+                  ? (subtitle || 'Đăng nhập để lưu tiến độ luyện thi Cambridge IELTS và từ vựng Anki của bạn.')
+                  : 'Tạo tài khoản học viên miễn phí để luyện đề thi, nghe chép chính tả và học từ vựng.'}
               </p>
 
-              {/* Academic Tab Toggle */}
+              {/* Tab Toggle */}
               <div className="inline-flex p-1 rounded-full bg-stone-200/80 border border-stone-300">
                 <button
                   type="button"
@@ -203,7 +165,7 @@ export const AcademicAuthModal: React.FC<AcademicAuthModalProps> = ({
                       : 'text-stone-700 hover:text-stone-900'
                   }`}
                 >
-                  Đăng Nhập Hồ Sơ
+                  Đăng Nhập
                 </button>
                 <button
                   type="button"
@@ -217,7 +179,7 @@ export const AcademicAuthModal: React.FC<AcademicAuthModalProps> = ({
                       : 'text-stone-700 hover:text-stone-900'
                   }`}
                 >
-                  Khởi Tạo Hồ Sơ Mới
+                  Đăng Ký
                 </button>
               </div>
             </div>
@@ -235,7 +197,7 @@ export const AcademicAuthModal: React.FC<AcademicAuthModalProps> = ({
                 <form onSubmit={handleLoginSubmit} className="space-y-3">
                   <div className="space-y-1 text-left">
                     <label className="text-xs font-bold text-forest-950 uppercase tracking-wider">
-                      Hòm Thư Nghiên Cứu (Email)
+                      Email
                     </label>
                     <div className="relative">
                       <Mail
@@ -246,7 +208,7 @@ export const AcademicAuthModal: React.FC<AcademicAuthModalProps> = ({
                         type="email"
                         value={loginEmail}
                         onChange={(e) => setLoginEmail(e.target.value)}
-                        placeholder="ten.nghiencuu@eduflow.vn"
+                        placeholder="ten@eduflow.vn"
                         className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-stone-300 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-gold-500 focus:border-forest-900 transition-all"
                         required
                       />
@@ -256,13 +218,13 @@ export const AcademicAuthModal: React.FC<AcademicAuthModalProps> = ({
                   <div className="space-y-1 text-left">
                     <div className="flex items-center justify-between">
                       <label className="text-xs font-bold text-forest-950 uppercase tracking-wider">
-                        Mật Khẩu Xác Thực
+                        Mật Khẩu
                       </label>
                       <a
                         href="#forgot"
                         onClick={(e) => {
                           e.preventDefault();
-                          alert('Vui lòng sử dụng cơ chế Đăng nhập 1 chạm bên dưới để truy cập tức thì.');
+                          alert('Vui lòng liên hệ quản trị viên để khôi phục mật khẩu.');
                         }}
                         className="text-[11px] text-gold-700 hover:underline"
                       >
@@ -289,59 +251,19 @@ export const AcademicAuthModal: React.FC<AcademicAuthModalProps> = ({
                     type="submit"
                     className="w-full py-3.5 rounded-xl bg-[#D97706] hover:bg-[#B45309] text-white text-xs font-bold uppercase tracking-wider shadow-md hover:shadow-lg transition-all cursor-pointer flex items-center justify-center gap-2"
                   >
-                    <span>Vào Bàn Học Nghiên Cứu</span>
+                    <span>Đăng Nhập Ngay</span>
                     <ArrowRight size={14} />
                   </button>
                 </form>
-
-                {/* 1-Click Fast Academic Credentials */}
-                <div className="pt-3 border-t border-stone-200 space-y-2 text-center">
-                  <span className="text-[10px] font-mono text-stone-500 uppercase tracking-widest block">
-                    — Hoặc Đăng Nhập 1 Chạm Theo Danh Nghĩa —
-                  </span>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                    <button
-                      type="button"
-                      onClick={() => handleQuickLogin('student')}
-                      className="p-2.5 rounded-xl bg-white hover:bg-gold-50/60 text-forest-950 border border-stone-300 hover:border-gold-400 transition-all flex items-center gap-2.5 cursor-pointer shadow-xs text-left"
-                    >
-                      <div className="w-7 h-7 rounded-lg bg-forest-900 text-gold-300 flex items-center justify-center text-xs shrink-0 font-sans font-bold">
-                        ĐC
-                      </div>
-                      <div className="overflow-hidden">
-                        <div className="truncate font-bold text-xs">Minh Chiến Đặng</div>
-                        <div className="text-[10px] text-gold-700 font-medium">
-                          2250 XP • Chuỗi 14 ngày
-                        </div>
-                      </div>
-                    </button>
-
-                    <button
-                      type="button"
-                      onClick={() => handleQuickLogin('admin')}
-                      className="p-2.5 rounded-xl bg-white hover:bg-forest-50/60 text-forest-950 border border-stone-300 hover:border-forest-700 transition-all flex items-center gap-2.5 cursor-pointer shadow-xs text-left"
-                    >
-                      <div className="w-7 h-7 rounded-lg bg-gold-700 text-white flex items-center justify-center text-xs shrink-0 font-sans font-bold">
-                        VT
-                      </div>
-                      <div className="overflow-hidden">
-                        <div className="truncate font-bold text-xs">Viện Trưởng Khảo Thí</div>
-                        <div className="text-[10px] text-forest-700 font-medium">
-                          Toàn quyền học thuật
-                        </div>
-                      </div>
-                    </button>
-                  </div>
-                </div>
               </div>
             )}
 
-            {/* Tab 2: ĐĂNG KÝ HỒ SƠ MỚI */}
+            {/* Tab 2: ĐĂNG KÝ MỚI */}
             {tab === 'register' && (
               <form onSubmit={handleRegisterSubmit} className="space-y-3 text-left">
                 <div className="space-y-1">
                   <label className="text-xs font-bold text-forest-950 uppercase tracking-wider">
-                    Danh Xưng Học Thuật (Họ và Tên)
+                    Họ và Tên
                   </label>
                   <div className="relative">
                     <UserIcon
@@ -361,7 +283,7 @@ export const AcademicAuthModal: React.FC<AcademicAuthModalProps> = ({
 
                 <div className="space-y-1">
                   <label className="text-xs font-bold text-forest-950 uppercase tracking-wider">
-                    Hòm Thư Liên Lạc
+                    Email
                   </label>
                   <div className="relative">
                     <Mail
@@ -395,47 +317,16 @@ export const AcademicAuthModal: React.FC<AcademicAuthModalProps> = ({
                   </div>
                   <div className="space-y-1">
                     <label className="text-xs font-bold text-forest-950 uppercase tracking-wider">
-                      Xác Nhận
+                      Xác Nhận Mật Khẩu
                     </label>
                     <input
                       type="password"
                       value={regConfirmPassword}
                       onChange={(e) => setRegConfirmPassword(e.target.value)}
-                      placeholder="Trùng khớp mật khẩu"
+                      placeholder="Nhập lại mật khẩu"
                       className="w-full px-3.5 py-2 rounded-xl border border-stone-300 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-gold-500 transition-all"
                       required
                     />
-                  </div>
-                </div>
-
-                {/* Role selection */}
-                <div className="space-y-1 pt-1">
-                  <label className="text-xs font-bold text-forest-950 uppercase tracking-wider">
-                    Mục Tiêu Nghiên Cứu
-                  </label>
-                  <div className="grid grid-cols-2 gap-2">
-                    <button
-                      type="button"
-                      onClick={() => setRegRole('student')}
-                      className={`p-2 rounded-xl border text-xs font-bold text-center transition-all cursor-pointer ${
-                        regRole === 'student'
-                          ? 'bg-forest-950 text-gold-300 border-gold-500/50 shadow-xs'
-                          : 'bg-white border-stone-300 text-stone-700 hover:bg-stone-100'
-                      }`}
-                    >
-                      Học Viên Luyện Đề
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setRegRole('admin')}
-                      className={`p-2 rounded-xl border text-xs font-bold text-center transition-all cursor-pointer ${
-                        regRole === 'admin'
-                          ? 'bg-gold-700 text-white border-gold-800 shadow-xs'
-                          : 'bg-white border-stone-300 text-stone-700 hover:bg-stone-100'
-                      }`}
-                    >
-                      Hội Đồng Khảo Thí
-                    </button>
                   </div>
                 </div>
 
@@ -443,8 +334,8 @@ export const AcademicAuthModal: React.FC<AcademicAuthModalProps> = ({
                   type="submit"
                   className="w-full py-3.5 rounded-xl bg-[#D97706] hover:bg-[#B45309] text-white text-xs font-bold uppercase tracking-wider shadow-md hover:shadow-lg transition-all cursor-pointer flex items-center justify-center gap-2 mt-2"
                 >
-                  <Sparkles size={14} className="text-amber-200" />
-                  <span>Hoàn Tất Khởi Tạo &amp; Nhận 2250 XP</span>
+                  <span>Đăng Ký Tài Khoản Học Viên</span>
+                  <ArrowRight size={14} />
                 </button>
               </form>
             )}

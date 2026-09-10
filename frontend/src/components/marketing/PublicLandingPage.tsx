@@ -37,7 +37,7 @@ export const PublicLandingPage: React.FC<PublicLandingPageProps> = ({
       role: 'Sinh viên ĐH Bách Khoa • IELTS 7.5',
       avatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=120&auto=format&fit=crop&q=80',
       content:
-        'Tính năng Flashcard 3D và phòng thu âm AI của EduFlow đã giúp mình sửa triệt để các âm đuôi và trọng âm. Sau 3 tháng học liên tục đạt chuỗi Streak 14 ngày, điểm Speaking của mình từ 6.0 lên thẳng 7.5.',
+        'Tính năng Flashcard 3D và phòng thu âm AI của EduFlow đã giúp mình sửa triệt để các âm đuôi và trọng âm. Sau 3 tháng kiên trì rèn luyện, điểm Speaking của mình từ 6.0 lên thẳng 7.5.',
       score: '7.5 Speaking',
       tag: 'IELTS Academic',
     },
@@ -46,7 +46,7 @@ export const PublicLandingPage: React.FC<PublicLandingPageProps> = ({
       role: 'Du học sinh Úc • IELTS 8.5',
       avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=120&auto=format&fit=crop&q=80',
       content:
-        'Phương pháp Linearthinking giúp mình loại bỏ hoàn toàn thói quen dịch word-by-word. Hệ thống chấm Writing AI phân tích cực kỳ sát sao từng tiêu chí ngữ pháp và từ vựng nâng cao C1-C2.',
+        'Bộ đề thi thử Cambridge và phòng luyện đọc giúp mình làm quen với áp lực phòng thi. Hệ thống chấm Writing AI phân tích rất sát sao ngữ pháp và từ vựng.',
       score: '8.5 Overall',
       tag: 'Du Học Sinh',
     },
@@ -168,7 +168,7 @@ export const PublicLandingPage: React.FC<PublicLandingPageProps> = ({
                 <ul className="space-y-4 text-xs sm:text-sm text-blue-100">
                   <li className="flex items-start gap-3">
                     <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
-                    <span><strong>Spaced Repetition &amp; Flashcard 3D:</strong> Thuật toán Leitner 5 hộp phân loại ghi nhớ sâu vào vỏ não.</span>
+                    <span><strong>Spaced Repetition &amp; Flashcard 3D:</strong> Thuật toán lặp lại ngắt quãng giúp ghi nhớ từ vựng bền vững lâu dài.</span>
                   </li>
                   <li className="flex items-start gap-3">
                     <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
@@ -267,16 +267,15 @@ export const PublicLandingPage: React.FC<PublicLandingPageProps> = ({
             </h2>
 
             <p className="text-sm sm:text-base text-blue-100 max-w-2xl mx-auto font-normal">
-              Đăng ký tài khoản miễn phí chỉ trong 30 giây để trải nghiệm không gian học tập tương tác
-              và nhận ngay 2250 XP khởi đầu.
+              Đăng ký tài khoản miễn phí chỉ trong 30 giây để trải nghiệm trọn bộ không gian học tập tương tác Cambridge, Anki và AI.
             </p>
 
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-2">
               <button
-                onClick={() => onOpenAuth('register', 'Đăng ký nhận 2250 XP')}
+                onClick={() => onOpenAuth('register')}
                 className="w-full sm:w-auto px-8 py-4 rounded-2xl bg-white text-brand-navy hover:bg-slate-100 text-xs sm:text-sm font-black uppercase tracking-wider shadow-lg shadow-black/10 active:scale-95 transition-all cursor-pointer flex items-center justify-center gap-2"
               >
-                <span>Tạo Tài Khoản Nhận 2250 XP</span>
+                <span>Tạo Tài Khoản Miễn Phí</span>
                 <ArrowRight className="w-4 h-4" />
               </button>
 

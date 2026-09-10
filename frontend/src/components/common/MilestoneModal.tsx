@@ -116,13 +116,13 @@ export const MilestoneModal: React.FC<MilestoneModalProps> = ({
             <div className="space-y-2">
               <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs font-semibold uppercase tracking-wider">
                 <CheckCircle2 size={13} />
-                100% Hoàn Thành Khóa Học
+                100% Hoàn Thành Mục Tiêu
               </div>
               <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight">
                 Chúc Mừng, {studentName}!
               </h2>
               <p className="text-sm text-slate-600 max-w-md mx-auto leading-relaxed">
-                Bạn đã nỗ lực xuất sắc hoàn thành toàn bộ bài giảng và bài kiểm tra trong khóa học:
+                Bạn đã nỗ lực xuất sắc hoàn thành trọn vẹn mục tiêu luyện tập:
               </p>
               <p className="text-base font-semibold text-blue-600 bg-blue-50/70 py-2 px-4 rounded-xl border border-blue-100">
                 {courseTitle}
@@ -130,16 +130,12 @@ export const MilestoneModal: React.FC<MilestoneModalProps> = ({
             </div>
 
             {/* Reward Stats */}
-            <div className="grid grid-cols-3 gap-3 py-3 border-y border-slate-100">
+            <div className="grid grid-cols-2 gap-3 py-3 border-y border-slate-100">
               <div className="space-y-0.5">
                 <div className="text-lg font-bold text-slate-900 font-mono">100%</div>
                 <div className="text-xs text-slate-500">Tiến độ</div>
               </div>
-              <div className="space-y-0.5 border-x border-slate-100">
-                <div className="text-lg font-bold text-amber-600 font-mono">+150 XP</div>
-                <div className="text-xs text-slate-500">Điểm thưởng</div>
-              </div>
-              <div className="space-y-0.5">
+              <div className="space-y-0.5 border-l border-slate-100">
                 <div className="text-lg font-bold text-emerald-600 font-mono">Đạt chuẩn</div>
                 <div className="text-xs text-slate-500">Chứng chỉ</div>
               </div>

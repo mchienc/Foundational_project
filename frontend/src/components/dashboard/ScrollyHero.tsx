@@ -1,21 +1,21 @@
 import React, { useRef } from 'react';
 import gsap from 'gsap';
 import { useGSAP } from '@gsap/react';
-import { Sparkles, RotateCw, Trophy, ArrowRight, ShieldCheck } from 'lucide-react';
+import { Sparkles, RotateCw, BookOpen, ArrowRight, ShieldCheck } from 'lucide-react';
 import { User, Screen } from '../../types';
 
 gsap.registerPlugin(useGSAP);
 
 interface ScrollyHeroProps {
   currentUser: User | null;
-  streakDays: number;
+  streakDays?: number;
   onNavigateScreen?: (screen: Screen) => void;
   onOpenAuth?: (tab: 'login' | 'register') => void;
 }
 
 export const ScrollyHero: React.FC<ScrollyHeroProps> = ({
   currentUser,
-  streakDays,
+  streakDays: _streakDays,
   onNavigateScreen,
   onOpenAuth: _onOpenAuth,
 }) => {
@@ -99,27 +99,23 @@ export const ScrollyHero: React.FC<ScrollyHeroProps> = ({
         <div className="hero-badge flex flex-wrap items-center gap-3">
           <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#022C22] border border-amber-500/40 text-xs font-mono font-bold text-amber-300 uppercase tracking-widest shadow-xs">
             <Sparkles size={13} className="text-amber-400 animate-pulse" />
-            <span>KÝ DANH NGHIÊN CỨU VIÊN: {(currentUser?.full_name || 'MINH CHIẾN ĐẶNG').toUpperCase()}</span>
+            <span>KÝ DANH HỌC VIÊN: {(currentUser?.full_name || 'MINH CHIẾN ĐẶNG').toUpperCase()}</span>
           </div>
 
           <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/20 border border-amber-400/40 text-xs font-semibold text-amber-200">
             <span className="w-2 h-2 rounded-full bg-amber-400 animate-ping inline-block" />
-            <span>EduFlow Academic Engine Active</span>
+            <span>EduFlow Ready</span>
           </div>
         </div>
 
         {/* Main Headline */}
         <h1 className="hero-title text-3xl sm:text-5xl lg:text-5xl font-bold tracking-tight leading-[1.2] text-white">
-          Tiếp Tục Lộ Trình Học Thuật Cùng EduFlow Institute
+          Tiếp Tục Luyện Thi Cambridge Cùng EduFlow
         </h1>
 
         {/* Description */}
         <p className="hero-desc text-base sm:text-lg text-stone-200 max-w-2xl leading-relaxed">
-          Chuỗi{' '}
-          <strong className="text-amber-300 font-bold underline decoration-amber-400/50 underline-offset-4">
-            {streakDays || 14} ngày nghiên cứu liên tục đạt chuẩn Bạch Kim 🔥
-          </strong>
-          . Hệ thống Spaced Repetition và thuật toán âm vị học AI đã sẵn sàng cho phiên nghiên cứu chuyên sâu của bạn.
+          Luyện thi Cambridge chuyên sâu, mở rộng vốn từ vựng với phương pháp lặp lại ngắt quãng Anki và phòng luyện nghe - đọc thông minh.
         </p>
 
         {/* Action Buttons */}
@@ -134,13 +130,13 @@ export const ScrollyHero: React.FC<ScrollyHeroProps> = ({
             <ArrowRight className="w-4 h-4 text-amber-200 group-hover:translate-x-1 transition-transform" />
           </button>
 
-          {/* Secondary CTA Button: Translucent Frosted Glass */}
+          {/* Secondary CTA Button: Reading Room */}
           <button
-            onClick={() => onNavigateScreen && onNavigateScreen('leaderboard')}
+            onClick={() => onNavigateScreen && onNavigateScreen('reading')}
             className="inline-flex items-center gap-2 px-6 py-3.5 rounded-xl bg-white/10 hover:bg-white/20 border border-white/25 text-white font-bold text-xs sm:text-sm backdrop-blur-md active:scale-95 transition-all cursor-pointer shadow-sm"
           >
-            <Trophy className="w-4 h-4 text-amber-300" />
-            <span>Bảng Vinh Danh / Xếp Hạng</span>
+            <BookOpen className="w-4 h-4 text-amber-300" />
+            <span>Phòng Luyện Đọc Cambridge</span>
           </button>
 
           {/* Third CTA Button: Writing Studio */}

@@ -12,6 +12,7 @@ const adminRoutes = require('./routes/adminRoutes');
 const studentRoutes = require('./routes/studentRoutes');
 const quizRoutes = require('./routes/quizRoutes');
 const englishRoutes = require('./routes/api/englishRoutes');
+const cambridgeRoutes = require('./routes/api/cambridgeRoutes');
 const { checkAuth, checkAdmin } = require('./middlewares/auth');
 
 const app = express();
@@ -57,6 +58,7 @@ app.get('/', (req, res) => res.redirect('http://localhost:5173'));
 
 // ----- RESTful API cho Hệ thống Học Tiếng Anh (React Frontend) -----
 app.use('/api/english', englishRoutes);
+app.use('/api/cambridge', cambridgeRoutes);
 
 app.use('/', authRoutes); // /login, /register, /logout
 

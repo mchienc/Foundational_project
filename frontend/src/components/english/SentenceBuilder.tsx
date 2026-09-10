@@ -101,7 +101,7 @@ export const SentenceBuilder: React.FC<SentenceBuilderProps> = ({
 
       onEarnXp(
         currentExercise.points,
-        `Ghép câu chính xác "${currentExercise.grammarTopic}" (+${currentExercise.points} XP)`
+        `Ghép câu chính xác "${currentExercise.grammarTopic}"`
       );
     } else {
       setStatus('wrong');
@@ -131,7 +131,7 @@ export const SentenceBuilder: React.FC<SentenceBuilderProps> = ({
   };
 
   return (
-    <div className="max-w-4xl mx-auto px-4 py-8">
+    <div className="max-w-4xl mx-auto px-4 py-8 relative z-10">
       {/* Header */}
       <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
         <div>
@@ -154,7 +154,7 @@ export const SentenceBuilder: React.FC<SentenceBuilderProps> = ({
               onClick={onBackToDashboard}
               className="flex items-center gap-1 px-3 py-1.5 rounded-xl border border-slate-200 bg-white text-xs font-semibold text-slate-700 hover:bg-slate-50 shadow-sm"
             >
-              <ChevronLeft className="w-3.5 h-3.5" /> Lộ trình
+              <ChevronLeft className="w-3.5 h-3.5" /> Quay lại
             </button>
           )}
           <div className="px-3 py-1.5 bg-white border border-slate-200 rounded-xl text-xs font-semibold text-slate-700 shadow-sm">
@@ -174,7 +174,7 @@ export const SentenceBuilder: React.FC<SentenceBuilderProps> = ({
             </span>
           </div>
           <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-slate-800 text-slate-300">
-            +{currentExercise.points} XP
+            Câu {currentIndex + 1} / {exercises.length}
           </span>
         </div>
 
@@ -288,7 +288,7 @@ export const SentenceBuilder: React.FC<SentenceBuilderProps> = ({
                   <div className="flex items-center gap-2">
                     <CheckCircle2 className="w-5 h-5 text-emerald-600" />
                     <span className="font-bold text-sm text-emerald-900">
-                      Chính xác hoàn hảo! (+{currentExercise.points} XP)
+                      Chính xác hoàn hảo!
                     </span>
                   </div>
                   <button

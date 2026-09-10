@@ -1,24 +1,28 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Screen, Course, User, ToastMessage } from './types';
+import { Screen, Course, User, ToastMessage, ReadingSessionConfig } from './types';
 import { sampleCourses, initialUserStats } from './data/mockData';
 import { Navbar } from './components/common/Navbar';
 import { ToastContainer } from './components/common/ToastContainer';
 import { AcademicAuthModal } from './components/auth/AcademicAuthModal';
 import { CertificateModal } from './components/common/CertificateModal';
-import { Dashboard } from './components/dashboard/Dashboard';
 import { Profile } from './components/profile/Profile';
 import { AdminDashboard } from './components/admin/AdminDashboard';
-import { FlashcardPlayer } from './components/english/FlashcardPlayer';
-import { PronunciationStudio } from './components/english/PronunciationStudio';
-import { ListeningPlayer } from './components/english/ListeningPlayer';
-import { SentenceBuilder } from './components/english/SentenceBuilder';
-import { AcademicWritingStudio } from './components/english/AcademicWritingStudio';
-import { LeaderboardModal } from './components/english/LeaderboardModal';
+import { ReadingLibrary, CambridgeTestGroup } from './modules/reading/ReadingLibrary';
+import { ReadingTestRoom } from './modules/reading/ReadingTestRoom';
+import { IELTSComputerExamRoom } from './modules/exam/IELTSComputerExamRoom';
+import { MistakeVaultView } from './modules/mistakes/MistakeVaultView';
+import { mockReadingPassages } from './data/cambridgeMockData';
+import { ListeningLibrary } from './modules/listening/ListeningLibrary';
+import { ListeningDictationRoom } from './modules/listening/ListeningDictationRoom';
+import { AnkiWorkspace } from './modules/anki/AnkiWorkspace';
+import { AnkiFlashcardPlayer } from './modules/anki/AnkiFlashcardPlayer';
 import { AcademicLandingPage } from './components/marketing/AcademicLandingPage';
-import { sampleFlashcards } from './data/englishMockData';
 import { englishApi } from './services/englishApi';
 import { AuthProvider, useAuth } from './context/AuthContext';
+import { VocabularyVaultProvider } from './context/VocabularyVaultContext';
+import { AnkiProvider } from './context/AnkiContext';
+import { SmoothScrollProvider } from './context/SmoothScrollProvider';
 import { SoftAtmosphereBackground } from './components/common/SoftAtmosphereBackground';
 
 // Error Boundary to prevent white screen crashes
@@ -53,7 +57,7 @@ class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundarySta
             Đã xảy ra sự cố khi tải phân hệ học tập
           </h2>
           <p className="text-xs text-red-600 mb-4">
-            Vui lòng nhấn nút thử lại bên dưới hoặc quay lại trang chủ Lộ Trình.
+            Vui lòng nhấn nút thử lại bên dưới hoặc quay lại trang chủ.
           </p>
           <pre className="text-xs bg-white p-4 rounded-xl border border-red-200 overflow-x-auto text-red-800 font-mono mb-4">
             {this.state.error?.message}
@@ -95,11 +99,27 @@ const AppContent: React.FC = () => {
     setNotifyHandler,
   } = useAuth();
 
-  // Navigation Screen State: Guests land on 'landing', authenticated students go to 'dashboard'
+  // Navigation Screen State: Guests land on 'landing', authenticated students go to 'reading'
   const [currentScreen, setCurrentScreen] = useState<Screen>(() => {
     const saved = localStorage.getItem('eduflow_current_user');
-    return saved ? 'dashboard' : 'landing';
+    return saved ? 'reading' : 'landing';
   });
+
+  // Active Cambridge Reading Passage ID & Session Config (Single Passage vs Full Test)
+  const [selectedPassageId, setSelectedPassageId] = useState<string>('cambridge-18-test-2-p2');
+  const [readingSession, setReadingSession] = useState<ReadingSessionConfig>({
+    mode: 'single',
+    passageId: 'cambridge-18-test-2-p2',
+    testTitle: 'Cambridge 18 Test 2',
+  });
+  const [selectedComputerExamGroup, setSelectedComputerExamGroup] = useState<CambridgeTestGroup | null>(null);
+
+  // Active Cambridge Listening Test ID
+  const [selectedListeningTestId, setSelectedListeningTestId] = useState<string>('cambridge-18-listening-p4');
+
+  // Active Anki Deck ID and Study mode
+  const [selectedAnkiDeckId, setSelectedAnkiDeckId] = useState<string | null>(null);
+  const [isStudyingAnki, setIsStudyingAnki] = useState<boolean>(false);
 
   // Courses list
   const [courses, setCourses] = useState<Course[]>(sampleCourses);
@@ -110,13 +130,6 @@ const AppContent: React.FC = () => {
 
   // User Learning Stats
   const [stats, setStats] = useState(initialUserStats);
-
-  // Gamification XP State & Leaderboard Modal
-  const [xp, setXp] = useState<number>(() => {
-    const saved = localStorage.getItem('eduflow_xp');
-    return saved ? parseInt(saved, 10) : 2250;
-  });
-  const [showLeaderboardModal, setShowLeaderboardModal] = useState<boolean>(false);
 
   // Global Toast Notifications
   const [toasts, setToasts] = useState<ToastMessage[]>([]);
@@ -138,20 +151,18 @@ const AppContent: React.FC = () => {
     setNotifyHandler(addToast);
   }, [setNotifyHandler]);
 
-  const handleEarnXp = (amount: number, reason: string) => {
-    setXp((prev) => {
-      const next = prev + amount;
-      localStorage.setItem('eduflow_xp', next.toString());
-      return next;
-    });
+  const handleEarnXp = (_amount: number, reason: string) => {
     setStats((prev) => ({
       ...prev,
       hoursLearned: Math.round((prev.hoursLearned + 0.15) * 10) / 10,
     }));
-    addToast(reason, 'success');
+    const cleanMsg = reason.replace(/\s*\(\+?\d+\s*XP\)/gi, '').replace(/\+?\d+\s*XP/gi, '').trim();
+    if (cleanMsg) {
+      addToast(cleanMsg, 'success');
+    }
   };
 
-  // Sync user learning stats & XP from MySQL Database
+  // Sync user learning stats from MySQL Database
   useEffect(() => {
     if (!user) return;
 
@@ -161,10 +172,6 @@ const AppContent: React.FC = () => {
       .getUserStats(userId)
       .then((dbStats) => {
         if (isMounted && dbStats) {
-          if (dbStats.xp_this_week) {
-            setXp(dbStats.xp_this_week);
-            localStorage.setItem('eduflow_xp', dbStats.xp_this_week.toString());
-          }
           if (dbStats.streak_days) {
             setStats((prev) => ({
               ...prev,
@@ -182,23 +189,19 @@ const AppContent: React.FC = () => {
 
   // Protected screens requiring authentication
   const protectedScreens: Screen[] = [
-    'dashboard',
-    'vocab-srs',
-    'speaking',
+    'reading',
+    'reading-test',
+    'computer-exam',
+    'mistake-vault',
     'listening',
-    'sentence-builder',
-    'writing',
+    'listening-test',
+    'anki',
     'profile',
     'admin',
   ];
 
   // Auth Guard Navigation Handler
   const handleScreenNavigate = (screen: Screen) => {
-    if (screen === 'leaderboard') {
-      setShowLeaderboardModal(true);
-      return;
-    }
-
     if (screen === 'landing') {
       setCurrentScreen('landing');
       window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -208,21 +211,21 @@ const AppContent: React.FC = () => {
     // Intercept if guest attempts to access protected screens
     if (!isAuthenticated && protectedScreens.includes(screen)) {
       requireAuth(
-        screen === 'dashboard'
-          ? 'Bàn Học Cá Nhân'
-          : screen === 'vocab-srs'
-          ? 'Thẻ Từ Vựng 3D'
-          : screen === 'speaking'
-          ? 'Phòng Thu Phát Âm Waveform AI'
-          : screen === 'listening'
-          ? 'Luyện Nghe Dictation A-B Loop'
-          : screen === 'sentence-builder'
-          ? 'Kiến Trúc Cú Pháp Câu'
-          : screen === 'writing'
-          ? 'Chấm Luận Văn IELTS AI'
+        screen === 'reading' || screen === 'reading-test' || screen === 'computer-exam'
+          ? 'Phòng Thi Máy Tính & Luyện Đọc Cambridge'
+          : screen === 'mistake-vault'
+          ? 'Sổ Tay Câu Sai (Mistake Vault)'
+          : screen === 'listening' || screen === 'listening-test'
+          ? 'Luyện Nghe Dictation Audio Slicing'
+          : screen === 'anki'
+          ? 'Anki Flashcard Spaced Repetition'
           : 'Phân Hệ Nghiên Cứu'
       );
       return;
+    }
+
+    if (screen === 'anki') {
+      setIsStudyingAnki(false);
     }
 
     setCurrentScreen(screen);
@@ -235,7 +238,7 @@ const AppContent: React.FC = () => {
     if (userData.role === 'admin') {
       setCurrentScreen('admin');
     } else {
-      setCurrentScreen('dashboard');
+      setCurrentScreen('reading');
     }
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
@@ -255,9 +258,9 @@ const AppContent: React.FC = () => {
   const handleAddCourse = (newCourseData: Partial<Course>) => {
     const fullCourse: Course = {
       id: `course-${Date.now()}`,
-      title: newCourseData.title || 'Khóa học học thuật mới',
-      headline: newCourseData.headline || 'Khóa học chuyên sâu chất lượng cao',
-      description: 'Chương trình đào tạo thực chiến được biên soạn bởi hội đồng khảo thí.',
+      title: newCourseData.title || 'Khóa học mới',
+      headline: newCourseData.headline || 'Khóa học chất lượng cao',
+      description: 'Chương trình luyện thi thực chiến bám sát đề thi Cambridge.',
       category: newCourseData.category || 'Ngoại ngữ',
       level: 'Mọi cấp độ',
       duration: '18 giờ học',
@@ -271,17 +274,17 @@ const AppContent: React.FC = () => {
         newCourseData.image ||
         'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=800&auto=format&fit=crop&q=80',
       instructor: {
-        name: user?.full_name || 'Hội đồng Khảo thí',
-        role: 'Giảng viên chuyên môn',
+        name: user?.full_name || 'Đội ngũ EduFlow',
+        role: 'Ban chuyên môn',
         avatar:
           'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=120&auto=format&fit=crop&q=80',
-        bio: 'Chuyên gia đào tạo với nhiều năm kinh nghiệm nghiên cứu ngôn ngữ.',
+        bio: 'Đội ngũ đồng hành luyện thi Cambridge IELTS.',
         coursesCount: 1,
         rating: 5.0,
       },
       learningOutcomes: [
-        'Nắm vững cấu trúc câu phức và từ vựng học thuật C1-C2.',
-        'Luyện tập phát âm chuẩn âm vị IPA và phản xạ giao tiếp quốc tế.',
+        'Nắm vững cấu trúc câu và mở rộng vốn từ vựng Band 7.0+.',
+        'Luyện tập phát âm chuẩn IPA và phản xạ giao tiếp tự tin.',
       ],
       features: ['Truy cập trọn đời', 'Chứng chỉ chuẩn hóa sau khi hoàn thành'],
       modules: [
@@ -326,54 +329,162 @@ const AppContent: React.FC = () => {
           />
         );
 
-      case 'dashboard':
+      case 'reading':
         return (
-          <Dashboard
-            stats={stats}
-            currentUser={user}
-            onOpenAuth={openAuthModal}
-            onNavigateScreen={handleScreenNavigate}
+          <ReadingLibrary
+            onStartSession={(config) => {
+              setReadingSession(config);
+              setSelectedPassageId(config.passageId);
+              setCurrentScreen('reading-test');
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+            }}
+            onSelectPassage={(passageId) => {
+              setSelectedPassageId(passageId);
+              setReadingSession({
+                mode: 'single',
+                passageId,
+                testTitle: 'Cambridge IELTS',
+              });
+              setCurrentScreen('reading-test');
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+            }}
+            onStartComputerExam={(group) => {
+              setSelectedComputerExamGroup(group);
+              setCurrentScreen('computer-exam');
+            }}
+            onNavigateMistakeVault={() => {
+              setCurrentScreen('mistake-vault');
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+            }}
+            onNavigateAnki={() => {
+              setCurrentScreen('anki');
+              setIsStudyingAnki(false);
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+            }}
           />
         );
 
-      case 'vocab-srs':
+      case 'computer-exam': {
+        const passagesToUse =
+          selectedComputerExamGroup?.passages && selectedComputerExamGroup.passages.length > 0
+            ? selectedComputerExamGroup.passages
+            : mockReadingPassages.slice(0, 3);
+        const titleToUse = selectedComputerExamGroup?.source || 'Cambridge 18 - Test 2';
+
         return (
-          <FlashcardPlayer
-            cards={sampleFlashcards}
-            onEarnXp={handleEarnXp}
-            onBackToDashboard={() => handleScreenNavigate('dashboard')}
+          <IELTSComputerExamRoom
+            passages={passagesToUse}
+            testTitle={titleToUse}
+            customTestId={selectedComputerExamGroup?.id}
+            onExit={() => {
+              setCurrentScreen('reading');
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+            }}
+            onNavigateMistakeVault={() => {
+              setCurrentScreen('mistake-vault');
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+            }}
+          />
+        );
+      }
+
+      case 'mistake-vault':
+        return (
+          <MistakeVaultView
+            onBackToLibrary={() => {
+              setCurrentScreen('reading');
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+            }}
+            onNavigateExam={() => {
+              setCurrentScreen('reading');
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+            }}
           />
         );
 
-      case 'speaking':
+      case 'reading-test':
         return (
-          <PronunciationStudio
+          <ReadingTestRoom
+            passageId={selectedPassageId}
+            sessionConfig={readingSession}
+            onBackToLibrary={() => {
+              setCurrentScreen('reading');
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+            }}
             onEarnXp={handleEarnXp}
-            onBackToDashboard={() => handleScreenNavigate('dashboard')}
+            onNavigateAnki={() => {
+              setCurrentScreen('anki');
+              setIsStudyingAnki(false);
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+            }}
           />
         );
 
       case 'listening':
         return (
-          <ListeningPlayer
-            onEarnXp={handleEarnXp}
-            onBackToDashboard={() => handleScreenNavigate('dashboard')}
+          <ListeningLibrary
+            onSelectTest={(testId) => {
+              setSelectedListeningTestId(testId);
+              setCurrentScreen('listening-test');
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+            }}
+            onNavigateAnki={() => {
+              setCurrentScreen('anki');
+              setIsStudyingAnki(false);
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+            }}
           />
         );
 
-      case 'sentence-builder':
+      case 'listening-test':
         return (
-          <SentenceBuilder
+          <ListeningDictationRoom
+            testId={selectedListeningTestId}
+            onBackToLibrary={() => {
+              setCurrentScreen('listening');
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+            }}
             onEarnXp={handleEarnXp}
-            onBackToDashboard={() => handleScreenNavigate('dashboard')}
+            onNavigateAnki={() => {
+              setCurrentScreen('anki');
+              setIsStudyingAnki(false);
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+            }}
           />
         );
 
-      case 'writing':
+      case 'anki':
+        if (isStudyingAnki && selectedAnkiDeckId) {
+          return (
+            <AnkiFlashcardPlayer
+              deckId={selectedAnkiDeckId}
+              onBackToWorkspace={() => {
+                setIsStudyingAnki(false);
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+              }}
+              onEarnXp={handleEarnXp}
+            />
+          );
+        }
         return (
-          <AcademicWritingStudio
-            onEarnXp={handleEarnXp}
-            onBackToDashboard={() => handleScreenNavigate('dashboard')}
+          <AnkiWorkspace
+            onStartStudy={(deckId?: string) => {
+              if (deckId) {
+                setSelectedAnkiDeckId(deckId);
+              } else {
+                setSelectedAnkiDeckId('deck-personal');
+              }
+              setIsStudyingAnki(true);
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+            }}
+            onNavigateReading={() => {
+              setCurrentScreen('reading');
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+            }}
+            onNavigateListening={() => {
+              setCurrentScreen('listening');
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+            }}
           />
         );
 
@@ -405,11 +516,17 @@ const AppContent: React.FC = () => {
 
       default:
         return (
-          <Dashboard
-            stats={stats}
-            currentUser={user}
-            onOpenAuth={openAuthModal}
-            onNavigateScreen={handleScreenNavigate}
+          <ReadingLibrary
+            onSelectPassage={(passageId) => {
+              setSelectedPassageId(passageId);
+              setCurrentScreen('reading-test');
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+            }}
+            onNavigateAnki={() => {
+              setCurrentScreen('anki');
+              setIsStudyingAnki(false);
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+            }}
           />
         );
     }
@@ -420,8 +537,8 @@ const AppContent: React.FC = () => {
       {/* Dynamic Customizable Soft Atmosphere Background */}
       <SoftAtmosphereBackground />
 
-      {/* Student LMS Navigation: Only displayed in authenticated workspace */}
-      {currentScreen !== 'landing' && (
+      {/* Student LMS Navigation: Only displayed in authenticated workspace and outside of computer exam room */}
+      {currentScreen !== 'landing' && currentScreen !== 'computer-exam' && (
         <Navbar
           currentScreen={currentScreen}
           onSelectScreen={handleScreenNavigate}
@@ -429,13 +546,11 @@ const AppContent: React.FC = () => {
           currentUser={user}
           onOpenAuth={openAuthModal}
           onLogout={handleLogout}
-          xp={xp}
-          onOpenLeaderboard={() => setShowLeaderboardModal(true)}
         />
       )}
 
       {/* Dynamic Screen Routing with ErrorBoundary & AnimatePresence */}
-      <main className="flex-1">
+      <main className="flex-1 relative z-10">
         <ErrorBoundary>
           <AnimatePresence mode="wait">
             <motion.div
@@ -470,24 +585,17 @@ const AppContent: React.FC = () => {
         studentEmail={user?.email || 'dangchien2005@gmail.com'}
       />
 
-      {/* Weekly Gamification Leaderboard Modal */}
-      <LeaderboardModal
-        isOpen={showLeaderboardModal}
-        onClose={() => setShowLeaderboardModal(false)}
-        currentUserXp={xp}
-      />
-
       {/* Global Toast Notifications Container */}
       <ToastContainer toasts={toasts} onDismiss={removeToast} />
 
       {/* Student LMS Workspace Footer */}
-      {currentScreen !== 'landing' && (
-        <footer className="mt-auto border-t border-stone-300 bg-white py-8">
+      {currentScreen !== 'landing' && currentScreen !== 'computer-exam' && (
+        <footer className="mt-auto border-t border-stone-200/80 bg-white/85 backdrop-blur-md py-8">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-stone-500">
             <div className="flex items-center gap-3 font-sans">
-              <span className="font-bold text-forest-950">EduFlow Institute</span>
+              <span className="font-bold text-forest-950">EduFlow</span>
               <span>•</span>
-              <span className="font-sans">Hệ Thống Quản Lý Bàn Học Nghiên Cứu Toàn Diện</span>
+              <span className="font-sans">Hệ Thống Luyện Thi Cambridge IELTS &amp; Anki Spaced Repetition</span>
             </div>
 
             <div className="flex items-center gap-4 font-mono text-[11px]">
@@ -506,7 +614,13 @@ const AppContent: React.FC = () => {
 export const App: React.FC = () => {
   return (
     <AuthProvider>
-      <AppContent />
+      <AnkiProvider>
+        <VocabularyVaultProvider>
+          <SmoothScrollProvider>
+            <AppContent />
+          </SmoothScrollProvider>
+        </VocabularyVaultProvider>
+      </AnkiProvider>
     </AuthProvider>
   );
 };

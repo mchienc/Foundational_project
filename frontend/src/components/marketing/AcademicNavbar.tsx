@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import {
-  PenTool,
   ArrowRight,
   Menu,
   X,
@@ -22,11 +21,10 @@ export const AcademicNavbar: React.FC<AcademicNavbarProps> = ({
   const [mobileMenuOpen, setMobileMenuOpen] = useState<boolean>(false);
 
   const navLinks = [
-    { label: 'Luận Điểm AI', href: '#methodology' },
-    { label: '5 Phân Hệ Học Thuật', href: '#chapters' },
-    { label: 'Khảo Thí & Lộ Trình', href: '#programs' },
-    { label: 'Biểu Phí & Khảo Sát', href: '#tuition' },
-    { label: 'Minh Chứng Nghiên Cứu', href: '#evidence' },
+    { label: 'Luyện Đọc Cambridge', href: '#chapters' },
+    { label: 'Luyện Nghe Dictation', href: '#chapters' },
+    { label: 'Anki Flashcard', href: '#chapters' },
+    { label: 'Đánh Giá', href: '#evidence' },
   ];
 
   const handleScrollTo = (e: React.MouseEvent, href: string) => {
@@ -39,25 +37,31 @@ export const AcademicNavbar: React.FC<AcademicNavbarProps> = ({
   };
 
   return (
-    <header className="sticky top-0 z-40 bg-[#032B20] border-b border-emerald-900/90 shadow-md transition-colors">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-18 flex items-center justify-between gap-4">
-        {/* Academic Brand Mark */}
+    <header className="sticky top-0 z-40 bg-[#064E3B] border-b border-emerald-800/80 shadow-md transition-colors">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
+        {/* Academic Brand Mark - 100% Unified with Inside Navbar */}
         <div
           onClick={() => onNavigateScreen('landing')}
-          className="flex items-center gap-3 cursor-pointer group select-none"
+          className="flex items-center gap-2.5 cursor-pointer group select-none text-left"
         >
-          <div className="w-10 h-10 rounded-xl bg-forest-900 border border-amber-500/40 text-amber-400 flex items-center justify-center shadow-sm group-hover:scale-105 transition-transform duration-200">
-            <PenTool size={20} className="text-amber-400" />
+          <div className="relative w-9 h-9 sm:w-10 sm:h-10 rounded-xl overflow-hidden bg-white p-1 border border-amber-400/40 shadow-sm group-hover:border-amber-400 group-hover:shadow-amber-400/20 group-hover:scale-105 transition-all duration-200 shrink-0 flex items-center justify-center">
+            <img
+              src="/logo.jpg"
+              alt="EduFlow Logo"
+              className="w-full h-full object-contain"
+            />
           </div>
-          <div>
-            <div className="flex items-center gap-2 font-sans font-bold text-white text-xl leading-tight">
-              EduFlow
-              <span className="font-sans text-[9px] font-extrabold uppercase px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-400/40 tracking-wider">
-                Institute
+          <div className="flex flex-col justify-center min-w-0">
+            <div className="flex items-center gap-2">
+              <span className="text-base sm:text-lg font-sans font-bold tracking-tight text-white leading-tight">
+                EduFlow
+              </span>
+              <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[9px] sm:text-[10px] font-semibold bg-[#032B20]/90 text-amber-300 border border-amber-400/30 whitespace-nowrap leading-none tracking-wide shadow-xs">
+                Cambridge &amp; Anki
               </span>
             </div>
-            <span className="text-[10px] text-stone-300 font-mono tracking-wider block">
-              Viện Công Nghệ Ngôn Ngữ Học
+            <span className="text-[10px] sm:text-[11px] text-emerald-200/80 font-sans tracking-normal leading-tight whitespace-nowrap mt-0.5 hidden sm:block">
+              Luyện thi Cambridge IELTS &amp; Học từ vựng Anki
             </span>
           </div>
         </div>
@@ -80,7 +84,7 @@ export const AcademicNavbar: React.FC<AcademicNavbarProps> = ({
         <div className="hidden sm:flex items-center gap-4">
           {currentUser ? (
             <button
-              onClick={() => onNavigateScreen('dashboard')}
+              onClick={() => onNavigateScreen('reading')}
               className="group inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-emerald-900/90 hover:bg-emerald-800 text-stone-100 border border-amber-400/40 text-xs font-bold shadow-md active:scale-95 transition-all cursor-pointer"
             >
               <div className="w-5 h-5 rounded-full overflow-hidden border border-amber-400/50">
@@ -93,7 +97,7 @@ export const AcademicNavbar: React.FC<AcademicNavbarProps> = ({
                   className="w-full h-full object-cover"
                 />
               </div>
-              <span>Bàn Học Cá Nhân ({currentUser.full_name})</span>
+              <span>Vào Học Ngay ({currentUser.full_name})</span>
               <ArrowRight className="w-3.5 h-3.5 text-amber-400 group-hover:translate-x-0.5 transition-transform" />
             </button>
           ) : (
@@ -110,7 +114,7 @@ export const AcademicNavbar: React.FC<AcademicNavbarProps> = ({
                 className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#D97706] hover:bg-[#B45309] text-white text-xs font-bold uppercase tracking-wider shadow-md hover:shadow-lg active:scale-95 transition-all cursor-pointer"
               >
                 <Compass className="w-3.5 h-3.5 text-white" />
-                <span>Bắt Đầu Nghiên Cứu</span>
+                <span>Luyện Đề Miễn Phí</span>
               </button>
             </div>
           )}
@@ -120,10 +124,9 @@ export const AcademicNavbar: React.FC<AcademicNavbarProps> = ({
         <div className="lg:hidden flex items-center gap-2">
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="p-2 rounded-xl text-stone-200 hover:bg-forest-900 transition-colors"
-            title="Menu điều hướng"
+            className="p-2 rounded-xl text-stone-300 hover:text-white hover:bg-forest-900 transition-colors"
           >
-            {mobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
+            {mobileMenuOpen ? <X size={22} /> : <Menu size={22} />}
           </button>
         </div>
       </div>
@@ -149,11 +152,11 @@ export const AcademicNavbar: React.FC<AcademicNavbarProps> = ({
               <button
                 onClick={() => {
                   setMobileMenuOpen(false);
-                  onNavigateScreen('dashboard');
+                  onNavigateScreen('reading');
                 }}
                 className="w-full py-2.5 rounded-xl bg-forest-950 text-gold-300 text-xs font-bold flex items-center justify-center gap-2"
               >
-                <span>Vào Bàn Học ({currentUser.full_name})</span>
+                <span>Vào Học Ngay ({currentUser.full_name})</span>
                 <ArrowRight size={14} />
               </button>
             ) : (
@@ -174,7 +177,7 @@ export const AcademicNavbar: React.FC<AcademicNavbarProps> = ({
                   }}
                   className="py-2.5 rounded-xl bg-forest-950 text-gold-300 text-xs font-bold text-center"
                 >
-                  Gia Nhập
+                  Đăng Ký
                 </button>
               </div>
             )}

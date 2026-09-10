@@ -3,7 +3,6 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
   Volume2,
   RotateCw,
-  Sparkles,
   ChevronLeft,
   ChevronRight,
   CheckCircle2,
@@ -107,7 +106,7 @@ export const FlashcardPlayer: React.FC<FlashcardPlayerProps> = ({
         .catch((err) => console.warn('Could not sync SRS review with MySQL:', err));
     }
 
-    onEarnXp(xpGained, `${feedback} (+${xpGained} XP)`);
+    onEarnXp(xpGained, feedback);
 
     // Advance to next card
     if (currentIndex < deck.length - 1) {
@@ -202,7 +201,7 @@ export const FlashcardPlayer: React.FC<FlashcardPlayerProps> = ({
   }, [currentIndex, deck.length, isDeckFinished, handleFlip]);
 
   return (
-    <div className="max-w-4xl mx-auto px-4 py-8 relative">
+    <div className="max-w-4xl mx-auto px-4 py-8 relative z-10">
       {/* Header controls & stats */}
       <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
         <div>
@@ -266,10 +265,6 @@ export const FlashcardPlayer: React.FC<FlashcardPlayerProps> = ({
                   <div className="flex items-center gap-2">
                     <span className="px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wider bg-indigo-50 text-indigo-700 border border-indigo-200/60">
                       {currentCard.partOfSpeech}
-                    </span>
-                    <span className="text-xs text-slate-500 flex items-center gap-1">
-                      <Sparkles className="w-3.5 h-3.5 text-amber-500" />
-                      Streak: {currentCard.streak} ngày
                     </span>
                   </div>
                   <div className="text-xs font-medium text-slate-400 flex items-center gap-1">
@@ -513,7 +508,6 @@ export const FlashcardPlayer: React.FC<FlashcardPlayerProps> = ({
                 <span className="text-[11px] text-red-600 font-normal mt-0.5">
                   Ôn lại ngay (&lt;1m)
                 </span>
-                <span className="text-[10px] text-red-500 mt-1 font-bold">+5 XP</span>
               </button>
 
               {/* Hard (Orange) */}
@@ -527,7 +521,6 @@ export const FlashcardPlayer: React.FC<FlashcardPlayerProps> = ({
                 <span className="text-[11px] text-amber-600 font-normal mt-0.5">
                   Khó nhớ (10m)
                 </span>
-                <span className="text-[10px] text-amber-600 mt-1 font-bold">+10 XP</span>
               </button>
 
               {/* Good (Blue) */}
@@ -541,7 +534,6 @@ export const FlashcardPlayer: React.FC<FlashcardPlayerProps> = ({
                 <span className="text-[11px] text-blue-600 font-normal mt-0.5">
                   Nhớ được (1 ngày)
                 </span>
-                <span className="text-[10px] text-blue-600 mt-1 font-bold">+15 XP</span>
               </button>
 
               {/* Easy (Green) */}
@@ -555,7 +547,6 @@ export const FlashcardPlayer: React.FC<FlashcardPlayerProps> = ({
                 <span className="text-[11px] text-emerald-600 font-normal mt-0.5">
                   Rất dễ (4 ngày)
                 </span>
-                <span className="text-[10px] text-emerald-600 mt-1 font-bold">+20 XP</span>
               </button>
             </div>
           </div>
@@ -627,7 +618,7 @@ export const FlashcardPlayer: React.FC<FlashcardPlayerProps> = ({
             Hệ thống Spaced Repetition đã ghi nhận tiến độ ghi nhớ. Các từ cần củng cố sẽ xuất hiện trong phiên học tiếp theo.
           </p>
 
-          <div className="grid grid-cols-3 gap-4 max-w-md mx-auto mb-8">
+          <div className="grid grid-cols-2 gap-4 max-w-sm mx-auto mb-8">
             <div className="p-4 bg-slate-50 rounded-2xl border border-slate-100">
               <div className="text-2xl font-extrabold text-slate-900">
                 {deck.length}
@@ -639,12 +630,6 @@ export const FlashcardPlayer: React.FC<FlashcardPlayerProps> = ({
                 {masteredCount}
               </div>
               <div className="text-xs text-emerald-700 mt-1">Ghi nhớ tốt</div>
-            </div>
-            <div className="p-4 bg-amber-50 rounded-2xl border border-amber-100">
-              <div className="text-2xl font-extrabold text-amber-600">
-                +120
-              </div>
-              <div className="text-xs text-amber-700 mt-1">XP Nhận được</div>
             </div>
           </div>
 
@@ -661,7 +646,7 @@ export const FlashcardPlayer: React.FC<FlashcardPlayerProps> = ({
                 onClick={onBackToDashboard}
                 className="flex items-center gap-2 px-6 py-3 rounded-xl bg-slate-100 text-slate-700 font-semibold hover:bg-slate-200 active:scale-95 transition-all text-sm"
               >
-                Về trang chủ lộ trình
+                Về màn hình chính
               </button>
             )}
           </div>

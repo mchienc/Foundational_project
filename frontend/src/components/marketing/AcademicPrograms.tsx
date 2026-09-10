@@ -14,68 +14,68 @@ interface AcademicProgramsProps {
 }
 
 export const AcademicPrograms: React.FC<AcademicProgramsProps> = ({ onOpenAuth }) => {
-  const [activeTab, setActiveTab] = useState<'all' | 'ielts' | 'school' | 'comm'>('all');
+  const [activeTab, setActiveTab] = useState<'all' | 'reading' | 'dictation' | 'expert'>('all');
 
   const programs = [
     {
-      id: 'ielts',
-      category: 'ielts',
-      badge: 'Chuyên Khảo Phổ Biến Nhất',
+      id: 'reading',
+      category: 'reading',
+      badge: 'Luyện Đọc Thực Chiến',
       isPopular: true,
-      title: 'IELTS Academic Sinh Viên & Chuyên Gia',
-      target: 'Mục tiêu: 6.5 - 8.0+ IELTS Học Thuật',
+      title: 'Luyện Đọc Cambridge IELTS (Cam 10 - 20)',
+      target: 'Mục tiêu: Bứt phá điểm số 7.0 - 8.5+ IELTS Reading',
       headline:
-        'Hệ thống hóa tư duy phản biện, tối ưu hóa điểm số 4 kỹ năng qua phương pháp bóc tách ngôn ngữ và ngân hàng đề thi chuẩn Cambridge.',
-      duration: '3 - 6 tháng (Theo khảo sát đầu vào)',
-      level: 'Sinh viên đại học, nghiên cứu sinh, người đi làm thăng tiến',
+        'Làm chủ kỹ năng đọc hiểu qua 28 đề thi thật Cambridge 10 - 20, tùy chọn làm Full Test 60 phút bấm giờ hoặc làm riêng từng bài đọc Passage.',
+      duration: 'Tự do theo tốc độ cá nhân',
+      level: 'Người luyện thi IELTS, học sinh, sinh viên và người đi làm',
       features: [
-        'Loại bỏ triệt để thói quen dịch thô word-by-word tiếng Việt',
-        'Phòng thu âm AI bóc tách từng âm vị IPA và trọng âm câu',
-        'Chấm viết luận Task 1 & Task 2 chuẩn 4 trục IELTS Band Descriptors',
-        'Kho 1,200+ từ vựng học thuật Spaced Repetition chuẩn Oxford C1',
-        'Cam kết chuẩn đầu ra 6.5 - 7.5+ bằng thỏa ước đào tạo',
+        'Trọn bộ đề thi thật từ Cambridge 10 đến 20 (28 đề Full Tests & 84 Passages)',
+        'Tùy chọn: Làm Full Test 60 phút có chấm điểm hoặc làm riêng từng Passage',
+        'Tra từ điển trực tiếp ngay trên bài đọc: IPA, giải nghĩa tiếng Việt, ví dụ',
+        'Lưu từ vựng 1-click vào bộ thẻ Anki để ôn lại dễ dàng',
+        'Xem đáp án chi tiết và chỉ rõ vị trí câu trả lời trong đoạn văn',
       ],
-      ctaText: 'Đăng Ký Lộ Trình 6.5 - 8.0+',
+      ctaText: 'Bắt Đầu Luyện Đọc Ngay',
     },
     {
-      id: 'school',
-      category: 'school',
-      badge: 'Bứt Phá Điểm Số Học Đường',
+      id: 'dictation',
+      category: 'dictation',
+      badge: 'Luyện Tai & Chính Tả',
       isPopular: false,
-      title: 'Tiếng Anh Học Đường THCS & THPT',
-      target: 'Mục tiêu: 9.0+ Thi Vào 10 Chuyên & THPT Quốc Gia',
+      title: 'Luyện Nghe Chép Chính Tả (Dictation)',
+      target: 'Mục tiêu: Nghe rõ từng từ, sửa triệt để lỗi chính tả',
       headline:
-        'Xây dựng móng ngữ pháp kiến tạo, giải mã đề thi thử của các trường chuyên top đầu và bám sát SGK mới Global Success.',
-      duration: 'Toàn diện theo năm học / Cấp tốc ôn thi',
-      level: 'Học sinh lớp 6 đến lớp 12 chuẩn bị thi chuyên & tốt nghiệp',
+        'Chấm dứt lối nghe thụ động qua phương pháp nghe chép từng câu ngắn, hệ thống tự động so khớp và chỉ rõ từ sai tức thì.',
+      duration: '15 - 30 phút mỗi ngày',
+      level: 'Người nghe chậm, hay bỏ sót âm đuôi hoặc hay sai lỗi chính tả',
       features: [
-        'Cây ngữ pháp kiến tạo kéo thả trực quan qua Sentence Builder',
-        'Luyện nghe A-B loop và chép chính tả Dictation không bỏ sót từ',
-        'Kho đề thi thử bấm giờ có phân tích lỗi sai chi tiết tự động',
-        'Rèn luyện tư duy đọc hiểu nhanh các đoạn văn học thuật dài',
-        'Hỗ trợ giải đáp 1-1 với đội ngũ trợ giảng đạt IELTS 8.0+',
+        'Nghe từng câu ngắn với tốc độ tùy chỉnh 0.8x đến 1.2x',
+        'Đối soát từng từ: từ đúng màu xanh, từ sai màu đỏ giúp bạn sửa lỗi ngay',
+        'Phím tắt tiện lợi, nút gợi ý ký tự tiếp theo và xem bản dịch tiếng Việt',
+        'Chấm điểm và phản hồi trực quan cho mỗi câu chép chính xác',
+        'Cải thiện rõ rệt khả năng bắt âm vị và độ nhạy tai khi làm bài nghe',
       ],
-      ctaText: 'Khám Phá Lộ Trình Học Đường',
+      ctaText: 'Bắt Đầu Luyện Nghe Dictation',
     },
     {
-      id: 'comm',
-      category: 'comm',
-      badge: 'Thực Chiến Âm Vị',
+      id: 'expert',
+      category: 'expert',
+      badge: 'Ghi Nhớ Bền Vững',
       isPopular: false,
-      title: 'Khảo Thí & Phản Xạ Âm Vị Cấp Tốc',
-      target: 'Mục tiêu: Phản Xạ Tự Nhiên & Chuẩn Âm Vị Trong 60 Ngày',
+      title: 'Bộ Thẻ 3D Anki Flashcard (SRS)',
+      target: 'Mục tiêu: Nhớ lâu 1000+ từ vựng cốt lõi không bao giờ quên',
       headline:
-        'Làm chủ ngữ điệu Intonation và nhịp điệu Stress trong câu. Tự tin thuyết trình hội thảo, phỏng vấn xin việc và hội nhập quốc tế.',
-      duration: '8 - 12 tuần (Cường độ cao)',
-      level: 'Người mất gốc ngữ âm, chuẩn bị du học hoặc phỏng vấn visa',
+        'Ứng dụng thuật toán lặp lại ngắt quãng SM-2 với thẻ lật 3D sống động, tự động đồng bộ từ mới đã lưu từ bài Đọc và bài Nghe.',
+      duration: '5 - 10 phút ôn tập mỗi ngày',
+      level: 'Mọi học viên muốn xây dựng vốn từ vựng phong phú',
       features: [
-        'Sửa khẩu hình, nối âm, nuốt âm qua biểu đồ sóng âm Waveform',
-        'Mô phỏng 50+ kịch bản đối thoại môi trường công sở & học thuật',
-        'Luyện nghe đa giọng điệu: Anh - Mỹ - Úc với tốc độ biến thiên',
-        'Thẻ từ vựng flashcard kích hoạt phản xạ câu tức thì',
-        'Thực hành ghi âm mỗi ngày, nhận báo cáo tiến độ chi tiết',
+        'Thẻ học lật 3D tương tác đa chiều, mô phỏng thẻ giấy chân thực',
+        'Thuật toán SM-2 tự động tính toán ngày ôn lại tối ưu',
+        '4 nút đánh giá quen thuộc: Again, Hard, Good, Easy',
+        'Tự động đồng bộ toàn bộ từ vựng đã lưu từ bài Đọc và bài Nghe',
+        'Luyện phản xạ điền từ vào câu ngữ cảnh giúp dùng từ tự nhiên',
       ],
-      ctaText: 'Đăng Ký Khóa Phản Xạ Cấp Tốc',
+      ctaText: 'Bắt Đầu Học Thẻ Anki',
     },
   ];
 
@@ -87,27 +87,26 @@ export const AcademicPrograms: React.FC<AcademicProgramsProps> = ({ onOpenAuth }
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="text-center max-w-3xl mx-auto mb-14 space-y-3">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#064E3B] border border-amber-500/40 text-amber-300 text-xs font-mono font-bold tracking-normal uppercase shadow-xs">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#064E3B] border border-amber-500/40 text-amber-300 text-xs font-sans font-bold tracking-normal shadow-xs">
             <Compass className="w-3.5 h-3.5 text-amber-400" />
-            <span>Chương Trình Đào Tạo Trọng Tâm</span>
+            <span>3 Tính Năng Chính</span>
           </div>
 
           <h2 className="text-3xl sm:text-4xl lg:text-5xl font-sans font-bold text-[#064E3B] tracking-normal leading-tight">
-            Chọn Lộ Trình Nghiên Cứu Phù Hợp
+            Lộ Trình Luyện Tập Toàn Diện
           </h2>
 
           <p className="text-sm sm:text-base text-stone-600 font-sans leading-relaxed">
-            Hệ sinh thái EdTech AI của EduFlow thiết kế riêng biệt cho từng đối tượng học viên,
-            tập trung vào thực hành tương tác trực tiếp và cam kết chuẩn đầu ra.
+            Kết hợp trọn vẹn Luyện đọc đề thật Cambridge, Luyện nghe chép chính tả và Ghi nhớ ngắt quãng bằng thẻ Anki.
           </p>
 
           {/* Filter Pills */}
           <div className="flex flex-wrap items-center justify-center gap-2 pt-3">
             {[
               { id: 'all', label: 'Tất Cả Lộ Trình' },
-              { id: 'ielts', label: '🎯 IELTS Học Thuật 6.5 - 8.0+' },
-              { id: 'school', label: '🏫 Học Đường THCS & THPT' },
-              { id: 'comm', label: '⚡ Phản Xạ Âm Vị Cấp Tốc' },
+              { id: 'reading', label: '📖 Đọc Sâu & Vocabulary Vault' },
+              { id: 'dictation', label: '🎧 Nghe Chép Chính Tả' },
+              { id: 'expert', label: '🏛️ Chuyên Gia C1-C2' },
             ].map((tab) => (
               <button
                 key={tab.id}

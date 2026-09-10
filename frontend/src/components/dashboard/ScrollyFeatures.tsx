@@ -42,14 +42,14 @@ interface FeatureItem {
 const FEATURES: FeatureItem[] = [
   {
     id: 1,
-    chapterLabel: '[CHƯƠNG I: PHẢN XẠ 3D]',
+    chapterLabel: '[TÍNH NĂNG 1: THẺ TỪ VỰNG 3D]',
     screen: 'vocab-srs',
     badge: 'Spaced Repetition System',
     badgeColor: 'bg-amber-50 text-amber-900 border-amber-200/80',
     title: 'Thẻ Từ Vựng Thông Minh 3D',
     headline: 'Ghi Nhớ Dài Hạn Qua Thuật Toán Lặp Lại Ngắt Quãng',
     description:
-      'Trải nghiệm lật thẻ 3D 180° mượt mà, phát âm chuẩn Oxford UK/US, tra từ điển popup nhanh trong ngữ cảnh và thuật toán SRS tự động lên lịch ôn tập tối ưu.',
+      'Trải nghiệm lật thẻ 3D 180° mượt mà, phát âm chuẩn Oxford UK/US, tra từ điển nhanh trong ngữ cảnh và thuật toán SRS tự động lên lịch ôn tập tối ưu.',
     highlights: [
       'Lật thẻ 3D 180° mô phỏng chuyển động thực tế',
       'Âm thanh bản xứ chuẩn Anh - Anh & Anh - Mỹ',
@@ -64,14 +64,14 @@ const FEATURES: FeatureItem[] = [
   },
   {
     id: 2,
-    chapterLabel: '[CHƯƠNG II: PHỔ ÂM VỊ]',
+    chapterLabel: '[TÍNH NĂNG 2: PHÁT ÂM & GHI ÂM AI]',
     screen: 'speaking',
     badge: 'Phoneme AI Speech',
     badgeColor: 'bg-emerald-50 text-emerald-900 border-emerald-200/80',
     title: 'Phát Âm & Ghi Âm AI Studio',
     headline: 'Bóc Tách Âm Vị IPA & So Sánh Đồ Thị Sóng Âm',
     description:
-      'Ghi âm tương tác với mic ripple rings trực quan, phân tích chi tiết điểm số từng âm vị IPA, phát hiện lỗi phát âm sai và đối chiếu trực quan đồ thị sóng âm Waveform với người bản xứ.',
+      'Ghi âm tương tác với mic trực quan, phân tích chi tiết điểm số từng âm IPA, phát hiện lỗi phát âm sai và đối chiếu trực quan đồ thị sóng âm Waveform với người bản xứ.',
     highlights: [
       'Bóc tách từng âm tiết và phiên âm quốc tế IPA',
       'Đồ thị sóng âm Waveform đối chiếu thời gian thực',
@@ -86,14 +86,14 @@ const FEATURES: FeatureItem[] = [
   },
   {
     id: 3,
-    chapterLabel: '[CHƯƠNG III: THÍNH GIÁC A-B]',
+    chapterLabel: '[TÍNH NĂNG 3: LUYỆN NGHE DICTATION]',
     screen: 'listening',
     badge: 'Smart Audio & Dictation',
     badgeColor: 'bg-stone-100 text-stone-800 border-stone-200',
     title: 'Luyện Nghe Karaoke & Dictation',
     headline: 'Nghe Chép Chính Tả & Lặp Đoạn Chuyên Sâu A-B Loop',
     description:
-      'Trình phát audio thông minh tua ±5s, lặp đoạn A-B loop chuyên sâu, lời thoại song ngữ chạy karaoke theo từng mili-giây và chế độ điền từ khuyết thử thách phản xạ tai nghe.',
+      'Trình phát audio thông minh tua ±5s, lặp đoạn A-B loop, lời thoại song ngữ chạy karaoke theo giọng đọc và chế độ điền từ khuyết thử thách phản xạ tai nghe.',
     highlights: [
       'Karaoke transcript tự động cuộn theo giọng nói',
       'Công cụ đánh dấu đoạn lặp vô tận A-B Loop',
@@ -108,17 +108,17 @@ const FEATURES: FeatureItem[] = [
   },
   {
     id: 4,
-    chapterLabel: '[CHƯƠNG IV: CÚ PHÁP CẤU TRÚC]',
+    chapterLabel: '[TÍNH NĂNG 4: GHÉP CÂU TƯƠNG TÁC]',
     screen: 'sentence-builder',
     badge: 'Grammar Architecture',
     badgeColor: 'bg-amber-50 text-amber-900 border-amber-200/80',
     title: 'Ghép Câu Ngữ Pháp Tương Tác',
-    headline: 'Lắp Ghép Trật Tự Câu Với Phản Hồi Xúc Giác',
+    headline: 'Lắp Ghép Trật Tự Câu Trực Quan & Vui Vẻ',
     description:
-      'Rèn luyện tư duy cấu trúc câu tiếng Anh tự nhiên qua thao tác chạm kéo word pill chips, phản hồi rung lắc khi sai vị trí và hiệu ứng âm thanh pop + confetti khi hoàn thành chính xác.',
+      'Rèn luyện tư duy cấu trúc câu tiếng Anh tự nhiên qua thao tác chạm kéo từ ngữ, phản hồi rung lắc khi sai vị trí và hiệu ứng pháo hoa khi hoàn thành chính xác.',
     highlights: [
-      'Học trật tự từ tự nhiên qua thao tác xúc giác tương tác',
-      'Hiệu ứng rung lắc (shake) cảnh báo lỗi sai vị trí',
+      'Học trật tự từ tự nhiên qua thao tác tương tác',
+      'Hiệu ứng rung lắc cảnh báo lỗi sai vị trí',
       'Giải thích ngữ pháp chi tiết & phát âm toàn câu',
     ],
     gradient: 'from-[#064E3B] to-[#022C22]',
@@ -130,18 +130,18 @@ const FEATURES: FeatureItem[] = [
   },
   {
     id: 5,
-    chapterLabel: '[CHƯƠNG V: KHẢO THÍ VIẾT LUẬN]',
+    chapterLabel: '[TÍNH NĂNG 5: CHẤM BÀI VIẾT LUẬN AI]',
     screen: 'writing',
     badge: 'Cambridge IELTS 4 Rubrics',
     badgeColor: 'bg-emerald-50 text-emerald-900 border-emerald-200/80',
-    title: 'Chấm Viết Luận Học Thuật AI',
-    headline: 'Phân Tích Bài Luận Chuẩn Quốc Tế Band 1.0 - 9.0',
+    title: 'Chấm Bài Viết Luận IELTS Cùng AI',
+    headline: 'Đánh Giá Bài Luận Bám Sát 4 Tiêu Chí IELTS',
     description:
-      'Môi trường mô phỏng phòng thi IELTS Task 1 & 2 với live word count, đồng hồ đếm ngược, phân tích danh mục từ vựng học thuật Academic Word List (AWL), gợi ý Collocations và lời phê giám khảo.',
+      'Luyện viết IELTS Task 1 & 2 với bộ đếm từ trực tiếp, đồng hồ đếm ngược, phân tích từ vựng nâng cao, gợi ý Collocations và nhận xét chi tiết từng câu.',
     highlights: [
       'Chấm điểm 4 tiêu chí: Task Response • CC • Lexical • Grammar',
-      'Tự động bóc tách từ vựng Academic Word List (AWL/C1)',
-      'Gợi ý nâng cấp Collocations & Bài luận mẫu Band 8.5+',
+      'Tự động nhận diện từ vựng học thuật quan trọng',
+      'Gợi ý nâng cấp Collocations & Bài luận mẫu Band 8.0+',
     ],
     gradient: 'from-[#064E3B] to-[#022C22]',
     iconBg: 'bg-[#064E3B]',
@@ -316,7 +316,7 @@ export const ScrollyFeatures: React.FC<ScrollyFeaturesProps> = ({ onNavigateScre
         {/* Scroll indicator text */}
         <div className="absolute top-6 right-8 flex items-center gap-2 text-xs text-amber-400/80 font-mono tracking-wider">
           <Sparkles className="w-3.5 h-3.5 text-amber-400" />
-          <span>CHƯƠNG MỤC HỌC THUẬT: 5 PHÂN HỆ</span>
+          <span>5 TÍNH NĂNG NỔI BẬT</span>
         </div>
 
         {/* 2-Column Scrollytelling Container */}
@@ -326,13 +326,13 @@ export const ScrollyFeatures: React.FC<ScrollyFeaturesProps> = ({ onNavigateScre
             <div>
               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/20 border border-amber-400/30 text-amber-300 text-xs font-bold uppercase tracking-wider mb-3">
                 <span className="w-2 h-2 rounded-full bg-amber-400 animate-ping inline-block" />
-                <span>Không Gian Luyện Tập Học Thuật</span>
+                <span>Không Gian Luyện Thi Toàn Diện</span>
               </div>
               <h2 className="text-3xl sm:text-4xl font-extrabold text-stone-100 tracking-tight leading-tight">
                 Chinh Phục Toàn Diện 4 Kỹ Năng Cùng AI
               </h2>
               <p className="text-sm text-stone-300 mt-2 leading-relaxed">
-                Cuộn chuột để trải nghiệm lần lượt 5 phân hệ chuyên khảo với phản hồi tức thì và chuẩn hóa năng lực ngôn ngữ.
+                Cuộn chuột để khám phá các công cụ hỗ trợ luyện thi với phản hồi tức thì và tiến bộ rõ rệt.
               </p>
             </div>
 

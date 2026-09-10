@@ -5,9 +5,6 @@ import {
   Mail,
   Lock,
   User as UserIcon,
-  Zap,
-  Flame,
-  Sparkles,
   ArrowRight,
 } from 'lucide-react';
 import { User } from '../../types';
@@ -27,8 +24,8 @@ export const AuthModal: React.FC<AuthModalProps> = ({
   onClose,
   onSuccess,
   initialTab = 'login',
-  title = 'Đăng nhập EduFlow để lưu lộ trình và nhận 2250 XP',
-  subtitle = 'Trải nghiệm không gian học tập tương tác với 5 phân hệ AI chuyên sâu',
+  title = 'Đăng nhập để bắt đầu học và lưu kết quả',
+  subtitle = 'Đăng nhập để lưu tiến độ luyện thi Cambridge IELTS và từ vựng Anki của bạn.',
 }) => {
   const [tab, setTab] = useState<'login' | 'register'>(initialTab);
 
@@ -41,43 +38,17 @@ export const AuthModal: React.FC<AuthModalProps> = ({
   }, [isOpen, initialTab]);
 
   // Login form state
-  const [loginEmail, setLoginEmail] = useState<string>('dangchien2005@gmail.com');
-  const [loginPassword, setLoginPassword] = useState<string>('123456');
+  const [loginEmail, setLoginEmail] = useState<string>('');
+  const [loginPassword, setLoginPassword] = useState<string>('');
 
   // Register form state
   const [regFullName, setRegFullName] = useState<string>('');
   const [regEmail, setRegEmail] = useState<string>('');
   const [regPassword, setRegPassword] = useState<string>('');
   const [regConfirmPassword, setRegConfirmPassword] = useState<string>('');
-  const [regRole, setRegRole] = useState<'student' | 'admin'>('student');
 
   // Error message
   const [error, setError] = useState<string | null>(null);
-
-  // Quick Preset Logins
-  const handleQuickLogin = (role: 'student' | 'admin') => {
-    if (role === 'student') {
-      const studentUser: User = {
-        id: 'user-student-3',
-        email: 'dangchien2005@gmail.com',
-        full_name: 'Minh Chiến Đặng',
-        role: 'student',
-        avatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=120&auto=format&fit=crop&q=80',
-      };
-      onSuccess(studentUser);
-      onClose();
-    } else {
-      const adminUser: User = {
-        id: 'user-admin-1',
-        email: 'admin@example.com',
-        full_name: 'Quản Trị Viên (Admin)',
-        role: 'admin',
-        avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=120&auto=format&fit=crop&q=80',
-      };
-      onSuccess(adminUser);
-      onClose();
-    }
-  };
 
   // Submit Login
   const handleLoginSubmit = (e: React.FormEvent) => {
@@ -129,7 +100,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
       id: `user-${Date.now()}`,
       email: regEmail,
       full_name: regFullName,
-      role: regRole,
+      role: 'student',
       avatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=120&auto=format&fit=crop&q=80',
     };
 
@@ -171,20 +142,14 @@ export const AuthModal: React.FC<AuthModalProps> = ({
 
             {/* Header & Value Proposition */}
             <div className="space-y-3 text-center pt-2">
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-50 border border-amber-200 text-amber-800 text-xs font-black shadow-xs">
-                <Zap className="w-3.5 h-3.5 fill-amber-500 text-amber-500" />
-                <span>+2250 XP Khởi Đầu</span>
-                <span className="text-slate-300">•</span>
-                <Flame className="w-3.5 h-3.5 fill-orange-500 text-orange-500" />
-                <span>Chuỗi Streak 14 Ngày</span>
-              </div>
-
               <h3 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight leading-tight">
-                {title}
+                {tab === 'login' ? (title || 'Đăng Nhập Tài Khoản') : 'Đăng Ký Tài Khoản Học Viên'}
               </h3>
 
               <p className="text-xs text-slate-500 max-w-md mx-auto leading-relaxed">
-                {subtitle}
+                {tab === 'login'
+                  ? (subtitle || 'Đăng nhập để lưu tiến độ luyện thi Cambridge IELTS và từ vựng Anki của bạn.')
+                  : 'Tạo tài khoản học viên miễn phí để luyện đề thi, nghe chép chính tả và học từ vựng.'}
               </p>
 
               {/* Tabs Switcher */}
@@ -281,42 +246,6 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                     <ArrowRight size={14} />
                   </button>
                 </form>
-
-                {/* 1-Click Fast Logins */}
-                <div className="pt-3 border-t border-slate-100 space-y-2 text-center">
-                  <span className="text-[11px] font-mono text-slate-400 uppercase tracking-wider block">
-                    ⚡ Hoặc đăng nhập nhanh 1 chạm:
-                  </span>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                    <button
-                      type="button"
-                      onClick={() => handleQuickLogin('student')}
-                      className="p-2.5 rounded-xl bg-blue-50 hover:bg-blue-100 text-blue-900 text-xs font-bold border border-blue-200 transition-all flex items-center justify-center gap-2 cursor-pointer shadow-xs text-left"
-                    >
-                      <div className="w-6 h-6 rounded-full bg-blue-600 text-white flex items-center justify-center text-[10px] shrink-0 font-black">
-                        HV
-                      </div>
-                      <div className="overflow-hidden">
-                        <div className="truncate font-black">Minh Chiến Đặng</div>
-                        <div className="text-[10px] text-blue-600 font-normal">2250 XP • 14 ngày Streak</div>
-                      </div>
-                    </button>
-
-                    <button
-                      type="button"
-                      onClick={() => handleQuickLogin('admin')}
-                      className="p-2.5 rounded-xl bg-purple-50 hover:bg-purple-100 text-purple-900 text-xs font-bold border border-purple-200 transition-all flex items-center justify-center gap-2 cursor-pointer shadow-xs text-left"
-                    >
-                      <div className="w-6 h-6 rounded-full bg-purple-600 text-white flex items-center justify-center text-[10px] shrink-0 font-black">
-                        AD
-                      </div>
-                      <div className="overflow-hidden">
-                        <div className="truncate font-black">Quản Trị Viên</div>
-                        <div className="text-[10px] text-purple-600 font-normal">Toàn quyền hệ thống</div>
-                      </div>
-                    </button>
-                  </div>
-                </div>
               </div>
             )}
 
@@ -378,41 +307,12 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                   </div>
                 </div>
 
-                {/* Role selection */}
-                <div className="space-y-1 pt-1">
-                  <label className="text-xs font-semibold text-slate-700">Mục đích học tập</label>
-                  <div className="grid grid-cols-2 gap-2">
-                    <button
-                      type="button"
-                      onClick={() => setRegRole('student')}
-                      className={`p-2 rounded-xl border text-xs font-bold text-center transition-colors cursor-pointer ${
-                        regRole === 'student'
-                          ? 'bg-blue-50 border-blue-500 text-blue-700 shadow-xs'
-                          : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50'
-                      }`}
-                    >
-                      Học Viên Tiếng Anh
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setRegRole('admin')}
-                      className={`p-2 rounded-xl border text-xs font-bold text-center transition-colors cursor-pointer ${
-                        regRole === 'admin'
-                          ? 'bg-purple-50 border-purple-500 text-purple-700 shadow-xs'
-                          : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50'
-                      }`}
-                    >
-                      Quản Trị Viên
-                    </button>
-                  </div>
-                </div>
-
                 <button
                   type="submit"
                   className="w-full py-3 rounded-xl bg-gradient-to-r from-brand-navy to-brand-primary text-white text-xs font-black uppercase tracking-wider shadow-md hover:from-blue-900 hover:to-indigo-700 transition-all cursor-pointer flex items-center justify-center gap-2 mt-2"
                 >
-                  <Sparkles size={14} />
-                  <span>Hoàn Tất &amp; Nhận 2250 XP</span>
+                  <span>Đăng Ký Tài Khoản Học Viên</span>
+                  <ArrowRight size={14} />
                 </button>
               </form>
             )}

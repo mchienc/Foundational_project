@@ -1,26 +1,22 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-  LayoutDashboard,
-  Zap,
   LogIn,
   UserPlus,
   LogOut,
   User as UserIcon,
   Shield,
-  Layers,
   ChevronDown,
-  Mic,
+  BookOpen,
   Headphones,
-  FileText,
-  Trophy,
+  Layers,
+  Bookmark,
+  BookmarkCheck,
   Menu,
   X,
-  PenTool,
   Globe,
 } from 'lucide-react';
 import { Screen, UserStats, User } from '../../types';
-import { StreakBadge } from './StreakBadge';
 import { Button } from './Button';
 
 interface NavbarProps {
@@ -30,61 +26,47 @@ interface NavbarProps {
   currentUser: User | null;
   onOpenAuth: (tab: 'login' | 'register') => void;
   onLogout: () => void;
-  xp?: number;
-  onOpenLeaderboard?: () => void;
 }
 
 export const Navbar: React.FC<NavbarProps> = ({
   currentScreen,
   onSelectScreen,
-  stats,
+  stats: _stats,
   currentUser,
   onOpenAuth,
   onLogout,
-  xp = 1980,
-  onOpenLeaderboard,
 }) => {
   const [showUserMenu, setShowUserMenu] = useState<boolean>(false);
   const [showMobileNav, setShowMobileNav] = useState<boolean>(false);
 
-  // Dynamic Navigation Links for English LMS
+  // Core Routes for Cambridge IELTS & Anki Platform
   const navLinks: { id: Screen; label: string; icon: React.ReactNode; adminOnly?: boolean }[] = [
     {
-      id: 'dashboard',
-      label: 'Lộ Trình',
-      icon: <LayoutDashboard size={14} />,
+      id: 'reading',
+      label: 'Luyện Đọc Cambridge',
+      icon: <BookOpen size={15} />,
     },
     {
-      id: 'vocab-srs',
-      label: 'Flashcard 3D',
-      icon: <Layers size={14} />,
-    },
-    {
-      id: 'speaking',
-      label: 'Phát Âm AI',
-      icon: <Mic size={14} />,
+      id: 'mistake-vault',
+      label: 'Sổ Tay Câu Sai',
+      icon: <BookmarkCheck size={15} className="text-amber-300" />,
     },
     {
       id: 'listening',
-      label: 'Luyện Nghe',
-      icon: <Headphones size={14} />,
+      label: 'Luyện Nghe Dictation',
+      icon: <Headphones size={15} />,
     },
     {
-      id: 'sentence-builder',
-      label: 'Ghép Câu',
-      icon: <FileText size={14} />,
-    },
-    {
-      id: 'writing',
-      label: 'Chấm Viết AI',
-      icon: <PenTool size={14} />,
+      id: 'anki',
+      label: 'Anki Flashcard (SRS)',
+      icon: <Layers size={15} />,
     },
     ...(currentUser?.role === 'admin'
       ? [
           {
             id: 'admin' as Screen,
             label: 'Quản Trị',
-            icon: <Shield size={14} className="text-purple-600" />,
+            icon: <Shield size={15} className="text-amber-400" />,
             adminOnly: true,
           },
         ]
@@ -93,105 +75,79 @@ export const Navbar: React.FC<NavbarProps> = ({
 
   return (
     <header className="sticky top-0 z-40 bg-[#064E3B] border-b border-emerald-800/80 shadow-md transition-colors">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-3">
-        {/* Brand Logo */}
-        <div className="flex items-center gap-4">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
+        {/* Brand Logo - Left Aligned */}
+        <div className="flex items-center shrink-0">
           <button
-            onClick={() => onSelectScreen('dashboard')}
+            onClick={() => onSelectScreen(currentUser ? 'reading' : 'landing')}
             className="flex items-center gap-2.5 group cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 rounded-lg select-none text-left"
           >
-            <div className="w-10 h-10 rounded-xl bg-[#022C22] border border-amber-500/40 text-amber-400 flex items-center justify-center shadow-xs group-hover:scale-105 transition-transform duration-200">
-              <PenTool size={20} className="text-amber-400" />
+            <div className="relative w-9 h-9 sm:w-10 sm:h-10 rounded-xl overflow-hidden bg-white p-1 border border-amber-400/40 shadow-sm group-hover:border-amber-400 group-hover:shadow-amber-400/20 group-hover:scale-105 transition-all duration-200 shrink-0 flex items-center justify-center">
+              <img
+                src="/logo.jpg"
+                alt="EduFlow Logo"
+                className="w-full h-full object-contain"
+              />
             </div>
-            <div>
-              <span className="text-base sm:text-lg font-sans font-bold tracking-tight text-white flex items-center gap-1.5">
-                EduFlow
-                <span className="font-sans text-[9px] px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-400/40 font-extrabold uppercase tracking-wider">
-                  Academic
+            <div className="flex flex-col justify-center min-w-0">
+              <div className="flex items-center gap-2">
+                <span className="text-base sm:text-lg font-sans font-bold tracking-tight text-white leading-tight">
+                  EduFlow
                 </span>
-              </span>
-              <span className="text-[10px] text-stone-300 font-mono block -mt-1 hidden sm:block">
-                Bàn Học Nghiên Cứu
+                <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[9px] sm:text-[10px] font-semibold bg-[#032B20]/90 text-amber-300 border border-amber-400/30 whitespace-nowrap leading-none tracking-wide shadow-xs">
+                  Cambridge &amp; Anki
+                </span>
+              </div>
+              <span className="text-[10px] sm:text-[11px] text-emerald-200/80 font-sans tracking-normal leading-tight whitespace-nowrap mt-0.5 hidden sm:block">
+                Luyện thi Cambridge IELTS &amp; Học từ vựng Anki
               </span>
             </div>
           </button>
-
-          {/* Desktop Navigation Tabs */}
-          <nav className="hidden xl:flex items-center gap-1 bg-[#022C22]/80 p-1 rounded-full border border-emerald-900/60">
-            {navLinks.map((link) => {
-              const isActive = currentScreen === link.id;
-              return (
-                <button
-                  key={link.id}
-                  onClick={() => onSelectScreen(link.id)}
-                  className={`relative px-3 py-1.5 rounded-full text-xs font-semibold flex items-center gap-1.5 transition-colors cursor-pointer select-none ${
-                    isActive
-                      ? 'text-amber-300 font-bold'
-                      : 'text-stone-200 hover:text-amber-300 hover:bg-emerald-900/50'
-                  }`}
-                >
-                  {isActive && (
-                    <motion.div
-                      layoutId="activeNavIndicator"
-                      transition={{ type: 'spring', stiffness: 400, damping: 30 }}
-                      className="absolute inset-0 bg-[#064E3B] rounded-full shadow-inner border border-amber-500/40"
-                    />
-                  )}
-                  <span className="relative z-10 flex items-center gap-1.5">
-                    {link.icon}
-                    {link.label}
-                  </span>
-                </button>
-              );
-            })}
-          </nav>
         </div>
 
-        {/* Right Gamification & Actions Area */}
-        <div className="flex items-center gap-2 sm:gap-2.5">
-          {/* Animated XP Counter - Deep Forest & Amber Gold */}
-          {currentUser && (
-            <motion.div
-              key={xp}
-              initial={{ scale: 1.15 }}
-              animate={{ scale: 1 }}
-              transition={{ duration: 0.25 }}
-              className="flex items-center gap-1.5 px-3 py-1 bg-[#022C22] border border-amber-500/40 rounded-full text-amber-300 shadow-xs cursor-pointer hover:border-amber-400 transition-colors"
-              onClick={onOpenLeaderboard}
-              title="Điểm kinh nghiệm tuần - Bấm để xem Bảng xếp hạng"
-            >
-              <Zap className="w-3.5 h-3.5 text-amber-400 fill-amber-400" />
-              <span className="text-xs font-black tracking-tight">{xp}</span>
-              <span className="text-[10px] font-bold text-amber-400/80">XP</span>
-            </motion.div>
-          )}
+        {/* Desktop Navigation Tabs - Perfectly Centered */}
+        <nav className="hidden md:flex items-center justify-center gap-1 bg-[#022C22]/80 p-1 rounded-full border border-emerald-900/60 shadow-inner">
+          {navLinks.map((link) => {
+            const isActive =
+              currentScreen === link.id ||
+              (link.id === 'reading' && (currentScreen === 'reading-test' || currentScreen === 'library' || currentScreen === 'reader')) ||
+              (link.id === 'listening' && currentScreen === 'listening-test') ||
+              (link.id === 'anki' && currentScreen === 'vault');
 
-          {/* Flame Streak Badge - Only shown when user is logged in */}
-          {currentUser && (
-            <StreakBadge
-              days={stats.streakDays}
-              size="sm"
-              className="!bg-amber-500/20 !text-amber-300 !border-amber-500/40"
-            />
-          )}
+            return (
+              <button
+                key={link.id}
+                onClick={() => onSelectScreen(link.id)}
+                className={`relative px-3.5 py-1.5 rounded-full text-xs font-semibold flex items-center gap-1.5 transition-colors cursor-pointer select-none ${
+                  isActive
+                    ? 'text-amber-300 font-bold'
+                    : 'text-stone-200 hover:text-amber-300 hover:bg-emerald-900/50'
+                }`}
+              >
+                {isActive && (
+                  <motion.div
+                    layoutId="activeNavIndicator"
+                    transition={{ type: 'spring', stiffness: 400, damping: 30 }}
+                    className="absolute inset-0 bg-[#064E3B] rounded-full shadow-inner border border-amber-500/40"
+                  />
+                )}
+                <span className="relative z-10 flex items-center gap-1.5">
+                  {link.icon}
+                  {link.label}
+                </span>
+              </button>
+            );
+          })}
+        </nav>
 
-          {/* Leaderboard Trophy Button */}
-          {onOpenLeaderboard && (
-            <button
-              onClick={onOpenLeaderboard}
-              title="Bảng xếp hạng tuần"
-              className="p-2 rounded-full border border-amber-500/30 bg-[#022C22] text-amber-400 hover:text-amber-300 hover:bg-emerald-950 transition-colors cursor-pointer"
-            >
-              <Trophy size={15} />
-            </button>
-          )}
-
+        {/* Right Actions Area - Right Aligned */}
+        <div className="flex items-center gap-2 sm:gap-2.5 shrink-0">
           {/* User Auth Dropdown */}
           {currentUser ? (
-            <div className="relative pl-1 border-l border-emerald-800/80">
+            <div className="relative">
               <button
                 onClick={() => setShowUserMenu(!showUserMenu)}
-                className="flex items-center gap-2 p-1 pl-2 rounded-full hover:bg-emerald-900/60 border border-transparent hover:border-emerald-700/60 transition-colors cursor-pointer select-none"
+                className="flex items-center gap-2 py-1 pl-1.5 pr-2.5 rounded-full hover:bg-emerald-900/60 border border-emerald-800/60 hover:border-emerald-700/80 transition-colors cursor-pointer select-none bg-emerald-950/40"
               >
                 <div className="w-8 h-8 rounded-full bg-[#022C22] ring-2 ring-amber-500/40 text-amber-300 flex items-center justify-center font-sans font-bold text-xs shadow-xs">
                   {currentUser.full_name.charAt(0).toUpperCase()}
@@ -215,7 +171,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                       <p className="font-bold text-forest-950 truncate font-sans">{currentUser.full_name}</p>
                       <p className="text-[11px] text-stone-500 font-mono truncate">{currentUser.email}</p>
                       <span className="inline-block mt-1 px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-amber-50 text-amber-900 border border-amber-300">
-                        {currentUser.role === 'admin' ? 'Hội Đồng Khảo Thí' : 'Học Viên Nghiên Cứu'}
+                        {currentUser.role === 'admin' ? 'Quản Trị Viên' : 'Học Viên'}
                       </span>
                     </div>
 
@@ -242,13 +198,13 @@ export const Navbar: React.FC<NavbarProps> = ({
                       </button>
                       <button
                         onClick={() => {
-                          onSelectScreen('vocab-srs');
+                          onSelectScreen('vault');
                           setShowUserMenu(false);
                         }}
                         className="w-full px-4 py-2 flex items-center gap-2.5 text-stone-700 hover:bg-stone-100 hover:text-forest-950 transition-colors cursor-pointer"
                       >
-                        <Layers size={14} />
-                        Ôn Tập Flashcard SRS
+                        <Bookmark size={14} />
+                        Sổ Tay Từ Vựng (SRS)
                       </button>
                       {currentUser.role === 'admin' && (
                         <button
@@ -305,7 +261,7 @@ export const Navbar: React.FC<NavbarProps> = ({
           {/* Mobile menu hamburger toggle */}
           <button
             onClick={() => setShowMobileNav((prev) => !prev)}
-            className="xl:hidden p-2 rounded-xl text-stone-200 hover:text-amber-300 hover:bg-[#022C22] transition-colors cursor-pointer"
+            className="lg:hidden p-2 rounded-xl text-stone-200 hover:text-amber-300 hover:bg-[#022C22] transition-colors cursor-pointer"
           >
             {showMobileNav ? <X size={18} /> : <Menu size={18} />}
           </button>
@@ -319,7 +275,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
-            className="xl:hidden border-t border-emerald-800/80 bg-[#022C22] px-4 py-3 space-y-1 shadow-xl"
+            className="lg:hidden border-t border-emerald-800/80 bg-[#022C22] px-4 py-3 space-y-1 shadow-xl"
           >
             {navLinks.map((link) => (
               <button

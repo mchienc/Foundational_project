@@ -209,10 +209,10 @@ export const ListeningPlayer: React.FC<ListeningPlayerProps> = ({
     if (correct === total && total > 0) {
       soundEffects.playSuccess();
       triggerConfetti();
-      onEarnXp(40, `Xuất sắc! Chép chính tả đúng 100% (+40 XP)`);
+      onEarnXp(40, `Xuất sắc! Chép chính tả đúng 100%`);
     } else {
       soundEffects.playPop();
-      onEarnXp(15, `Đã hoàn thành bài kiểm tra Dictation (+15 XP)`);
+      onEarnXp(15, `Đã hoàn thành bài kiểm tra Dictation`);
     }
   };
 
@@ -225,7 +225,7 @@ export const ListeningPlayer: React.FC<ListeningPlayerProps> = ({
   };
 
   return (
-    <div className="max-w-4xl mx-auto px-4 py-8">
+    <div className="max-w-4xl mx-auto px-4 py-8 relative z-10">
       {/* Header */}
       <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
         <div>
@@ -248,7 +248,7 @@ export const ListeningPlayer: React.FC<ListeningPlayerProps> = ({
               onClick={onBackToDashboard}
               className="flex items-center gap-1 px-3 py-1.5 rounded-xl border border-slate-200 bg-white text-xs font-semibold text-slate-700 hover:bg-slate-50 shadow-sm"
             >
-              <ChevronLeft className="w-3.5 h-3.5" /> Lộ trình
+              <ChevronLeft className="w-3.5 h-3.5" /> Quay lại
             </button>
           )}
           {/* Lesson Switcher */}

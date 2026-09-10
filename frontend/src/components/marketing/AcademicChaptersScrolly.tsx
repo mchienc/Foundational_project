@@ -1,21 +1,17 @@
-import React, { useRef, useState } from 'react';
-import gsap from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { useGSAP } from '@gsap/react';
+import React, { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import {
-  Layers,
-  Activity,
+  BookOpen,
   Headphones,
-  FileText,
-  PenTool,
-  Lock,
+  Layers,
   ArrowRight,
   CheckCircle2,
   Bookmark,
   Sparkles,
+  Activity,
+  ChevronLeft,
+  ChevronRight,
 } from 'lucide-react';
-
-gsap.registerPlugin(ScrollTrigger, useGSAP);
 
 interface AcademicChaptersScrollyProps {
   onRequireAuth: (chapterTitle: string) => void;
@@ -24,280 +20,185 @@ interface AcademicChaptersScrollyProps {
 export const AcademicChaptersScrolly: React.FC<AcademicChaptersScrollyProps> = ({
   onRequireAuth,
 }) => {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const pinSectionRef = useRef<HTMLDivElement>(null);
-  const rightColumnRef = useRef<HTMLDivElement>(null);
   const [activeChapterIndex, setActiveChapterIndex] = useState<number>(0);
+  const [isPaused, setIsPaused] = useState<boolean>(false);
 
   const chapters = [
     {
       id: 'chapter-1',
-      number: 'Chương I',
-      title: 'Thẻ Từ Vựng 3D & Thuật Toán Spaced Repetition',
-      subtitle: 'Khai thác đường cong quên của Ebbinghaus và cơ chế 5 Hộp Leitner',
-      discipline: 'Nhận Thức & Ghi Nhớ Ngữ Nghĩa',
-      icon: <Layers className="w-5 h-5 text-forest-900" />,
-      tag: 'Leitner Box 1-5 • Oxford 3000',
+      number: 'Tính Năng 1',
+      title: 'Luyện Đọc Cambridge IELTS (Cam 10 - 20)',
+      subtitle: 'Trọn bộ 28 đề Full Tests và 84 bài đọc Passage',
+      discipline: 'Luyện Đọc Thực Chiến',
+      icon: <BookOpen className="w-5 h-5 text-amber-300" />,
+      tag: 'Cambridge 10 - 20 • Full Test 60 Phút • Tra Từ Popover',
       description:
-        'Cung cấp khả năng quan sát từ vựng đa chiều qua mô hình thẻ 3D lật 180 độ. Thuật toán tự động đo đạc ngưỡng phản xạ của não bộ, lập lịch ôn tập đúng thời điểm vàng trước khi ký ức bắt đầu phai nhạt.',
+        'Luyện giải đề thi Cambridge thật. Bạn có thể làm trọn vẹn đề Full Test 60 phút có tính giờ hoặc làm riêng từng Passage theo thời gian rảnh, tra cứu từ điển trực tiếp trên bài đọc và lưu ngay vào thẻ Anki chỉ với 1-click.',
       features: [
-        'Mô hình thẻ lật 3D hai mặt kèm phát âm bản xứ chuẩn ngữ âm IPA',
-        'Phân loại 5 cấp độ trí nhớ từ vựng (Nhận biết sơ cấp đến Vỏ não sâu)',
-        'Ngữ cảnh ví dụ học thuật trích xuất từ các tạp chí khoa học quốc tế',
+        'Lựa chọn linh hoạt: Làm Full Test 40 câu có đồng hồ đếm ngược hoặc luyện riêng từng bài đọc',
+        'Tra từ điển tức thời: Xem phiên âm IPA, nghĩa tiếng Việt, câu ví dụ và lưu Anki 1 chạm',
+        'Chấm điểm tự động và có lời giải chi tiết kèm vị trí câu trả lời trong đoạn văn',
       ],
-      previewBadge: '148 Đơn vị từ vựng chuẩn hóa',
+      previewBadge: '28 Đề Full Test • 84 Passages Cambridge',
       mockVisual: {
-        title: 'ephemeral',
-        ipa: '/ɪˈfem.ər.əl/',
-        type: 'adjective',
-        def: 'Lasting for a very short time; transitory.',
-        example: '"Fashions are ephemeral, but true academic style is timeless."',
-        box: 'Hộp Leitner 4 (Nhớ vững 14 ngày)',
+        articleTitle: 'Cambridge IELTS 18 - Test 1 - Reading Passage 1',
+        targetWord: 'subterranean /ˌsʌb.təˈreɪ.ni.ən/ (adj)',
+        meaning: 'Nằm dưới mặt đất, ngầm',
+        sentence: '"The planning of a subterranean railway system beneath central London."',
+        collocation: 'subterranean railway • subterranean tunnel',
       },
     },
     {
       id: 'chapter-2',
-      number: 'Chương II',
-      title: 'Phòng Thu Âm Vị & Biểu Đồ Sóng Âm AI Waveform',
-      subtitle: 'Bóc tách tần số Hertz và định vị chuẩn xác khẩu hình IPA',
-      discipline: 'Âm Học Thực Nghiệm (Acoustic Phonetics)',
-      icon: <Activity className="w-5 h-5 text-emerald-800" />,
-      tag: 'Phoneme Recognition • Waveform AI',
+      number: 'Tính Năng 2',
+      title: 'Luyện Nghe Chép Chính Tả (Dictation)',
+      subtitle: 'Luyện tai nhạy từng câu với thanh sóng âm và đối soát từng từ',
+      discipline: 'Luyện Tai & Sửa Lỗi Chính Tả',
+      icon: <Headphones className="w-5 h-5 text-amber-300" />,
+      tag: 'Nghe Chép Từng Câu • Sửa Lỗi Tức Thì',
       description:
-        'Không đơn thuần ghi âm, hệ thống AI bóc tách tín hiệu giọng nói thành phổ tần số sóng âm (Spectrogram). Đối soát từng miligiây với phát âm mẫu của người bản ngữ để chỉ rõ điểm nuốt âm, trọng âm sai và vị trí đặt lưỡi.',
+        'Chấm dứt lối nghe thụ động trôi tuột. Hệ thống phát âm thanh từng câu ngắn, bạn gõ lại và hệ thống sẽ đối soát từng ký tự: từ đúng hiện màu xanh, từ sai hiện màu đỏ để sửa lỗi ngay tại chỗ.',
       features: [
-        'Trực quan hóa đồ thị sóng âm thời gian thực khi học viên nói',
-        'Phát hiện lỗi sai nguyên âm đôi, phụ âm cuối (/t/, /d/, /θ/, /ð/)',
-        'Chấm điểm độ chuẩn xác âm vị theo thang phần trăm Cambridge',
+        'Nghe từng câu ngắn với tốc độ tùy chỉnh 0.8x đến 1.2x dễ nghe',
+        'Tự động so khớp từng từ gõ: báo từ đúng, từ sai rõ ràng',
+        'Phím tắt tiện lợi, nút gợi ý ký tự tiếp theo và xem bản dịch tiếng Việt',
       ],
-      previewBadge: 'Độ chuẩn xác âm vị đạt 94.2%',
+      previewBadge: 'Độ chính xác Dictation đạt 96%',
       mockVisual: {
-        targetPhrase: '"Theory without practice is sterile."',
-        phoneticTarget: '/ˈθɪə.ri wɪˈðaʊt ˈpræk.tɪs ɪz ˈster.aɪl/',
-        detectedScore: '94% Match',
-        feedback: 'Âm /θ/ đặt lưỡi chuẩn xác, lưu ý nối âm "without practice".',
+        audioSentence: '"Modern architectures employ stochastic mechanisms to approximate reasoning."',
+        userTyped: 'Modern architectures employ stocastic mechanisms...',
+        diffResult: 'stocastic ➔ stochastic (Lỗi chính tả thiếu ký tự \'h\')',
+        xpBadge: 'Độ chính xác 100%',
       },
     },
     {
       id: 'chapter-3',
-      number: 'Chương III',
-      title: 'Khảo Thí Nghe & Chép Chính Tả A-B Loop & Dictation',
-      subtitle: 'Chấm dứt lối nghe thụ động bằng cơ chế định vị micro-audio',
-      discipline: 'Thính Giác & Phân Tích Cú Pháp Nghe',
-      icon: <Headphones className="w-5 h-5 text-gold-700" />,
-      tag: 'A-B Loop • Real-time Dictation',
+      number: 'Tính Năng 3',
+      title: 'Thẻ 3D Anki Flashcard (Spaced Repetition)',
+      subtitle: 'Thẻ lật 3D trực quan & Thuật toán lặp lại ngắt quãng SM-2',
+      discipline: 'Ghi Nhớ Lâu Dài',
+      icon: <Layers className="w-5 h-5 text-amber-300" />,
+      tag: 'Thẻ 3D Flip • Thuật toán SM-2 • Again/Hard/Good/Easy',
       description:
-        'Biến việc nghe tiếng Anh thành quá trình giải mã ký tự chủ động. Chế độ lặp phân đoạn A-B Loop cho phép tua chậm 0.75x - 1.0x kết hợp gõ chép chính tả tức thời từng từ, đồng bộ chữ chạy chính xác như phòng thu âm.',
+        'Tự động đồng bộ toàn bộ từ vựng đã lưu từ bài Đọc và bài Nghe vào bộ thẻ cá nhân. Ứng dụng mô phỏng thẻ 3D lật mặt trước - mặt sau trực quan và thuật toán ngắt quãng SM-2 giúp ghi nhớ lâu dài.',
       features: [
-        'Tùy chỉnh điểm đầu và điểm cuối vòng lặp A-B loop tùy ý',
-        'Bộ lọc nhận diện gõ đúng - gõ sai từng ký tự trong thời gian thực',
-        'Phân đoạn hội thoại học thuật, bài giảng TED Talk và phỏng vấn quốc tế',
+        'Thẻ lật 3D sinh động, lật mặt trước - mặt sau như cầm thẻ giấy trên tay',
+        'Thuật toán SM-2 tự tính ngày ôn tập tối ưu: Again, Hard, Good, Easy',
+        'Tự động đồng bộ từ mới đã lưu từ bài Đọc Cambridge và bài Nghe Dictation',
       ],
-      previewBadge: '32 Khung bài nghe phân đoạn chuyên sâu',
+      previewBadge: 'Nhớ lâu gấp 3 lần sau 30 ngày',
       mockVisual: {
-        audioSource: 'Lecture 04: The Evolution of Syntax (Dr. Harrison)',
-        loopRange: '02:15 - 02:28 (A-B Loop)',
-        dictationPrompt: 'Gõ chính xác những gì bạn nghe được trong đoạn trích trên:',
-        transcriptStatus: 'Đã khớp 18/19 từ • Độ nhạy 95%',
-      },
-    },
-    {
-      id: 'chapter-4',
-      number: 'Chương IV',
-      title: 'Kiến Trúc Cú Pháp & Cây Ngữ Pháp Trực Quan',
-      subtitle: 'Kéo thả Token cấu trúc câu, loại bỏ hoàn toàn lối dịch word-by-word',
-      discipline: 'Cú Pháp Học Cấu Trúc (Generative Syntax)',
-      icon: <FileText className="w-5 h-5 text-forest-900" />,
-      tag: 'Sentence Builder • Token Architecture',
-      description:
-        'Thay thế việc học thuộc lòng các công thức ngữ pháp rời rạc bằng bảng lắp ghép cấu trúc câu logic. Người học kéo thả các khối từ (Subject, Verb, Object, Complement) để kiến tạo câu phức và câu ghép mạch lạc.',
-      features: [
-        'Hệ thống khối từ phân màu nhận diện từ loại (Danh từ, Động từ, Giới từ)',
-        'Phát hiện lỗi sai thì, sự hòa hợp chủ - vị và trật tự bổ ngữ tức thì',
-        'Giải thích bản chất ngữ pháp dưới góc nhìn ngôn ngữ học cấu trúc',
-      ],
-      previewBadge: 'Cấu trúc cú pháp đa tầng trực quan',
-      mockVisual: {
-        syntaxGoal: 'Kiến tạo câu điều kiện loại 3 đảo ngữ:',
-        tokens: ['Had', 'the committee', 'analyzed', 'the empirical data', 'thoroughly,'],
-        feedback: 'Cấu trúc đảo ngữ chuẩn xác 100%. Mức độ học thuật C2.',
-      },
-    },
-    {
-      id: 'chapter-5',
-      number: 'Chương V',
-      title: 'Đánh Giá & Hiệu Chỉnh Luận Văn Học Thuật AI',
-      subtitle: 'Chấm 4 tiêu chí IELTS Band Descriptors và khuyến nghị nâng cấp C1-C2',
-      discipline: 'Khảo Thí Văn Bản Học Thuật (Academic Discourse)',
-      icon: <PenTool className="w-5 h-5 text-forest-900" />,
-      tag: 'Task 1 & Task 2 • Rubric Evaluator',
-      description:
-        'Phòng thẩm định văn bản học thuật áp dụng đúng biểu điểm 4 tiêu chí chính thức: Task Response, Coherence & Cohesion, Lexical Resource và Grammatical Range & Accuracy. Đưa ra gợi ý viết lại câu nâng cao phong cách trang trọng.',
-      features: [
-        'Báo cáo chấm điểm chi tiết 4 tiêu chí theo thang điểm Band 1.0 - 9.0',
-        'Gợi ý nâng cấp các từ vựng thông dụng sang thuật ngữ học thuật C1 - C2',
-        'Phát hiện văn phong khẩu ngữ (informal) và sửa lỗi liên kết câu',
-      ],
-      previewBadge: 'Chấm 4 tiêu chuẩn IELTS Band trong 3 giây',
-      mockVisual: {
-        essayTopic: 'IELTS Writing Task 2: Artificial Intelligence in Education',
-        currentScore: 'Overall Band 8.0 (TR: 8.0, CC: 8.0, LR: 8.5, GRA: 7.5)',
-        suggestion: 'Thay "a lot of" bằng "a substantial volume of empirical research".',
+        word: 'subterranean /ˌsʌb.təˈreɪ.ni.ən/',
+        prompt: 'Nghĩa tiếng Việt & Câu ví dụ:',
+        clozeSentence: '"The planning of a subterranean railway system beneath central London."',
+        nextReview: 'Thuật toán SM-2: Ôn lại sau 3 ngày (Good)',
       },
     },
   ];
 
-  useGSAP(
-    () => {
-      // Create responsive ScrollTrigger using matchMedia
-      const mm = gsap.matchMedia();
+  // Auto rotate chapters every 7s unless user is hovering/interacting
+  useEffect(() => {
+    if (isPaused) return;
+    const interval = setInterval(() => {
+      setActiveChapterIndex((prev) => (prev + 1) % chapters.length);
+    }, 7000);
+    return () => clearInterval(interval);
+  }, [isPaused, chapters.length]);
 
-      // DESKTOP: Screen width >= 1024px -> Pin entire section and scroll through chapters
-      mm.add('(min-width: 1024px)', () => {
-        const cards = gsap.utils.toArray<HTMLElement>('.chapter-dossier-card');
-        if (cards.length === 0 || !pinSectionRef.current) return;
+  const handlePrev = () => {
+    setActiveChapterIndex((prev) => (prev === 0 ? chapters.length - 1 : prev - 1));
+  };
 
-        // Set initial positions: first card visible, others stacked below
-        gsap.set(cards, { autoAlpha: 0, yPercent: 40, scale: 0.95 });
-        gsap.set(cards[0], { autoAlpha: 1, yPercent: 0, scale: 1 });
+  const handleNext = () => {
+    setActiveChapterIndex((prev) => (prev + 1) % chapters.length);
+  };
 
-        const tl = gsap.timeline({
-          scrollTrigger: {
-            trigger: pinSectionRef.current,
-            start: 'top top',
-            end: '+=3200',
-            pin: true,
-            scrub: 1,
-            anticipatePin: 1,
-            onUpdate: (self) => {
-              const progress = self.progress;
-              const chapterIndex = Math.min(
-                Math.floor(progress * chapters.length),
-                chapters.length - 1
-              );
-              setActiveChapterIndex(chapterIndex);
-            },
-          },
-        });
-
-        // Sequence through the 5 chapters
-        cards.forEach((card, idx) => {
-          if (idx === 0) return;
-          const prevCard = cards[idx - 1];
-
-          tl.to(
-            prevCard,
-            {
-              yPercent: -30,
-              autoAlpha: 0,
-              scale: 0.92,
-              duration: 1,
-              ease: 'power2.inOut',
-            },
-            `step-${idx}`
-          ).to(
-            card,
-            {
-              yPercent: 0,
-              autoAlpha: 1,
-              scale: 1,
-              duration: 1,
-              ease: 'power2.inOut',
-            },
-            `step-${idx}`
-          );
-        });
-      });
-
-      // MOBILE: Screen width < 1024px -> Normal vertical stack with fade-in stagger
-      mm.add('(max-width: 1023px)', () => {
-        const cards = gsap.utils.toArray<HTMLElement>('.chapter-dossier-card');
-        gsap.set(cards, { autoAlpha: 1, yPercent: 0, scale: 1 });
-
-        cards.forEach((card) => {
-          gsap.from(card, {
-            scrollTrigger: {
-              trigger: card,
-              start: 'top 85%',
-            },
-            y: 30,
-            autoAlpha: 0,
-            duration: 0.6,
-            ease: 'power2.out',
-          });
-        });
-      });
-
-      return () => mm.revert();
-    },
-    { scope: containerRef }
-  );
+  const currentChapter = chapters[activeChapterIndex];
 
   return (
     <section
       id="chapters"
-      ref={containerRef}
-      className="bg-[#FAFAF9]/85 backdrop-blur-[2px] border-b border-stone-300 relative text-stone-900"
+      className="py-20 bg-transparent border-b border-stone-200/60 relative text-stone-900"
+      onMouseEnter={() => setIsPaused(true)}
+      onMouseLeave={() => setIsPaused(false)}
     >
-      {/* Desktop Pin Wrapper */}
-      <div
-        ref={pinSectionRef}
-        className="min-h-screen max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 flex flex-col justify-center"
-      >
-        {/* Section Header */}
-        <div className="text-left mb-10 pb-6 border-b border-stone-300 flex flex-col sm:flex-row sm:items-end justify-between gap-4">
-          <div className="space-y-2">
-            <div className="inline-flex items-center gap-2 text-gold-700 text-xs font-mono uppercase font-bold tracking-normal">
-              <Bookmark className="w-3.5 h-3.5 text-gold-600" />
-              <span>Phương Pháp Luận Khoa Học</span>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        {/* Section Editorial Header */}
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-14 pb-6 border-b border-stone-200">
+          <div className="space-y-2 text-left">
+            <div className="inline-flex items-center gap-2 text-amber-800 text-xs font-sans font-bold tracking-normal">
+              <Bookmark className="w-3.5 h-3.5 text-amber-700" />
+              <span>3 Tính Năng Chính</span>
             </div>
             <h2 className="text-3xl sm:text-4xl lg:text-5xl font-sans font-bold text-[#064E3B] tracking-tight leading-tight">
-              5 Chương Phương Pháp Luận Tương Tác
+              Tính Năng Học Tập Toàn Diện
             </h2>
           </div>
-          <p className="text-xs text-stone-600 font-sans max-w-md">
-            Mỗi phân hệ học thuật được thiết kế như một phòng thí nghiệm ngôn ngữ chuyên biệt,
-            giúp học viên biến kiến thức thụ động thành năng lực phản xạ vững vàng.
+          <p className="text-xs text-stone-600 font-sans max-w-md leading-relaxed">
+            Kết hợp trọn vẹn Luyện đọc đề thật Cambridge, Luyện nghe chép chính tả Dictation và Ôn tập từ vựng bằng Thẻ 3D Anki.
           </p>
         </div>
 
-        {/* 2-Column Scrolly Layout */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
-          {/* LEFT COLUMN: Fixed 5 Chapters Table of Contents (5 Cols on Desktop) */}
-          <div className="lg:col-span-5 space-y-3">
-            <div className="hidden lg:block space-y-2.5">
-              <p className="text-[11px] font-mono font-bold uppercase tracking-normal text-stone-400 mb-2">
-                — Mục Lục Chuyên Khảo —
+        {/* 2-Column Responsive Layout */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-start">
+          {/* LEFT COLUMN: Interactive Chapters Navigation (5 Cols on Desktop) */}
+          <div className="lg:col-span-5 space-y-4">
+            <div className="flex items-center justify-between">
+              <p className="text-[11px] font-sans font-bold uppercase tracking-normal text-stone-500">
+                — Chọn Tính Năng Để Xem —
               </p>
+              {/* Prev / Next Chevrons and Counter */}
+              <div className="flex items-center gap-2">
+                <span className="text-[11px] font-mono font-bold text-stone-600">
+                  {activeChapterIndex + 1} / {chapters.length}
+                </span>
+                <div className="inline-flex rounded-lg border border-stone-200 bg-white p-0.5 shadow-2xs">
+                  <button
+                    onClick={handlePrev}
+                    aria-label="Phân hệ trước"
+                    className="p-1 rounded text-stone-600 hover:text-stone-900 hover:bg-stone-100 transition-colors cursor-pointer"
+                  >
+                    <ChevronLeft size={16} />
+                  </button>
+                  <button
+                    onClick={handleNext}
+                    aria-label="Phân hệ kế tiếp"
+                    className="p-1 rounded text-stone-600 hover:text-stone-900 hover:bg-stone-100 transition-colors cursor-pointer"
+                  >
+                    <ChevronRight size={16} />
+                  </button>
+                </div>
+              </div>
+            </div>
 
+            {/* Chapter Selection Tabs */}
+            <div className="space-y-3">
               {chapters.map((ch, idx) => {
                 const isActive = activeChapterIndex === idx;
                 return (
-                  <div
+                  <button
                     key={ch.id}
-                    onClick={() => {
-                      // Allow clicking chapter in desktop
-                      setActiveChapterIndex(idx);
-                    }}
-                    className={`p-4 rounded-2xl transition-all duration-300 border cursor-pointer ${
+                    type="button"
+                    onClick={() => setActiveChapterIndex(idx)}
+                    className={`w-full text-left p-4 sm:p-5 rounded-2xl transition-all duration-300 border cursor-pointer ${
                       isActive
-                        ? 'bg-[#064E3B] text-white border-amber-500/60 shadow-md translate-x-1.5'
-                        : 'bg-white/80 border-stone-200 hover:border-stone-300 hover:bg-white'
+                        ? 'bg-[#064E3B] text-white border-amber-500 shadow-lg translate-x-1 sm:translate-x-2 ring-2 ring-amber-400/20'
+                        : 'bg-white/85 backdrop-blur-md border-stone-200 hover:border-stone-300 hover:bg-white text-stone-800 shadow-xs'
                     }`}
                   >
-                    <div className="flex items-center justify-between gap-2 mb-1">
+                    <div className="flex items-center justify-between gap-2 mb-1.5">
                       <span
-                        className={`text-[11px] font-mono font-bold uppercase tracking-normal ${
+                        className={`text-xs font-mono font-bold uppercase tracking-normal ${
                           isActive ? 'text-amber-300' : 'text-stone-500'
                         }`}
                       >
                         {ch.number}
                       </span>
                       <span
-                        className={`text-[10px] px-2 py-0.5 rounded font-mono ${
+                        className={`text-[10px] px-2 py-0.5 rounded-md font-mono ${
                           isActive
-                            ? 'bg-amber-400/20 text-amber-300 border border-amber-400/40'
-                            : 'bg-stone-100 text-stone-600'
+                            ? 'bg-amber-400/20 text-amber-200 border border-amber-400/40'
+                            : 'bg-stone-100 text-stone-600 border border-stone-200'
                         }`}
                       >
                         {ch.discipline}
@@ -313,153 +214,135 @@ export const AcademicChaptersScrolly: React.FC<AcademicChaptersScrollyProps> = (
                     >
                       {ch.title}
                     </h3>
-                  </div>
+                  </button>
                 );
               })}
             </div>
 
-            {/* Micro citation badge */}
-            <div className="p-4 rounded-xl bg-gold-50 border border-gold-200 text-xs text-gold-950 space-y-1 hidden lg:block">
-              <span className="font-bold flex items-center gap-1 text-gold-800">
-                <Sparkles className="w-3.5 h-3.5" />
-                Nguyên Lý Micro-Feedback:
+            {/* Micro Citation Badge */}
+            <div className="p-4 rounded-xl bg-amber-50/80 border border-amber-200 text-xs text-amber-950 space-y-1.5 shadow-2xs">
+              <span className="font-bold flex items-center gap-1.5 text-amber-900">
+                <Sparkles className="w-4 h-4 text-amber-700" />
+                Vòng Lặp Học Sâu Khép Kín:
               </span>
-              <p className="text-[11px] text-stone-600 leading-relaxed font-sans">
-                Não bộ học ngôn ngữ nhanh hơn 400% khi được đối chiếu sai lệch phát âm và ngữ pháp
-                ngay trong khoảnh khắc vừa tạo ra câu nói.
+              <p className="text-[11px] text-stone-700 leading-relaxed font-sans">
+                Đọc hiểu nạp từ trong ngữ cảnh ➔ Thử thách thính giác gõ lại nguyên văn câu ➔ Ôn tập ngắt quãng 5 chu kỳ.
+                Loại bỏ 100% thói quen dịch thô word-by-word.
               </p>
             </div>
           </div>
 
-          {/* RIGHT COLUMN: Interactive Depth Dossier Cards (7 Cols on Desktop) */}
-          <div
-            ref={rightColumnRef}
-            className="lg:col-span-7 relative min-h-[460px] lg:h-[500px]"
-          >
-            {chapters.map((ch, idx) => (
-              <div
-                key={ch.id}
-                className={`chapter-dossier-card rounded-3xl bg-white border border-stone-300 p-6 sm:p-8 shadow-md flex flex-col justify-between space-y-6 lg:absolute lg:inset-0 ${
-                  // On mobile, keep standard margin
-                  'mb-6 lg:mb-0'
-                }`}
+          {/* RIGHT COLUMN: Interactive Depth Dossier Card with AnimatePresence (7 Cols on Desktop) */}
+          <div className="lg:col-span-7 w-full">
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={currentChapter.id}
+                initial={{ opacity: 0, y: 15 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -15 }}
+                transition={{ duration: 0.35, ease: 'easeOut' }}
+                className="w-full rounded-3xl bg-white border border-stone-200/90 p-6 sm:p-8 shadow-sm flex flex-col justify-between space-y-6"
               >
                 {/* Header of Dossier Card */}
                 <div className="space-y-3">
-                  <div className="flex items-center justify-between gap-3">
-                    <div className="inline-flex items-center gap-2">
-                      <div className="w-10 h-10 rounded-xl bg-[#064E3B] text-amber-300 flex items-center justify-center shadow-xs">
-                        {ch.icon}
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <div className="inline-flex items-center gap-3">
+                      <div className="w-11 h-11 rounded-xl bg-[#064E3B] text-amber-300 flex items-center justify-center shadow-xs shrink-0">
+                        {currentChapter.icon}
                       </div>
                       <div>
                         <span className="text-[10px] font-mono uppercase font-bold text-amber-700 tracking-normal">
-                          {ch.number} • {ch.discipline}
+                          {currentChapter.number} • {currentChapter.discipline}
                         </span>
                         <h4 className="text-lg sm:text-xl font-sans font-bold text-[#064E3B] leading-snug tracking-normal">
-                          {ch.title}
+                          {currentChapter.title}
                         </h4>
                       </div>
                     </div>
 
-                    <div className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-stone-100 border border-stone-300 text-[11px] font-bold text-stone-600 shrink-0">
-                      <Lock className="w-3 h-3 text-gold-700" />
-                      <span>Cần xác thực</span>
+                    <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-50 border border-amber-200/80 text-[11px] font-bold text-amber-800 shrink-0 self-start sm:self-auto">
+                      <Sparkles className="w-3.5 h-3.5 text-amber-600" />
+                      <span>Tương tác thực tế</span>
                     </div>
                   </div>
 
-                  <p className="text-xs text-stone-600 font-sans leading-relaxed pt-1">
-                    {ch.description}
+                  <p className="text-xs sm:text-sm text-stone-600 font-sans leading-relaxed pt-1">
+                    {currentChapter.description}
                   </p>
                 </div>
 
                 {/* Simulated Scientific Experiment Mockup Visual */}
-                <div className="p-4 rounded-2xl bg-[#FAFAF9] border border-stone-200 text-xs space-y-2">
-                  <div className="flex items-center justify-between text-[10px] font-mono text-stone-400 border-b border-stone-200 pb-1.5 uppercase tracking-normal">
-                    <span>Mô phỏng dữ liệu phòng thí nghiệm</span>
-                    <span className="text-forest-900 font-bold">{ch.previewBadge}</span>
+                <div className="p-4 sm:p-5 rounded-2xl bg-[#FAFAF9] border border-stone-200 text-xs space-y-2.5">
+                  <div className="flex items-center justify-between text-[10px] font-mono text-stone-500 border-b border-stone-200 pb-2 uppercase tracking-normal">
+                    <span>Xem trước giao diện học tập</span>
+                    <span className="text-emerald-900 font-bold bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
+                      {currentChapter.previewBadge}
+                    </span>
                   </div>
 
-                  {/* Chapter specific mock preview */}
-                  {idx === 0 && (
-                    <div className="space-y-1">
-                      <div className="text-base font-sans font-bold text-forest-950">
-                        {ch.mockVisual.title}{' '}
-                        <span className="font-mono text-xs font-normal text-stone-500">
-                          {ch.mockVisual.ipa}
+                  {/* Chapter 1: Deep Reading Mockup */}
+                  {activeChapterIndex === 0 && (
+                    <div className="space-y-2 pt-1">
+                      <div className="text-xs text-stone-500 font-mono italic">
+                        Bài đọc: {currentChapter.mockVisual.articleTitle}
+                      </div>
+                      <div className="text-sm font-sans font-bold text-[#064E3B] flex items-center gap-2">
+                        <span>{currentChapter.mockVisual.targetWord}</span>
+                        <span className="text-[10px] bg-emerald-100 text-emerald-900 px-2 py-0.5 rounded font-mono font-bold">
+                          Đã lưu Anki
                         </span>
                       </div>
-                      <p className="text-stone-700 italic font-sans text-xs">
-                        {ch.mockVisual.example}
+                      <p className="text-xs text-stone-800 italic font-serif border-l-2 border-amber-500 pl-3 py-0.5 bg-amber-50/40 rounded-r">
+                        {currentChapter.mockVisual.sentence}
                       </p>
-                      <div className="text-[10px] text-gold-700 font-mono font-bold pt-1">
-                        {ch.mockVisual.box}
+                      <div className="text-[11px] text-amber-800 font-mono pt-0.5">
+                        Collocations: {currentChapter.mockVisual.collocation}
                       </div>
                     </div>
                   )}
 
-                  {idx === 1 && (
-                    <div className="space-y-1.5">
-                      <div className="font-sans font-bold text-forest-950">
-                        {ch.mockVisual.targetPhrase}
+                  {/* Chapter 2: Dictation Studio Mockup */}
+                  {activeChapterIndex === 1 && (
+                    <div className="space-y-2 pt-1">
+                      <div className="text-xs text-stone-700 font-serif italic">
+                        {currentChapter.mockVisual.audioSentence}
                       </div>
-                      <div className="font-mono text-[11px] text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200 inline-block">
-                        {ch.mockVisual.detectedScore} • {ch.mockVisual.phoneticTarget}
+                      <div className="p-2.5 rounded-xl bg-[#064E3B] text-white flex items-center justify-between gap-2">
+                        <div className="flex items-center gap-2 text-xs text-teal-300 font-mono">
+                          <Activity className="w-4 h-4 text-[#0D9488]" />
+                          <span>Waveform: 1.0x</span>
+                        </div>
+                        <span className="text-[10px] font-mono text-amber-300 font-bold">
+                          {currentChapter.mockVisual.xpBadge}
+                        </span>
                       </div>
-                      <p className="text-[11px] text-stone-600">{ch.mockVisual.feedback}</p>
+                      <div className="p-2.5 rounded-lg bg-red-50 border border-red-200 text-[11px] text-red-900 font-mono flex items-center gap-1.5">
+                        <span className="font-bold">Diff:</span>
+                        <span>{currentChapter.mockVisual.diffResult}</span>
+                      </div>
                     </div>
                   )}
 
-                  {idx === 2 && (
-                    <div className="space-y-1.5">
-                      <div className="font-bold text-forest-950">{ch.mockVisual.audioSource}</div>
-                      <div className="text-[11px] font-mono text-gold-800 bg-gold-50 px-2 py-0.5 rounded border border-gold-200 inline-block">
-                        {ch.mockVisual.loopRange}
+                  {/* Chapter 3: SRS Cloze Test Mockup */}
+                  {activeChapterIndex === 2 && (
+                    <div className="space-y-2 pt-1">
+                      <div className="text-xs font-bold text-[#064E3B]">
+                        {currentChapter.mockVisual.word}
                       </div>
-                      <p className="text-[11px] text-stone-600 font-sans">
-                        {ch.mockVisual.transcriptStatus}
-                      </p>
-                    </div>
-                  )}
-
-                  {idx === 3 && (
-                    <div className="space-y-1.5">
-                      <div className="text-[11px] font-bold text-forest-950">
-                        {ch.mockVisual.syntaxGoal}
+                      <div className="bg-amber-50/70 border border-amber-200 rounded-xl p-3 text-xs font-serif text-stone-900 leading-relaxed">
+                        {currentChapter.mockVisual.clozeSentence}
                       </div>
-                      <div className="flex flex-wrap gap-1.5 py-1">
-                        {ch.mockVisual.tokens?.map((tok, ti) => (
-                          <span
-                            key={ti}
-                            className="px-2.5 py-1 rounded-lg bg-stone-100 border border-stone-300 text-stone-800 text-xs font-sans font-medium shadow-sm"
-                          >
-                            {tok}
-                          </span>
-                        ))}
+                      <div className="flex items-center justify-between text-[10px] font-mono pt-1 text-stone-500">
+                        <span className="text-amber-800 font-bold">{currentChapter.mockVisual.nextReview}</span>
+                        <span className="text-emerald-800 font-bold bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">Độ nhớ: 95%</span>
                       </div>
-                      <p className="text-[11px] text-emerald-700 font-medium">
-                        {ch.mockVisual.feedback}
-                      </p>
-                    </div>
-                  )}
-
-                  {idx === 4 && (
-                    <div className="space-y-1.5">
-                      <div className="text-xs font-bold text-forest-950">
-                        {ch.mockVisual.essayTopic}
-                      </div>
-                      <div className="font-mono text-[11px] text-gold-800 bg-gold-50 px-2 py-0.5 rounded border border-gold-200 inline-block">
-                        {ch.mockVisual.currentScore}
-                      </div>
-                      <p className="text-[11px] text-stone-600 italic">
-                        Khuyến nghị: {ch.mockVisual.suggestion}
-                      </p>
                     </div>
                   )}
                 </div>
 
                 {/* Features checklist */}
-                <ul className="space-y-1.5 text-xs text-stone-700">
-                  {ch.features.map((feat, fi) => (
+                <ul className="space-y-2 text-xs text-stone-700">
+                  {currentChapter.features.map((feat, fi) => (
                     <li key={fi} className="flex items-start gap-2">
                       <CheckCircle2 className="w-4 h-4 text-emerald-700 shrink-0 mt-0.5" />
                       <span>{feat}</span>
@@ -468,21 +351,21 @@ export const AcademicChaptersScrolly: React.FC<AcademicChaptersScrollyProps> = (
                 </ul>
 
                 {/* Action Button: Intercepts & triggers Auth Modal */}
-                <div className="pt-2 border-t border-stone-200 flex items-center justify-between">
+                <div className="pt-3 border-t border-stone-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                   <span className="text-[11px] font-mono text-stone-500">
-                    Phân hệ cần tài khoản học thuật
+                    Đăng ký miễn phí để lưu toàn bộ tiến độ làm bài
                   </span>
 
                   <button
-                    onClick={() => onRequireAuth(ch.title)}
-                    className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#064E3B] hover:bg-[#022C22] font-sans font-semibold text-white tracking-wide border border-emerald-800 text-xs uppercase shadow-sm hover:shadow-md active:scale-95 transition-all cursor-pointer"
+                    onClick={() => onRequireAuth(currentChapter.title)}
+                    className="inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-xl bg-[#064E3B] hover:bg-[#022C22] font-sans font-semibold text-white tracking-wide border border-emerald-800 text-xs uppercase shadow-sm hover:shadow-md active:scale-95 transition-all cursor-pointer"
                   >
-                    <span>Vào phòng thí nghiệm</span>
+                    <span>Vào Không Gian Học</span>
                     <ArrowRight size={14} className="text-amber-400" />
                   </button>
                 </div>
-              </div>
-            ))}
+              </motion.div>
+            </AnimatePresence>
           </div>
         </div>
       </div>

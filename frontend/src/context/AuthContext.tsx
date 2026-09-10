@@ -44,8 +44,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [authModalConfig, setAuthModalConfig] = useState<AuthModalConfig>({
     isOpen: false,
     tab: 'login',
-    title: 'Đăng nhập để khởi tạo hồ sơ học thuật và bảo lưu tiến độ 14 ngày',
-    subtitle: 'Nhận ngay 2250 XP học bổng nghiên cứu và mở khóa trọn bộ 5 phân hệ tương tác',
+    title: 'Đăng nhập để bắt đầu học và lưu kết quả',
+    subtitle: 'Đăng nhập để lưu tiến độ luyện thi Cambridge IELTS và từ vựng Anki của bạn.',
   });
 
   const [notifyHandler, setNotifyHandler] = useState<
@@ -68,12 +68,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (notifyHandler) {
       if (isNewRegistration) {
         notifyHandler(
-          `Khởi tạo hồ sơ học thuật thành công! Chào mừng ${userData.full_name}`,
+          `Đăng ký tài khoản thành công! Chào mừng ${userData.full_name}`,
           'success'
         );
       } else {
         notifyHandler(
-          `Chào mừng ${userData.full_name} (${userData.role === 'admin' ? 'Hội đồng Khảo thí' : 'Học viên Nghiên cứu'})!`,
+          `Chào mừng ${userData.full_name} (${userData.role === 'admin' ? 'Quản trị viên' : 'Học viên'})!`,
           'success'
         );
       }
@@ -83,20 +83,22 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const logout = () => {
     setUser(null);
     if (notifyHandler) {
-      notifyHandler('Đã lưu trữ và bảo mật phiên học thuật an toàn.', 'info');
+      notifyHandler('Đã đăng xuất thành công.', 'info');
     }
   };
 
   const openAuthModal = (
     tab: 'login' | 'register' = 'login',
-    title = 'Đăng nhập để khởi tạo hồ sơ học thuật và bảo lưu tiến độ 14 ngày',
-    subtitle = 'Nhận ngay 2250 XP học bổng nghiên cứu và mở khóa trọn bộ 5 phân hệ tương tác'
+    title?: string,
+    subtitle?: string
   ) => {
     setAuthModalConfig({
       isOpen: true,
       tab,
-      title,
-      subtitle,
+      title: title || (tab === 'login' ? 'Đăng nhập để bắt đầu học và lưu kết quả' : 'Đăng ký tài khoản học viên'),
+      subtitle: subtitle || (tab === 'login'
+        ? 'Đăng nhập để lưu tiến độ luyện thi Cambridge IELTS và từ vựng Anki của bạn.'
+        : 'Tạo tài khoản học viên miễn phí để luyện đề thi, nghe chép chính tả và học từ vựng.'),
     });
   };
 
@@ -108,15 +110,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (user) return true;
 
     if (notifyHandler) {
-      notifyHandler('Vui lòng đăng nhập để bắt đầu nghiên cứu phân hệ này', 'info');
+      notifyHandler('Vui lòng đăng nhập để tiếp tục tính năng này', 'info');
     }
 
     openAuthModal(
       'login',
       actionName
-        ? `Đăng nhập để mở khóa: ${actionName}`
-        : 'Đăng nhập để khởi tạo hồ sơ học thuật và bảo lưu tiến độ 14 ngày',
-      'Lưu trữ hồ sơ học thuật, chuỗi ngày Streak 14 ngày và nhận 2250 XP ban đầu.'
+        ? `Đăng nhập để: ${actionName}`
+        : 'Đăng nhập để bắt đầu học và lưu kết quả',
+      'Đăng nhập để lưu tiến độ làm bài và đồng bộ thẻ từ vựng Anki của bạn.'
     );
 
     return false;

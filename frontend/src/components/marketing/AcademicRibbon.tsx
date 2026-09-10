@@ -15,22 +15,22 @@ export const AcademicRibbon: React.FC<AcademicRibbonProps> = ({ onOpenAuth }) =>
       <div className="max-w-7xl mx-auto flex items-center justify-between gap-3">
         {/* Center editorial bulletin */}
         <div className="flex-1 flex items-center justify-center gap-2.5 text-center flex-wrap">
-          <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-amber-500/20 border border-amber-400/40 text-amber-300 text-[10px] font-mono uppercase font-bold tracking-wider">
+          <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-amber-500/20 border border-amber-400/40 text-amber-300 text-[10px] font-sans uppercase font-bold tracking-wider">
             <BookOpen className="w-3 h-3 text-amber-300" />
-            Ấn Phẩm Học Thuật 2026
+            Ấn Bản Cambridge 2026
           </span>
 
-          <span className="font-sans italic text-stone-200 hidden sm:inline">
-            "Phương pháp Spaced Repetition &amp; Nhận diện âm vị chuẩn Cambridge"
+          <span className="font-sans text-stone-200 hidden sm:inline">
+            "Hệ Thống Luyện Đề Cambridge IELTS 10-20 • Nghe Chép Chính Tả • Thẻ 3D Anki SRS"
           </span>
 
           <span className="text-stone-400 hidden md:inline">•</span>
 
           <button
-            onClick={() => onOpenAuth('register', 'Báo Cáo Nghiên Cứu Phương Pháp Luận')}
-            className="inline-flex items-center gap-1 text-gold-300 hover:text-gold-200 font-bold underline underline-offset-4 decoration-gold-500/50 hover:decoration-gold-400 transition-colors cursor-pointer"
+            onClick={() => onOpenAuth('register', 'Trải nghiệm luyện đề Cambridge')}
+            className="inline-flex items-center gap-1 text-amber-300 hover:text-amber-200 font-bold underline underline-offset-4 decoration-amber-500/50 hover:decoration-amber-400 transition-colors cursor-pointer"
           >
-            <span>Nhận Báo Cáo Phân Tích Phương Pháp</span>
+            <span>Luyện Đề Thi Thử Miễn Phí</span>
             <ArrowRight className="w-3 h-3" />
           </button>
         </div>

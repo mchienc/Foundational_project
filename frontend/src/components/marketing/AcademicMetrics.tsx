@@ -2,7 +2,7 @@ import React, { useRef } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { useGSAP } from '@gsap/react';
-import { BookOpen, Activity, Headphones, Flame } from 'lucide-react';
+import { BookOpen, Activity, Headphones, CheckCircle2 } from 'lucide-react';
 
 gsap.registerPlugin(ScrollTrigger, useGSAP);
 
@@ -16,23 +16,19 @@ export const AcademicMetrics: React.FC = () => {
   useGSAP(
     () => {
       const counters = [
-        { ref: val1Ref, target: 148, suffix: '' },
-        { ref: val2Ref, target: 94, suffix: '%' },
-        { ref: val3Ref, target: 32, suffix: '' },
-        { ref: val4Ref, target: 14, suffix: ' ngày' },
+        { ref: val1Ref, target: 28, suffix: ' đề' },
+        { ref: val2Ref, target: 96, suffix: '%' },
+        { ref: val3Ref, target: 4, suffix: ' mức' },
+        { ref: val4Ref, target: 100, suffix: '%' },
       ];
 
-      // Stagger entrance of metric cells
+      // Smooth entrance of metric cells without ever hiding them on initial load
       gsap.from('.metric-column-cell', {
-        scrollTrigger: {
-          trigger: containerRef.current,
-          start: 'top 85%',
-        },
-        y: 25,
-        autoAlpha: 0,
+        y: 15,
+        opacity: 0,
         duration: 0.6,
-        stagger: 0.12,
-        ease: 'power3.out',
+        stagger: 0.08,
+        ease: 'power2.out',
       });
 
       // Count up numbers
@@ -40,12 +36,8 @@ export const AcademicMetrics: React.FC = () => {
         if (!item.ref.current) return;
         const obj = { val: 0 };
         gsap.to(obj, {
-          scrollTrigger: {
-            trigger: containerRef.current,
-            start: 'top 85%',
-          },
           val: item.target,
-          duration: 1.8,
+          duration: 1.4,
           ease: 'power2.out',
           onUpdate: () => {
             if (item.ref.current) {
@@ -61,71 +53,71 @@ export const AcademicMetrics: React.FC = () => {
   return (
     <section
       ref={containerRef}
-      className="bg-[#F9F9F6]/85 backdrop-blur-[2px] border-b border-stone-300 py-10 relative z-10"
+      className="bg-transparent border-b border-stone-200/60 py-10 relative z-10"
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-2 lg:grid-cols-4 divide-y lg:divide-y-0 lg:divide-x divide-stone-300 border border-stone-300 rounded-2xl bg-white shadow-xs overflow-hidden">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
           {/* Metric 1 */}
-          <div className="metric-column-cell p-6 text-center space-y-2">
-            <div className="w-9 h-9 rounded-xl bg-amber-100/70 border border-amber-300/60 text-amber-900 flex items-center justify-center mx-auto mb-1.5 shadow-2xs">
-              <BookOpen className="w-4 h-4 text-amber-900" />
+          <div className="metric-column-cell p-6 text-center space-y-3 bg-white/85 backdrop-blur-md border border-stone-200/90 rounded-2xl shadow-xs hover:shadow-md hover:border-amber-400/40 transition-all duration-300">
+            <div className="w-10 h-10 rounded-xl bg-amber-50 border border-amber-200/60 text-amber-800 flex items-center justify-center mx-auto shadow-2xs">
+              <BookOpen className="w-5 h-5 text-amber-800" />
             </div>
-            <div className="font-sans font-bold text-3xl sm:text-4xl text-[#064E3B] tracking-normal">
-              <span ref={val1Ref}>0</span>
+            <div className="font-sans font-bold text-3xl sm:text-4xl text-[#064E3B] tracking-tight font-mono">
+              <span ref={val1Ref}>28 đề</span>
             </div>
             <p className="text-xs font-bold text-[#064E3B] uppercase tracking-normal">
-              Đơn Vị Từ Vựng
+              Đề Thi Cambridge
             </p>
-            <p className="text-[11px] text-stone-600 font-sans">
-              Chuẩn Oxford 3000 &amp; IELTS Academic C1
+            <p className="text-[11px] text-stone-500 font-sans">
+              Trọn bộ đề thi thật từ Cambridge 10 đến 20
             </p>
           </div>
 
           {/* Metric 2 */}
-          <div className="metric-column-cell p-6 text-center space-y-2">
-            <div className="w-9 h-9 rounded-xl bg-amber-100/70 border border-amber-300/60 text-amber-900 flex items-center justify-center mx-auto mb-1.5 shadow-2xs">
-              <Activity className="w-4 h-4 text-amber-900" />
+          <div className="metric-column-cell p-6 text-center space-y-3 bg-white/85 backdrop-blur-md border border-stone-200/90 rounded-2xl shadow-xs hover:shadow-md hover:border-amber-400/40 transition-all duration-300">
+            <div className="w-10 h-10 rounded-xl bg-amber-50 border border-amber-200/60 text-amber-800 flex items-center justify-center mx-auto shadow-2xs">
+              <Activity className="w-5 h-5 text-amber-800" />
             </div>
-            <div className="font-sans font-bold text-3xl sm:text-4xl text-[#064E3B] tracking-normal">
-              <span ref={val2Ref}>0%</span>
+            <div className="font-sans font-bold text-3xl sm:text-4xl text-[#064E3B] tracking-tight font-mono">
+              <span ref={val2Ref}>96%</span>
             </div>
             <p className="text-xs font-bold text-[#064E3B] uppercase tracking-normal">
-              Chuẩn Xác Âm Vị
+              Chính Xác Dictation
             </p>
-            <p className="text-[11px] text-stone-600 font-sans">
-              Độ tương thích phổ sóng âm giọng bản xứ
+            <p className="text-[11px] text-stone-500 font-sans">
+              Nghe chép từng câu, phát hiện từ sai tức thì
             </p>
           </div>
 
           {/* Metric 3 */}
-          <div className="metric-column-cell p-6 text-center space-y-2">
-            <div className="w-9 h-9 rounded-xl bg-amber-100/70 border border-amber-300/60 text-amber-900 flex items-center justify-center mx-auto mb-1.5 shadow-2xs">
-              <Headphones className="w-4 h-4 text-amber-900" />
+          <div className="metric-column-cell p-6 text-center space-y-3 bg-white/85 backdrop-blur-md border border-stone-200/90 rounded-2xl shadow-xs hover:shadow-md hover:border-amber-400/40 transition-all duration-300">
+            <div className="w-10 h-10 rounded-xl bg-amber-50 border border-amber-200/60 text-amber-800 flex items-center justify-center mx-auto shadow-2xs">
+              <Headphones className="w-5 h-5 text-amber-800" />
             </div>
-            <div className="font-sans font-bold text-3xl sm:text-4xl text-[#064E3B] tracking-normal">
-              <span ref={val3Ref}>0</span>
+            <div className="font-sans font-bold text-3xl sm:text-4xl text-[#064E3B] tracking-tight font-mono">
+              <span ref={val3Ref}>4 mức</span>
             </div>
             <p className="text-xs font-bold text-[#064E3B] uppercase tracking-normal">
-              Khung Bài Ngữ Âm
+              Đánh Giá Thẻ Anki
             </p>
-            <p className="text-[11px] text-stone-600 font-sans">
-              A-B loop phân đoạn &amp; Chép chính tả
+            <p className="text-[11px] text-stone-500 font-sans">
+              Again, Hard, Good, Easy theo thuật toán SM-2
             </p>
           </div>
 
           {/* Metric 4 */}
-          <div className="metric-column-cell p-6 text-center space-y-2">
-            <div className="w-9 h-9 rounded-xl bg-amber-100/70 border border-amber-300/60 text-amber-900 flex items-center justify-center mx-auto mb-1.5 shadow-2xs">
-              <Flame className="w-4 h-4 text-amber-900 fill-amber-700" />
+          <div className="metric-column-cell p-6 text-center space-y-3 bg-white/85 backdrop-blur-md border border-stone-200/90 rounded-2xl shadow-xs hover:shadow-md hover:border-amber-400/40 transition-all duration-300">
+            <div className="w-10 h-10 rounded-xl bg-amber-50 border border-amber-200/60 text-amber-800 flex items-center justify-center mx-auto shadow-2xs">
+              <CheckCircle2 className="w-5 h-5 text-amber-800" />
             </div>
-            <div className="font-sans font-bold text-3xl sm:text-4xl text-[#064E3B] tracking-normal">
-              <span ref={val4Ref}>0 ngày</span>
+            <div className="font-sans font-bold text-3xl sm:text-4xl text-[#064E3B] tracking-tight font-mono">
+              <span ref={val4Ref}>100%</span>
             </div>
             <p className="text-xs font-bold text-[#064E3B] uppercase tracking-normal">
-              Chuỗi Nghiên Cứu
+              Lời Giải Chi Tiết
             </p>
-            <p className="text-[11px] text-stone-600 font-sans">
-              Kỷ luật 14 ngày kích hoạt trí nhớ dài hạn
+            <p className="text-[11px] text-stone-500 font-sans">
+              Giải thích đáp án học thuật cho từng câu hỏi
             </p>
           </div>
         </div>

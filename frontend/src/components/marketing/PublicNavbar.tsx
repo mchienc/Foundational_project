@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import {
-  GraduationCap,
   Sparkles,
   ArrowRight,
   LogIn,
@@ -24,9 +23,7 @@ export const PublicNavbar: React.FC<PublicNavbarProps> = ({
 
   const navLinks = [
     { label: 'Về EduFlow', href: '#about' },
-    { label: 'Phương Pháp AI', href: '#methodology' },
-    { label: 'Lộ Trình Đào Tạo', href: '#programs' },
-    { label: '5 Tính Năng AI', href: '#features' },
+    { label: '5 Tính Năng Nổi Bật', href: '#features' },
     { label: 'Đánh Giá Học Viên', href: '#reviews' },
   ];
 
@@ -46,20 +43,26 @@ export const PublicNavbar: React.FC<PublicNavbarProps> = ({
         <div className="flex items-center gap-3">
           <div
             onClick={() => onNavigateScreen('landing')}
-            className="flex items-center gap-2.5 cursor-pointer group select-none"
+            className="flex items-center gap-2.5 cursor-pointer group select-none text-left"
           >
-            <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-brand-navy via-brand-primary to-blue-500 text-white flex items-center justify-center shadow-md shadow-blue-500/25 group-hover:scale-105 transition-transform duration-200">
-              <GraduationCap size={22} />
+            <div className="relative w-9 h-9 sm:w-10 sm:h-10 rounded-xl overflow-hidden bg-white p-1 border border-amber-400/40 shadow-sm group-hover:border-amber-400 group-hover:shadow-amber-400/20 group-hover:scale-105 transition-all duration-200 shrink-0 flex items-center justify-center">
+              <img
+                src="/logo.jpg"
+                alt="EduFlow Logo"
+                className="w-full h-full object-contain"
+              />
             </div>
-            <div>
-              <div className="flex items-center gap-1.5 font-black text-slate-900 tracking-tight text-lg leading-tight">
-                EduFlow
-                <span className="text-[10px] font-black uppercase px-1.5 py-0.2 rounded bg-rose-100 text-rose-700 border border-rose-200">
-                  AI EdTech
+            <div className="flex flex-col justify-center min-w-0">
+              <div className="flex items-center gap-2">
+                <span className="text-base sm:text-lg font-sans font-bold tracking-tight text-slate-900 leading-tight">
+                  EduFlow
+                </span>
+                <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[9px] sm:text-[10px] font-semibold bg-emerald-100 text-emerald-900 border border-emerald-300 whitespace-nowrap leading-none tracking-wide shadow-xs">
+                  Cambridge &amp; Anki
                 </span>
               </div>
-              <span className="text-[10px] text-slate-500 font-medium tracking-wide">
-                Hệ Sinh Thái Học Tiếng Anh Tương Tác
+              <span className="text-[10px] sm:text-[11px] text-slate-600 font-sans tracking-normal leading-tight whitespace-nowrap mt-0.5 hidden sm:block">
+                IELTS Actual Tests &amp; Spaced Repetition
               </span>
             </div>
           </div>

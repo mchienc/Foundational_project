@@ -10,7 +10,9 @@
     "server": "nodemon app.js",
     "client:dev": "npm --prefix frontend run dev",
     "client:build": "npm --prefix frontend run build",
-    "client:preview": "npm --prefix frontend run preview"
+    "client:preview": "npm --prefix frontend run preview",
+    "db:seed:cambridge": "node scripts/seedCambridgeData.js",
+    "db:seed:cam13": "node scripts/seedCambridge13All.js"
   },
   "dependencies": {
     "bcrypt": "^5.1.1",
@@ -18,8 +20,14 @@
     "ejs": "^3.1.10",
     "express": "^4.19.2",
     "express-session": "^1.18.0",
+    "jszip": "^3.10.2",
+    "lucide-react": "^1.44.0",
     "method-override": "^3.0.0",
-    "mysql2": "^3.10.0"
+    "mysql2": "^3.10.0",
+    "react-resizable-panels": "^4.12.4",
+    "recharts": "^3.10.1",
+    "sql.js": "^1.14.2",
+    "zustand": "^5.0.15"
   },
   "devDependencies": {
     "concurrently": "^10.0.5",

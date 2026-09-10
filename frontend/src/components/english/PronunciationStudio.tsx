@@ -122,10 +122,10 @@ export const PronunciationStudio: React.FC<PronunciationStudioProps> = ({
         if (finalScore >= 80) {
           soundEffects.playSuccess();
           triggerConfetti();
-          onEarnXp(35, `Phát âm xuất sắc đạt ${finalScore}/100 điểm! (+35 XP)`);
+          onEarnXp(35, `Phát âm xuất sắc đạt ${finalScore}/100 điểm!`);
         } else {
           soundEffects.playPop();
-          onEarnXp(15, `Đã hoàn thành lượt ghi âm phát âm (+15 XP)`);
+          onEarnXp(15, `Đã hoàn thành lượt ghi âm phát âm`);
         }
       }, 700);
     } else {
@@ -179,7 +179,7 @@ export const PronunciationStudio: React.FC<PronunciationStudioProps> = ({
   };
 
   return (
-    <div className="max-w-4xl mx-auto px-4 py-8">
+    <div className="max-w-4xl mx-auto px-4 py-8 relative z-10">
       {/* Header & Lesson Tabs */}
       <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
         <div>
@@ -202,7 +202,7 @@ export const PronunciationStudio: React.FC<PronunciationStudioProps> = ({
               onClick={onBackToDashboard}
               className="flex items-center gap-1 px-3 py-1.5 rounded-xl border border-slate-200 bg-white text-xs font-semibold text-slate-700 hover:bg-slate-50 shadow-sm"
             >
-              <ChevronLeft className="w-3.5 h-3.5" /> Lộ trình
+              <ChevronLeft className="w-3.5 h-3.5" /> Quay lại
             </button>
           )}
           {/* Lesson Selector */}

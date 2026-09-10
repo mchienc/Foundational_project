@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import {
   Trophy,
-  Flame,
   Zap,
   Crown,
   X,
@@ -203,11 +202,6 @@ export const LeaderboardModal: React.FC<LeaderboardModalProps> = ({
                       )}
                     </div>
                     <div className="text-[11px] text-slate-500 flex items-center gap-2 mt-0.5">
-                      <span className="flex items-center gap-0.5 text-amber-600 font-semibold">
-                        <Flame className="w-3 h-3 fill-amber-500" />
-                        {user.streakDays} ngày
-                      </span>
-                      <span>•</span>
                       <span className="text-slate-400 font-medium">
                         Giải {user.league}
                       </span>

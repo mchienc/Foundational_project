@@ -2,15 +2,15 @@ import React, { useRef } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { useGSAP } from '@gsap/react';
-import { Layers, Mic, Headphones, Flame } from 'lucide-react';
+import { Layers, Mic, Headphones, CheckCircle2 } from 'lucide-react';
 
 gsap.registerPlugin(ScrollTrigger, useGSAP);
 
 interface ScrollyMetricsProps {
-  streakDays: number;
+  streakDays?: number;
 }
 
-export const ScrollyMetrics: React.FC<ScrollyMetricsProps> = ({ streakDays }) => {
+export const ScrollyMetrics: React.FC<ScrollyMetricsProps> = ({ streakDays: _streakDays }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const num1Ref = useRef<HTMLSpanElement>(null);
   const num2Ref = useRef<HTMLSpanElement>(null);
@@ -56,7 +56,7 @@ export const ScrollyMetrics: React.FC<ScrollyMetricsProps> = ({ streakDays }) =>
           n1: 148,
           n2: 94,
           n3: 32,
-          n4: streakDays || 14,
+          n4: 128,
           duration: 1.6,
           ease: 'power1.out',
           onUpdate: () => {
@@ -69,7 +69,7 @@ export const ScrollyMetrics: React.FC<ScrollyMetricsProps> = ({ streakDays }) =>
         '-=0.4'
       );
     },
-    { scope: containerRef, dependencies: [streakDays] }
+    { scope: containerRef }
   );
 
   const metrics = [
@@ -98,12 +98,12 @@ export const ScrollyMetrics: React.FC<ScrollyMetricsProps> = ({ streakDays }) =>
       icon: <Headphones className="text-amber-800" size={20} />,
     },
     {
-      label: 'Chuỗi Nghiên Cứu',
+      label: 'Bài Tập Hoàn Thành',
       ref: num4Ref,
-      initial: streakDays ? streakDays.toString() : '14',
-      unit: 'ngày liên tục',
-      sub: 'Kỷ luật 14 ngày đạt chuẩn Bạch Kim',
-      icon: <Flame className="text-amber-700 fill-amber-600" size={20} />,
+      initial: '128',
+      unit: 'bài tập',
+      sub: 'Luyện tập các kỹ năng Nghe - Đọc - Viết',
+      icon: <CheckCircle2 className="text-amber-800" size={20} />,
     },
   ];
 

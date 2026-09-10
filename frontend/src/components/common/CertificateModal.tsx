@@ -111,7 +111,7 @@ export const CertificateModal: React.FC<CertificateModalProps> = ({
 
               <div className="space-y-1">
                 <p className="text-xs text-slate-500 font-mono">
-                  Đã hoàn thành xuất sắc toàn bộ bài giảng và các kỳ kiểm tra trong khóa học
+                  Đã hoàn thành xuất sắc toàn bộ bài luyện tập và kiểm tra đánh giá năng lực
                 </p>
                 <h3 className="text-lg sm:text-xl font-bold text-blue-600 px-4">
                   {courseTitle}

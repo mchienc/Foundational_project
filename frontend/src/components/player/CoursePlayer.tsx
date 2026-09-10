@@ -565,7 +565,7 @@ export const CoursePlayer: React.FC<CoursePlayerProps> = ({
                     rows={2}
                     value={newQuestion}
                     onChange={(e) => setNewQuestion(e.target.value)}
-                    placeholder="Đặt câu hỏi thắc mắc về bài giảng này với Giảng viên và cộng đồng..."
+                    placeholder="Đặt câu hỏi thắc mắc về nội dung này..."
                     className="w-full p-3.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                   <div className="flex justify-end">
@@ -588,7 +588,7 @@ export const CoursePlayer: React.FC<CoursePlayerProps> = ({
                           <span className="text-xs font-bold text-slate-900">{c.author}</span>
                           {c.role === 'instructor' && (
                             <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-purple-100 text-purple-700">
-                              Giảng viên
+                              Hỗ trợ viên
                             </span>
                           )}
                           <span className="text-[11px] text-slate-400 font-mono">

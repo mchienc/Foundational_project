@@ -117,19 +117,24 @@ export interface QuizResult {
 
 export type Screen =
   | 'landing'
+  | 'reading'
+  | 'reading-test'
+  | 'computer-exam'
+  | 'mistake-vault'
+  | 'listening'
+  | 'listening-test'
+  | 'anki'
+  | 'library'
+  | 'reader'
+  | 'vault'
   | 'dashboard'
-  | 'course-details'
-  | 'course-player'
-  | 'my-courses'
-  | 'quiz'
   | 'profile'
   | 'admin'
+  | 'leaderboard'
   | 'vocab-srs'
   | 'speaking'
-  | 'listening'
   | 'sentence-builder'
-  | 'writing'
-  | 'leaderboard';
+  | 'writing';
 
 export interface ToastMessage {
   id: string;
@@ -308,4 +313,232 @@ export interface WritingSubmissionHistory {
   createdAt: string;
 }
 
+// ================= Academic Reading & Vocabulary Vault Types ================= //
+
+export interface TargetWord {
+  id: string;
+  word: string;
+  partOfSpeech: 'noun' | 'verb' | 'adjective' | 'adverb' | 'phrase';
+  ipa: string;
+  definitionVi: string;
+  definitionEn: string;
+  collocations: string[];
+  contextSentence: string;
+  explanation: string;
+}
+
+export interface ReadingQuestion {
+  id: string;
+  question: string;
+  options: string[];
+  correctAnswer: number; // 0, 1, 2, 3
+  explanation: string;
+}
+
+export interface DictationSentence {
+  id: string;
+  sentence: string;
+  translationVi: string;
+  focusWord: string;
+  audioUrl?: string;
+}
+
+export interface Article {
+  id: string;
+  title: string;
+  slug: string;
+  topic: 'Khoa Học' | 'Xã Hội' | 'Kinh Tế';
+  topicColor: string;
+  level: 'B1' | 'B2' | 'C1' | 'C2';
+  levelBadgeColor: string;
+  author: string;
+  authorRole: string;
+  journal: string;
+  publishedDate: string;
+  readTimeMinutes: number;
+  wordCount: number;
+  thumbnail: string;
+  summary: string;
+  contentParagraphs: string[];
+  targetWords: TargetWord[];
+  dictationSentences: DictationSentence[];
+  comprehensionQuestions: ReadingQuestion[];
+}
+
+export interface VocabItem {
+  id: string;
+  word: string;
+  ipa: string;
+  pos: string;
+  contextMeaning: string;
+  contextSentence: string;
+  sourceArticleTitle: string;
+  srsLevel: number; // 1 -> 5
+  nextReviewDate: string; // ISO string
+  collocations?: string[];
+  definitionEn?: string;
+  articleId?: string;
+  savedAt?: string;
+  reviewCount?: number;
+}
+
+// Backward compatibility alias
+export type SavedWordItem = VocabItem;
+
+// ================= Cambridge IELTS & Anki Platform Types ================= //
+
+export type AnkiRating = 'again' | 'hard' | 'good' | 'easy';
+
+export interface AnkiCard {
+  id: string;
+  deckId: string;
+  word: string;
+  ipa: string;
+  pos: string; // noun, verb, adj, adv, idiom, phrase
+  definitionEn: string;
+  definitionVi: string;
+  clozeSentence: string; // Sentence with "[ ... ]" masking the target word
+  fullSentence: string;
+  source: string; // e.g. "Cambridge 18 Test 2"
+  repetitions: number;
+  interval: number; // in days
+  easeFactor: number; // default 2.5
+  nextReviewDate: string; // ISO date string
+  status: 'new' | 'learning' | 'review' | 'mastered';
+  lastReviewedDate?: string;
+  createdDate: string;
+}
+
+export interface AnkiDeck {
+  id: string;
+  title: string;
+  description: string;
+  category: string;
+  isPersonal?: boolean;
+  totalCards: number;
+  dueTodayCount: number;
+  learningCount: number;
+  masteredCount: number;
+  iconName?: string;
+}
+
+export interface CambridgeQuestionOption {
+  id: string;
+  label: string; // "A", "B", "C", "D" or "TRUE", "FALSE", "NOT GIVEN"
+  text: string;
+}
+
+export interface CambridgeReadingQuestion {
+  id: string;
+  number: number;
+  type: 'tfng' | 'multiple_choice' | 'summary_completion' | 'matching_info';
+  groupHeader?: string; // e.g. "Questions 1–6"
+  groupInstruction?: string; // e.g. "Do the following statements agree with the information given in Reading Passage 2? In boxes 1–6, choose TRUE, FALSE, or NOT GIVEN."
+  question: string;
+  options?: CambridgeQuestionOption[];
+  correctAnswer: string;
+  acceptableAnswers?: string[]; // for summary completion / fill-in-blank
+  explanation: string;
+  referenceParagraph: string; // e.g. "Đoạn B"
+}
+
+export interface CambridgeReadingPassage {
+  id: string;
+  source: string; // e.g. "Cambridge 18 Test 2" or "Recent Actual Tests Vol 5"
+  sourceType: 'cambridge' | 'actual_test';
+  passageNumber: 1 | 2 | 3;
+  title: string;
+  subtitle?: string;
+  topic: 'Kiến Trúc & Đô Thị' | 'Trí Tuệ Nhân Tạo' | 'Môi Trường Sinh Thái' | 'Khoa Học Ứng Dụng' | 'Lịch Sử & Xã Hội';
+  level: 'Passage 1 (Cơ bản)' | 'Passage 2 (Trung cấp)' | 'Passage 3 (Nâng cao)';
+  estimatedMinutes: number;
+  wordCount: number;
+  paragraphs: { letter: string; text: string }[];
+  targetWords: TargetWord[];
+  questions: CambridgeReadingQuestion[];
+}
+
+export interface ListeningSlice {
+  id: string;
+  sentenceIndex: number;
+  text: string;
+  vietnameseMeaning: string;
+  hint: string;
+  keyVocab: string[];
+  phoneticNotes: string; // e.g. "Linking sound: /t/ in 'part of' -> /pɑːrt əv/"
+  audioStartSeconds?: number;
+  audioEndSeconds?: number;
+}
+
+export interface CambridgeListeningTest {
+  id: string;
+  title: string;
+  source: string; // e.g. "Cambridge IELTS 18 Test 4"
+  part: 1 | 2 | 3 | 4;
+  partLabel: string; // e.g. "Part 4: Độc thoại học thuật"
+  topic: string;
+  speaker: string;
+  wpm: number; // Words Per Minute
+  accent: 'British' | 'American' | 'Australian';
+  phoneticFocus: string; // e.g. "Nối âm /r/, âm đuôi /t, d/, từ vựng C1"
+  totalSentences: number;
+  sentences: ListeningSlice[];
+}
+
+export interface ReadingSessionConfig {
+  mode: 'single' | 'full';
+  passageId: string;
+  passageIds?: string[];
+  testTitle: string;
+  passageNumber?: 1 | 2 | 3;
+}
+
+// ================= IELTS on Computer & Mistake Vault Types ================= //
+
+export type ContrastMode = 'standard' | 'high-contrast' | 'inverted';
+
+export type MistakeQuestionType =
+  | 'TFNG'
+  | 'MATCHING_HEADINGS'
+  | 'SUMMARY_COMPLETION'
+  | 'MULTIPLE_CHOICE'
+  | 'MATCHING_INFO';
+
+export interface MistakeRecord {
+  id: string;
+  testId: string;
+  source: string; // e.g., "Cambridge 18 - Test 1"
+  passage: 1 | 2 | 3;
+  questionNumber: number;
+  questionType: MistakeQuestionType;
+  questionText: string;
+  options?: { id: string; label: string; text: string }[];
+  userAnswer: string;
+  correctAnswer: string;
+  acceptableAnswers?: string[];
+  evidenceSnippet: string; // Trích đoạn đoạn văn chứa bằng chứng
+  explanation: string;
+  status: 'NEEDS_PRACTICE' | 'RESOLVED';
+  attemptsCount: number;
+  createdAt: string;
+  lastPracticedAt?: string;
+}
+
+export interface ExamHighlight {
+  id: string;
+  passageIndex: number;
+  text: string;
+  color?: string;
+  timestamp: number;
+}
+
+export interface ExamNote {
+  id: string;
+  passageIndex: number;
+  text: string;
+  note: string;
+  top: number;
+  left: number;
+  timestamp: number;
+}
 

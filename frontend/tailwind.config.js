@@ -54,7 +54,7 @@ export default {
         }
       },
       fontFamily: {
-        serif: ['"Be Vietnam Pro"', 'sans-serif'],
+        serif: ['"Lora"', 'Georgia', 'serif'],
         sans: ['"Be Vietnam Pro"', 'sans-serif'],
         ipa: ['"Gentium Plus"', 'sans-serif'],
       },
