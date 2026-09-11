@@ -6,7 +6,6 @@ import {
   ArrowRight,
   BookmarkCheck,
   Compass,
-  Database,
   Award,
   X,
   CheckCircle2,
@@ -15,7 +14,7 @@ import {
   Laptop,
 } from 'lucide-react';
 import { mockReadingPassages } from '../../data/cambridgeMockData';
-import { getReadingPassages, checkDatabaseHealth } from '../../services/cambridgeApi';
+import { getReadingPassages } from '../../services/cambridgeApi';
 import { CambridgeReadingPassage, ReadingSessionConfig } from '../../types';
 import { useCardEntrance } from '../../hooks/useCardEntrance';
 import { useMistakeStore } from '../../store/useMistakeStore';
@@ -50,14 +49,9 @@ export const ReadingLibrary: React.FC<ReadingLibraryProps> = ({
 }) => {
   const { mistakes } = useMistakeStore();
   const [passages, setPassages] = useState<CambridgeReadingPassage[]>(mockReadingPassages);
-  const [dbStatus, setDbStatus] = useState<{ connected: boolean; message: string }>({
-    connected: false,
-    message: 'Đang kiểm tra kết nối...',
-  });
 
   useEffect(() => {
-    // Kiểm tra CSDL và tải bài thi từ MySQL
-    checkDatabaseHealth().then(setDbStatus);
+    // Tải danh sách bài thi từ cơ sở dữ liệu
     getReadingPassages().then((data) => {
       if (data && data.length > 0) {
         setPassages(data);
@@ -233,21 +227,6 @@ export const ReadingLibrary: React.FC<ReadingLibraryProps> = ({
 
         {/* Header Actions */}
         <div className="flex flex-wrap items-center gap-3 shrink-0">
-          {/* Database Connection Badge */}
-          <div
-            className={`inline-flex items-center gap-2 px-3.5 py-2 rounded-2xl border text-xs font-mono font-medium shadow-xs transition-colors ${
-              dbStatus.connected
-                ? 'bg-emerald-50 text-emerald-900 border-emerald-300'
-                : 'bg-amber-50 text-amber-900 border-amber-300'
-            }`}
-            title={dbStatus.message}
-          >
-            <span className={`w-2 h-2 rounded-full ${dbStatus.connected ? 'bg-emerald-500 animate-pulse' : 'bg-amber-500'}`} />
-            <Database size={13} className={dbStatus.connected ? 'text-emerald-700' : 'text-amber-700'} />
-            <span className="font-sans font-semibold">
-              {dbStatus.connected ? 'MySQL Database (28 Tests Cam 13–20)' : 'Offline / Local'}
-            </span>
-          </div>
 
           {/* Quick link to Mistake Vault */}
           {onNavigateMistakeVault && (

@@ -28,7 +28,6 @@ import { AuthProvider, useAuth } from './context/AuthContext';
 import { VocabularyVaultProvider } from './context/VocabularyVaultContext';
 import { AnkiProvider } from './context/AnkiContext';
 import { SmoothScrollProvider } from './context/SmoothScrollProvider';
-import { SoftAtmosphereBackground } from './components/common/SoftAtmosphereBackground';
 
 // Error Boundary to prevent white screen crashes
 interface ErrorBoundaryProps {
@@ -610,9 +609,6 @@ const AppContent: React.FC = () => {
 
   return (
     <div className="min-h-screen flex flex-col bg-[#FAFAF9] text-stone-900 selection:bg-gold-600 selection:text-white font-sans antialiased relative">
-      {/* Dynamic Customizable Soft Atmosphere Background */}
-      <SoftAtmosphereBackground />
-
       {/* Student LMS Navigation: Only displayed in authenticated workspace and outside of exam rooms */}
       {currentScreen !== 'landing' && currentScreen !== 'computer-exam' && currentScreen !== 'listening-exam' && (
         <Navbar
