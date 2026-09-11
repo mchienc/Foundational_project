@@ -61,6 +61,7 @@ if (fs.existsSync(frontendDist)) {
 }
 
 // ----- RESTful API cho Hệ thống Học Tiếng Anh (React Frontend) -----
+app.use('/api/auth', require('./routes/api/authRoutes'));
 app.use('/api/english', englishRoutes);
 app.use('/api/cambridge', cambridgeRoutes);
 

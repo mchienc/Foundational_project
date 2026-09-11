@@ -45,8 +45,9 @@ export const AcademicAuthModal: React.FC<AcademicAuthModalProps> = ({
   const [regConfirmPassword, setRegConfirmPassword] = useState<string>('');
 
   const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState<boolean>(false);
 
-  const handleLoginSubmit = (e: React.FormEvent) => {
+  const handleLoginSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
 
@@ -55,22 +56,34 @@ export const AcademicAuthModal: React.FC<AcademicAuthModalProps> = ({
       return;
     }
 
-    const isAdmin = loginEmail.toLowerCase().includes('admin');
-    const user: User = {
-      id: isAdmin ? 'user-admin-1' : `user-${Date.now()}`,
-      email: loginEmail,
-      full_name: isAdmin ? 'Quản Trị Viên (Admin)' : (loginEmail.includes('dangchien') ? 'Minh Chiến Đặng' : loginEmail.split('@')[0]),
-      role: isAdmin ? 'admin' : 'student',
-      avatar: isAdmin
-        ? 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=120&auto=format&fit=crop&q=80'
-        : 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=120&auto=format&fit=crop&q=80',
-    };
+    setLoading(true);
+    try {
+      const res = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: loginEmail.trim(),
+          password: loginPassword,
+        }),
+      });
 
-    onSuccess(user);
-    onClose();
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        setError(data.message || 'Email hoặc mật khẩu không chính xác.');
+        setLoading(false);
+        return;
+      }
+
+      onSuccess(data.user);
+      onClose();
+    } catch (err: any) {
+      setError('Không thể kết nối máy chủ xác thực. Vui lòng kiểm tra lại mạng.');
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const handleRegisterSubmit = (e: React.FormEvent) => {
+  const handleRegisterSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
 
@@ -89,17 +102,32 @@ export const AcademicAuthModal: React.FC<AcademicAuthModalProps> = ({
       return;
     }
 
-    const newUser: User = {
-      id: `user-${Date.now()}`,
-      email: regEmail,
-      full_name: regFullName,
-      role: 'student',
-      avatar:
-        'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=120&auto=format&fit=crop&q=80',
-    };
+    setLoading(true);
+    try {
+      const res = await fetch('/api/auth/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          full_name: regFullName.trim(),
+          email: regEmail.trim(),
+          password: regPassword,
+        }),
+      });
 
-    onSuccess(newUser, true);
-    onClose();
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        setError(data.message || 'Đăng ký thất bại. Vui lòng thử lại.');
+        setLoading(false);
+        return;
+      }
+
+      onSuccess(data.user, true);
+      onClose();
+    } catch (err: any) {
+      setError('Không thể kết nối máy chủ xác thực. Vui lòng thử lại.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -249,9 +277,10 @@ export const AcademicAuthModal: React.FC<AcademicAuthModalProps> = ({
 
                   <button
                     type="submit"
-                    className="w-full py-3.5 rounded-xl bg-[#D97706] hover:bg-[#B45309] text-white text-xs font-bold uppercase tracking-wider shadow-md hover:shadow-lg transition-all cursor-pointer flex items-center justify-center gap-2"
+                    disabled={loading}
+                    className="w-full py-3.5 rounded-xl bg-[#D97706] hover:bg-[#B45309] text-white text-xs font-bold uppercase tracking-wider shadow-md hover:shadow-lg transition-all cursor-pointer flex items-center justify-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed"
                   >
-                    <span>Đăng Nhập Ngay</span>
+                    <span>{loading ? 'Đang xác thực...' : 'Đăng Nhập Ngay'}</span>
                     <ArrowRight size={14} />
                   </button>
                 </form>
@@ -332,9 +361,10 @@ export const AcademicAuthModal: React.FC<AcademicAuthModalProps> = ({
 
                 <button
                   type="submit"
-                  className="w-full py-3.5 rounded-xl bg-[#D97706] hover:bg-[#B45309] text-white text-xs font-bold uppercase tracking-wider shadow-md hover:shadow-lg transition-all cursor-pointer flex items-center justify-center gap-2 mt-2"
+                  disabled={loading}
+                  className="w-full py-3.5 rounded-xl bg-[#064E3B] hover:bg-[#043327] text-amber-300 text-xs font-bold uppercase tracking-wider shadow-md hover:shadow-lg transition-all cursor-pointer flex items-center justify-center gap-2 mt-2 disabled:opacity-60 disabled:cursor-not-allowed border border-amber-400/30"
                 >
-                  <span>Đăng Ký Tài Khoản Học Viên</span>
+                  <span>{loading ? 'Đang tạo tài khoản...' : 'Đăng Ký Tài Khoản Học Viên'}</span>
                   <ArrowRight size={14} />
                 </button>
               </form>

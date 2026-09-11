@@ -82,6 +82,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const logout = () => {
     setUser(null);
+    fetch('/api/auth/logout', { method: 'POST' }).catch(() => {});
     if (notifyHandler) {
       notifyHandler('Đã đăng xuất thành công.', 'info');
     }
