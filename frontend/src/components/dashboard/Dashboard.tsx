@@ -7,7 +7,7 @@ import {
   ArrowRight,
 } from 'lucide-react';
 import { UserStats, User, Screen } from '../../types';
-import { useLenisSmoothScroll } from '../../utils/useLenisSmoothScroll';
+import { useSmoothScroll } from '../../context/SmoothScrollProvider';
 import { ScrollyHero } from './ScrollyHero';
 import { ScrollyMetrics } from './ScrollyMetrics';
 import { ScrollyFeatures } from './ScrollyFeatures';
@@ -25,8 +25,11 @@ export const Dashboard: React.FC<DashboardProps> = ({
   onOpenAuth,
   onNavigateScreen,
 }) => {
-  // Kích hoạt cuộn mượt Lenis Smooth Scroll đồng bộ với GSAP ScrollTrigger
-  useLenisSmoothScroll(true);
+  const { resize } = useSmoothScroll();
+
+  React.useEffect(() => {
+    resize();
+  }, [resize]);
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-12">

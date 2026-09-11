@@ -19,6 +19,7 @@ import { getReadingPassages, checkDatabaseHealth } from '../../services/cambridg
 import { CambridgeReadingPassage, ReadingSessionConfig } from '../../types';
 import { useCardEntrance } from '../../hooks/useCardEntrance';
 import { useMistakeStore } from '../../store/useMistakeStore';
+import { useSmoothScroll } from '../../context/SmoothScrollProvider';
 
 export interface CambridgeTestGroup {
   id: string;
@@ -184,6 +185,17 @@ export const ReadingLibrary: React.FC<ReadingLibraryProps> = ({
 
   const gridContainerRef = useRef<HTMLDivElement>(null);
   useCardEntrance(gridContainerRef, [filteredTests]);
+
+  const { resize: resizeScroll } = useSmoothScroll();
+
+  useEffect(() => {
+    // Tự động tính toán lại chiều cao cuộn khi danh sách đề thi hoàn tất render
+    resizeScroll();
+    const t = setTimeout(() => {
+      resizeScroll();
+    }, 250);
+    return () => clearTimeout(t);
+  }, [filteredTests.length, resizeScroll]);
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 space-y-8">

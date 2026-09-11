@@ -13,6 +13,7 @@ interface SmoothScrollContextValue {
   scrollTo: (target: string | HTMLElement | number, options?: Record<string, any>) => void;
   stop: () => void;
   start: () => void;
+  resize: () => void;
 }
 
 const SmoothScrollContext = createContext<SmoothScrollContextValue>({
@@ -20,6 +21,7 @@ const SmoothScrollContext = createContext<SmoothScrollContextValue>({
   scrollTo: () => {},
   stop: () => {},
   start: () => {},
+  resize: () => {},
 });
 
 export const useSmoothScroll = () => useContext(SmoothScrollContext);
@@ -49,6 +51,7 @@ export const SmoothScrollProvider: React.FC<SmoothScrollProviderProps> = ({
       wheelMultiplier: 1.0,
       touchMultiplier: 1.2,
       infinite: false,
+      autoResize: true,
     });
 
     lenisRef.current = lenis;
@@ -67,10 +70,30 @@ export const SmoothScrollProvider: React.FC<SmoothScrollProviderProps> = ({
     // 3. Tắt lagSmoothing để chống giật khựng khung hình khi chuyển cảnh
     gsap.ticker.lagSmoothing(0);
 
+    // 4. Tự động cập nhật giới hạn cuộn khi chiều cao DOM thay đổi (ví dụ khi nạp đề thi từ API)
+    const handleDomResize = () => {
+      lenis.resize();
+      ScrollTrigger.update();
+      ScrollTrigger.refresh();
+    };
+
+    const resizeObserver = new ResizeObserver(() => {
+      handleDomResize();
+    });
+
+    if (document.body) {
+      resizeObserver.observe(document.body);
+    }
+    const rootEl = document.getElementById('root');
+    if (rootEl) {
+      resizeObserver.observe(rootEl);
+    }
+
     // Cập nhật lại ScrollTrigger sau khi DOM ổn định
-    ScrollTrigger.refresh();
+    handleDomResize();
 
     return () => {
+      resizeObserver.disconnect();
       gsap.ticker.remove(tickerCallback);
       lenis.destroy();
       lenisRef.current = null;
@@ -99,12 +122,21 @@ export const SmoothScrollProvider: React.FC<SmoothScrollProviderProps> = ({
     lenisRef.current?.start();
   }, []);
 
+  const resize = useCallback(() => {
+    if (lenisRef.current) {
+      lenisRef.current.resize();
+      ScrollTrigger.update();
+      ScrollTrigger.refresh();
+    }
+  }, []);
+
   const value = useMemo(() => ({
     lenis: lenisInstance,
     scrollTo,
     stop,
-    start
-  }), [lenisInstance, scrollTo, stop, start]);
+    start,
+    resize,
+  }), [lenisInstance, scrollTo, stop, start, resize]);
 
   return (
     <SmoothScrollContext.Provider value={value}>
