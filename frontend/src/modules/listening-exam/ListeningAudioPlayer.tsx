@@ -12,7 +12,7 @@ interface ListeningAudioPlayerProps {
   sectionTitle: string;
 }
 
-const AUDIO_BASE_URL = 'http://localhost:3000/audio/';
+const AUDIO_BASE_URL = (import.meta as any).env?.VITE_AUDIO_URL || ((import.meta as any).env?.DEV ? 'http://localhost:3000/audio/' : '/audio/');
 
 export const ListeningAudioPlayer: React.FC<ListeningAudioPlayerProps> = ({
   audioFile,

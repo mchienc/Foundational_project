@@ -6,6 +6,7 @@ const express = require('express');
 const session = require('express-session');
 const methodOverride = require('method-override');
 const path = require('path');
+const fs = require('fs');
 
 const authRoutes = require('./routes/authRoutes');
 const adminRoutes = require('./routes/adminRoutes');
@@ -53,9 +54,11 @@ app.use((req, res, next) => {
   next();
 });
 
-// ----- Routes -----
-// Tự động chuyển hướng sang giao diện mới React tại http://localhost:5173
-app.get('/', (req, res) => res.redirect('http://localhost:5173'));
+// ----- Phục vụ Frontend React (Production SPA Build) -----
+const frontendDist = path.join(__dirname, 'frontend', 'dist');
+if (fs.existsSync(frontendDist)) {
+  app.use(express.static(frontendDist));
+}
 
 // ----- RESTful API cho Hệ thống Học Tiếng Anh (React Frontend) -----
 app.use('/api/english', englishRoutes);
@@ -72,6 +75,19 @@ app.use('/', checkAuth, quizRoutes);
 // Toàn bộ route quản lý khóa học/bài học nằm dưới /admin/*
 // và đều yêu cầu đã đăng nhập (checkAuth) + phải là admin (checkAdmin)
 app.use('/admin', checkAuth, checkAdmin, adminRoutes);
+ 
+// ----- SPA Fallback cho React Frontend -----
+if (fs.existsSync(frontendDist)) {
+  app.get('*', (req, res, next) => {
+    if (req.path.startsWith('/api') || req.path.startsWith('/audio') || req.path.startsWith('/admin')) {
+      return next();
+    }
+    res.sendFile(path.join(frontendDist, 'index.html'));
+  });
+} else {
+  // Ở môi trường dev khi chưa build dist, chuyển hướng sang http://localhost:5173
+  app.get('/', (req, res) => res.redirect('http://localhost:5173'));
+}
 
 // ----- Khởi động server -----
 const PORT = process.env.PORT || 3000;

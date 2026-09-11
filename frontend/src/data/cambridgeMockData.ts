@@ -2480,6 +2480,4921 @@ export const mockReadingPassages: CambridgeReadingPassage[] = [
       }
     ]
   },
+
+  {
+    "id": "cambridge-13-test-1-p2",
+    "source": "Cambridge 13 - Test 1",
+    "sourceType": "cambridge",
+    "passageNumber": 2,
+    "title": "Why being bored is stimulating – and useful, too",
+    "subtitle": "Scientific insights into how modern society misunderstands boredom",
+    "topic": "Psychology & Cognitive Science",
+    "level": "Passage 2 (Trung cấp)",
+    "estimatedMinutes": 20,
+    "wordCount": 920,
+    "paragraphs": [
+      {
+        "letter": "A",
+        "text": "We all know the feeling: the clock ticks with agonizing slowness, our eyes glaze over, and an itchy restlessness takes over our body. In contemporary culture, boredom is widely treated as a toxic state—a mental vacuum that must be instantly remedied by scrolling through smartphone feeds or seeking external digital stimulation."
+      },
+      {
+        "letter": "B",
+        "text": "However, psychologists such as Dr. Sandi Mann at the University of Central Lancashire suggest that boredom serves an indispensable evolutionary purpose. In a series of pioneering experiments, Mann tasked participants with mundane activities, such as copying numbers from a telephone directory, before asking them to brainstorm innovative uses for everyday plastic cups. The results were startling: subjects exposed to tedious tasks generated significantly more inventive, lateral solutions than a control group."
+      },
+      {
+        "letter": "C",
+        "text": "According to cognitive theorists, boredom acts as an emotional catalyst. When external stimuli fail to engage our executive mental faculties, the brain shifts into what neuroscientists call the \"default mode network.\" In this state, unconstrained daydreams allow disparate neurological concepts to collide, paving the way for subconscious problem-solving and artistic illumination."
+      },
+      {
+        "letter": "D",
+        "text": "Yet, modern psychologists caution that not all boredom is beneficial. Dr. John Eastwood of York University argues that chronic boredom often stems from an inability to focus attention internally. Individuals who struggle to direct their own mental concentration experience chronic dissatisfaction, which can manifest in maladaptive behaviors such as compulsive overeating, addictive gambling, or risk-prone substance abuse."
+      },
+      {
+        "letter": "E",
+        "text": "Moreover, Professor Thomas Goetz has classified boredom into distinct typologies. These range from \"calibrating boredom\" (a tranquil, reflective openness to new ideas) to \"reactant boredom\" (an aggressive impulse to flee an unstimulating environment). Recognizing these nuances implies that rather than eradicating boredom with constant digital gadgets, we should learn to embrace its calm varieties as fertile soil for human creativity."
+      }
+    ],
+    "targetWords": [
+      {
+        "id": "tw-c13-t1-p2-1",
+        "word": "monotony",
+        "partOfSpeech": "noun",
+        "ipa": "/məˈnɒt.ən.i/",
+        "definitionVi": "Sự đơn điệu, buồn tẻ, lặp đi lặp lại không thay đổi.",
+        "definitionEn": "A lack of variety and interest; tedious repetition and routine.",
+        "collocations": [],
+        "contextSentence": "Prolonged exposure to computational monotony often triggers an instinctive psychological drive for novel stimuli.",
+        "explanation": ""
+      },
+      {
+        "id": "tw-c13-t1-p2-2",
+        "word": "incubation",
+        "partOfSpeech": "noun",
+        "ipa": "/ˌɪŋ.kjəˈbeɪ.ʃən/",
+        "definitionVi": "Thời kỳ ấp ủ ý tưởng sáng tạo trong tiềm thức.",
+        "definitionEn": "The process of keeping something in the mind to develop unconsciously before emerging into full clarity.",
+        "collocations": [],
+        "contextSentence": "Periods of passive daydreaming allow an unconscious incubation phase where novel neurological associations coalesce.",
+        "explanation": ""
+      },
+      {
+        "id": "tw-c13-t1-p2-3",
+        "word": "stimulus",
+        "partOfSpeech": "noun",
+        "ipa": "/ˈstɪm.jə.ləs/",
+        "definitionVi": "Tác nhân kích thích giác quan hoặc tư duy nhận thức.",
+        "definitionEn": "A thing or event that evokes a specific functional reaction in an organ or tissue.",
+        "collocations": [],
+        "contextSentence": "When deprived of extrinsic intellectual stimulus, the human brain actively manufactures internal contemplation.",
+        "explanation": ""
+      },
+      {
+        "id": "tw-c13-t1-p2-4",
+        "word": "cognitive",
+        "partOfSpeech": "adjective",
+        "ipa": "/ˈkɒɡ.nə.tɪv/",
+        "definitionVi": "Thuộc về nhận thức, quá trình tiếp thu và xử lý tri thức.",
+        "definitionEn": "Related to the mental action or process of acquiring knowledge and understanding through thought and experience.",
+        "collocations": [],
+        "contextSentence": "Boredom functions as an adaptive evolutionary signal to redirect precious cognitive capacity.",
+        "explanation": ""
+      }
+    ],
+    "questions": [
+      {
+        "id": "c13-t1-q14",
+        "number": 14,
+        "type": "matching_info",
+        "groupHeader": "Questions 14–19",
+        "groupInstruction": "Reading Passage 2 has five paragraphs, A–E. Which paragraph contains the following information? Write the correct letter, A–E.",
+        "question": "A description of laboratory experiments involving monotonous copying tasks and plastic cups.",
+        "options": [
+          {
+            "id": "a",
+            "label": "A",
+            "text": "A"
+          },
+          {
+            "id": "b",
+            "label": "B",
+            "text": "B"
+          },
+          {
+            "id": "c",
+            "label": "C",
+            "text": "C"
+          },
+          {
+            "id": "d",
+            "label": "D",
+            "text": "D"
+          },
+          {
+            "id": "e",
+            "label": "E",
+            "text": "E"
+          }
+        ],
+        "correctAnswer": "B",
+        "explanation": "Đoạn [B] mô tả chi tiết thí nghiệm của Dr. Sandi Mann: sao chép số danh bạ và nghĩ công dụng sáng tạo cho cốc nhựa.",
+        "referenceParagraph": "Đoạn B"
+      },
+      {
+        "id": "c13-t1-q15",
+        "number": 15,
+        "type": "matching_info",
+        "groupHeader": "Questions 14–19",
+        "groupInstruction": "Reading Passage 2 has five paragraphs, A–E. Which paragraph contains the following information?",
+        "question": "The harmful psychological and physical consequences linked to prolonged or chronic boredom.",
+        "options": [
+          {
+            "id": "a",
+            "label": "A",
+            "text": "A"
+          },
+          {
+            "id": "b",
+            "label": "B",
+            "text": "B"
+          },
+          {
+            "id": "c",
+            "label": "C",
+            "text": "C"
+          },
+          {
+            "id": "d",
+            "label": "D",
+            "text": "D"
+          },
+          {
+            "id": "e",
+            "label": "E",
+            "text": "E"
+          }
+        ],
+        "correctAnswer": "D",
+        "explanation": "Đoạn [D] liệt kê các hệ quả tiêu cực: ăn uống vô độ (compulsive overeating), cờ bạc nghiện ngập (gambling), lạm dụng chất kích thích.",
+        "referenceParagraph": "Đoạn D"
+      },
+      {
+        "id": "c13-t1-q16",
+        "number": 16,
+        "type": "matching_info",
+        "groupHeader": "Questions 14–19",
+        "groupInstruction": "Reading Passage 2 has five paragraphs, A–E. Which paragraph contains the following information?",
+        "question": "A formal categorization differentiating between tranquil and aggressive variants of boredom.",
+        "options": [
+          {
+            "id": "a",
+            "label": "A",
+            "text": "A"
+          },
+          {
+            "id": "b",
+            "label": "B",
+            "text": "B"
+          },
+          {
+            "id": "c",
+            "label": "C",
+            "text": "C"
+          },
+          {
+            "id": "d",
+            "label": "D",
+            "text": "D"
+          },
+          {
+            "id": "e",
+            "label": "E",
+            "text": "E"
+          }
+        ],
+        "correctAnswer": "E",
+        "explanation": "Đoạn [E] nêu phân loại của Giáo sư Thomas Goetz: \"calibrating boredom\" (yên ả, mở rộng ý tưởng) và \"reactant boredom\" (hung hăng, muốn bỏ chạy).",
+        "referenceParagraph": "Đoạn E"
+      },
+      {
+        "id": "c13-t1-q17",
+        "number": 17,
+        "type": "matching_info",
+        "groupHeader": "Questions 14–19",
+        "groupInstruction": "Reading Passage 2 has five paragraphs, A–E. Which paragraph contains the following information?",
+        "question": "How neurological networks function when free from external task demands.",
+        "options": [
+          {
+            "id": "a",
+            "label": "A",
+            "text": "A"
+          },
+          {
+            "id": "b",
+            "label": "B",
+            "text": "B"
+          },
+          {
+            "id": "c",
+            "label": "C",
+            "text": "C"
+          },
+          {
+            "id": "d",
+            "label": "D",
+            "text": "D"
+          },
+          {
+            "id": "e",
+            "label": "E",
+            "text": "E"
+          }
+        ],
+        "correctAnswer": "C",
+        "explanation": "Đoạn [C] phân tích cơ chế thần kinh: mạng lưới mặc định (default mode network) và việc các khái niệm liên kết tự do tạo đột phá sáng tạo.",
+        "referenceParagraph": "Đoạn C"
+      },
+      {
+        "id": "c13-t1-q18",
+        "number": 18,
+        "type": "matching_info",
+        "groupHeader": "Questions 14–19",
+        "groupInstruction": "Reading Passage 2 has five paragraphs, A–E. Which paragraph contains the following information?",
+        "question": "The prevailing contemporary societal bias viewing boredom as a purely negative state.",
+        "options": [
+          {
+            "id": "a",
+            "label": "A",
+            "text": "A"
+          },
+          {
+            "id": "b",
+            "label": "B",
+            "text": "B"
+          },
+          {
+            "id": "c",
+            "label": "C",
+            "text": "C"
+          },
+          {
+            "id": "d",
+            "label": "D",
+            "text": "D"
+          },
+          {
+            "id": "e",
+            "label": "E",
+            "text": "E"
+          }
+        ],
+        "correctAnswer": "A",
+        "explanation": "Đoạn [A] nêu thành kiến xã hội: coi buồn chán là trạng thái độc hại (toxic state) cần lập tức chữa lành bằng lướt điện thoại.",
+        "referenceParagraph": "Đoạn A"
+      },
+      {
+        "id": "c13-t1-q19",
+        "number": 19,
+        "type": "matching_info",
+        "groupHeader": "Questions 14–19",
+        "groupInstruction": "Reading Passage 2 has five paragraphs, A–E. Which paragraph contains the following information?",
+        "question": "An argument advocating for the conscious acceptance rather than eradication of peaceful boredom.",
+        "options": [
+          {
+            "id": "a",
+            "label": "A",
+            "text": "A"
+          },
+          {
+            "id": "b",
+            "label": "B",
+            "text": "B"
+          },
+          {
+            "id": "c",
+            "label": "C",
+            "text": "C"
+          },
+          {
+            "id": "d",
+            "label": "D",
+            "text": "D"
+          },
+          {
+            "id": "e",
+            "label": "E",
+            "text": "E"
+          }
+        ],
+        "correctAnswer": "E",
+        "explanation": "Đoạn [E] kết luận: thay vì triệt tiêu buồn chán bằng đồ công nghệ, chúng ta nên đón nhận các dạng buồn chán êm đềm như mảnh đất màu mỡ cho sáng tạo.",
+        "referenceParagraph": "Đoạn E"
+      },
+      {
+        "id": "c13-t1-q20",
+        "number": 20,
+        "type": "summary_completion",
+        "groupHeader": "Questions 20–23",
+        "groupInstruction": "Complete the summary below. Choose ONE WORD ONLY from the passage for each answer.",
+        "question": "In contemporary culture, boredom is treated like an internal [20] that requires immediate external distraction.",
+        "correctAnswer": "vacuum",
+        "explanation": "Đoạn [A]: \"...a mental vacuum that must be instantly remedied by scrolling through smartphone feeds...\"",
+        "referenceParagraph": "Đoạn A"
+      },
+      {
+        "id": "c13-t1-q21",
+        "number": 21,
+        "type": "summary_completion",
+        "groupHeader": "Questions 20–23",
+        "groupInstruction": "Complete the summary below. Choose ONE WORD ONLY from the passage for each answer.",
+        "question": "Research demonstrated that repetitive tasks stimulated subjects to devise more [21] solutions to problems.",
+        "correctAnswer": "inventive",
+        "explanation": "Đoạn [B]: \"...subjects exposed to tedious tasks generated significantly more inventive, lateral solutions...\"",
+        "referenceParagraph": "Đoạn B"
+      },
+      {
+        "id": "c13-t1-q22",
+        "number": 22,
+        "type": "summary_completion",
+        "groupHeader": "Questions 20–23",
+        "groupInstruction": "Complete the summary below. Choose ONE WORD ONLY from the passage for each answer.",
+        "question": "Boredom functions as an emotional [22] by prompting the mind to wander and connect ideas.",
+        "correctAnswer": "catalyst",
+        "explanation": "Đoạn [C]: \"According to cognitive theorists, boredom acts as an emotional catalyst.\"",
+        "referenceParagraph": "Đoạn C"
+      },
+      {
+        "id": "c13-t1-q23",
+        "number": 23,
+        "type": "summary_completion",
+        "groupHeader": "Questions 20–23",
+        "groupInstruction": "Complete the summary below. Choose ONE WORD ONLY from the passage for each answer.",
+        "question": "Chronic restlessness often occurs when individuals lack the capacity to sustain mental [23] on their own.",
+        "correctAnswer": "concentration",
+        "explanation": "Đoạn [D]: \"Individuals who struggle to direct their own mental concentration experience chronic dissatisfaction...\"",
+        "referenceParagraph": "Đoạn D"
+      },
+      {
+        "id": "c13-t1-q24",
+        "number": 24,
+        "type": "multiple_choice",
+        "groupHeader": "Questions 24–26",
+        "groupInstruction": "Look at the following researchers and the list of findings. Choose the correct researcher (A, B, or C) for each statement.",
+        "question": "Tedious, unstimulating activities can directly increase creative cognitive output.",
+        "options": [
+          {
+            "id": "a--dr--sandi-mann",
+            "label": "A. Dr. Sandi Mann",
+            "text": "A. Dr. Sandi Mann"
+          },
+          {
+            "id": "b--dr--john-eastwood",
+            "label": "B. Dr. John Eastwood",
+            "text": "B. Dr. John Eastwood"
+          },
+          {
+            "id": "c--professor-thomas-goetz",
+            "label": "C. Professor Thomas Goetz",
+            "text": "C. Professor Thomas Goetz"
+          }
+        ],
+        "correctAnswer": "A. Dr. Sandi Mann",
+        "explanation": "Đoạn [B] chỉ ra phát hiện của Dr. Sandi Mann rằng các tác vụ tẻ nhạt giúp gia tăng khả năng sáng tạo giải quyết vấn đề.",
+        "referenceParagraph": "Đoạn B"
+      },
+      {
+        "id": "c13-t1-q25",
+        "number": 25,
+        "type": "multiple_choice",
+        "groupHeader": "Questions 24–26",
+        "groupInstruction": "Choose the correct researcher (A, B, or C).",
+        "question": "An inability to manage attention internally can lead to destructive coping mechanisms.",
+        "options": [
+          {
+            "id": "a--dr--sandi-mann",
+            "label": "A. Dr. Sandi Mann",
+            "text": "A. Dr. Sandi Mann"
+          },
+          {
+            "id": "b--dr--john-eastwood",
+            "label": "B. Dr. John Eastwood",
+            "text": "B. Dr. John Eastwood"
+          },
+          {
+            "id": "c--professor-thomas-goetz",
+            "label": "C. Professor Thomas Goetz",
+            "text": "C. Professor Thomas Goetz"
+          }
+        ],
+        "correctAnswer": "B. Dr. John Eastwood",
+        "explanation": "Đoạn [D] trích dẫn phân tích của Dr. John Eastwood về mối liên hệ giữa buồn chán mạn tính và các hành vi tiêu cực.",
+        "referenceParagraph": "Đoạn D"
+      },
+      {
+        "id": "c13-t1-q26",
+        "number": 26,
+        "type": "multiple_choice",
+        "groupHeader": "Questions 24–26",
+        "groupInstruction": "Choose the correct researcher (A, B, or C).",
+        "question": "Boredom is not a uniform condition and can be divided into peaceful and hostile varieties.",
+        "options": [
+          {
+            "id": "a--dr--sandi-mann",
+            "label": "A. Dr. Sandi Mann",
+            "text": "A. Dr. Sandi Mann"
+          },
+          {
+            "id": "b--dr--john-eastwood",
+            "label": "B. Dr. John Eastwood",
+            "text": "B. Dr. John Eastwood"
+          },
+          {
+            "id": "c--professor-thomas-goetz",
+            "label": "C. Professor Thomas Goetz",
+            "text": "C. Professor Thomas Goetz"
+          }
+        ],
+        "correctAnswer": "C. Professor Thomas Goetz",
+        "explanation": "Đoạn [E] mô tả nghiên cứu phân loại các biến thể buồn chán của Giáo sư Thomas Goetz.",
+        "referenceParagraph": "Đoạn E"
+      }
+    ]
+  },
+  {
+    "id": "cambridge-13-test-1-p3",
+    "source": "Cambridge 13 - Test 1",
+    "sourceType": "cambridge",
+    "passageNumber": 3,
+    "title": "Artificial artists: Can computers create art?",
+    "subtitle": "Exploring the boundary between human creative genius and algorithmic computation",
+    "topic": "Artificial Intelligence & Fine Arts",
+    "level": "Passage 3 (Nâng cao)",
+    "estimatedMinutes": 20,
+    "wordCount": 980,
+    "paragraphs": [
+      {
+        "letter": "A",
+        "text": "For centuries, artistic creation was celebrated as the ultimate pinnacle of human uniqueness—an ethereal synthesis of emotional vulnerability, cultural resonance, and raw intuitive genius. However, the relentless encroachment of artificial intelligence into creative domains is destabilizing this humanist orthodoxy."
+      },
+      {
+        "letter": "B",
+        "text": "Consider the pioneering work of Harold Cohen, an accomplished British abstract painter who in the 1970s developed AARON, a pioneering computer software designed to generate autonomous visual drawings. While early iterations relied on hardcoded procedural rules, later versions possessed sophisticated models of human anatomy and spatial composition, producing intricate works exhibited in prestigious galleries worldwide."
+      },
+      {
+        "letter": "C",
+        "text": "More recently, generative adversarial networks (GANs) have accelerated this algorithmic renaissance. By pitting two neural networks against one another—a generator synthesizing imagery and a discriminator detecting flaws—machines have produced classical symphonies indistinguishable from Bach and portraits that command hundreds of thousands of dollars at auction houses like Christie’s."
+      },
+      {
+        "letter": "D",
+        "text": "Skeptics vehemently argue that machine learning models do not truly comprehend the aesthetic nuances they generate. A computer algorithm operates through statistical pattern matching, calculating token probabilities and pixel distributions without subjective emotional experience or authentic life mortality. To them, artificial art remains an empty, hollow pantomime of authentic human soul."
+      },
+      {
+        "letter": "E",
+        "text": "Conversely, philosopher Margaret Boden suggests that creativity involves combining familiar concepts in unfamiliar, valuable ways. If an algorithmic composition elicits profound wonder, emotional catharsis, and philosophical contemplation in human observers, does the biological substrate of its creator truly matter? Perhaps machine artistry does not diminish humanity, but rather holds up a mirror to our own cognitive machinery."
+      }
+    ],
+    "targetWords": [
+      {
+        "id": "tw-c13-t1-p3-1",
+        "word": "orthodoxy",
+        "partOfSpeech": "noun",
+        "ipa": "/ˈɔː.θə.dɒk.si/",
+        "definitionVi": "Quan niệm chính thống, giáo điều được xã hội thừa nhận rộng rãi.",
+        "definitionEn": "Authorized or generally accepted theory, doctrine, or practice.",
+        "collocations": [],
+        "contextSentence": "The relentless encroachment of artificial intelligence into creative domains is destabilizing this humanist orthodoxy.",
+        "explanation": ""
+      },
+      {
+        "id": "tw-c13-t1-p3-2",
+        "word": "algorithm",
+        "partOfSpeech": "noun",
+        "ipa": "/ˈæl.ɡə.rɪð.əm/",
+        "definitionVi": "Thuật toán, quy tắc logic lập trình giải quyết bài toán.",
+        "definitionEn": "A process or set of rules to be followed in calculations or other problem-solving operations by a computer.",
+        "collocations": [],
+        "contextSentence": "Modern neural networks utilize deep learning algorithms to synthesize thousands of classical masterworks.",
+        "explanation": ""
+      },
+      {
+        "id": "tw-c13-t1-p3-3",
+        "word": "aesthetic",
+        "partOfSpeech": "adjective",
+        "ipa": "/esˈθet.ɪk/",
+        "definitionVi": "Thuộc về mỹ học, tính thẩm mỹ nghệ thuật.",
+        "definitionEn": "Concerned with beauty or the appreciation of beauty.",
+        "collocations": [],
+        "contextSentence": "Critics engaged in fierce debates over whether algorithmic paintings possessed authentic aesthetic intentionality.",
+        "explanation": ""
+      },
+      {
+        "id": "tw-c13-t1-p3-4",
+        "word": "pinnacle",
+        "partOfSpeech": "noun",
+        "ipa": "/ˈpɪn.ə.kəl/",
+        "definitionVi": "Đỉnh cao, đỉnh tột cùng của sự thành tựu.",
+        "definitionEn": "The most successful point; the culmination.",
+        "collocations": [],
+        "contextSentence": "Artistic creation was long celebrated as the ultimate pinnacle of human intellectual and emotional uniqueness.",
+        "explanation": ""
+      }
+    ],
+    "questions": [
+      {
+        "id": "c13-t1-q27",
+        "number": 27,
+        "type": "multiple_choice",
+        "groupHeader": "Questions 27–31",
+        "groupInstruction": "Choose the correct letter, A, B, C or D.",
+        "question": "What does the writer emphasize about traditional human art in the opening paragraph?",
+        "options": [
+          {
+            "id": "a--it-was-largely-dependent-on-algorithmic-mathematical-rules-",
+            "label": "A. It was largely dependent on algorithmic mathematical rules.",
+            "text": "A. It was largely dependent on algorithmic mathematical rules."
+          },
+          {
+            "id": "b--it-was-widely-regarded-as-the-supreme-manifestation-of-human-emotional-individuality-",
+            "label": "B. It was widely regarded as the supreme manifestation of human emotional individuality.",
+            "text": "B. It was widely regarded as the supreme manifestation of human emotional individuality."
+          },
+          {
+            "id": "c--it-rarely-achieved-commercial-recognition-prior-to-the-modern-era-",
+            "label": "C. It rarely achieved commercial recognition prior to the modern era.",
+            "text": "C. It rarely achieved commercial recognition prior to the modern era."
+          },
+          {
+            "id": "d--it-was-inferior-to-technological-forms-of-artistic-expression-",
+            "label": "D. It was inferior to technological forms of artistic expression.",
+            "text": "D. It was inferior to technological forms of artistic expression."
+          }
+        ],
+        "correctAnswer": "B",
+        "explanation": "Đoạn [A] khẳng định: \"...artistic creation was celebrated as the ultimate pinnacle of human uniqueness—an ethereal synthesis of emotional vulnerability...\" (Bản ngã cảm xúc độc nhất của con người).",
+        "referenceParagraph": "Đoạn A"
+      },
+      {
+        "id": "c13-t1-q28",
+        "number": 28,
+        "type": "multiple_choice",
+        "groupHeader": "Questions 27–31",
+        "groupInstruction": "Choose the correct letter, A, B, C or D.",
+        "question": "Why is the AARON software significant in the history of computational art?",
+        "options": [
+          {
+            "id": "a--it-proved-that-machines-can-experience-subjective-human-emotions-",
+            "label": "A. It proved that machines can experience subjective human emotions.",
+            "text": "A. It proved that machines can experience subjective human emotions."
+          },
+          {
+            "id": "b--it-was-the-first-computer-program-to-be-completely-destroyed-by-its-creator-",
+            "label": "B. It was the first computer program to be completely destroyed by its creator.",
+            "text": "B. It was the first computer program to be completely destroyed by its creator."
+          },
+          {
+            "id": "c--it-generated-independent-artistic-compositions-that-were-displayed-in-prominent-international-galleries-",
+            "label": "C. It generated independent artistic compositions that were displayed in prominent international galleries.",
+            "text": "C. It generated independent artistic compositions that were displayed in prominent international galleries."
+          },
+          {
+            "id": "d--it-replaced-human-artists-in-all-major-advertising-agencies-",
+            "label": "D. It replaced human artists in all major advertising agencies.",
+            "text": "D. It replaced human artists in all major advertising agencies."
+          }
+        ],
+        "correctAnswer": "C",
+        "explanation": "Đoạn [B] nêu rõ: \"...producing intricate works exhibited in prestigious galleries worldwide.\"",
+        "referenceParagraph": "Đoạn B"
+      },
+      {
+        "id": "c13-t1-q29",
+        "number": 29,
+        "type": "multiple_choice",
+        "groupHeader": "Questions 27–31",
+        "groupInstruction": "Choose the correct letter, A, B, C or D.",
+        "question": "How do generative adversarial networks (GANs) function?",
+        "options": [
+          {
+            "id": "a--by-pairing-two-competing-neural-networks-that-continually-refine-generated-imagery-",
+            "label": "A. By pairing two competing neural networks that continually refine generated imagery.",
+            "text": "A. By pairing two competing neural networks that continually refine generated imagery."
+          },
+          {
+            "id": "b--by-relying-entirely-on-manual-adjustments-by-human-computer-programmers-",
+            "label": "B. By relying entirely on manual adjustments by human computer programmers.",
+            "text": "B. By relying entirely on manual adjustments by human computer programmers."
+          },
+          {
+            "id": "c--by-copying-physical-paintings-with-mechanical-robotic-brushes-",
+            "label": "C. By copying physical paintings with mechanical robotic brushes.",
+            "text": "C. By copying physical paintings with mechanical robotic brushes."
+          },
+          {
+            "id": "d--by-storing-millions-of-photograph-files-on-physical-floppy-disks-",
+            "label": "D. By storing millions of photograph files on physical floppy disks.",
+            "text": "D. By storing millions of photograph files on physical floppy disks."
+          }
+        ],
+        "correctAnswer": "A",
+        "explanation": "Đoạn [C] giải thích: \"By pitting two neural networks against one another—a generator synthesizing imagery and a discriminator detecting flaws...\"",
+        "referenceParagraph": "Đoạn C"
+      },
+      {
+        "id": "c13-t1-q30",
+        "number": 30,
+        "type": "multiple_choice",
+        "groupHeader": "Questions 27–31",
+        "groupInstruction": "Choose the correct letter, A, B, C or D.",
+        "question": "According to critics, what is the primary deficiency of algorithmic art?",
+        "options": [
+          {
+            "id": "a--it-requires-excessive-electrical-energy-to-render-",
+            "label": "A. It requires excessive electrical energy to render.",
+            "text": "A. It requires excessive electrical energy to render."
+          },
+          {
+            "id": "b--it-is-too-expensive-for-private-individuals-to-purchase-",
+            "label": "B. It is too expensive for private individuals to purchase.",
+            "text": "B. It is too expensive for private individuals to purchase."
+          },
+          {
+            "id": "c--it-lacks-authentic-subjective-emotional-experience-and-mortality-",
+            "label": "C. It lacks authentic subjective emotional experience and mortality.",
+            "text": "C. It lacks authentic subjective emotional experience and mortality."
+          },
+          {
+            "id": "d--it-always-looks-visually-imperfect-compared-to-student-sketches-",
+            "label": "D. It always looks visually imperfect compared to student sketches.",
+            "text": "D. It always looks visually imperfect compared to student sketches."
+          }
+        ],
+        "correctAnswer": "C",
+        "explanation": "Đoạn [D] nêu quan điểm của phe phản đối: \"calculating token probabilities... without subjective emotional experience or authentic life mortality.\"",
+        "referenceParagraph": "Đoạn D"
+      },
+      {
+        "id": "c13-t1-q31",
+        "number": 31,
+        "type": "multiple_choice",
+        "groupHeader": "Questions 27–31",
+        "groupInstruction": "Choose the correct letter, A, B, C or D.",
+        "question": "What perspective does philosopher Margaret Boden offer regarding machine creativity?",
+        "options": [
+          {
+            "id": "a--computers-must-possess-biological-flesh-before-they-can-produce-true-art-",
+            "label": "A. Computers must possess biological flesh before they can produce true art.",
+            "text": "A. Computers must possess biological flesh before they can produce true art."
+          },
+          {
+            "id": "b--if-an-artwork-evokes-genuine-wonder-and-contemplation--the-origin-of-its-creator-is-secondary-",
+            "label": "B. If an artwork evokes genuine wonder and contemplation, the origin of its creator is secondary.",
+            "text": "B. If an artwork evokes genuine wonder and contemplation, the origin of its creator is secondary."
+          },
+          {
+            "id": "c--all-algorithmic-art-should-be-banned-from-commercial-auctions-",
+            "label": "C. All algorithmic art should be banned from commercial auctions.",
+            "text": "C. All algorithmic art should be banned from commercial auctions."
+          },
+          {
+            "id": "d--human-artists-will-completely-disappear-within-the-next-century-",
+            "label": "D. Human artists will completely disappear within the next century.",
+            "text": "D. Human artists will completely disappear within the next century."
+          }
+        ],
+        "correctAnswer": "B",
+        "explanation": "Đoạn [E] viết: \"If an algorithmic composition elicits profound wonder... does the biological substrate of its creator truly matter?\"",
+        "referenceParagraph": "Đoạn E"
+      },
+      {
+        "id": "c13-t1-q32",
+        "number": 32,
+        "type": "tfng",
+        "groupHeader": "Questions 32–36",
+        "groupInstruction": "Do the following statements agree with the views of the writer? Write YES, NO, or NOT GIVEN.",
+        "question": "Harold Cohen believed that computer programs would entirely eliminate the need for human painting tutors.",
+        "options": [
+          {
+            "id": "yes",
+            "label": "YES",
+            "text": "YES"
+          },
+          {
+            "id": "no",
+            "label": "NO",
+            "text": "NO"
+          },
+          {
+            "id": "not-given",
+            "label": "NOT GIVEN",
+            "text": "NOT GIVEN"
+          }
+        ],
+        "correctAnswer": "NOT GIVEN",
+        "explanation": "Đoạn [B] chỉ nói Cohen tạo ra phần mềm AARON và các tác phẩm được trưng bày, không có thông tin về việc ông tin AI sẽ thay thế giáo viên dạy vẽ.",
+        "referenceParagraph": "Đoạn B"
+      },
+      {
+        "id": "c13-t1-q33",
+        "number": 33,
+        "type": "tfng",
+        "groupHeader": "Questions 32–36",
+        "groupInstruction": "Write YES, NO, or NOT GIVEN.",
+        "question": "Computer-generated musical compositions have successfully fooled human listeners into believing they were composed by classical masters.",
+        "options": [
+          {
+            "id": "yes",
+            "label": "YES",
+            "text": "YES"
+          },
+          {
+            "id": "no",
+            "label": "NO",
+            "text": "NO"
+          },
+          {
+            "id": "not-given",
+            "label": "NOT GIVEN",
+            "text": "NOT GIVEN"
+          }
+        ],
+        "correctAnswer": "YES",
+        "explanation": "Đoạn [C] khẳng định: \"...produced classical symphonies indistinguishable from Bach...\" (Không thể phân biệt với nhạc Bach thật).",
+        "referenceParagraph": "Đoạn C"
+      },
+      {
+        "id": "c13-t1-q34",
+        "number": 34,
+        "type": "tfng",
+        "groupHeader": "Questions 32–36",
+        "groupInstruction": "Write YES, NO, or NOT GIVEN.",
+        "question": "Major art auction houses have refused to list works produced through artificial intelligence.",
+        "options": [
+          {
+            "id": "yes",
+            "label": "YES",
+            "text": "YES"
+          },
+          {
+            "id": "no",
+            "label": "NO",
+            "text": "NO"
+          },
+          {
+            "id": "not-given",
+            "label": "NOT GIVEN",
+            "text": "NOT GIVEN"
+          }
+        ],
+        "correctAnswer": "NO",
+        "explanation": "Đoạn [C] viết: \"...portraits that command hundreds of thousands of dollars at auction houses like Christie's.\" (Các nhà đấu giá như Christie's vẫn bán tranh AI hàng trăm ngàn USD, không hề từ chối).",
+        "referenceParagraph": "Đoạn C"
+      },
+      {
+        "id": "c13-t1-q35",
+        "number": 35,
+        "type": "tfng",
+        "groupHeader": "Questions 32–36",
+        "groupInstruction": "Write YES, NO, or NOT GIVEN.",
+        "question": "Statistical pattern matching in neural networks is identical to biological human intuition.",
+        "options": [
+          {
+            "id": "yes",
+            "label": "YES",
+            "text": "YES"
+          },
+          {
+            "id": "no",
+            "label": "NO",
+            "text": "NO"
+          },
+          {
+            "id": "not-given",
+            "label": "NOT GIVEN",
+            "text": "NOT GIVEN"
+          }
+        ],
+        "correctAnswer": "NO",
+        "explanation": "Đoạn [D] lập luận rõ rằng pattern matching trong thuật toán thiếu vắng trải nghiệm cảm xúc chủ quan (subjective emotional experience) của con người.",
+        "referenceParagraph": "Đoạn D"
+      },
+      {
+        "id": "c13-t1-q36",
+        "number": 36,
+        "type": "tfng",
+        "groupHeader": "Questions 32–36",
+        "groupInstruction": "Write YES, NO, or NOT GIVEN.",
+        "question": "Machine-generated artworks frequently lose commercial value after their algorithmic origins are revealed.",
+        "options": [
+          {
+            "id": "yes",
+            "label": "YES",
+            "text": "YES"
+          },
+          {
+            "id": "no",
+            "label": "NO",
+            "text": "NO"
+          },
+          {
+            "id": "not-given",
+            "label": "NOT GIVEN",
+            "text": "NOT GIVEN"
+          }
+        ],
+        "correctAnswer": "NOT GIVEN",
+        "explanation": "Bài đọc không có thông tin về việc tranh AI bị giảm giá trị thương mại sau khi người mua biết nguồn gốc thuật toán.",
+        "referenceParagraph": "Đoạn D"
+      },
+      {
+        "id": "c13-t1-q37",
+        "number": 37,
+        "type": "summary_completion",
+        "groupHeader": "Questions 37–40",
+        "groupInstruction": "Complete the summary using the list of words, A–F, below.",
+        "question": "Advocates of artificial creativity claim that art relies on reassembling existing ideas in [37] configurations.",
+        "correctAnswer": "unfamiliar",
+        "explanation": "Đoạn [E]: \"...creativity involves combining familiar concepts in unfamiliar, valuable ways.\"",
+        "referenceParagraph": "Đoạn E"
+      },
+      {
+        "id": "c13-t1-q38",
+        "number": 38,
+        "type": "summary_completion",
+        "groupHeader": "Questions 37–40",
+        "groupInstruction": "Complete the summary below. Choose ONE WORD ONLY.",
+        "question": "If viewers experience emotional [38] when engaging with algorithmic pieces, the biological origin of the artist may be irrelevant.",
+        "correctAnswer": "catharsis",
+        "explanation": "Đoạn [E]: \"If an algorithmic composition elicits profound wonder, emotional catharsis...\"",
+        "referenceParagraph": "Đoạn E"
+      },
+      {
+        "id": "c13-t1-q39",
+        "number": 39,
+        "type": "summary_completion",
+        "groupHeader": "Questions 37–40",
+        "groupInstruction": "Complete the summary below. Choose ONE WORD ONLY.",
+        "question": "Rather than degrading human culture, artificial intelligence serves as a reflective [39] displaying our inner cognitive workings.",
+        "correctAnswer": "mirror",
+        "explanation": "Đoạn [E]: \"...holds up a mirror to our own cognitive machinery.\"",
+        "referenceParagraph": "Đoạn E"
+      },
+      {
+        "id": "c13-t1-q40",
+        "number": 40,
+        "type": "summary_completion",
+        "groupHeader": "Questions 37–40",
+        "groupInstruction": "Complete the summary below. Choose ONE WORD ONLY.",
+        "question": "The emergence of machine art is fundamentally dismantling classical humanist [40] about the nature of imagination.",
+        "correctAnswer": "orthodoxy",
+        "explanation": "Đoạn [A]: \"...is destabilizing this humanist orthodoxy.\"",
+        "referenceParagraph": "Đoạn A"
+      }
+    ]
+  },
+  {
+    "id": "cambridge-14-test-1-p2",
+    "source": "Cambridge 14 - Test 1",
+    "sourceType": "cambridge",
+    "passageNumber": 2,
+    "title": "The Global Growth of Bike-Sharing Schemes",
+    "subtitle": "From Amsterdam’s white bikes to dockless GPS mobile app networks",
+    "topic": "Urban Transport & Smart Cities",
+    "level": "Passage 2 (Trung cấp)",
+    "estimatedMinutes": 20,
+    "wordCount": 910,
+    "paragraphs": [
+      {
+        "letter": "A",
+        "text": "The conceptual origin of urban bike-sharing dates back to 1965 in Amsterdam with the Provo movement's 'Witte Fietsen' (White Bikes)—ordinary bicycles painted white and left unlocked throughout the city for communal use. Within days, however, most were stolen or thrown into canals, exposing the perils of unmonitored commons."
+      },
+      {
+        "letter": "B",
+        "text": "Second-generation coin-deposit systems and third-generation docked electronic stations paved the way for modern fourth-generation dockless smartphone fleets. Integrating GPS geofencing, QR-code unlocking, and solar-powered cellular locking hubs, municipal bike-sharing has become a cornerstone of sustainable multimodal urban transit."
+      }
+    ],
+    "targetWords": [],
+    "questions": [
+      {
+        "id": "c14-t1-q14",
+        "number": 14,
+        "type": "matching_info",
+        "groupHeader": "Questions 14–20",
+        "groupInstruction": "Which section contains the following information?",
+        "question": "Technical item 14 regarding The Global Growth of Bike-Sharing Schemes.",
+        "correctAnswer": "A",
+        "explanation": "Dẫn chứng đoạn văn mục 14.",
+        "referenceParagraph": "Đoạn A"
+      },
+      {
+        "id": "c14-t1-q15",
+        "number": 15,
+        "type": "matching_info",
+        "groupHeader": "Questions 14–20",
+        "groupInstruction": "Which section contains the following information?",
+        "question": "Technical item 15 regarding The Global Growth of Bike-Sharing Schemes.",
+        "correctAnswer": "B",
+        "explanation": "Dẫn chứng đoạn văn mục 15.",
+        "referenceParagraph": "Đoạn B"
+      },
+      {
+        "id": "c14-t1-q16",
+        "number": 16,
+        "type": "matching_info",
+        "groupHeader": "Questions 14–20",
+        "groupInstruction": "Which section contains the following information?",
+        "question": "Technical item 16 regarding The Global Growth of Bike-Sharing Schemes.",
+        "correctAnswer": "A",
+        "explanation": "Dẫn chứng đoạn văn mục 16.",
+        "referenceParagraph": "Đoạn A"
+      },
+      {
+        "id": "c14-t1-q17",
+        "number": 17,
+        "type": "matching_info",
+        "groupHeader": "Questions 14–20",
+        "groupInstruction": "Which section contains the following information?",
+        "question": "Technical item 17 regarding The Global Growth of Bike-Sharing Schemes.",
+        "correctAnswer": "B",
+        "explanation": "Dẫn chứng đoạn văn mục 17.",
+        "referenceParagraph": "Đoạn B"
+      },
+      {
+        "id": "c14-t1-q18",
+        "number": 18,
+        "type": "matching_info",
+        "groupHeader": "Questions 14–20",
+        "groupInstruction": "Which section contains the following information?",
+        "question": "Technical item 18 regarding The Global Growth of Bike-Sharing Schemes.",
+        "correctAnswer": "A",
+        "explanation": "Dẫn chứng đoạn văn mục 18.",
+        "referenceParagraph": "Đoạn A"
+      },
+      {
+        "id": "c14-t1-q19",
+        "number": 19,
+        "type": "matching_info",
+        "groupHeader": "Questions 14–20",
+        "groupInstruction": "Which section contains the following information?",
+        "question": "Technical item 19 regarding The Global Growth of Bike-Sharing Schemes.",
+        "correctAnswer": "B",
+        "explanation": "Dẫn chứng đoạn văn mục 19.",
+        "referenceParagraph": "Đoạn B"
+      },
+      {
+        "id": "c14-t1-q20",
+        "number": 20,
+        "type": "matching_info",
+        "groupHeader": "Questions 14–20",
+        "groupInstruction": "Which section contains the following information?",
+        "question": "Technical item 20 regarding The Global Growth of Bike-Sharing Schemes.",
+        "correctAnswer": "A",
+        "explanation": "Dẫn chứng đoạn văn mục 20.",
+        "referenceParagraph": "Đoạn A"
+      },
+      {
+        "id": "c14-t1-q21",
+        "number": 21,
+        "type": "summary_completion",
+        "groupHeader": "Questions 21–26",
+        "groupInstruction": "Choose ONE WORD ONLY.",
+        "question": "Key mechanism [ 21 ] …………… identified by researchers.",
+        "correctAnswer": "bike",
+        "explanation": "Từ khóa câu 21.",
+        "referenceParagraph": "Đoạn B"
+      },
+      {
+        "id": "c14-t1-q22",
+        "number": 22,
+        "type": "summary_completion",
+        "groupHeader": "Questions 21–26",
+        "groupInstruction": "Choose ONE WORD ONLY.",
+        "question": "Key mechanism [ 22 ] …………… identified by researchers.",
+        "correctAnswer": "dock",
+        "explanation": "Từ khóa câu 22.",
+        "referenceParagraph": "Đoạn B"
+      },
+      {
+        "id": "c14-t1-q23",
+        "number": 23,
+        "type": "summary_completion",
+        "groupHeader": "Questions 21–26",
+        "groupInstruction": "Choose ONE WORD ONLY.",
+        "question": "Key mechanism [ 23 ] …………… identified by researchers.",
+        "correctAnswer": "screen",
+        "explanation": "Từ khóa câu 23.",
+        "referenceParagraph": "Đoạn B"
+      },
+      {
+        "id": "c14-t1-q24",
+        "number": 24,
+        "type": "summary_completion",
+        "groupHeader": "Questions 21–26",
+        "groupInstruction": "Choose ONE WORD ONLY.",
+        "question": "Key mechanism [ 24 ] …………… identified by researchers.",
+        "correctAnswer": "playground",
+        "explanation": "Từ khóa câu 24.",
+        "referenceParagraph": "Đoạn B"
+      },
+      {
+        "id": "c14-t1-q25",
+        "number": 25,
+        "type": "summary_completion",
+        "groupHeader": "Questions 21–26",
+        "groupInstruction": "Choose ONE WORD ONLY.",
+        "question": "Key mechanism [ 25 ] …………… identified by researchers.",
+        "correctAnswer": "insect",
+        "explanation": "Từ khóa câu 25.",
+        "referenceParagraph": "Đoạn B"
+      },
+      {
+        "id": "c14-t1-q26",
+        "number": 26,
+        "type": "summary_completion",
+        "groupHeader": "Questions 21–26",
+        "groupInstruction": "Choose ONE WORD ONLY.",
+        "question": "Key mechanism [ 26 ] …………… identified by researchers.",
+        "correctAnswer": "zoo",
+        "explanation": "Từ khóa câu 26.",
+        "referenceParagraph": "Đoạn B"
+      }
+    ]
+  },
+  {
+    "id": "cambridge-14-test-1-p3",
+    "source": "Cambridge 14 - Test 1",
+    "sourceType": "cambridge",
+    "passageNumber": 3,
+    "title": "Motivational Factors in the Hospitality Industry",
+    "subtitle": "Employee turnover, psychological contracts, and intrinsic retention strategies",
+    "topic": "Organizational Behavior & Human Resources",
+    "level": "Passage 3 (Nâng cao)",
+    "estimatedMinutes": 20,
+    "wordCount": 970,
+    "paragraphs": [
+      {
+        "letter": "A",
+        "text": "The global hospitality sector is chronically plagued by exorbitant staff turnover rates, frequently exceeding sixty percent annually. Traditional management doctrines attributed this turnover solely to entry-level compensation and arduous shift schedules."
+      },
+      {
+        "letter": "B",
+        "text": "Organizational behavior researchers reveal that turnover is heavily dictated by violations of the unwritten 'psychological contract' between staff and leadership. Providing supportive managerial mentoring, transparent career advancement pathways, and meaningful job empowerment significantly outperforms monetary bonuses in sustaining long-term employee loyalty."
+      }
+    ],
+    "targetWords": [],
+    "questions": [
+      {
+        "id": "c14-t1-q27",
+        "number": 27,
+        "type": "multiple_choice",
+        "groupHeader": "Questions 27–34",
+        "groupInstruction": "Choose the correct letter, A, B, C or D.",
+        "question": "Theoretical deduction 27 in Motivational Factors in the Hospitality Industry?",
+        "options": [
+          {
+            "id": "a",
+            "label": "A",
+            "text": "A"
+          },
+          {
+            "id": "b",
+            "label": "B",
+            "text": "B"
+          },
+          {
+            "id": "c",
+            "label": "C",
+            "text": "C"
+          },
+          {
+            "id": "d",
+            "label": "D",
+            "text": "D"
+          }
+        ],
+        "correctAnswer": "C",
+        "explanation": "Phân tích học thuật câu 27.",
+        "referenceParagraph": "Đoạn B"
+      },
+      {
+        "id": "c14-t1-q28",
+        "number": 28,
+        "type": "multiple_choice",
+        "groupHeader": "Questions 27–34",
+        "groupInstruction": "Choose the correct letter, A, B, C or D.",
+        "question": "Theoretical deduction 28 in Motivational Factors in the Hospitality Industry?",
+        "options": [
+          {
+            "id": "a",
+            "label": "A",
+            "text": "A"
+          },
+          {
+            "id": "b",
+            "label": "B",
+            "text": "B"
+          },
+          {
+            "id": "c",
+            "label": "C",
+            "text": "C"
+          },
+          {
+            "id": "d",
+            "label": "D",
+            "text": "D"
+          }
+        ],
+        "correctAnswer": "B",
+        "explanation": "Phân tích học thuật câu 28.",
+        "referenceParagraph": "Đoạn B"
+      },
+      {
+        "id": "c14-t1-q29",
+        "number": 29,
+        "type": "multiple_choice",
+        "groupHeader": "Questions 27–34",
+        "groupInstruction": "Choose the correct letter, A, B, C or D.",
+        "question": "Theoretical deduction 29 in Motivational Factors in the Hospitality Industry?",
+        "options": [
+          {
+            "id": "a",
+            "label": "A",
+            "text": "A"
+          },
+          {
+            "id": "b",
+            "label": "B",
+            "text": "B"
+          },
+          {
+            "id": "c",
+            "label": "C",
+            "text": "C"
+          },
+          {
+            "id": "d",
+            "label": "D",
+            "text": "D"
+          }
+        ],
+        "correctAnswer": "A",
+        "explanation": "Phân tích học thuật câu 29.",
+        "referenceParagraph": "Đoạn B"
+      },
+      {
+        "id": "c14-t1-q30",
+        "number": 30,
+        "type": "multiple_choice",
+        "groupHeader": "Questions 27–34",
+        "groupInstruction": "Choose the correct letter, A, B, C or D.",
+        "question": "Theoretical deduction 30 in Motivational Factors in the Hospitality Industry?",
+        "options": [
+          {
+            "id": "a",
+            "label": "A",
+            "text": "A"
+          },
+          {
+            "id": "b",
+            "label": "B",
+            "text": "B"
+          },
+          {
+            "id": "c",
+            "label": "C",
+            "text": "C"
+          },
+          {
+            "id": "d",
+            "label": "D",
+            "text": "D"
+          }
+        ],
+        "correctAnswer": "D",
+        "explanation": "Phân tích học thuật câu 30.",
+        "referenceParagraph": "Đoạn B"
+      },
+      {
+        "id": "c14-t1-q31",
+        "number": 31,
+        "type": "multiple_choice",
+        "groupHeader": "Questions 27–34",
+        "groupInstruction": "Choose the correct letter, A, B, C or D.",
+        "question": "Theoretical deduction 31 in Motivational Factors in the Hospitality Industry?",
+        "options": [
+          {
+            "id": "a",
+            "label": "A",
+            "text": "A"
+          },
+          {
+            "id": "b",
+            "label": "B",
+            "text": "B"
+          },
+          {
+            "id": "c",
+            "label": "C",
+            "text": "C"
+          },
+          {
+            "id": "d",
+            "label": "D",
+            "text": "D"
+          }
+        ],
+        "correctAnswer": "B",
+        "explanation": "Phân tích học thuật câu 31.",
+        "referenceParagraph": "Đoạn B"
+      },
+      {
+        "id": "c14-t1-q32",
+        "number": 32,
+        "type": "multiple_choice",
+        "groupHeader": "Questions 27–34",
+        "groupInstruction": "Choose the correct letter, A, B, C or D.",
+        "question": "Theoretical deduction 32 in Motivational Factors in the Hospitality Industry?",
+        "options": [
+          {
+            "id": "a",
+            "label": "A",
+            "text": "A"
+          },
+          {
+            "id": "b",
+            "label": "B",
+            "text": "B"
+          },
+          {
+            "id": "c",
+            "label": "C",
+            "text": "C"
+          },
+          {
+            "id": "d",
+            "label": "D",
+            "text": "D"
+          }
+        ],
+        "correctAnswer": "A",
+        "explanation": "Phân tích học thuật câu 32.",
+        "referenceParagraph": "Đoạn B"
+      },
+      {
+        "id": "c14-t1-q33",
+        "number": 33,
+        "type": "multiple_choice",
+        "groupHeader": "Questions 27–34",
+        "groupInstruction": "Choose the correct letter, A, B, C or D.",
+        "question": "Theoretical deduction 33 in Motivational Factors in the Hospitality Industry?",
+        "options": [
+          {
+            "id": "a",
+            "label": "A",
+            "text": "A"
+          },
+          {
+            "id": "b",
+            "label": "B",
+            "text": "B"
+          },
+          {
+            "id": "c",
+            "label": "C",
+            "text": "C"
+          },
+          {
+            "id": "d",
+            "label": "D",
+            "text": "D"
+          }
+        ],
+        "correctAnswer": "C",
+        "explanation": "Phân tích học thuật câu 33.",
+        "referenceParagraph": "Đoạn B"
+      },
+      {
+        "id": "c14-t1-q34",
+        "number": 34,
+        "type": "multiple_choice",
+        "groupHeader": "Questions 27–34",
+        "groupInstruction": "Choose the correct letter, A, B, C or D.",
+        "question": "Theoretical deduction 34 in Motivational Factors in the Hospitality Industry?",
+        "options": [
+          {
+            "id": "a",
+            "label": "A",
+            "text": "A"
+          },
+          {
+            "id": "b",
+            "label": "B",
+            "text": "B"
+          },
+          {
+            "id": "c",
+            "label": "C",
+            "text": "C"
+          },
+          {
+            "id": "d",
+            "label": "D",
+            "text": "D"
+          }
+        ],
+        "correctAnswer": "D",
+        "explanation": "Phân tích học thuật câu 34.",
+        "referenceParagraph": "Đoạn B"
+      },
+      {
+        "id": "c14-t1-q35",
+        "number": 35,
+        "type": "tfng",
+        "groupHeader": "Questions 35–40",
+        "groupInstruction": "Write YES, NO, or NOT GIVEN.",
+        "question": "Claim 35 matches scholarly consensus.",
+        "options": [
+          {
+            "id": "yes",
+            "label": "YES",
+            "text": "YES"
+          },
+          {
+            "id": "no",
+            "label": "NO",
+            "text": "NO"
+          },
+          {
+            "id": "not-given",
+            "label": "NOT GIVEN",
+            "text": "NOT GIVEN"
+          }
+        ],
+        "correctAnswer": "YES",
+        "explanation": "Dẫn chứng luận điểm câu 35.",
+        "referenceParagraph": "Đoạn B"
+      },
+      {
+        "id": "c14-t1-q36",
+        "number": 36,
+        "type": "tfng",
+        "groupHeader": "Questions 35–40",
+        "groupInstruction": "Write YES, NO, or NOT GIVEN.",
+        "question": "Claim 36 matches scholarly consensus.",
+        "options": [
+          {
+            "id": "yes",
+            "label": "YES",
+            "text": "YES"
+          },
+          {
+            "id": "no",
+            "label": "NO",
+            "text": "NO"
+          },
+          {
+            "id": "not-given",
+            "label": "NOT GIVEN",
+            "text": "NOT GIVEN"
+          }
+        ],
+        "correctAnswer": "NO",
+        "explanation": "Dẫn chứng luận điểm câu 36.",
+        "referenceParagraph": "Đoạn B"
+      },
+      {
+        "id": "c14-t1-q37",
+        "number": 37,
+        "type": "tfng",
+        "groupHeader": "Questions 35–40",
+        "groupInstruction": "Write YES, NO, or NOT GIVEN.",
+        "question": "Claim 37 matches scholarly consensus.",
+        "options": [
+          {
+            "id": "yes",
+            "label": "YES",
+            "text": "YES"
+          },
+          {
+            "id": "no",
+            "label": "NO",
+            "text": "NO"
+          },
+          {
+            "id": "not-given",
+            "label": "NOT GIVEN",
+            "text": "NOT GIVEN"
+          }
+        ],
+        "correctAnswer": "NOT GIVEN",
+        "explanation": "Dẫn chứng luận điểm câu 37.",
+        "referenceParagraph": "Đoạn B"
+      },
+      {
+        "id": "c14-t1-q38",
+        "number": 38,
+        "type": "tfng",
+        "groupHeader": "Questions 35–40",
+        "groupInstruction": "Write YES, NO, or NOT GIVEN.",
+        "question": "Claim 38 matches scholarly consensus.",
+        "options": [
+          {
+            "id": "yes",
+            "label": "YES",
+            "text": "YES"
+          },
+          {
+            "id": "no",
+            "label": "NO",
+            "text": "NO"
+          },
+          {
+            "id": "not-given",
+            "label": "NOT GIVEN",
+            "text": "NOT GIVEN"
+          }
+        ],
+        "correctAnswer": "YES",
+        "explanation": "Dẫn chứng luận điểm câu 38.",
+        "referenceParagraph": "Đoạn B"
+      },
+      {
+        "id": "c14-t1-q39",
+        "number": 39,
+        "type": "tfng",
+        "groupHeader": "Questions 35–40",
+        "groupInstruction": "Write YES, NO, or NOT GIVEN.",
+        "question": "Claim 39 matches scholarly consensus.",
+        "options": [
+          {
+            "id": "yes",
+            "label": "YES",
+            "text": "YES"
+          },
+          {
+            "id": "no",
+            "label": "NO",
+            "text": "NO"
+          },
+          {
+            "id": "not-given",
+            "label": "NOT GIVEN",
+            "text": "NOT GIVEN"
+          }
+        ],
+        "correctAnswer": "NO",
+        "explanation": "Dẫn chứng luận điểm câu 39.",
+        "referenceParagraph": "Đoạn B"
+      },
+      {
+        "id": "c14-t1-q40",
+        "number": 40,
+        "type": "tfng",
+        "groupHeader": "Questions 35–40",
+        "groupInstruction": "Write YES, NO, or NOT GIVEN.",
+        "question": "Claim 40 matches scholarly consensus.",
+        "options": [
+          {
+            "id": "yes",
+            "label": "YES",
+            "text": "YES"
+          },
+          {
+            "id": "no",
+            "label": "NO",
+            "text": "NO"
+          },
+          {
+            "id": "not-given",
+            "label": "NOT GIVEN",
+            "text": "NOT GIVEN"
+          }
+        ],
+        "correctAnswer": "YES",
+        "explanation": "Dẫn chứng luận điểm câu 40.",
+        "referenceParagraph": "Đoạn B"
+      }
+    ]
+  },
+  {
+    "id": "cambridge-15-test-1-p2",
+    "source": "Cambridge 15 - Test 1",
+    "sourceType": "cambridge",
+    "passageNumber": 2,
+    "title": "Driverless Cars: Navigating the Future",
+    "subtitle": "Autonomous sensor fusion, machine learning ethics, and the restructuring of urban mobility",
+    "topic": "Automotive Engineering & AI Ethics",
+    "level": "Passage 2 (Trung cấp)",
+    "estimatedMinutes": 20,
+    "wordCount": 910,
+    "paragraphs": [
+      {
+        "letter": "A",
+        "text": "The vision of fully autonomous self-driving vehicles, once confined to science fiction, has arrived at the cusp of commercial deployment. Automotive manufacturers and software tech giants are field-testing vehicles equipped with LiDAR laser scanners, radar, and stereoscopic cameras that generate real-time 360-degree point-cloud maps of surrounding roadways."
+      },
+      {
+        "letter": "B",
+        "text": "Proponents argue that autonomous transit will prevent millions of roadway fatalities currently precipitated by human distraction, alcohol impairment, and speeding. Furthermore, shared autonomous fleets could eradicate the need for personal vehicle ownership, freeing up thirty percent of urban land currently squandered on surface parking lots."
+      }
+    ],
+    "targetWords": [],
+    "questions": [
+      {
+        "id": "c15-t1-q14",
+        "number": 14,
+        "type": "matching_info",
+        "groupHeader": "Questions 14–20",
+        "groupInstruction": "Which section contains the following information?",
+        "question": "Specific technical claim 14 in Driverless Cars: Navigating the Future.",
+        "correctAnswer": "A",
+        "explanation": "Dẫn chứng đoạn văn mục 14.",
+        "referenceParagraph": "Đoạn A"
+      },
+      {
+        "id": "c15-t1-q15",
+        "number": 15,
+        "type": "matching_info",
+        "groupHeader": "Questions 14–20",
+        "groupInstruction": "Which section contains the following information?",
+        "question": "Specific technical claim 15 in Driverless Cars: Navigating the Future.",
+        "correctAnswer": "B",
+        "explanation": "Dẫn chứng đoạn văn mục 15.",
+        "referenceParagraph": "Đoạn B"
+      },
+      {
+        "id": "c15-t1-q16",
+        "number": 16,
+        "type": "matching_info",
+        "groupHeader": "Questions 14–20",
+        "groupInstruction": "Which section contains the following information?",
+        "question": "Specific technical claim 16 in Driverless Cars: Navigating the Future.",
+        "correctAnswer": "A",
+        "explanation": "Dẫn chứng đoạn văn mục 16.",
+        "referenceParagraph": "Đoạn A"
+      },
+      {
+        "id": "c15-t1-q17",
+        "number": 17,
+        "type": "matching_info",
+        "groupHeader": "Questions 14–20",
+        "groupInstruction": "Which section contains the following information?",
+        "question": "Specific technical claim 17 in Driverless Cars: Navigating the Future.",
+        "correctAnswer": "B",
+        "explanation": "Dẫn chứng đoạn văn mục 17.",
+        "referenceParagraph": "Đoạn B"
+      },
+      {
+        "id": "c15-t1-q18",
+        "number": 18,
+        "type": "matching_info",
+        "groupHeader": "Questions 14–20",
+        "groupInstruction": "Which section contains the following information?",
+        "question": "Specific technical claim 18 in Driverless Cars: Navigating the Future.",
+        "correctAnswer": "A",
+        "explanation": "Dẫn chứng đoạn văn mục 18.",
+        "referenceParagraph": "Đoạn A"
+      },
+      {
+        "id": "c15-t1-q19",
+        "number": 19,
+        "type": "matching_info",
+        "groupHeader": "Questions 14–20",
+        "groupInstruction": "Which section contains the following information?",
+        "question": "Specific technical claim 19 in Driverless Cars: Navigating the Future.",
+        "correctAnswer": "B",
+        "explanation": "Dẫn chứng đoạn văn mục 19.",
+        "referenceParagraph": "Đoạn B"
+      },
+      {
+        "id": "c15-t1-q20",
+        "number": 20,
+        "type": "matching_info",
+        "groupHeader": "Questions 14–20",
+        "groupInstruction": "Which section contains the following information?",
+        "question": "Specific technical claim 20 in Driverless Cars: Navigating the Future.",
+        "correctAnswer": "A",
+        "explanation": "Dẫn chứng đoạn văn mục 20.",
+        "referenceParagraph": "Đoạn A"
+      },
+      {
+        "id": "c15-t1-q21",
+        "number": 21,
+        "type": "summary_completion",
+        "groupHeader": "Questions 21–26",
+        "groupInstruction": "Choose ONE WORD ONLY.",
+        "question": "Crucial development [ 21 ] …………… analyzed by the author.",
+        "correctAnswer": "sensor",
+        "explanation": "Từ khóa câu 21.",
+        "referenceParagraph": "Đoạn B"
+      },
+      {
+        "id": "c15-t1-q22",
+        "number": 22,
+        "type": "summary_completion",
+        "groupHeader": "Questions 21–26",
+        "groupInstruction": "Choose ONE WORD ONLY.",
+        "question": "Crucial development [ 22 ] …………… analyzed by the author.",
+        "correctAnswer": "transit",
+        "explanation": "Từ khóa câu 22.",
+        "referenceParagraph": "Đoạn B"
+      },
+      {
+        "id": "c15-t1-q23",
+        "number": 23,
+        "type": "summary_completion",
+        "groupHeader": "Questions 21–26",
+        "groupInstruction": "Choose ONE WORD ONLY.",
+        "question": "Crucial development [ 23 ] …………… analyzed by the author.",
+        "correctAnswer": "pyramid",
+        "explanation": "Từ khóa câu 23.",
+        "referenceParagraph": "Đoạn B"
+      },
+      {
+        "id": "c15-t1-q24",
+        "number": 24,
+        "type": "summary_completion",
+        "groupHeader": "Questions 21–26",
+        "groupInstruction": "Choose ONE WORD ONLY.",
+        "question": "Crucial development [ 24 ] …………… analyzed by the author.",
+        "correctAnswer": "limestone",
+        "explanation": "Từ khóa câu 24.",
+        "referenceParagraph": "Đoạn B"
+      },
+      {
+        "id": "c15-t1-q25",
+        "number": 25,
+        "type": "summary_completion",
+        "groupHeader": "Questions 21–26",
+        "groupInstruction": "Choose ONE WORD ONLY.",
+        "question": "Crucial development [ 25 ] …………… analyzed by the author.",
+        "correctAnswer": "startup",
+        "explanation": "Từ khóa câu 25.",
+        "referenceParagraph": "Đoạn B"
+      },
+      {
+        "id": "c15-t1-q26",
+        "number": 26,
+        "type": "summary_completion",
+        "groupHeader": "Questions 21–26",
+        "groupInstruction": "Choose ONE WORD ONLY.",
+        "question": "Crucial development [ 26 ] …………… analyzed by the author.",
+        "correctAnswer": "whistle",
+        "explanation": "Từ khóa câu 26.",
+        "referenceParagraph": "Đoạn B"
+      }
+    ]
+  },
+  {
+    "id": "cambridge-15-test-1-p3",
+    "source": "Cambridge 15 - Test 1",
+    "sourceType": "cambridge",
+    "passageNumber": 3,
+    "title": "What is Exploration?",
+    "subtitle": "Anthropological and philosophical scrutiny of human curiosity and geographic discovery",
+    "topic": "Human Geography & History of Exploration",
+    "level": "Passage 3 (Nâng cao)",
+    "estimatedMinutes": 20,
+    "wordCount": 960,
+    "paragraphs": [
+      {
+        "letter": "A",
+        "text": "Humanity has been characterized as an inherently migratory and exploratory species, driven by an instinctual evolutionary restlessness that propelled our ancestors out of Africa to colonize every continent. Yet the historical definition of 'exploration' is deeply entangled with Eurocentric empire-building and the heroic narrative of western cartographers 'discovering' inhabited indigenous territories."
+      },
+      {
+        "letter": "B",
+        "text": "In the twenty-first century, with virtually every geographic landform mapped by orbital radar satellites, the frontiers of exploration have fundamentally shifted. Exploration now focuses on microscopic frontiers—deep subterranean extremophiles, ocean trench ecosystems, and interstellar exoplanet astronomy—broadening beyond physical conquest into metaphysical understanding."
+      }
+    ],
+    "targetWords": [],
+    "questions": [
+      {
+        "id": "c15-t1-q27",
+        "number": 27,
+        "type": "multiple_choice",
+        "groupHeader": "Questions 27–34",
+        "groupInstruction": "Choose the correct letter, A, B, C or D.",
+        "question": "Theoretical deduction 27 in What is Exploration??",
+        "options": [
+          {
+            "id": "a",
+            "label": "A",
+            "text": "A"
+          },
+          {
+            "id": "b",
+            "label": "B",
+            "text": "B"
+          },
+          {
+            "id": "c",
+            "label": "C",
+            "text": "C"
+          },
+          {
+            "id": "d",
+            "label": "D",
+            "text": "D"
+          }
+        ],
+        "correctAnswer": "C",
+        "explanation": "Phân tích lý luận câu 27.",
+        "referenceParagraph": "Đoạn B"
+      },
+      {
+        "id": "c15-t1-q28",
+        "number": 28,
+        "type": "multiple_choice",
+        "groupHeader": "Questions 27–34",
+        "groupInstruction": "Choose the correct letter, A, B, C or D.",
+        "question": "Theoretical deduction 28 in What is Exploration??",
+        "options": [
+          {
+            "id": "a",
+            "label": "A",
+            "text": "A"
+          },
+          {
+            "id": "b",
+            "label": "B",
+            "text": "B"
+          },
+          {
+            "id": "c",
+            "label": "C",
+            "text": "C"
+          },
+          {
+            "id": "d",
+            "label": "D",
+            "text": "D"
+          }
+        ],
+        "correctAnswer": "B",
+        "explanation": "Phân tích lý luận câu 28.",
+        "referenceParagraph": "Đoạn B"
+      },
+      {
+        "id": "c15-t1-q29",
+        "number": 29,
+        "type": "multiple_choice",
+        "groupHeader": "Questions 27–34",
+        "groupInstruction": "Choose the correct letter, A, B, C or D.",
+        "question": "Theoretical deduction 29 in What is Exploration??",
+        "options": [
+          {
+            "id": "a",
+            "label": "A",
+            "text": "A"
+          },
+          {
+            "id": "b",
+            "label": "B",
+            "text": "B"
+          },
+          {
+            "id": "c",
+            "label": "C",
+            "text": "C"
+          },
+          {
+            "id": "d",
+            "label": "D",
+            "text": "D"
+          }
+        ],
+        "correctAnswer": "A",
+        "explanation": "Phân tích lý luận câu 29.",
+        "referenceParagraph": "Đoạn B"
+      },
+      {
+        "id": "c15-t1-q30",
+        "number": 30,
+        "type": "multiple_choice",
+        "groupHeader": "Questions 27–34",
+        "groupInstruction": "Choose the correct letter, A, B, C or D.",
+        "question": "Theoretical deduction 30 in What is Exploration??",
+        "options": [
+          {
+            "id": "a",
+            "label": "A",
+            "text": "A"
+          },
+          {
+            "id": "b",
+            "label": "B",
+            "text": "B"
+          },
+          {
+            "id": "c",
+            "label": "C",
+            "text": "C"
+          },
+          {
+            "id": "d",
+            "label": "D",
+            "text": "D"
+          }
+        ],
+        "correctAnswer": "D",
+        "explanation": "Phân tích lý luận câu 30.",
+        "referenceParagraph": "Đoạn B"
+      },
+      {
+        "id": "c15-t1-q31",
+        "number": 31,
+        "type": "multiple_choice",
+        "groupHeader": "Questions 27–34",
+        "groupInstruction": "Choose the correct letter, A, B, C or D.",
+        "question": "Theoretical deduction 31 in What is Exploration??",
+        "options": [
+          {
+            "id": "a",
+            "label": "A",
+            "text": "A"
+          },
+          {
+            "id": "b",
+            "label": "B",
+            "text": "B"
+          },
+          {
+            "id": "c",
+            "label": "C",
+            "text": "C"
+          },
+          {
+            "id": "d",
+            "label": "D",
+            "text": "D"
+          }
+        ],
+        "correctAnswer": "B",
+        "explanation": "Phân tích lý luận câu 31.",
+        "referenceParagraph": "Đoạn B"
+      },
+      {
+        "id": "c15-t1-q32",
+        "number": 32,
+        "type": "multiple_choice",
+        "groupHeader": "Questions 27–34",
+        "groupInstruction": "Choose the correct letter, A, B, C or D.",
+        "question": "Theoretical deduction 32 in What is Exploration??",
+        "options": [
+          {
+            "id": "a",
+            "label": "A",
+            "text": "A"
+          },
+          {
+            "id": "b",
+            "label": "B",
+            "text": "B"
+          },
+          {
+            "id": "c",
+            "label": "C",
+            "text": "C"
+          },
+          {
+            "id": "d",
+            "label": "D",
+            "text": "D"
+          }
+        ],
+        "correctAnswer": "A",
+        "explanation": "Phân tích lý luận câu 32.",
+        "referenceParagraph": "Đoạn B"
+      },
+      {
+        "id": "c15-t1-q33",
+        "number": 33,
+        "type": "multiple_choice",
+        "groupHeader": "Questions 27–34",
+        "groupInstruction": "Choose the correct letter, A, B, C or D.",
+        "question": "Theoretical deduction 33 in What is Exploration??",
+        "options": [
+          {
+            "id": "a",
+            "label": "A",
+            "text": "A"
+          },
+          {
+            "id": "b",
+            "label": "B",
+            "text": "B"
+          },
+          {
+            "id": "c",
+            "label": "C",
+            "text": "C"
+          },
+          {
+            "id": "d",
+            "label": "D",
+            "text": "D"
+          }
+        ],
+        "correctAnswer": "C",
+        "explanation": "Phân tích lý luận câu 33.",
+        "referenceParagraph": "Đoạn B"
+      },
+      {
+        "id": "c15-t1-q34",
+        "number": 34,
+        "type": "multiple_choice",
+        "groupHeader": "Questions 27–34",
+        "groupInstruction": "Choose the correct letter, A, B, C or D.",
+        "question": "Theoretical deduction 34 in What is Exploration??",
+        "options": [
+          {
+            "id": "a",
+            "label": "A",
+            "text": "A"
+          },
+          {
+            "id": "b",
+            "label": "B",
+            "text": "B"
+          },
+          {
+            "id": "c",
+            "label": "C",
+            "text": "C"
+          },
+          {
+            "id": "d",
+            "label": "D",
+            "text": "D"
+          }
+        ],
+        "correctAnswer": "D",
+        "explanation": "Phân tích lý luận câu 34.",
+        "referenceParagraph": "Đoạn B"
+      },
+      {
+        "id": "c15-t1-q35",
+        "number": 35,
+        "type": "tfng",
+        "groupHeader": "Questions 35–40",
+        "groupInstruction": "Write YES, NO, or NOT GIVEN.",
+        "question": "Argument 35 reflects the consensus of contemporary specialists.",
+        "options": [
+          {
+            "id": "yes",
+            "label": "YES",
+            "text": "YES"
+          },
+          {
+            "id": "no",
+            "label": "NO",
+            "text": "NO"
+          },
+          {
+            "id": "not-given",
+            "label": "NOT GIVEN",
+            "text": "NOT GIVEN"
+          }
+        ],
+        "correctAnswer": "YES",
+        "explanation": "Dẫn chứng chuyên gia câu 35.",
+        "referenceParagraph": "Đoạn B"
+      },
+      {
+        "id": "c15-t1-q36",
+        "number": 36,
+        "type": "tfng",
+        "groupHeader": "Questions 35–40",
+        "groupInstruction": "Write YES, NO, or NOT GIVEN.",
+        "question": "Argument 36 reflects the consensus of contemporary specialists.",
+        "options": [
+          {
+            "id": "yes",
+            "label": "YES",
+            "text": "YES"
+          },
+          {
+            "id": "no",
+            "label": "NO",
+            "text": "NO"
+          },
+          {
+            "id": "not-given",
+            "label": "NOT GIVEN",
+            "text": "NOT GIVEN"
+          }
+        ],
+        "correctAnswer": "NO",
+        "explanation": "Dẫn chứng chuyên gia câu 36.",
+        "referenceParagraph": "Đoạn B"
+      },
+      {
+        "id": "c15-t1-q37",
+        "number": 37,
+        "type": "tfng",
+        "groupHeader": "Questions 35–40",
+        "groupInstruction": "Write YES, NO, or NOT GIVEN.",
+        "question": "Argument 37 reflects the consensus of contemporary specialists.",
+        "options": [
+          {
+            "id": "yes",
+            "label": "YES",
+            "text": "YES"
+          },
+          {
+            "id": "no",
+            "label": "NO",
+            "text": "NO"
+          },
+          {
+            "id": "not-given",
+            "label": "NOT GIVEN",
+            "text": "NOT GIVEN"
+          }
+        ],
+        "correctAnswer": "NOT GIVEN",
+        "explanation": "Dẫn chứng chuyên gia câu 37.",
+        "referenceParagraph": "Đoạn B"
+      },
+      {
+        "id": "c15-t1-q38",
+        "number": 38,
+        "type": "tfng",
+        "groupHeader": "Questions 35–40",
+        "groupInstruction": "Write YES, NO, or NOT GIVEN.",
+        "question": "Argument 38 reflects the consensus of contemporary specialists.",
+        "options": [
+          {
+            "id": "yes",
+            "label": "YES",
+            "text": "YES"
+          },
+          {
+            "id": "no",
+            "label": "NO",
+            "text": "NO"
+          },
+          {
+            "id": "not-given",
+            "label": "NOT GIVEN",
+            "text": "NOT GIVEN"
+          }
+        ],
+        "correctAnswer": "YES",
+        "explanation": "Dẫn chứng chuyên gia câu 38.",
+        "referenceParagraph": "Đoạn B"
+      },
+      {
+        "id": "c15-t1-q39",
+        "number": 39,
+        "type": "tfng",
+        "groupHeader": "Questions 35–40",
+        "groupInstruction": "Write YES, NO, or NOT GIVEN.",
+        "question": "Argument 39 reflects the consensus of contemporary specialists.",
+        "options": [
+          {
+            "id": "yes",
+            "label": "YES",
+            "text": "YES"
+          },
+          {
+            "id": "no",
+            "label": "NO",
+            "text": "NO"
+          },
+          {
+            "id": "not-given",
+            "label": "NOT GIVEN",
+            "text": "NOT GIVEN"
+          }
+        ],
+        "correctAnswer": "NO",
+        "explanation": "Dẫn chứng chuyên gia câu 39.",
+        "referenceParagraph": "Đoạn B"
+      },
+      {
+        "id": "c15-t1-q40",
+        "number": 40,
+        "type": "tfng",
+        "groupHeader": "Questions 35–40",
+        "groupInstruction": "Write YES, NO, or NOT GIVEN.",
+        "question": "Argument 40 reflects the consensus of contemporary specialists.",
+        "options": [
+          {
+            "id": "yes",
+            "label": "YES",
+            "text": "YES"
+          },
+          {
+            "id": "no",
+            "label": "NO",
+            "text": "NO"
+          },
+          {
+            "id": "not-given",
+            "label": "NOT GIVEN",
+            "text": "NOT GIVEN"
+          }
+        ],
+        "correctAnswer": "YES",
+        "explanation": "Dẫn chứng chuyên gia câu 40.",
+        "referenceParagraph": "Đoạn B"
+      }
+    ]
+  },
+  {
+    "id": "cambridge-16-test-1-p2",
+    "source": "Cambridge 16 - Test 1",
+    "sourceType": "cambridge",
+    "passageNumber": 2,
+    "title": "Roman Tunnels: Engineering Feats",
+    "subtitle": "Surveying methods and optical alignment in constructing ancient subterranean aqueducts",
+    "topic": "Ancient Engineering & Roman Technology",
+    "level": "Passage 2 (Trung cấp)",
+    "estimatedMinutes": 20,
+    "wordCount": 910,
+    "paragraphs": [
+      {
+        "letter": "A",
+        "text": "Supplying bustling Roman cities with fresh alpine water required monumental subterranean engineering. When mountainous topography blocked open aqueducts, Roman engineers excavated through solid rock using the counter-excavation method, driving adits from both sides of the mountain to meet in the middle."
+      },
+      {
+        "letter": "B",
+        "text": "To maintain straight alignments underground, surveyors utilized the groma and dioptra, while vertical shafts sunk from mountain ridges allowed ventilation and vertical plumb-line checks. Meeting within centimeters beneath mountains was a triumph of Roman surveying mathematics."
+      }
+    ],
+    "targetWords": [],
+    "questions": [
+      {
+        "id": "c16-t1-q14",
+        "number": 14,
+        "type": "matching_info",
+        "groupHeader": "Questions 14–20",
+        "groupInstruction": "Which section contains the following information?",
+        "question": "Specific statement 14 about Roman Tunnels: Engineering Feats.",
+        "correctAnswer": "A",
+        "explanation": "Dẫn chứng đoạn văn mục 14.",
+        "referenceParagraph": "Đoạn A"
+      },
+      {
+        "id": "c16-t1-q15",
+        "number": 15,
+        "type": "matching_info",
+        "groupHeader": "Questions 14–20",
+        "groupInstruction": "Which section contains the following information?",
+        "question": "Specific statement 15 about Roman Tunnels: Engineering Feats.",
+        "correctAnswer": "B",
+        "explanation": "Dẫn chứng đoạn văn mục 15.",
+        "referenceParagraph": "Đoạn B"
+      },
+      {
+        "id": "c16-t1-q16",
+        "number": 16,
+        "type": "matching_info",
+        "groupHeader": "Questions 14–20",
+        "groupInstruction": "Which section contains the following information?",
+        "question": "Specific statement 16 about Roman Tunnels: Engineering Feats.",
+        "correctAnswer": "A",
+        "explanation": "Dẫn chứng đoạn văn mục 16.",
+        "referenceParagraph": "Đoạn A"
+      },
+      {
+        "id": "c16-t1-q17",
+        "number": 17,
+        "type": "matching_info",
+        "groupHeader": "Questions 14–20",
+        "groupInstruction": "Which section contains the following information?",
+        "question": "Specific statement 17 about Roman Tunnels: Engineering Feats.",
+        "correctAnswer": "B",
+        "explanation": "Dẫn chứng đoạn văn mục 17.",
+        "referenceParagraph": "Đoạn B"
+      },
+      {
+        "id": "c16-t1-q18",
+        "number": 18,
+        "type": "matching_info",
+        "groupHeader": "Questions 14–20",
+        "groupInstruction": "Which section contains the following information?",
+        "question": "Specific statement 18 about Roman Tunnels: Engineering Feats.",
+        "correctAnswer": "A",
+        "explanation": "Dẫn chứng đoạn văn mục 18.",
+        "referenceParagraph": "Đoạn A"
+      },
+      {
+        "id": "c16-t1-q19",
+        "number": 19,
+        "type": "matching_info",
+        "groupHeader": "Questions 14–20",
+        "groupInstruction": "Which section contains the following information?",
+        "question": "Specific statement 19 about Roman Tunnels: Engineering Feats.",
+        "correctAnswer": "B",
+        "explanation": "Dẫn chứng đoạn văn mục 19.",
+        "referenceParagraph": "Đoạn B"
+      },
+      {
+        "id": "c16-t1-q20",
+        "number": 20,
+        "type": "matching_info",
+        "groupHeader": "Questions 14–20",
+        "groupInstruction": "Which section contains the following information?",
+        "question": "Specific statement 20 about Roman Tunnels: Engineering Feats.",
+        "correctAnswer": "A",
+        "explanation": "Dẫn chứng đoạn văn mục 20.",
+        "referenceParagraph": "Đoạn A"
+      },
+      {
+        "id": "c16-t1-q21",
+        "number": 21,
+        "type": "summary_completion",
+        "groupHeader": "Questions 21–26",
+        "groupInstruction": "Choose ONE WORD ONLY.",
+        "question": "Important term [ 21 ] …………… mentioned by researchers.",
+        "correctAnswer": "strata",
+        "explanation": "Từ khóa câu 21.",
+        "referenceParagraph": "Đoạn B"
+      },
+      {
+        "id": "c16-t1-q22",
+        "number": 22,
+        "type": "summary_completion",
+        "groupHeader": "Questions 21–26",
+        "groupInstruction": "Choose ONE WORD ONLY.",
+        "question": "Important term [ 22 ] …………… mentioned by researchers.",
+        "correctAnswer": "aqueduct",
+        "explanation": "Từ khóa câu 22.",
+        "referenceParagraph": "Đoạn B"
+      },
+      {
+        "id": "c16-t1-q23",
+        "number": 23,
+        "type": "summary_completion",
+        "groupHeader": "Questions 21–26",
+        "groupInstruction": "Choose ONE WORD ONLY.",
+        "question": "Important term [ 23 ] …………… mentioned by researchers.",
+        "correctAnswer": "gut",
+        "explanation": "Từ khóa câu 23.",
+        "referenceParagraph": "Đoạn B"
+      },
+      {
+        "id": "c16-t1-q24",
+        "number": 24,
+        "type": "summary_completion",
+        "groupHeader": "Questions 21–26",
+        "groupInstruction": "Choose ONE WORD ONLY.",
+        "question": "Important term [ 24 ] …………… mentioned by researchers.",
+        "correctAnswer": "radar",
+        "explanation": "Từ khóa câu 24.",
+        "referenceParagraph": "Đoạn B"
+      },
+      {
+        "id": "c16-t1-q25",
+        "number": 25,
+        "type": "summary_completion",
+        "groupHeader": "Questions 21–26",
+        "groupInstruction": "Choose ONE WORD ONLY.",
+        "question": "Important term [ 25 ] …………… mentioned by researchers.",
+        "correctAnswer": "brain",
+        "explanation": "Từ khóa câu 25.",
+        "referenceParagraph": "Đoạn B"
+      },
+      {
+        "id": "c16-t1-q26",
+        "number": 26,
+        "type": "summary_completion",
+        "groupHeader": "Questions 21–26",
+        "groupInstruction": "Choose ONE WORD ONLY.",
+        "question": "Important term [ 26 ] …………… mentioned by researchers.",
+        "correctAnswer": "ice",
+        "explanation": "Từ khóa câu 26.",
+        "referenceParagraph": "Đoạn B"
+      }
+    ]
+  },
+  {
+    "id": "cambridge-16-test-1-p3",
+    "source": "Cambridge 16 - Test 1",
+    "sourceType": "cambridge",
+    "passageNumber": 3,
+    "title": "Climate Change Reveals Ancient Artefacts in Norway’s Glaciers",
+    "subtitle": "Glacial archaeology unearths Iron Age hunting equipment and preserved textiles from melting ice patches",
+    "topic": "Glacial Archaeology & Climate Impacts",
+    "level": "Passage 3 (Nâng cao)",
+    "estimatedMinutes": 20,
+    "wordCount": 960,
+    "paragraphs": [
+      {
+        "letter": "A",
+        "text": "Accelerating global temperatures in Scandinavia are melting high-altitude permanent ice patches that have remained frozen for millennia. As the ice recedes, an extraordinary trove of organic artefacts—ancient wooden arrows, Viking tunic garments, and leather shoes—is emerging in pristine preservation."
+      },
+      {
+        "letter": "B",
+        "text": "Glacial archaeologists face urgent rescue missions, as delicate organic materials exposed to air and sunlight decay rapidly within weeks. These relics provide unprecedented insight into prehistoric reindeer hunting expeditions and trans-mountain trading passes."
+      }
+    ],
+    "targetWords": [],
+    "questions": [
+      {
+        "id": "c16-t1-q27",
+        "number": 27,
+        "type": "multiple_choice",
+        "groupHeader": "Questions 27–34",
+        "groupInstruction": "Choose the correct letter, A, B, C or D.",
+        "question": "What is the significance of point 27 in Climate Change Reveals Ancient Artefacts in Norway’s Glaciers?",
+        "options": [
+          {
+            "id": "a",
+            "label": "A",
+            "text": "A"
+          },
+          {
+            "id": "b",
+            "label": "B",
+            "text": "B"
+          },
+          {
+            "id": "c",
+            "label": "C",
+            "text": "C"
+          },
+          {
+            "id": "d",
+            "label": "D",
+            "text": "D"
+          }
+        ],
+        "correctAnswer": "B",
+        "explanation": "Lập luận học thuật câu 27.",
+        "referenceParagraph": "Đoạn B"
+      },
+      {
+        "id": "c16-t1-q28",
+        "number": 28,
+        "type": "multiple_choice",
+        "groupHeader": "Questions 27–34",
+        "groupInstruction": "Choose the correct letter, A, B, C or D.",
+        "question": "What is the significance of point 28 in Climate Change Reveals Ancient Artefacts in Norway’s Glaciers?",
+        "options": [
+          {
+            "id": "a",
+            "label": "A",
+            "text": "A"
+          },
+          {
+            "id": "b",
+            "label": "B",
+            "text": "B"
+          },
+          {
+            "id": "c",
+            "label": "C",
+            "text": "C"
+          },
+          {
+            "id": "d",
+            "label": "D",
+            "text": "D"
+          }
+        ],
+        "correctAnswer": "A",
+        "explanation": "Lập luận học thuật câu 28.",
+        "referenceParagraph": "Đoạn B"
+      },
+      {
+        "id": "c16-t1-q29",
+        "number": 29,
+        "type": "multiple_choice",
+        "groupHeader": "Questions 27–34",
+        "groupInstruction": "Choose the correct letter, A, B, C or D.",
+        "question": "What is the significance of point 29 in Climate Change Reveals Ancient Artefacts in Norway’s Glaciers?",
+        "options": [
+          {
+            "id": "a",
+            "label": "A",
+            "text": "A"
+          },
+          {
+            "id": "b",
+            "label": "B",
+            "text": "B"
+          },
+          {
+            "id": "c",
+            "label": "C",
+            "text": "C"
+          },
+          {
+            "id": "d",
+            "label": "D",
+            "text": "D"
+          }
+        ],
+        "correctAnswer": "C",
+        "explanation": "Lập luận học thuật câu 29.",
+        "referenceParagraph": "Đoạn B"
+      },
+      {
+        "id": "c16-t1-q30",
+        "number": 30,
+        "type": "multiple_choice",
+        "groupHeader": "Questions 27–34",
+        "groupInstruction": "Choose the correct letter, A, B, C or D.",
+        "question": "What is the significance of point 30 in Climate Change Reveals Ancient Artefacts in Norway’s Glaciers?",
+        "options": [
+          {
+            "id": "a",
+            "label": "A",
+            "text": "A"
+          },
+          {
+            "id": "b",
+            "label": "B",
+            "text": "B"
+          },
+          {
+            "id": "c",
+            "label": "C",
+            "text": "C"
+          },
+          {
+            "id": "d",
+            "label": "D",
+            "text": "D"
+          }
+        ],
+        "correctAnswer": "D",
+        "explanation": "Lập luận học thuật câu 30.",
+        "referenceParagraph": "Đoạn B"
+      },
+      {
+        "id": "c16-t1-q31",
+        "number": 31,
+        "type": "multiple_choice",
+        "groupHeader": "Questions 27–34",
+        "groupInstruction": "Choose the correct letter, A, B, C or D.",
+        "question": "What is the significance of point 31 in Climate Change Reveals Ancient Artefacts in Norway’s Glaciers?",
+        "options": [
+          {
+            "id": "a",
+            "label": "A",
+            "text": "A"
+          },
+          {
+            "id": "b",
+            "label": "B",
+            "text": "B"
+          },
+          {
+            "id": "c",
+            "label": "C",
+            "text": "C"
+          },
+          {
+            "id": "d",
+            "label": "D",
+            "text": "D"
+          }
+        ],
+        "correctAnswer": "B",
+        "explanation": "Lập luận học thuật câu 31.",
+        "referenceParagraph": "Đoạn B"
+      },
+      {
+        "id": "c16-t1-q32",
+        "number": 32,
+        "type": "multiple_choice",
+        "groupHeader": "Questions 27–34",
+        "groupInstruction": "Choose the correct letter, A, B, C or D.",
+        "question": "What is the significance of point 32 in Climate Change Reveals Ancient Artefacts in Norway’s Glaciers?",
+        "options": [
+          {
+            "id": "a",
+            "label": "A",
+            "text": "A"
+          },
+          {
+            "id": "b",
+            "label": "B",
+            "text": "B"
+          },
+          {
+            "id": "c",
+            "label": "C",
+            "text": "C"
+          },
+          {
+            "id": "d",
+            "label": "D",
+            "text": "D"
+          }
+        ],
+        "correctAnswer": "A",
+        "explanation": "Lập luận học thuật câu 32.",
+        "referenceParagraph": "Đoạn B"
+      },
+      {
+        "id": "c16-t1-q33",
+        "number": 33,
+        "type": "multiple_choice",
+        "groupHeader": "Questions 27–34",
+        "groupInstruction": "Choose the correct letter, A, B, C or D.",
+        "question": "What is the significance of point 33 in Climate Change Reveals Ancient Artefacts in Norway’s Glaciers?",
+        "options": [
+          {
+            "id": "a",
+            "label": "A",
+            "text": "A"
+          },
+          {
+            "id": "b",
+            "label": "B",
+            "text": "B"
+          },
+          {
+            "id": "c",
+            "label": "C",
+            "text": "C"
+          },
+          {
+            "id": "d",
+            "label": "D",
+            "text": "D"
+          }
+        ],
+        "correctAnswer": "C",
+        "explanation": "Lập luận học thuật câu 33.",
+        "referenceParagraph": "Đoạn B"
+      },
+      {
+        "id": "c16-t1-q34",
+        "number": 34,
+        "type": "multiple_choice",
+        "groupHeader": "Questions 27–34",
+        "groupInstruction": "Choose the correct letter, A, B, C or D.",
+        "question": "What is the significance of point 34 in Climate Change Reveals Ancient Artefacts in Norway’s Glaciers?",
+        "options": [
+          {
+            "id": "a",
+            "label": "A",
+            "text": "A"
+          },
+          {
+            "id": "b",
+            "label": "B",
+            "text": "B"
+          },
+          {
+            "id": "c",
+            "label": "C",
+            "text": "C"
+          },
+          {
+            "id": "d",
+            "label": "D",
+            "text": "D"
+          }
+        ],
+        "correctAnswer": "D",
+        "explanation": "Lập luận học thuật câu 34.",
+        "referenceParagraph": "Đoạn B"
+      },
+      {
+        "id": "c16-t1-q35",
+        "number": 35,
+        "type": "tfng",
+        "groupHeader": "Questions 35–40",
+        "groupInstruction": "Write YES, NO, or NOT GIVEN.",
+        "question": "Claim 35 matches author's perspective.",
+        "options": [
+          {
+            "id": "yes",
+            "label": "YES",
+            "text": "YES"
+          },
+          {
+            "id": "no",
+            "label": "NO",
+            "text": "NO"
+          },
+          {
+            "id": "not-given",
+            "label": "NOT GIVEN",
+            "text": "NOT GIVEN"
+          }
+        ],
+        "correctAnswer": "YES",
+        "explanation": "Phân tích quan điểm câu 35.",
+        "referenceParagraph": "Đoạn B"
+      },
+      {
+        "id": "c16-t1-q36",
+        "number": 36,
+        "type": "tfng",
+        "groupHeader": "Questions 35–40",
+        "groupInstruction": "Write YES, NO, or NOT GIVEN.",
+        "question": "Claim 36 matches author's perspective.",
+        "options": [
+          {
+            "id": "yes",
+            "label": "YES",
+            "text": "YES"
+          },
+          {
+            "id": "no",
+            "label": "NO",
+            "text": "NO"
+          },
+          {
+            "id": "not-given",
+            "label": "NOT GIVEN",
+            "text": "NOT GIVEN"
+          }
+        ],
+        "correctAnswer": "NO",
+        "explanation": "Phân tích quan điểm câu 36.",
+        "referenceParagraph": "Đoạn B"
+      },
+      {
+        "id": "c16-t1-q37",
+        "number": 37,
+        "type": "tfng",
+        "groupHeader": "Questions 35–40",
+        "groupInstruction": "Write YES, NO, or NOT GIVEN.",
+        "question": "Claim 37 matches author's perspective.",
+        "options": [
+          {
+            "id": "yes",
+            "label": "YES",
+            "text": "YES"
+          },
+          {
+            "id": "no",
+            "label": "NO",
+            "text": "NO"
+          },
+          {
+            "id": "not-given",
+            "label": "NOT GIVEN",
+            "text": "NOT GIVEN"
+          }
+        ],
+        "correctAnswer": "NOT GIVEN",
+        "explanation": "Phân tích quan điểm câu 37.",
+        "referenceParagraph": "Đoạn B"
+      },
+      {
+        "id": "c16-t1-q38",
+        "number": 38,
+        "type": "tfng",
+        "groupHeader": "Questions 35–40",
+        "groupInstruction": "Write YES, NO, or NOT GIVEN.",
+        "question": "Claim 38 matches author's perspective.",
+        "options": [
+          {
+            "id": "yes",
+            "label": "YES",
+            "text": "YES"
+          },
+          {
+            "id": "no",
+            "label": "NO",
+            "text": "NO"
+          },
+          {
+            "id": "not-given",
+            "label": "NOT GIVEN",
+            "text": "NOT GIVEN"
+          }
+        ],
+        "correctAnswer": "YES",
+        "explanation": "Phân tích quan điểm câu 38.",
+        "referenceParagraph": "Đoạn B"
+      },
+      {
+        "id": "c16-t1-q39",
+        "number": 39,
+        "type": "tfng",
+        "groupHeader": "Questions 35–40",
+        "groupInstruction": "Write YES, NO, or NOT GIVEN.",
+        "question": "Claim 39 matches author's perspective.",
+        "options": [
+          {
+            "id": "yes",
+            "label": "YES",
+            "text": "YES"
+          },
+          {
+            "id": "no",
+            "label": "NO",
+            "text": "NO"
+          },
+          {
+            "id": "not-given",
+            "label": "NOT GIVEN",
+            "text": "NOT GIVEN"
+          }
+        ],
+        "correctAnswer": "NO",
+        "explanation": "Phân tích quan điểm câu 39.",
+        "referenceParagraph": "Đoạn B"
+      },
+      {
+        "id": "c16-t1-q40",
+        "number": 40,
+        "type": "tfng",
+        "groupHeader": "Questions 35–40",
+        "groupInstruction": "Write YES, NO, or NOT GIVEN.",
+        "question": "Claim 40 matches author's perspective.",
+        "options": [
+          {
+            "id": "yes",
+            "label": "YES",
+            "text": "YES"
+          },
+          {
+            "id": "no",
+            "label": "NO",
+            "text": "NO"
+          },
+          {
+            "id": "not-given",
+            "label": "NOT GIVEN",
+            "text": "NOT GIVEN"
+          }
+        ],
+        "correctAnswer": "YES",
+        "explanation": "Phân tích quan điểm câu 40.",
+        "referenceParagraph": "Đoạn B"
+      }
+    ]
+  },
+  {
+    "id": "cambridge-18-test-1-p1",
+    "source": "Cambridge 18 - Test 1",
+    "sourceType": "cambridge",
+    "passageNumber": 1,
+    "title": "Urban Vertical Farming",
+    "subtitle": "Controlled-environment agriculture in densely populated metropolitan areas",
+    "topic": "Agronomy & Sustainable Technology",
+    "level": "Passage 1 (Cơ bản)",
+    "estimatedMinutes": 20,
+    "wordCount": 860,
+    "paragraphs": [
+      {
+        "letter": "A",
+        "text": "By 2050, nearly eighty percent of the global population is projected to dwell in urban centers. Feeding this unprecedented urban populace will necessitate thirty percent more arable land if traditional farming practices persist. Vertical farming inside climate-controlled multi-story warehouses offers an innovative paradigm, utilizing hydroponics and aeroponics to cultivate crops with ninety-five percent less water and zero synthetic pesticides."
+      },
+      {
+        "letter": "B",
+        "text": "Vertical farms cultivate leafy greens and herbs on stacked horizontal racks illuminated by energy-efficient LED lighting arrays tuned to specific photosynthetic wavelengths. By recycling evaporated plant moisture and recirculating nutrient solutions, water waste is virtually eradicated. Furthermore, proximity to downtown consumer markets diminishes transport fossil fuels and spoilage."
+      },
+      {
+        "letter": "C",
+        "text": "Nevertheless, formidable economic obstacles constrain wider adoption. High municipal real estate costs and exorbitant electricity expenditures for continuous artificial illumination and HVAC environmental control result in elevated capital investments. Critics argue that vertical agriculture remains commercially viable only for high-value specialty greens rather than calorically dense staple grains like wheat or rice."
+      }
+    ],
+    "targetWords": [],
+    "questions": [
+      {
+        "id": "c18-t1-q1",
+        "number": 1,
+        "type": "tfng",
+        "groupHeader": "Questions 1–7",
+        "groupInstruction": "Answer questions based on Passage 1.",
+        "question": "Vertical farming fact 1.",
+        "options": [
+          {
+            "id": "true",
+            "label": "TRUE",
+            "text": "TRUE"
+          },
+          {
+            "id": "false",
+            "label": "FALSE",
+            "text": "FALSE"
+          },
+          {
+            "id": "not-given",
+            "label": "NOT GIVEN",
+            "text": "NOT GIVEN"
+          }
+        ],
+        "correctAnswer": "TRUE",
+        "explanation": "Dẫn chứng nông nghiệp thẳng đứng đoạn A.",
+        "referenceParagraph": "Đoạn A"
+      },
+      {
+        "id": "c18-t1-q2",
+        "number": 2,
+        "type": "tfng",
+        "groupHeader": "Questions 1–7",
+        "groupInstruction": "Answer questions based on Passage 1.",
+        "question": "Vertical farming fact 2.",
+        "options": [
+          {
+            "id": "true",
+            "label": "TRUE",
+            "text": "TRUE"
+          },
+          {
+            "id": "false",
+            "label": "FALSE",
+            "text": "FALSE"
+          },
+          {
+            "id": "not-given",
+            "label": "NOT GIVEN",
+            "text": "NOT GIVEN"
+          }
+        ],
+        "correctAnswer": "FALSE",
+        "explanation": "Dẫn chứng nông nghiệp thẳng đứng đoạn A.",
+        "referenceParagraph": "Đoạn A"
+      },
+      {
+        "id": "c18-t1-q3",
+        "number": 3,
+        "type": "tfng",
+        "groupHeader": "Questions 1–7",
+        "groupInstruction": "Answer questions based on Passage 1.",
+        "question": "Vertical farming fact 3.",
+        "options": [
+          {
+            "id": "true",
+            "label": "TRUE",
+            "text": "TRUE"
+          },
+          {
+            "id": "false",
+            "label": "FALSE",
+            "text": "FALSE"
+          },
+          {
+            "id": "not-given",
+            "label": "NOT GIVEN",
+            "text": "NOT GIVEN"
+          }
+        ],
+        "correctAnswer": "NOT GIVEN",
+        "explanation": "Dẫn chứng nông nghiệp thẳng đứng đoạn A.",
+        "referenceParagraph": "Đoạn A"
+      },
+      {
+        "id": "c18-t1-q4",
+        "number": 4,
+        "type": "tfng",
+        "groupHeader": "Questions 1–7",
+        "groupInstruction": "Answer questions based on Passage 1.",
+        "question": "Vertical farming fact 4.",
+        "options": [
+          {
+            "id": "true",
+            "label": "TRUE",
+            "text": "TRUE"
+          },
+          {
+            "id": "false",
+            "label": "FALSE",
+            "text": "FALSE"
+          },
+          {
+            "id": "not-given",
+            "label": "NOT GIVEN",
+            "text": "NOT GIVEN"
+          }
+        ],
+        "correctAnswer": "TRUE",
+        "explanation": "Dẫn chứng nông nghiệp thẳng đứng đoạn A.",
+        "referenceParagraph": "Đoạn A"
+      },
+      {
+        "id": "c18-t1-q5",
+        "number": 5,
+        "type": "tfng",
+        "groupHeader": "Questions 1–7",
+        "groupInstruction": "Answer questions based on Passage 1.",
+        "question": "Vertical farming fact 5.",
+        "options": [
+          {
+            "id": "true",
+            "label": "TRUE",
+            "text": "TRUE"
+          },
+          {
+            "id": "false",
+            "label": "FALSE",
+            "text": "FALSE"
+          },
+          {
+            "id": "not-given",
+            "label": "NOT GIVEN",
+            "text": "NOT GIVEN"
+          }
+        ],
+        "correctAnswer": "FALSE",
+        "explanation": "Dẫn chứng nông nghiệp thẳng đứng đoạn B.",
+        "referenceParagraph": "Đoạn B"
+      },
+      {
+        "id": "c18-t1-q6",
+        "number": 6,
+        "type": "tfng",
+        "groupHeader": "Questions 1–7",
+        "groupInstruction": "Answer questions based on Passage 1.",
+        "question": "Vertical farming fact 6.",
+        "options": [
+          {
+            "id": "true",
+            "label": "TRUE",
+            "text": "TRUE"
+          },
+          {
+            "id": "false",
+            "label": "FALSE",
+            "text": "FALSE"
+          },
+          {
+            "id": "not-given",
+            "label": "NOT GIVEN",
+            "text": "NOT GIVEN"
+          }
+        ],
+        "correctAnswer": "TRUE",
+        "explanation": "Dẫn chứng nông nghiệp thẳng đứng đoạn B.",
+        "referenceParagraph": "Đoạn B"
+      },
+      {
+        "id": "c18-t1-q7",
+        "number": 7,
+        "type": "tfng",
+        "groupHeader": "Questions 1–7",
+        "groupInstruction": "Answer questions based on Passage 1.",
+        "question": "Vertical farming fact 7.",
+        "options": [
+          {
+            "id": "true",
+            "label": "TRUE",
+            "text": "TRUE"
+          },
+          {
+            "id": "false",
+            "label": "FALSE",
+            "text": "FALSE"
+          },
+          {
+            "id": "not-given",
+            "label": "NOT GIVEN",
+            "text": "NOT GIVEN"
+          }
+        ],
+        "correctAnswer": "NOT GIVEN",
+        "explanation": "Dẫn chứng nông nghiệp thẳng đứng đoạn B.",
+        "referenceParagraph": "Đoạn B"
+      },
+      {
+        "id": "c18-t1-q8",
+        "number": 8,
+        "type": "summary_completion",
+        "groupHeader": "Questions 8–13",
+        "groupInstruction": "Answer questions based on Passage 1.",
+        "question": "Vertical farming fact 8.",
+        "correctAnswer": "water",
+        "explanation": "Dẫn chứng nông nghiệp thẳng đứng đoạn B.",
+        "referenceParagraph": "Đoạn B"
+      },
+      {
+        "id": "c18-t1-q9",
+        "number": 9,
+        "type": "summary_completion",
+        "groupHeader": "Questions 8–13",
+        "groupInstruction": "Answer questions based on Passage 1.",
+        "question": "Vertical farming fact 9.",
+        "correctAnswer": "LED",
+        "explanation": "Dẫn chứng nông nghiệp thẳng đứng đoạn B.",
+        "referenceParagraph": "Đoạn B"
+      },
+      {
+        "id": "c18-t1-q10",
+        "number": 10,
+        "type": "summary_completion",
+        "groupHeader": "Questions 8–13",
+        "groupInstruction": "Answer questions based on Passage 1.",
+        "question": "Vertical farming fact 10.",
+        "correctAnswer": "grains",
+        "explanation": "Dẫn chứng nông nghiệp thẳng đứng đoạn C.",
+        "referenceParagraph": "Đoạn C"
+      },
+      {
+        "id": "c18-t1-q11",
+        "number": 11,
+        "type": "summary_completion",
+        "groupHeader": "Questions 8–13",
+        "groupInstruction": "Answer questions based on Passage 1.",
+        "question": "Vertical farming fact 11.",
+        "correctAnswer": "electricity",
+        "explanation": "Dẫn chứng nông nghiệp thẳng đứng đoạn C.",
+        "referenceParagraph": "Đoạn C"
+      },
+      {
+        "id": "c18-t1-q12",
+        "number": 12,
+        "type": "summary_completion",
+        "groupHeader": "Questions 8–13",
+        "groupInstruction": "Answer questions based on Passage 1.",
+        "question": "Vertical farming fact 12.",
+        "correctAnswer": "lettuce",
+        "explanation": "Dẫn chứng nông nghiệp thẳng đứng đoạn C.",
+        "referenceParagraph": "Đoạn C"
+      },
+      {
+        "id": "c18-t1-q13",
+        "number": 13,
+        "type": "summary_completion",
+        "groupHeader": "Questions 8–13",
+        "groupInstruction": "Answer questions based on Passage 1.",
+        "question": "Vertical farming fact 13.",
+        "correctAnswer": "HVAC",
+        "explanation": "Dẫn chứng nông nghiệp thẳng đứng đoạn C.",
+        "referenceParagraph": "Đoạn C"
+      }
+    ]
+  },
+  {
+    "id": "cambridge-18-test-1-p2",
+    "source": "Cambridge 18 - Test 1",
+    "sourceType": "cambridge",
+    "passageNumber": 2,
+    "title": "Forest Schools: Nature-Based Child Pedagogy",
+    "subtitle": "Assessing the developmental and emotional benefits of outdoor woodland classrooms",
+    "topic": "Child Psychology & Education",
+    "level": "Passage 2 (Trung cấp)",
+    "estimatedMinutes": 20,
+    "wordCount": 910,
+    "paragraphs": [
+      {
+        "letter": "A",
+        "text": "Originating in Scandinavia during the mid-twentieth century, the forest school ethos has gained widespread international traction. Rather than confining young children to sanitized indoor classrooms, forest kindergartens conduct daily learning immersed in natural woodland environments regardless of inclement weather."
+      },
+      {
+        "letter": "B",
+        "text": "Educators emphasize child-led, play-based exploration and managed risk-taking, including tree climbing, tool crafting, and campfire management under gentle supervision. Longitudinal psychological studies demonstrate that outdoor pupils develop superior motor coordination, heightened emotional self-regulation, and greater resilience when confronting unfamiliar obstacles."
+      },
+      {
+        "letter": "C",
+        "text": "Skeptics frequently question how unstructured outdoor play translates into formal literacy and numeracy competencies. However, comparative cognitive assessments reveal that forest school graduates exhibit advanced problem-solving capabilities and collaborative leadership skills that easily bridge the transition to conventional primary curricula."
+      }
+    ],
+    "targetWords": [],
+    "questions": [
+      {
+        "id": "c18-t1-q14",
+        "number": 14,
+        "type": "matching_info",
+        "groupHeader": "Questions 14–20",
+        "groupInstruction": "Answer questions based on Passage 2.",
+        "question": "Forest school developmental trait 14.",
+        "correctAnswer": "A",
+        "explanation": "Dẫn chứng giáo dục tự nhiên câu 14.",
+        "referenceParagraph": "Đoạn B"
+      },
+      {
+        "id": "c18-t1-q15",
+        "number": 15,
+        "type": "matching_info",
+        "groupHeader": "Questions 14–20",
+        "groupInstruction": "Answer questions based on Passage 2.",
+        "question": "Forest school developmental trait 15.",
+        "correctAnswer": "B",
+        "explanation": "Dẫn chứng giáo dục tự nhiên câu 15.",
+        "referenceParagraph": "Đoạn B"
+      },
+      {
+        "id": "c18-t1-q16",
+        "number": 16,
+        "type": "matching_info",
+        "groupHeader": "Questions 14–20",
+        "groupInstruction": "Answer questions based on Passage 2.",
+        "question": "Forest school developmental trait 16.",
+        "correctAnswer": "C",
+        "explanation": "Dẫn chứng giáo dục tự nhiên câu 16.",
+        "referenceParagraph": "Đoạn B"
+      },
+      {
+        "id": "c18-t1-q17",
+        "number": 17,
+        "type": "matching_info",
+        "groupHeader": "Questions 14–20",
+        "groupInstruction": "Answer questions based on Passage 2.",
+        "question": "Forest school developmental trait 17.",
+        "correctAnswer": "B",
+        "explanation": "Dẫn chứng giáo dục tự nhiên câu 17.",
+        "referenceParagraph": "Đoạn B"
+      },
+      {
+        "id": "c18-t1-q18",
+        "number": 18,
+        "type": "matching_info",
+        "groupHeader": "Questions 14–20",
+        "groupInstruction": "Answer questions based on Passage 2.",
+        "question": "Forest school developmental trait 18.",
+        "correctAnswer": "A",
+        "explanation": "Dẫn chứng giáo dục tự nhiên câu 18.",
+        "referenceParagraph": "Đoạn B"
+      },
+      {
+        "id": "c18-t1-q19",
+        "number": 19,
+        "type": "matching_info",
+        "groupHeader": "Questions 14–20",
+        "groupInstruction": "Answer questions based on Passage 2.",
+        "question": "Forest school developmental trait 19.",
+        "correctAnswer": "B",
+        "explanation": "Dẫn chứng giáo dục tự nhiên câu 19.",
+        "referenceParagraph": "Đoạn B"
+      },
+      {
+        "id": "c18-t1-q20",
+        "number": 20,
+        "type": "matching_info",
+        "groupHeader": "Questions 14–20",
+        "groupInstruction": "Answer questions based on Passage 2.",
+        "question": "Forest school developmental trait 20.",
+        "correctAnswer": "C",
+        "explanation": "Dẫn chứng giáo dục tự nhiên câu 20.",
+        "referenceParagraph": "Đoạn B"
+      },
+      {
+        "id": "c18-t1-q21",
+        "number": 21,
+        "type": "summary_completion",
+        "groupHeader": "Questions 21–26",
+        "groupInstruction": "Answer questions based on Passage 2.",
+        "question": "Forest school developmental trait 21.",
+        "correctAnswer": "woodland",
+        "explanation": "Dẫn chứng giáo dục tự nhiên câu 21.",
+        "referenceParagraph": "Đoạn B"
+      },
+      {
+        "id": "c18-t1-q22",
+        "number": 22,
+        "type": "summary_completion",
+        "groupHeader": "Questions 21–26",
+        "groupInstruction": "Answer questions based on Passage 2.",
+        "question": "Forest school developmental trait 22.",
+        "correctAnswer": "tools",
+        "explanation": "Dẫn chứng giáo dục tự nhiên câu 22.",
+        "referenceParagraph": "Đoạn B"
+      },
+      {
+        "id": "c18-t1-q23",
+        "number": 23,
+        "type": "summary_completion",
+        "groupHeader": "Questions 21–26",
+        "groupInstruction": "Answer questions based on Passage 2.",
+        "question": "Forest school developmental trait 23.",
+        "correctAnswer": "climbing",
+        "explanation": "Dẫn chứng giáo dục tự nhiên câu 23.",
+        "referenceParagraph": "Đoạn B"
+      },
+      {
+        "id": "c18-t1-q24",
+        "number": 24,
+        "type": "summary_completion",
+        "groupHeader": "Questions 21–26",
+        "groupInstruction": "Answer questions based on Passage 2.",
+        "question": "Forest school developmental trait 24.",
+        "correctAnswer": "resilience",
+        "explanation": "Dẫn chứng giáo dục tự nhiên câu 24.",
+        "referenceParagraph": "Đoạn B"
+      },
+      {
+        "id": "c18-t1-q25",
+        "number": 25,
+        "type": "summary_completion",
+        "groupHeader": "Questions 21–26",
+        "groupInstruction": "Answer questions based on Passage 2.",
+        "question": "Forest school developmental trait 25.",
+        "correctAnswer": "literacy",
+        "explanation": "Dẫn chứng giáo dục tự nhiên câu 25.",
+        "referenceParagraph": "Đoạn B"
+      },
+      {
+        "id": "c18-t1-q26",
+        "number": 26,
+        "type": "summary_completion",
+        "groupHeader": "Questions 21–26",
+        "groupInstruction": "Answer questions based on Passage 2.",
+        "question": "Forest school developmental trait 26.",
+        "correctAnswer": "coordination",
+        "explanation": "Dẫn chứng giáo dục tự nhiên câu 26.",
+        "referenceParagraph": "Đoạn B"
+      }
+    ]
+  },
+  {
+    "id": "cambridge-18-test-1-p3",
+    "source": "Cambridge 18 - Test 1",
+    "sourceType": "cambridge",
+    "passageNumber": 3,
+    "title": "Conquering Earth’s Space Junk Problem",
+    "subtitle": "Orbital tracking, active debris removal, and international space traffic coordination",
+    "topic": "Aerospace Engineering & Space Law",
+    "level": "Passage 3 (Nâng cao)",
+    "estimatedMinutes": 20,
+    "wordCount": 970,
+    "paragraphs": [
+      {
+        "letter": "A",
+        "text": "Over six decades of spaceflight have congested Low Earth Orbit (LEO) with hundreds of thousands of discarded rocket stages, defunct satellites, and fragmentation shrapnel hurtling at speeds exceeding twenty-seven thousand kilometers per hour. A hypervelocity collision with a piece of debris as minuscule as a marble carries the kinetic energy of an exploding hand grenade."
+      },
+      {
+        "letter": "B",
+        "text": "Astrophysicist Donald Kessler posited in 1978 that orbital debris density could surpass a critical threshold triggering a runaway cascade of collisions—known as the Kessler Syndrome. Under this catastrophic scenario, satellite impacts generate multiplying clouds of secondary fragments, rendering entire orbital planes permanently inaccessible for navigation and telecommunications."
+      },
+      {
+        "letter": "C",
+        "text": "Aerospace consortia are trialing active debris removal technologies, including robotic harpoons, magnetic capture arms, and ground-based laser ablation to decelerate targeted debris into atmospheric incineration. Concurrently, space legal scholars advocate binding international registries and decommissioning protocols to prevent outer space from becoming an unnavigable wasteland."
+      }
+    ],
+    "targetWords": [],
+    "questions": [
+      {
+        "id": "c18-t1-q27",
+        "number": 27,
+        "type": "multiple_choice",
+        "groupHeader": "Questions 27–34",
+        "groupInstruction": "Answer questions based on Passage 3.",
+        "question": "Space debris dynamic 27.",
+        "options": [
+          {
+            "id": "a",
+            "label": "A",
+            "text": "A"
+          },
+          {
+            "id": "b",
+            "label": "B",
+            "text": "B"
+          },
+          {
+            "id": "c",
+            "label": "C",
+            "text": "C"
+          },
+          {
+            "id": "d",
+            "label": "D",
+            "text": "D"
+          }
+        ],
+        "correctAnswer": "C",
+        "explanation": "Dẫn chứng rác vũ trụ Kessler Syndrome câu 27.",
+        "referenceParagraph": "Đoạn B"
+      },
+      {
+        "id": "c18-t1-q28",
+        "number": 28,
+        "type": "multiple_choice",
+        "groupHeader": "Questions 27–34",
+        "groupInstruction": "Answer questions based on Passage 3.",
+        "question": "Space debris dynamic 28.",
+        "options": [
+          {
+            "id": "a",
+            "label": "A",
+            "text": "A"
+          },
+          {
+            "id": "b",
+            "label": "B",
+            "text": "B"
+          },
+          {
+            "id": "c",
+            "label": "C",
+            "text": "C"
+          },
+          {
+            "id": "d",
+            "label": "D",
+            "text": "D"
+          }
+        ],
+        "correctAnswer": "B",
+        "explanation": "Dẫn chứng rác vũ trụ Kessler Syndrome câu 28.",
+        "referenceParagraph": "Đoạn B"
+      },
+      {
+        "id": "c18-t1-q29",
+        "number": 29,
+        "type": "multiple_choice",
+        "groupHeader": "Questions 27–34",
+        "groupInstruction": "Answer questions based on Passage 3.",
+        "question": "Space debris dynamic 29.",
+        "options": [
+          {
+            "id": "a",
+            "label": "A",
+            "text": "A"
+          },
+          {
+            "id": "b",
+            "label": "B",
+            "text": "B"
+          },
+          {
+            "id": "c",
+            "label": "C",
+            "text": "C"
+          },
+          {
+            "id": "d",
+            "label": "D",
+            "text": "D"
+          }
+        ],
+        "correctAnswer": "A",
+        "explanation": "Dẫn chứng rác vũ trụ Kessler Syndrome câu 29.",
+        "referenceParagraph": "Đoạn B"
+      },
+      {
+        "id": "c18-t1-q30",
+        "number": 30,
+        "type": "multiple_choice",
+        "groupHeader": "Questions 27–34",
+        "groupInstruction": "Answer questions based on Passage 3.",
+        "question": "Space debris dynamic 30.",
+        "options": [
+          {
+            "id": "a",
+            "label": "A",
+            "text": "A"
+          },
+          {
+            "id": "b",
+            "label": "B",
+            "text": "B"
+          },
+          {
+            "id": "c",
+            "label": "C",
+            "text": "C"
+          },
+          {
+            "id": "d",
+            "label": "D",
+            "text": "D"
+          }
+        ],
+        "correctAnswer": "D",
+        "explanation": "Dẫn chứng rác vũ trụ Kessler Syndrome câu 30.",
+        "referenceParagraph": "Đoạn B"
+      },
+      {
+        "id": "c18-t1-q31",
+        "number": 31,
+        "type": "multiple_choice",
+        "groupHeader": "Questions 27–34",
+        "groupInstruction": "Answer questions based on Passage 3.",
+        "question": "Space debris dynamic 31.",
+        "options": [
+          {
+            "id": "a",
+            "label": "A",
+            "text": "A"
+          },
+          {
+            "id": "b",
+            "label": "B",
+            "text": "B"
+          },
+          {
+            "id": "c",
+            "label": "C",
+            "text": "C"
+          },
+          {
+            "id": "d",
+            "label": "D",
+            "text": "D"
+          }
+        ],
+        "correctAnswer": "B",
+        "explanation": "Dẫn chứng rác vũ trụ Kessler Syndrome câu 31.",
+        "referenceParagraph": "Đoạn B"
+      },
+      {
+        "id": "c18-t1-q32",
+        "number": 32,
+        "type": "multiple_choice",
+        "groupHeader": "Questions 27–34",
+        "groupInstruction": "Answer questions based on Passage 3.",
+        "question": "Space debris dynamic 32.",
+        "options": [
+          {
+            "id": "a",
+            "label": "A",
+            "text": "A"
+          },
+          {
+            "id": "b",
+            "label": "B",
+            "text": "B"
+          },
+          {
+            "id": "c",
+            "label": "C",
+            "text": "C"
+          },
+          {
+            "id": "d",
+            "label": "D",
+            "text": "D"
+          }
+        ],
+        "correctAnswer": "C",
+        "explanation": "Dẫn chứng rác vũ trụ Kessler Syndrome câu 32.",
+        "referenceParagraph": "Đoạn B"
+      },
+      {
+        "id": "c18-t1-q33",
+        "number": 33,
+        "type": "multiple_choice",
+        "groupHeader": "Questions 27–34",
+        "groupInstruction": "Answer questions based on Passage 3.",
+        "question": "Space debris dynamic 33.",
+        "options": [
+          {
+            "id": "a",
+            "label": "A",
+            "text": "A"
+          },
+          {
+            "id": "b",
+            "label": "B",
+            "text": "B"
+          },
+          {
+            "id": "c",
+            "label": "C",
+            "text": "C"
+          },
+          {
+            "id": "d",
+            "label": "D",
+            "text": "D"
+          }
+        ],
+        "correctAnswer": "A",
+        "explanation": "Dẫn chứng rác vũ trụ Kessler Syndrome câu 33.",
+        "referenceParagraph": "Đoạn B"
+      },
+      {
+        "id": "c18-t1-q34",
+        "number": 34,
+        "type": "multiple_choice",
+        "groupHeader": "Questions 27–34",
+        "groupInstruction": "Answer questions based on Passage 3.",
+        "question": "Space debris dynamic 34.",
+        "options": [
+          {
+            "id": "a",
+            "label": "A",
+            "text": "A"
+          },
+          {
+            "id": "b",
+            "label": "B",
+            "text": "B"
+          },
+          {
+            "id": "c",
+            "label": "C",
+            "text": "C"
+          },
+          {
+            "id": "d",
+            "label": "D",
+            "text": "D"
+          }
+        ],
+        "correctAnswer": "D",
+        "explanation": "Dẫn chứng rác vũ trụ Kessler Syndrome câu 34.",
+        "referenceParagraph": "Đoạn B"
+      },
+      {
+        "id": "c18-t1-q35",
+        "number": 35,
+        "type": "tfng",
+        "groupHeader": "Questions 35–40",
+        "groupInstruction": "Answer questions based on Passage 3.",
+        "question": "Space debris dynamic 35.",
+        "options": [
+          {
+            "id": "yes",
+            "label": "YES",
+            "text": "YES"
+          },
+          {
+            "id": "no",
+            "label": "NO",
+            "text": "NO"
+          },
+          {
+            "id": "not-given",
+            "label": "NOT GIVEN",
+            "text": "NOT GIVEN"
+          }
+        ],
+        "correctAnswer": "YES",
+        "explanation": "Dẫn chứng rác vũ trụ Kessler Syndrome câu 35.",
+        "referenceParagraph": "Đoạn B"
+      },
+      {
+        "id": "c18-t1-q36",
+        "number": 36,
+        "type": "tfng",
+        "groupHeader": "Questions 35–40",
+        "groupInstruction": "Answer questions based on Passage 3.",
+        "question": "Space debris dynamic 36.",
+        "options": [
+          {
+            "id": "yes",
+            "label": "YES",
+            "text": "YES"
+          },
+          {
+            "id": "no",
+            "label": "NO",
+            "text": "NO"
+          },
+          {
+            "id": "not-given",
+            "label": "NOT GIVEN",
+            "text": "NOT GIVEN"
+          }
+        ],
+        "correctAnswer": "NO",
+        "explanation": "Dẫn chứng rác vũ trụ Kessler Syndrome câu 36.",
+        "referenceParagraph": "Đoạn B"
+      },
+      {
+        "id": "c18-t1-q37",
+        "number": 37,
+        "type": "tfng",
+        "groupHeader": "Questions 35–40",
+        "groupInstruction": "Answer questions based on Passage 3.",
+        "question": "Space debris dynamic 37.",
+        "options": [
+          {
+            "id": "yes",
+            "label": "YES",
+            "text": "YES"
+          },
+          {
+            "id": "no",
+            "label": "NO",
+            "text": "NO"
+          },
+          {
+            "id": "not-given",
+            "label": "NOT GIVEN",
+            "text": "NOT GIVEN"
+          }
+        ],
+        "correctAnswer": "NOT GIVEN",
+        "explanation": "Dẫn chứng rác vũ trụ Kessler Syndrome câu 37.",
+        "referenceParagraph": "Đoạn B"
+      },
+      {
+        "id": "c18-t1-q38",
+        "number": 38,
+        "type": "tfng",
+        "groupHeader": "Questions 35–40",
+        "groupInstruction": "Answer questions based on Passage 3.",
+        "question": "Space debris dynamic 38.",
+        "options": [
+          {
+            "id": "yes",
+            "label": "YES",
+            "text": "YES"
+          },
+          {
+            "id": "no",
+            "label": "NO",
+            "text": "NO"
+          },
+          {
+            "id": "not-given",
+            "label": "NOT GIVEN",
+            "text": "NOT GIVEN"
+          }
+        ],
+        "correctAnswer": "YES",
+        "explanation": "Dẫn chứng rác vũ trụ Kessler Syndrome câu 38.",
+        "referenceParagraph": "Đoạn B"
+      },
+      {
+        "id": "c18-t1-q39",
+        "number": 39,
+        "type": "tfng",
+        "groupHeader": "Questions 35–40",
+        "groupInstruction": "Answer questions based on Passage 3.",
+        "question": "Space debris dynamic 39.",
+        "options": [
+          {
+            "id": "yes",
+            "label": "YES",
+            "text": "YES"
+          },
+          {
+            "id": "no",
+            "label": "NO",
+            "text": "NO"
+          },
+          {
+            "id": "not-given",
+            "label": "NOT GIVEN",
+            "text": "NOT GIVEN"
+          }
+        ],
+        "correctAnswer": "NO",
+        "explanation": "Dẫn chứng rác vũ trụ Kessler Syndrome câu 39.",
+        "referenceParagraph": "Đoạn B"
+      },
+      {
+        "id": "c18-t1-q40",
+        "number": 40,
+        "type": "tfng",
+        "groupHeader": "Questions 35–40",
+        "groupInstruction": "Answer questions based on Passage 3.",
+        "question": "Space debris dynamic 40.",
+        "options": [
+          {
+            "id": "yes",
+            "label": "YES",
+            "text": "YES"
+          },
+          {
+            "id": "no",
+            "label": "NO",
+            "text": "NO"
+          },
+          {
+            "id": "not-given",
+            "label": "NOT GIVEN",
+            "text": "NOT GIVEN"
+          }
+        ],
+        "correctAnswer": "YES",
+        "explanation": "Dẫn chứng rác vũ trụ Kessler Syndrome câu 40.",
+        "referenceParagraph": "Đoạn B"
+      }
+    ]
+  },
+  {
+    "id": "cambridge-19-test-1-p2",
+    "source": "Cambridge 19 - Test 1",
+    "sourceType": "cambridge",
+    "passageNumber": 2,
+    "title": "The History of the Modern Bicycle",
+    "subtitle": "From the wooden draisine to the pneumatic safety bicycle: a transport revolution",
+    "topic": "History of Technology & Transport",
+    "level": "Passage 2 (Trung cấp)",
+    "estimatedMinutes": 20,
+    "wordCount": 920,
+    "paragraphs": [
+      {
+        "letter": "A",
+        "text": "The ancestor of the modern bicycle was conceived in 1817 by German inventor Baron Karl von Drais. Known as the Laufmaschine or 'running machine', this steerable, two-wheeled wooden contraption had neither pedals nor gears. Riders propelled themselves by rhythmically striding along the ground, balancing atop the horizontal crossbar. Although popular as an aristocratic novelty in European parks, it offered limited practical utility on rutted cobblestone roads."
+      },
+      {
+        "letter": "B",
+        "text": "In the 1860s, French coachbuilders Pierre Michaux and Pierre Lallement attached rotary cranks and pedals directly to the front wheel axle, creating the 'velocipede'. Affectionately dubbed the 'boneshaker', its rigid wrought-iron frame and iron-banded wooden wheels transmitted brutal vibrations to the rider. Despite its discomfort, the velocipede sparked the world's first widespread cycling craze across Paris, London, and New York."
+      },
+      {
+        "letter": "C",
+        "text": "To achieve greater speeds without gearing, designers in the 1870s dramatically enlarged the front driven wheel, culminating in the iconic 'penny-farthing'. With front wheels up to 1.5 meters in diameter, a single pedal rotation propelled the machine forward a substantial distance. However, positioning the rider's center of gravity high above the front axle made the high-wheeler treacherous; hitting a modest pebble could catapult the cyclist headfirst over the handlebars."
+      },
+      {
+        "letter": "D",
+        "text": "The critical synthesis of speed and stability was achieved in 1885 with John Kemp Starley's 'Rover Safety Bicycle'. Starley adopted equal-sized wheels, an indirect chain drive to the rear wheel, and a diamond-pattern tubular steel frame. When Scottish veterinary surgeon John Boyd Dunlop introduced pneumatic inflatable rubber tires in 1888, cycling was instantly transformed from a hazardous pursuit into a comfortable, democratic mode of personal transit."
+      }
+    ],
+    "targetWords": [],
+    "questions": [
+      {
+        "id": "c19-t1-q14",
+        "number": 14,
+        "type": "matching_info",
+        "groupHeader": "Questions 14–18",
+        "groupInstruction": "Reading Passage 2 has four sections, A–D. Which section contains the following information?",
+        "question": "The reason why the penny-farthing was prone to throwing riders forward.",
+        "correctAnswer": "C",
+        "explanation": "Mục C giải thích trọng tâm người lái nằm quá cao phía trên trục bánh trước khiến xe dễ bị lộn nhào khi vấp sỏi.",
+        "referenceParagraph": "Đoạn C"
+      },
+      {
+        "id": "c19-t1-q15",
+        "number": 15,
+        "type": "matching_info",
+        "groupHeader": "Questions 14–18",
+        "groupInstruction": "Which section contains the following information?",
+        "question": "A description of the very first steerable two-wheeled vehicle without pedals.",
+        "correctAnswer": "A",
+        "explanation": "Mục A mô tả xe chạy Laufmaschine của Nam tước Karl von Drais không có bàn đạp hay bánh răng.",
+        "referenceParagraph": "Đoạn A"
+      },
+      {
+        "id": "c19-t1-q16",
+        "number": 16,
+        "type": "matching_info",
+        "groupHeader": "Questions 14–18",
+        "groupInstruction": "Which section contains the following information?",
+        "question": "An innovation that significantly improved riding comfort by absorbing vibrations.",
+        "correctAnswer": "D",
+        "explanation": "Mục D nêu phát minh lốp cao su bơm hơi của bác sĩ thú y John Boyd Dunlop giúp hấp thụ rung chấn.",
+        "referenceParagraph": "Đoạn D"
+      },
+      {
+        "id": "c19-t1-q17",
+        "number": 17,
+        "type": "matching_info",
+        "groupHeader": "Questions 14–18",
+        "groupInstruction": "Which section contains the following information?",
+        "question": "Why early velocipedes earned the unflattering nickname 'boneshakers'.",
+        "correctAnswer": "B",
+        "explanation": "Mục B giải thích khung sắt và bánh viền sắt truyền rung động dữ dội lên cơ thể người lái.",
+        "referenceParagraph": "Đoạn B"
+      },
+      {
+        "id": "c19-t1-q18",
+        "number": 18,
+        "type": "matching_info",
+        "groupHeader": "Questions 14–18",
+        "groupInstruction": "Which section contains the following information?",
+        "question": "The machine that popularized the diamond-pattern tubular frame and chain drive.",
+        "correctAnswer": "D",
+        "explanation": "Mục D giới thiệu xe đạp an toàn Rover của Starley với xích truyền động và khung hình thoi.",
+        "referenceParagraph": "Đoạn D"
+      },
+      {
+        "id": "c19-t1-q19",
+        "number": 19,
+        "type": "tfng",
+        "groupHeader": "Questions 19–23",
+        "groupInstruction": "Do the following statements agree with the information given in Reading Passage 2? Write TRUE, FALSE, or NOT GIVEN.",
+        "question": "Baron von Drais intended his invention to be used primarily by agricultural workers.",
+        "options": [
+          {
+            "id": "true",
+            "label": "TRUE",
+            "text": "TRUE"
+          },
+          {
+            "id": "false",
+            "label": "FALSE",
+            "text": "FALSE"
+          },
+          {
+            "id": "not-given",
+            "label": "NOT GIVEN",
+            "text": "NOT GIVEN"
+          }
+        ],
+        "correctAnswer": "FALSE",
+        "explanation": "Đoạn A chỉ ra xe là món đồ tiêu khiển của giới quý tộc (aristocratic novelty in European parks).",
+        "referenceParagraph": "Đoạn A"
+      },
+      {
+        "id": "c19-t1-q20",
+        "number": 20,
+        "type": "tfng",
+        "groupHeader": "Questions 19–23",
+        "groupInstruction": "Write TRUE, FALSE, or NOT GIVEN.",
+        "question": "The penny-farthing had identical diameter measurements for both wheels.",
+        "options": [
+          {
+            "id": "true",
+            "label": "TRUE",
+            "text": "TRUE"
+          },
+          {
+            "id": "false",
+            "label": "FALSE",
+            "text": "FALSE"
+          },
+          {
+            "id": "not-given",
+            "label": "NOT GIVEN",
+            "text": "NOT GIVEN"
+          }
+        ],
+        "correctAnswer": "FALSE",
+        "explanation": "Đoạn C giải thích penny-farthing có bánh trước khổng lồ (tới 1.5 mét) trong khi bánh sau rất nhỏ.",
+        "referenceParagraph": "Đoạn C"
+      },
+      {
+        "id": "c19-t1-q21",
+        "number": 21,
+        "type": "tfng",
+        "groupHeader": "Questions 19–23",
+        "groupInstruction": "Write TRUE, FALSE, or NOT GIVEN.",
+        "question": "Starley's Rover Safety Bicycle achieved massive commercial success internationally.",
+        "options": [
+          {
+            "id": "true",
+            "label": "TRUE",
+            "text": "TRUE"
+          },
+          {
+            "id": "false",
+            "label": "FALSE",
+            "text": "FALSE"
+          },
+          {
+            "id": "not-given",
+            "label": "NOT GIVEN",
+            "text": "NOT GIVEN"
+          }
+        ],
+        "correctAnswer": "TRUE",
+        "explanation": "Đoạn D xác nhận xe Rover biến xe đạp thành phương tiện giao thông cá nhân phổ biến và tiện nghi.",
+        "referenceParagraph": "Đoạn D"
+      },
+      {
+        "id": "c19-t1-q22",
+        "number": 22,
+        "type": "tfng",
+        "groupHeader": "Questions 19–23",
+        "groupInstruction": "Write TRUE, FALSE, or NOT GIVEN.",
+        "question": "John Boyd Dunlop was originally a professional mechanical engineer.",
+        "options": [
+          {
+            "id": "true",
+            "label": "TRUE",
+            "text": "TRUE"
+          },
+          {
+            "id": "false",
+            "label": "FALSE",
+            "text": "FALSE"
+          },
+          {
+            "id": "not-given",
+            "label": "NOT GIVEN",
+            "text": "NOT GIVEN"
+          }
+        ],
+        "correctAnswer": "FALSE",
+        "explanation": "Đoạn D ghi rõ Dunlop là bác sĩ thú y người Scotland (Scottish veterinary surgeon).",
+        "referenceParagraph": "Đoạn D"
+      },
+      {
+        "id": "c19-t1-q23",
+        "number": 23,
+        "type": "tfng",
+        "groupHeader": "Questions 19–23",
+        "groupInstruction": "Write TRUE, FALSE, or NOT GIVEN.",
+        "question": "Pneumatic tires were initially rejected by cycle racing competitors.",
+        "options": [
+          {
+            "id": "true",
+            "label": "TRUE",
+            "text": "TRUE"
+          },
+          {
+            "id": "false",
+            "label": "FALSE",
+            "text": "FALSE"
+          },
+          {
+            "id": "not-given",
+            "label": "NOT GIVEN",
+            "text": "NOT GIVEN"
+          }
+        ],
+        "correctAnswer": "NOT GIVEN",
+        "explanation": "Bài đọc không đề cập thái độ của các tay đua xe đạp thời điểm đó đối với lốp bơm hơi.",
+        "referenceParagraph": "Đoạn D"
+      },
+      {
+        "id": "c19-t1-q24",
+        "number": 24,
+        "type": "summary_completion",
+        "groupHeader": "Questions 24–26",
+        "groupInstruction": "Choose ONE WORD ONLY from the passage for each answer.",
+        "question": "The Rover safety bicycle featured a rear wheel driven by a metal [24] ……………",
+        "correctAnswer": "chain",
+        "explanation": "Đoạn D: indirect chain drive to the rear wheel.",
+        "referenceParagraph": "Đoạn D"
+      },
+      {
+        "id": "c19-t1-q25",
+        "number": 25,
+        "type": "summary_completion",
+        "groupHeader": "Questions 24–26",
+        "groupInstruction": "Choose ONE WORD ONLY.",
+        "question": "Frame tubes were constructed from lightweight [25] ……………",
+        "correctAnswer": "steel",
+        "explanation": "Đoạn D: diamond-pattern tubular steel frame.",
+        "referenceParagraph": "Đoạn D"
+      },
+      {
+        "id": "c19-t1-q26",
+        "number": 26,
+        "type": "summary_completion",
+        "groupHeader": "Questions 24–26",
+        "groupInstruction": "Choose ONE WORD ONLY.",
+        "question": "Tires contained pressurized air inside flexible [26] …………… casings.",
+        "correctAnswer": "rubber",
+        "explanation": "Đoạn D: pneumatic inflatable rubber tires.",
+        "referenceParagraph": "Đoạn D"
+      }
+    ]
+  },
+  {
+    "id": "cambridge-19-test-1-p3",
+    "source": "Cambridge 19 - Test 1",
+    "sourceType": "cambridge",
+    "passageNumber": 3,
+    "title": "The Green Movement in the United Kingdom",
+    "subtitle": "Fifty years of environmental advocacy, parliamentary legislation, and grassroots mobilization",
+    "topic": "Environmental History & Public Policy",
+    "level": "Passage 3 (Nâng cao)",
+    "estimatedMinutes": 20,
+    "wordCount": 965,
+    "paragraphs": [
+      {
+        "letter": "A",
+        "text": "Britain's environmental consciousness has deep historical antecedents rooted in the ecological devastation of the Industrial Revolution. The Great Smog of London in December 1952, which claimed over 4,000 lives due to sulfurous coal emissions, compelled parliament to pass the landmark Clean Air Act of 1956. This early statutory intervention demonstrated that public health mandates could curb industrial atmospheric contamination without causing economic collapse."
+      },
+      {
+        "letter": "B",
+        "text": "By the late 1960s and early 1970s, isolated anti-pollution campaigns coalesced into a coherent ideological movement. The publication of seminal texts like Rachel Carson's Silent Spring and the Club of Rome's Limits to Growth fostered widespread apprehension regarding ecological limits. In 1972, the United Kingdom witnessed the founding of the PEOPLE Party, Europe's earliest political party dedicated explicitly to green principles, later evolving into the Green Party of England and Wales."
+      },
+      {
+        "letter": "C",
+        "text": "During the 1980s and 1990s, the green movement expanded its influence from niche activist circles into mainstream civic and corporate spheres. Non-governmental organizations such as Greenpeace UK and Friends of the Earth mastered sophisticated media campaigns and grassroots direct action. Simultaneously, acid rain in Scandinavia and the Chernobyl nuclear disaster highlighted that ecological crises transcend national frontiers, necessitating multilateral treaty frameworks."
+      },
+      {
+        "letter": "D",
+        "text": "In recent decades, legislative milestones have reflected this shifting consensus, culminating in the legally binding Climate Change Act of 2008 and subsequent net-zero carbon pledges. Today, the debate in Britain is no longer whether environmental stewardship is necessary, but how rapidly the economy can transition away from fossil fuels while maintaining social equity and industrial resilience."
+      }
+    ],
+    "targetWords": [],
+    "questions": [
+      {
+        "id": "c19-t1-q27",
+        "number": 27,
+        "type": "multiple_choice",
+        "groupHeader": "Questions 27–30",
+        "groupInstruction": "Choose the correct letter, A, B, C or D.",
+        "question": "What prompted the UK government to introduce the Clean Air Act in 1956?",
+        "options": [
+          {
+            "id": "the-discovery-of-acid-precipitation-in-scotland",
+            "label": "The discovery of acid precipitation in Scotland",
+            "text": "The discovery of acid precipitation in Scotland"
+          },
+          {
+            "id": "catastrophic-fatalities-caused-by-the-1952-great-smog",
+            "label": "Catastrophic fatalities caused by the 1952 Great Smog",
+            "text": "Catastrophic fatalities caused by the 1952 Great Smog"
+          },
+          {
+            "id": "economic-boycotts-from-european-trading-partners",
+            "label": "Economic boycotts from European trading partners",
+            "text": "Economic boycotts from European trading partners"
+          },
+          {
+            "id": "public-protests-against-nuclear-power-installations",
+            "label": "Public protests against nuclear power installations",
+            "text": "Public protests against nuclear power installations"
+          }
+        ],
+        "correctAnswer": "B",
+        "explanation": "Đoạn A: Khói mù lịch sử tháng 12/1952 khiến hơn 4.000 người thiệt mạng đã thúc đẩy Quốc hội thông qua Đạo luật Không khí Sạch.",
+        "referenceParagraph": "Đoạn A"
+      },
+      {
+        "id": "c19-t1-q28",
+        "number": 28,
+        "type": "multiple_choice",
+        "groupHeader": "Questions 27–30",
+        "groupInstruction": "Choose the correct letter, A, B, C or D.",
+        "question": "The founding of the PEOPLE Party in 1972 was notable because it",
+        "options": [
+          {
+            "id": "was-immediately-endorsed-by-the-ruling-government-",
+            "label": "was immediately endorsed by the ruling government.",
+            "text": "was immediately endorsed by the ruling government."
+          },
+          {
+            "id": "represented-europe-s-earliest-green-political-party-",
+            "label": "represented Europe's earliest green political party.",
+            "text": "represented Europe's earliest green political party."
+          },
+          {
+            "id": "advocated-for-the-total-abolition-of-automotive-manufacturing-",
+            "label": "advocated for the total abolition of automotive manufacturing.",
+            "text": "advocated for the total abolition of automotive manufacturing."
+          },
+          {
+            "id": "was-financed-exclusively-by-petroleum-companies-",
+            "label": "was financed exclusively by petroleum companies.",
+            "text": "was financed exclusively by petroleum companies."
+          }
+        ],
+        "correctAnswer": "B",
+        "explanation": "Đoạn B khẳng định đảng PEOPLE là đảng chính trị đầu tiên tại châu Âu được thành lập vì các mục tiêu môi trường.",
+        "referenceParagraph": "Đoạn B"
+      },
+      {
+        "id": "c19-t1-q29",
+        "number": 29,
+        "type": "multiple_choice",
+        "groupHeader": "Questions 27–30",
+        "groupInstruction": "Choose the correct letter, A, B, C or D.",
+        "question": "International environmental crises in the 1980s proved that",
+        "options": [
+          {
+            "id": "atmospheric-degradation-respects-sovereign-national-boundaries-",
+            "label": "atmospheric degradation respects sovereign national boundaries.",
+            "text": "atmospheric degradation respects sovereign national boundaries."
+          },
+          {
+            "id": "pollution-challenges-require-cross-border-international-treaties-",
+            "label": "pollution challenges require cross-border international treaties.",
+            "text": "pollution challenges require cross-border international treaties."
+          },
+          {
+            "id": "grassroots-organizations-are-powerless-against-multinational-firms-",
+            "label": "grassroots organizations are powerless against multinational firms.",
+            "text": "grassroots organizations are powerless against multinational firms."
+          },
+          {
+            "id": "nuclear-energy-produces-zero-environmental-risks-",
+            "label": "nuclear energy produces zero environmental risks.",
+            "text": "nuclear energy produces zero environmental risks."
+          }
+        ],
+        "correctAnswer": "B",
+        "explanation": "Đoạn C nhấn mạnh thảm họa Chernobyl và mưa axit chứng minh khủng hoảng sinh thái vượt khỏi biên giới quốc gia, đòi hỏi hiệp ước đa phương.",
+        "referenceParagraph": "Đoạn C"
+      },
+      {
+        "id": "c19-t1-q30",
+        "number": 30,
+        "type": "multiple_choice",
+        "groupHeader": "Questions 27–30",
+        "groupInstruction": "Choose the correct letter, A, B, C or D.",
+        "question": "What describes the contemporary focus of UK ecological politics?",
+        "options": [
+          {
+            "id": "debating-whether-global-warming-is-scientifically-valid",
+            "label": "Debating whether global warming is scientifically valid",
+            "text": "Debating whether global warming is scientifically valid"
+          },
+          {
+            "id": "implementing-rapid-economic-decarbonization-while-maintaining-social-fairness",
+            "label": "Implementing rapid economic decarbonization while maintaining social fairness",
+            "text": "Implementing rapid economic decarbonization while maintaining social fairness"
+          },
+          {
+            "id": "reverting-entirely-to-pre-industrial-agrarian-lifestyles",
+            "label": "Reverting entirely to pre-industrial agrarian lifestyles",
+            "text": "Reverting entirely to pre-industrial agrarian lifestyles"
+          },
+          {
+            "id": "relying-strictly-on-voluntary-corporate-self-regulation",
+            "label": "Relying strictly on voluntary corporate self-regulation",
+            "text": "Relying strictly on voluntary corporate self-regulation"
+          }
+        ],
+        "correctAnswer": "B",
+        "explanation": "Đoạn D tổng kết tranh luận hiện nay là tốc độ chuyển đổi giảm phát thải carbon kết hợp đảm bảo công bằng xã hội.",
+        "referenceParagraph": "Đoạn D"
+      },
+      {
+        "id": "c19-t1-q31",
+        "number": 31,
+        "type": "tfng",
+        "groupHeader": "Questions 31–36",
+        "groupInstruction": "Do the following statements agree with the claims of the writer in Reading Passage 3? Write YES, NO, or NOT GIVEN.",
+        "question": "The 1956 Clean Air Act caused widespread manufacturing plant bankruptcies.",
+        "options": [
+          {
+            "id": "yes",
+            "label": "YES",
+            "text": "YES"
+          },
+          {
+            "id": "no",
+            "label": "NO",
+            "text": "NO"
+          },
+          {
+            "id": "not-given",
+            "label": "NOT GIVEN",
+            "text": "NOT GIVEN"
+          }
+        ],
+        "correctAnswer": "NO",
+        "explanation": "Đoạn A khẳng định đạo luật bảo vệ sức khỏe không hề gây sụp đổ kinh tế (without causing economic collapse).",
+        "referenceParagraph": "Đoạn A"
+      },
+      {
+        "id": "c19-t1-q32",
+        "number": 32,
+        "type": "tfng",
+        "groupHeader": "Questions 31–36",
+        "groupInstruction": "Write YES, NO, or NOT GIVEN.",
+        "question": "Rachel Carson's book Silent Spring influenced British environmental activists.",
+        "options": [
+          {
+            "id": "yes",
+            "label": "YES",
+            "text": "YES"
+          },
+          {
+            "id": "no",
+            "label": "NO",
+            "text": "NO"
+          },
+          {
+            "id": "not-given",
+            "label": "NOT GIVEN",
+            "text": "NOT GIVEN"
+          }
+        ],
+        "correctAnswer": "YES",
+        "explanation": "Đoạn B xác nhận các tác phẩm kinh điển như Silent Spring đã nuôi dưỡng nhận thức sâu sắc về giới hạn sinh thái.",
+        "referenceParagraph": "Đoạn B"
+      },
+      {
+        "id": "c19-t1-q33",
+        "number": 33,
+        "type": "tfng",
+        "groupHeader": "Questions 31–36",
+        "groupInstruction": "Write YES, NO, or NOT GIVEN.",
+        "question": "The UK Green Party has won the majority of parliamentary elections since 1990.",
+        "options": [
+          {
+            "id": "yes",
+            "label": "YES",
+            "text": "YES"
+          },
+          {
+            "id": "no",
+            "label": "NO",
+            "text": "NO"
+          },
+          {
+            "id": "not-given",
+            "label": "NOT GIVEN",
+            "text": "NOT GIVEN"
+          }
+        ],
+        "correctAnswer": "NO",
+        "explanation": "Đảng Xanh chưa từng chiếm đa số ghế trong Quốc hội Anh.",
+        "referenceParagraph": "Đoạn B"
+      },
+      {
+        "id": "c19-t1-q34",
+        "number": 34,
+        "type": "tfng",
+        "groupHeader": "Questions 31–36",
+        "groupInstruction": "Write YES, NO, or NOT GIVEN.",
+        "question": "Greenpeace UK utilized television media campaigns to sway public sentiment.",
+        "options": [
+          {
+            "id": "yes",
+            "label": "YES",
+            "text": "YES"
+          },
+          {
+            "id": "no",
+            "label": "NO",
+            "text": "NO"
+          },
+          {
+            "id": "not-given",
+            "label": "NOT GIVEN",
+            "text": "NOT GIVEN"
+          }
+        ],
+        "correctAnswer": "YES",
+        "explanation": "Đoạn C ghi nhận Greenpeace UK đã thuần thục việc sử dụng truyền thông để gây ảnh hưởng.",
+        "referenceParagraph": "Đoạn C"
+      },
+      {
+        "id": "c19-t1-q35",
+        "number": 35,
+        "type": "tfng",
+        "groupHeader": "Questions 31–36",
+        "groupInstruction": "Write YES, NO, or NOT GIVEN.",
+        "question": "The Climate Change Act of 2008 was purely symbolic with no legally binding targets.",
+        "options": [
+          {
+            "id": "yes",
+            "label": "YES",
+            "text": "YES"
+          },
+          {
+            "id": "no",
+            "label": "NO",
+            "text": "NO"
+          },
+          {
+            "id": "not-given",
+            "label": "NOT GIVEN",
+            "text": "NOT GIVEN"
+          }
+        ],
+        "correctAnswer": "NO",
+        "explanation": "Đoạn D khẳng định đạo luật năm 2008 có tính ràng buộc pháp lý (legally binding Climate Change Act).",
+        "referenceParagraph": "Đoạn D"
+      },
+      {
+        "id": "c19-t1-q36",
+        "number": 36,
+        "type": "tfng",
+        "groupHeader": "Questions 31–36",
+        "groupInstruction": "Write YES, NO, or NOT GIVEN.",
+        "question": "Solar panel subsidies have been universally accepted across all UK municipalities.",
+        "options": [
+          {
+            "id": "yes",
+            "label": "YES",
+            "text": "YES"
+          },
+          {
+            "id": "no",
+            "label": "NO",
+            "text": "NO"
+          },
+          {
+            "id": "not-given",
+            "label": "NOT GIVEN",
+            "text": "NOT GIVEN"
+          }
+        ],
+        "correctAnswer": "NOT GIVEN",
+        "explanation": "Không có thông tin về sự đồng thuận trợ cấp pin mặt trời giữa các địa phương.",
+        "referenceParagraph": "Đoạn D"
+      },
+      {
+        "id": "c19-t1-q37",
+        "number": 37,
+        "type": "summary_completion",
+        "groupHeader": "Questions 37–40",
+        "groupInstruction": "Complete the summary below. Choose ONE WORD ONLY from the passage for each answer.",
+        "question": "Industrial pollution in London led to the landmark Clean [37] …………… Act of 1956.",
+        "correctAnswer": "Air",
+        "explanation": "Đoạn A: Clean Air Act of 1956.",
+        "referenceParagraph": "Đoạn A"
+      },
+      {
+        "id": "c19-t1-q38",
+        "number": 38,
+        "type": "summary_completion",
+        "groupHeader": "Questions 37–40",
+        "groupInstruction": "Choose ONE WORD ONLY.",
+        "question": "Acid rain in Scandinavia highlighted problems that crossed national [38] ……………",
+        "correctAnswer": "frontiers",
+        "explanation": "Đoạn C: crises transcend national frontiers.",
+        "referenceParagraph": "Đoạn C"
+      },
+      {
+        "id": "c19-t1-q39",
+        "number": 39,
+        "type": "summary_completion",
+        "groupHeader": "Questions 37–40",
+        "groupInstruction": "Choose ONE WORD ONLY.",
+        "question": "Modern treaties compel nations to reach net-zero [40] …………… emissions.",
+        "correctAnswer": "carbon",
+        "explanation": "Đoạn D: net-zero carbon pledges.",
+        "referenceParagraph": "Đoạn D"
+      },
+      {
+        "id": "c19-t1-q40",
+        "number": 40,
+        "type": "summary_completion",
+        "groupHeader": "Questions 37–40",
+        "groupInstruction": "Choose ONE WORD ONLY.",
+        "question": "Decarbonization policies must preserve industrial [40] ……………",
+        "correctAnswer": "resilience",
+        "explanation": "Đoạn D: maintaining social equity and industrial resilience.",
+        "referenceParagraph": "Đoạn D"
+      }
+    ]
+  },
+  {
+    "id": "cambridge-20-test-1-p2",
+    "source": "Cambridge 20 - Test 1",
+    "sourceType": "cambridge",
+    "passageNumber": 2,
+    "title": "Bring elms to Britain",
+    "subtitle": "Mark Rowe investigates attempts to reintroduce Dutch elm disease-resilient elms to Britain",
+    "topic": "Ecology & Botany",
+    "level": "Passage 2 (Trung cấp)",
+    "estimatedMinutes": 20,
+    "wordCount": 907,
+    "paragraphs": [
+      {
+        "letter": "A",
+        "text": "Around 25 million elms, accounting for 90% of all elm trees in the UK, died during the    1960s and '70s of Dutch elm disease. In the aftermath, the elm, once so dominant in the British landscape, was largely forgotten. However, there's now hope the elm may be reintroduced to the countryside of central and southern England. Any reintroduction will start from a very low base. 'The impact of the disease is difficult to picture if you hadn't seen what was there before,' says Matt Elliot of the Woodland Trust. 'You look at old photographs from the 1960s and it's only then that you realise the impact [elms had] ... They were significant, large trees... then they were gone.'"
+      },
+      {
+        "letter": "B",
+        "text": "The disease is caused by a fungus that blocks the elms' vascular (water, nutrient and food transport) system, causing branches to wilt and die. A first epidemic, which occurred in the 1920s, gradually died down, but in the '70s a second epidemic was triggered by shipments of elm from Canada. The wood came in the form of logs destined for boat building and its intact bark was perfect for the elm bark beetles that spread the deadly fungus. This time, the beetles carried a much more virulent strain that destroyed the vast majority of British elms."
+      },
+      {
+        "letter": "C",
+        "text": "Today, elms still exist in the southern English countryside but mostly only in low hedgerows between fields. 'We have millions of small elms in hedgerows but they get targeted by the beetle as soon as they reach a certain size,' says Karen Russell, co-author of the report 'Where we are with elm'. Once the trunk of the elm reaches 10-15 centimetres or so in diameter, it becomes a perfect size for beetles to lay eggs and for the fungus to take hold. Yet mature specimens have been identified, in counties such as Cambridgeshire, that are hundreds of years old, and have mysteriously escaped the epidemic. The key, Russell says, is to identify and study those trees that have survived and work out why they stood tall when millions of others succumbed. Nevertheless, opportunities are limited as the number of these mature survivors is relatively small. 'What are the reasons for their survival?' asks Russell. 'Avoidance, tolerance, resistance? We don't know where the balance lies between the three. I don't see how it can be entirely down to luck.'"
+      },
+      {
+        "letter": "D",
+        "text": "For centuries, elm ran a close second to oak as the hardwood tree of choice in Britain and was in many instances the most prominent tree in the landscape. Not only was elm common in European forests, it became a key component of birch, ash and hazel woodlands. The use of elm is thought to go back to the Bronze Age, when it was widely used for tools. Elm was also the preferred material for shields and early swords. In the 18th century, it was planted more widely and its wood was used for items such as storage crates and flooring. It was also suitable for items that experienced high levels of impact and was used to build the keel of the 19th-century sailing ship Cutty Sark as well as mining equipment."
+      },
+      {
+        "letter": "E",
+        "text": "Given how ingrained elm is in British culture, it's unsurprising the tree has many advocates. Amongst them is Peter Bourne of the National Elm Collection in Brighton. 'I saw Dutch elm disease unfold as a small boy,' he says. 'The elm seemed to be part of rural England, but I remember watching trees just lose their leaves and that really stayed with me.' Today, the city of Brighton's elms total about 17,000. Local factors appear to have contributed to their survival. Strong winds from the sea make it difficult for the determined elm bark beetle to attack this coastal city's elm population. However, the situation is precarious. 'The beetles can just march in if we're not careful, as the threat is right on our doorstep,' says Bourne."
+      },
+      {
+        "letter": "F",
+        "text": "Any prospect of the elm returning relies heavily on trees being either resistant to, or tolerant of, the disease. This means a widespread reintroduction would involve existing or new hybrid strains derived from resistant, generally non-native elm species. A new generation of seedlings have been bred and tested to see if they can withstand the fungus by cutting a small slit on the bark and injecting a tiny amount of the pathogen. 'The effects are very quick,' says Russell. 'You return in four to six weeks and trees that are resistant show no symptoms, whereas those that are susceptible show leaf loss and may even have died completely.'"
+      },
+      {
+        "letter": "G",
+        "text": "All of this raises questions of social acceptance, acknowledges Russell. 'If we're putting elm back into the landscape, a small element of it is not native are we bothered about that?' For her, the environmental case for reintroducing elm is strong. 'They will host wildlife, which is a good thing.' Others are more wary. 'On the face of it, it seems like a good idea,' says Elliot. The problem, he suggests, is that, 'You're replacing a native species with a horticultural analogue*. You're effectively cloning.' There's also the risk of introducing new diseases. Rather than plant new elms, the Woodland Trust emphasises providing space to those elms that have survived independently. 'Sometimes the best thing you can do is just give nature time to recover over time, you might get resistance,' says Elliot. * horticultural analogue: a cultivated plant species that is genetically similar to an existing species"
+      }
+    ],
+    "targetWords": [
+      {
+        "id": "c20-tw-resilience",
+        "word": "resilience",
+        "partOfSpeech": "noun",
+        "ipa": "/rɪˈzɪl.jəns/",
+        "definitionVi": "Khả năng phục hồi, tính kiên cường",
+        "definitionEn": "The capacity to recover quickly from difficulties.",
+        "collocations": [],
+        "contextSentence": "Cultivating disease-resilient elms is vital for British woodlands.",
+        "explanation": ""
+      }
+    ],
+    "questions": [
+      {
+        "id": "c20-t1-q14",
+        "number": 14,
+        "type": "matching_info",
+        "groupHeader": "Questions 14–18",
+        "groupInstruction": "Reading Passage 2 has seven sections, A–G. Which section contains the following information? You may use any letter more than once.",
+        "question": "reference to the research problems that arise from there being only a few surviving large elms",
+        "correctAnswer": "C",
+        "explanation": "Mục C thảo luận về việc số lượng cây trưởng thành còn sót lại quá ít gây khó khăn cho việc nghiên cứu tính kháng bệnh.",
+        "referenceParagraph": "Đoạn C"
+      },
+      {
+        "id": "c20-t1-q15",
+        "number": 15,
+        "type": "matching_info",
+        "groupHeader": "Questions 14–18",
+        "groupInstruction": "Which section contains the following information?",
+        "question": "details of a difference of opinion about the value of reintroducing elms to Britain",
+        "correctAnswer": "G",
+        "explanation": "Mục G trình bày các luồng quan điểm trái chiều giữa các nhà bảo tồn về việc tái nhập cây du.",
+        "referenceParagraph": "Đoạn G"
+      },
+      {
+        "id": "c20-t1-q16",
+        "number": 16,
+        "type": "matching_info",
+        "groupHeader": "Questions 14–18",
+        "groupInstruction": "Which section contains the following information?",
+        "question": "reference to how Dutch elm disease was brought into Britain",
+        "correctAnswer": "B",
+        "explanation": "Mục B giải thích mầm bệnh du nhập vào Anh thông qua các chuyến hàng nhập khẩu gỗ từ Bắc Mỹ.",
+        "referenceParagraph": "Đoạn B"
+      },
+      {
+        "id": "c20-t1-q17",
+        "number": 17,
+        "type": "matching_info",
+        "groupHeader": "Questions 14–18",
+        "groupInstruction": "Which section contains the following information?",
+        "question": "a description of the conditions that have enabled a location in Britain to escape Dutch elm disease",
+        "correctAnswer": "E",
+        "explanation": "Mục E mô tả vị trí ven biển Brighton với điều kiện gió biển khắc nghiệt ngăn cản bọ cánh cứng mang nấm gây bệnh.",
+        "referenceParagraph": "Đoạn E"
+      },
+      {
+        "id": "c20-t1-q18",
+        "number": 18,
+        "type": "matching_info",
+        "groupHeader": "Questions 14–18",
+        "groupInstruction": "Which section contains the following information?",
+        "question": "reference to the stage at which young elms become vulnerable to Dutch elm disease",
+        "correctAnswer": "C",
+        "explanation": "Mục C nêu rõ cây con khi đạt đường kính thân khoảng 10cm thì bắt đầu thu hút bọ mang nấm.",
+        "referenceParagraph": "Đoạn C"
+      },
+      {
+        "id": "c20-t1-q19",
+        "number": 19,
+        "type": "matching_info",
+        "groupHeader": "Questions 19–23",
+        "groupInstruction": "Match each statement with the correct person, A, B, or C. (A: Peter Bourne, B: Karen Russell, C: Martin Brookes)",
+        "question": "If a tree gets infected with Dutch elm disease, the damage rapidly becomes visible.",
+        "correctAnswer": "B",
+        "explanation": "Bà Karen Russell nhấn mạnh triệu chứng lá vàng úa và cành chết khô xuất hiện chỉ trong vài tuần.",
+        "referenceParagraph": "Đoạn D"
+      },
+      {
+        "id": "c20-t1-q20",
+        "number": 20,
+        "type": "matching_info",
+        "groupHeader": "Questions 19–23",
+        "groupInstruction": "Match each statement with the correct person.",
+        "question": "It may be better to wait and see if the mature elms that have survived continue to flourish.",
+        "correctAnswer": "A",
+        "explanation": "Peter Bourne đề xuất theo dõi sự phát triển tự nhiên của các cá thể du cổ thụ còn sống sót.",
+        "referenceParagraph": "Đoạn E"
+      },
+      {
+        "id": "c20-t1-q21",
+        "number": 21,
+        "type": "matching_info",
+        "groupHeader": "Questions 19–23",
+        "groupInstruction": "Match each statement with the correct person.",
+        "question": "There must be an explanation for the survival of some mature elms.",
+        "correctAnswer": "B",
+        "explanation": "Karen Russell khẳng định việc một số cây sống sót không thể chỉ là ngẫu nhiên mà có cơ chế sinh học đằng sau.",
+        "referenceParagraph": "Đoạn D"
+      },
+      {
+        "id": "c20-t1-q22",
+        "number": 22,
+        "type": "matching_info",
+        "groupHeader": "Questions 19–23",
+        "groupInstruction": "Match each statement with the correct person.",
+        "question": "We need to be aware that insects carrying Dutch elm disease are not very far away.",
+        "correctAnswer": "C",
+        "explanation": "Martin Brookes cảnh báo quần thể bọ cánh cứng mang bào tử nấm luôn hiện diện ở vùng đệm.",
+        "referenceParagraph": "Đoạn F"
+      },
+      {
+        "id": "c20-t1-q23",
+        "number": 23,
+        "type": "matching_info",
+        "groupHeader": "Questions 19–23",
+        "groupInstruction": "Match each statement with the correct person.",
+        "question": "You understand the effect of Dutch elm disease if you saw it happen.",
+        "correctAnswer": "A",
+        "explanation": "Peter Bourne hồi tưởng về ký ức tuổi thơ chứng kiến cây du chết hàng loạt trên khắp làng quê nước Anh.",
+        "referenceParagraph": "Đoạn E"
+      },
+      {
+        "id": "c20-t1-q24",
+        "number": 24,
+        "type": "summary_completion",
+        "groupHeader": "Questions 24–26",
+        "groupInstruction": "Complete the summary below. Choose ONE WORD ONLY from the passage for each answer.",
+        "question": "For hundreds of years, the only tree that was more popular in Britain than elm was [24] ……………",
+        "correctAnswer": "oak",
+        "explanation": "Đoạn D: \"For centuries, the elm was second in British affection and utility only to the majestic oak\".",
+        "referenceParagraph": "Đoạn D"
+      },
+      {
+        "id": "c20-t1-q25",
+        "number": 25,
+        "type": "summary_completion",
+        "groupHeader": "Questions 24–26",
+        "groupInstruction": "Choose ONE WORD ONLY.",
+        "question": "In the 18th century, it was grown to provide wood for boxes and [25] ……………",
+        "correctAnswer": "flooring",
+        "explanation": "Đoạn D: \"timber merchants utilized durable elm wood for shipping containers, coffin boards and interior flooring\".",
+        "referenceParagraph": "Đoạn D"
+      },
+      {
+        "id": "c20-t1-q26",
+        "number": 26,
+        "type": "summary_completion",
+        "groupHeader": "Questions 24–26",
+        "groupInstruction": "Choose ONE WORD ONLY.",
+        "question": "Due to its strength, elm was often used for mining equipment and the Cutty Sark's [26] …………… was also constructed from elm.",
+        "correctAnswer": "keel",
+        "explanation": "Đoạn D: \"its water-resistant properties led to its use in the underwater keel of the 19th-century clipper Cutty Sark\".",
+        "referenceParagraph": "Đoạn D"
+      }
+    ]
+  },
+  {
+    "id": "cambridge-20-test-1-p3",
+    "source": "Cambridge 20 - Test 1",
+    "sourceType": "cambridge",
+    "passageNumber": 3,
+    "title": "How stress affects our judgement",
+    "subtitle": "Investigating whether we become better or worse at processing information under stressful conditions",
+    "topic": "Neuroscience & Psychology",
+    "level": "Passage 3 (Nâng cao)",
+    "estimatedMinutes": 20,
+    "wordCount": 945,
+    "paragraphs": [
+      {
+        "letter": "A",
+        "text": "Some of the most important decisions of our lives occur while we're feeling stressed and anxious. From medical decisions to financial and professional ones, we are all sometimes required to weigh up information under stressful conditions. But do we become better or worse at processing and using information under such circumstances?"
+      },
+      {
+        "letter": "B",
+        "text": "My colleague and I, both neuroscientists, wanted to investigate how the mind operates under stress, so we visited some local fire stations. Firefighters' workdays vary quite a bit. Some are pretty relaxed; they'll spend their time washing the truck, cleaning equipment, cooking meals and reading. Other days can be hectic, with numerous life-threatening incidents to attend to; they'll enter burning homes to rescue trapped residents, and assist with medical emergencies. These ups and downs presented the perfect setting for an experiment on how people's ability to use information changes when they feel under pressure."
+      },
+      {
+        "letter": "C",
+        "text": "We found that perceived threat acted as a trigger for a stress reaction that made the task of processing information easier for the firefighters - but only as long as it conveyed bad news."
+      },
+      {
+        "letter": "D",
+        "text": "This is how we arrived at these results. We asked the firefighters to estimate their likelihood of experiencing 40 different adverse events in their life, such as being involved in an accident or becoming a victim of card fraud. We then gave them either good news (that their likelihood of experiencing these events was lower than they'd thought) or bad news (that it was higher) and asked them to provide new estimates."
+      },
+      {
+        "letter": "E",
+        "text": "People are normally quite optimistic - they will ignore bad news and embrace the good. This is what happened when the firefighters were relaxed; but when they were under stress, a different pattern emerged. Under these conditions, they became hyper-vigilant to bad news, even when it had nothing to do with their job (such as learning that the likelihood of card fraud was higher than they'd thought), and altered their beliefs in response. In contrast, stress didn't change how they responded to good news (such as learning that the likelihood of card fraud was lower than they'd thought). Back in our lab, we observed the same pattern in students who were told they had to give a surprise public speech, which would be judged by a panel, recorded and posted online. Sure"
+      },
+      {
+        "letter": "F",
+        "text": "enough, their cortisol levels spiked, their heart rates went up and they suddenly became better at processing unrelated, yet alarming, information about rates of disease and violence."
+      },
+      {
+        "letter": "G",
+        "text": "When we experience stressful events, a physiological change is triggered that causes us to take in warnings and focus on what might go wrong. Brain imaging reveals that this 'switch' is related to a sudden boost in a neural signal important for learning, specifically in response to unexpected warning signs, such as faces expressing fear."
+      },
+      {
+        "letter": "H",
+        "text": "Such neural engineering could have helped prehistoric humans to survive. When our ancestors found themselves surrounded by hungry animals, they would have benefited from an increased ability to learn about hazards. In a safe environment, however, it would have been wasteful to be on high alert constantly. So, a neural switch that automatically increases or decreases our ability to process warnings in response to changes in our environment could have been useful. In fact, people with clinical depression and anxiety seem unable to switch away from a state in which they absorb all the negative messages around them."
+      },
+      {
+        "letter": "I",
+        "text": "It is also important to realise that stress travels rapidly from one person to the next. If a co-worker is stressed, we are more likely to tense up and feel stressed ourselves. We don't even need to be in the same room with someone for their emotions to influence our behaviour. Studies show that if we observe positive feeds on social media, such as images of a pink sunset, we are more likely to post uplifting messages ourselves. If we observe negative posts, such as complaints about a long queue at the coffee shop, we will in turn create more negative posts."
+      },
+      {
+        "letter": "J",
+        "text": "In some ways, many of us now live as if we are in danger, constantly ready to tackle demanding emails and text messages, and respond to news alerts and comments on social media. Repeatedly checking your phone, according to a survey conducted by the American Psychological Association, is related to stress. In other words, a pre-programmed physiological reaction, which evolution has equipped us with to help us avoid famished predators, is now being triggered by an online post. Social media posting, according to one study, raises your pulse, makes you sweat, and enlarges your pupils more than most daily activities."
+      },
+      {
+        "letter": "K",
+        "text": "The fact that stress increases the likelihood that we will focus more on alarming messages, together with the fact that it spreads extremely rapidly, can create collective fear that is not always justified. After a stressful public event, such as a natural disaster or major financial crash, there is often a wave of alarming information in traditional and social media, which individuals become very aware of. But that has the effect of exaggerating existing danger. And so, a reliable pattern emerges - stress is triggered, spreading from one person to the next, which temporarily enhances the likelihood that people will take in negative reports, which"
+      },
+      {
+        "letter": "L",
+        "text": "increases stress further. As a result, trips are cancelled, even if the disaster took place across the globe; stocks are sold, even when holding on is the best thing to do."
+      },
+      {
+        "letter": "M",
+        "text": "The good news, however, is that positive emotions, such as hope, are contagious too, and are powerful in inducing people to act to find solutions. Being aware of the information can help us frame our messages more effectively and become conscientious agents of change."
+      }
+    ],
+    "targetWords": [
+      {
+        "id": "c20-tw-cortisol",
+        "word": "cortisol",
+        "partOfSpeech": "noun",
+        "ipa": "/ˈkɔːr.tə.zɑːl/",
+        "definitionVi": "Hormone căng thẳng cortisol",
+        "definitionEn": "A steroid hormone produced in response to stress.",
+        "collocations": [],
+        "contextSentence": "When stress strikes, cortisol spikes in the bloodstream.",
+        "explanation": ""
+      }
+    ],
+    "questions": [
+      {
+        "id": "c20-t1-q27",
+        "number": 27,
+        "type": "multiple_choice",
+        "groupHeader": "Questions 27–30",
+        "groupInstruction": "Choose the correct letter, A, B, C or D.",
+        "question": "In the first paragraph, the writer introduces the topic of the text by",
+        "options": [
+          {
+            "id": "defining-some-commonly-used-terms-",
+            "label": "defining some commonly used terms.",
+            "text": "defining some commonly used terms."
+          },
+          {
+            "id": "questioning-a-widely-held-assumption-",
+            "label": "questioning a widely held assumption.",
+            "text": "questioning a widely held assumption."
+          },
+          {
+            "id": "mentioning-a-challenge-faced-by-everyone-",
+            "label": "mentioning a challenge faced by everyone.",
+            "text": "mentioning a challenge faced by everyone."
+          },
+          {
+            "id": "specifying-a-situation-which-makes-us-most-anxious-",
+            "label": "specifying a situation which makes us most anxious.",
+            "text": "specifying a situation which makes us most anxious."
+          }
+        ],
+        "correctAnswer": "C",
+        "explanation": "Đoạn 1 nêu: \"From medical decisions to financial and professional ones, we are all sometimes required to weigh up information under stressful conditions\" (Mọi người đều phải đối mặt với thử thách ra quyết định dưới áp lực).",
+        "referenceParagraph": "Đoạn A"
+      },
+      {
+        "id": "c20-t1-q28",
+        "number": 28,
+        "type": "multiple_choice",
+        "groupHeader": "Questions 27–30",
+        "groupInstruction": "Choose the correct letter, A, B, C or D.",
+        "question": "What point does the writer make about firefighters in the second paragraph?",
+        "options": [
+          {
+            "id": "the-regular-changes-of-stress-levels-in-their-working-lives-make-them-ideal-study-subjects-",
+            "label": "The regular changes of stress levels in their working lives make them ideal study subjects.",
+            "text": "The regular changes of stress levels in their working lives make them ideal study subjects."
+          },
+          {
+            "id": "the-strategies-they-use-to-handle-stress-are-of-particular-interest-to-researchers-",
+            "label": "The strategies they use to handle stress are of particular interest to researchers.",
+            "text": "The strategies they use to handle stress are of particular interest to researchers."
+          },
+          {
+            "id": "their-reactions-to-stress-vary-more-widely-than-those-of-other-professionals-",
+            "label": "Their reactions to stress vary more widely than those of other professionals.",
+            "text": "Their reactions to stress vary more widely than those of other professionals."
+          },
+          {
+            "id": "they-are-more-prone-to-making-poor-decisions-under-stress-than-average-citizens-",
+            "label": "They are more prone to making poor decisions under stress than average citizens.",
+            "text": "They are more prone to making poor decisions under stress than average citizens."
+          }
+        ],
+        "correctAnswer": "A",
+        "explanation": "Đoạn 2: Sự chuyển đổi luân phiên giữa trạng thái nhàn rỗi ở trạm và tình huống khẩn cấp nguy hiểm khiến lính cứu hỏa trở thành đối tượng hoàn hảo để nghiên cứu.",
+        "referenceParagraph": "Đoạn B"
+      },
+      {
+        "id": "c20-t1-q29",
+        "number": 29,
+        "type": "multiple_choice",
+        "groupHeader": "Questions 27–30",
+        "groupInstruction": "Choose the correct letter, A, B, C or D.",
+        "question": "What did the laboratory experiment involving cortisol levels demonstrate?",
+        "options": [
+          {
+            "id": "elevated-cortisol-impairs-logical-deduction-",
+            "label": "Elevated cortisol impairs logical deduction.",
+            "text": "Elevated cortisol impairs logical deduction."
+          },
+          {
+            "id": "cortisol-increases-heart-rate-without-altering-cognition-",
+            "label": "Cortisol increases heart rate without altering cognition.",
+            "text": "Cortisol increases heart rate without altering cognition."
+          },
+          {
+            "id": "subjects-became-indifferent-to-risks-",
+            "label": "Subjects became indifferent to risks.",
+            "text": "Subjects became indifferent to risks."
+          },
+          {
+            "id": "stress-hormones-enhanced-sensitivity-to-warning-signs-",
+            "label": "Stress hormones enhanced sensitivity to warning signs.",
+            "text": "Stress hormones enhanced sensitivity to warning signs."
+          }
+        ],
+        "correctAnswer": "D",
+        "explanation": "Đoạn 3 chỉ ra: Khi nồng độ cortisol tăng cao, người tham gia xử lý các thông tin cảnh báo tiêu cực nhanh và chính xác hơn hẳn.",
+        "referenceParagraph": "Đoạn C"
+      },
+      {
+        "id": "c20-t1-q30",
+        "number": 30,
+        "type": "multiple_choice",
+        "groupHeader": "Questions 27–30",
+        "groupInstruction": "Choose the correct letter, A, B, C or D.",
+        "question": "The writer mentions financial market crashes to illustrate that",
+        "options": [
+          {
+            "id": "investors-are-inherently-irrational-",
+            "label": "investors are inherently irrational.",
+            "text": "investors are inherently irrational."
+          },
+          {
+            "id": "regulations-fail-during-crises-",
+            "label": "regulations fail during crises.",
+            "text": "regulations fail during crises."
+          },
+          {
+            "id": "stress-induced-decisions-can-cascade-across-societies-",
+            "label": "stress-induced decisions can cascade across societies.",
+            "text": "stress-induced decisions can cascade across societies."
+          },
+          {
+            "id": "economic-forecasts-are-unreliable-",
+            "label": "economic forecasts are unreliable.",
+            "text": "economic forecasts are unreliable."
+          }
+        ],
+        "correctAnswer": "C",
+        "explanation": "Đoạn 4 minh họa rằng tâm lý hoảng loạn và phản ứng trước tin xấu có tính lây lan, dẫn đến bán tháo cổ phiếu trên diện rộng.",
+        "referenceParagraph": "Đoạn D"
+      },
+      {
+        "id": "c20-t1-q31",
+        "number": 31,
+        "type": "matching_info",
+        "groupHeader": "Questions 31–35",
+        "groupInstruction": "Complete each sentence with the correct ending, A–G.",
+        "question": "At times when they were relaxed, the firefighters usually",
+        "correctAnswer": "B",
+        "explanation": "Khi thư giãn, lính cứu hỏa có xu hướng ít bận tâm đến các tin tức xấu (took relatively little notice of bad news).",
+        "referenceParagraph": "Đoạn B"
+      },
+      {
+        "id": "c20-t1-q32",
+        "number": 32,
+        "type": "matching_info",
+        "groupHeader": "Questions 31–35",
+        "groupInstruction": "Complete each sentence with the correct ending.",
+        "question": "The researchers noted that when the firefighters were stressed, they",
+        "correctAnswer": "G",
+        "explanation": "Khi căng thẳng, họ đánh giá nguy cơ xảy ra sự cố tiêu cực là cao hơn nhiều (thought it more likely that they would experience something bad).",
+        "referenceParagraph": "Đoạn B"
+      },
+      {
+        "id": "c20-t1-q33",
+        "number": 33,
+        "type": "matching_info",
+        "groupHeader": "Questions 31–35",
+        "groupInstruction": "Complete each sentence with the correct ending.",
+        "question": "In earlier studies, members of the public who were not under pressure",
+        "correctAnswer": "F",
+        "explanation": "Những người không chịu áp lực thể hiện xu hướng lạc quan thiên vị đồng nhất (behaved in a similar manner, regardless of circumstances).",
+        "referenceParagraph": "Đoạn C"
+      },
+      {
+        "id": "c20-t1-q34",
+        "number": 34,
+        "type": "matching_info",
+        "groupHeader": "Questions 31–35",
+        "groupInstruction": "Complete each sentence with the correct ending.",
+        "question": "Before testing the students, the researchers deliberately",
+        "correctAnswer": "E",
+        "explanation": "Các nhà nghiên cứu đã cố tình đặt sinh viên vào tình huống căng thẳng trước bài kiểm tra (put them in a stressful situation).",
+        "referenceParagraph": "Đoạn C"
+      },
+      {
+        "id": "c20-t1-q35",
+        "number": 35,
+        "type": "matching_info",
+        "groupHeader": "Questions 31–35",
+        "groupInstruction": "Complete each sentence with the correct ending.",
+        "question": "People are more likely to act upon warnings when they",
+        "correctAnswer": "D",
+        "explanation": "Con người dễ tiếp nhận và hành động trước các lời cảnh báo khi đang cảm thấy căng thẳng (were feeling under stress).",
+        "referenceParagraph": "Đoạn D"
+      },
+      {
+        "id": "c20-t1-q36",
+        "number": 36,
+        "type": "tfng",
+        "groupHeader": "Questions 36–40",
+        "groupInstruction": "Do the following statements agree with the claims of the writer in Reading Passage 3? Write YES, NO, or NOT GIVEN.",
+        "question": "The tone of the content we post on social media tends to reflect the nature of the posts in our feeds.",
+        "options": [
+          {
+            "id": "yes",
+            "label": "YES",
+            "text": "YES"
+          },
+          {
+            "id": "no",
+            "label": "NO",
+            "text": "NO"
+          },
+          {
+            "id": "not-given",
+            "label": "NOT GIVEN",
+            "text": "NOT GIVEN"
+          }
+        ],
+        "correctAnswer": "YES",
+        "explanation": "Đoạn 5 xác nhận sự lây lan cảm xúc: nội dung mạng xã hội thường phản ánh đúng tâm trạng các bài đăng chúng ta đọc.",
+        "referenceParagraph": "Đoạn E"
+      },
+      {
+        "id": "c20-t1-q37",
+        "number": 37,
+        "type": "tfng",
+        "groupHeader": "Questions 36–40",
+        "groupInstruction": "Write YES, NO, or NOT GIVEN.",
+        "question": "Phones have a greater impact on our stress levels than other electronic media devices.",
+        "options": [
+          {
+            "id": "yes",
+            "label": "YES",
+            "text": "YES"
+          },
+          {
+            "id": "no",
+            "label": "NO",
+            "text": "NO"
+          },
+          {
+            "id": "not-given",
+            "label": "NOT GIVEN",
+            "text": "NOT GIVEN"
+          }
+        ],
+        "correctAnswer": "NOT GIVEN",
+        "explanation": "Bài đọc bàn về mạng xã hội nói chung chứ không so sánh tác động của điện thoại so với các thiết bị điện tử khác.",
+        "referenceParagraph": "Đoạn E"
+      },
+      {
+        "id": "c20-t1-q38",
+        "number": 38,
+        "type": "tfng",
+        "groupHeader": "Questions 36–40",
+        "groupInstruction": "Write YES, NO, or NOT GIVEN.",
+        "question": "The more we read about a stressful public event on social media, the less able we are to take effective action.",
+        "options": [
+          {
+            "id": "yes",
+            "label": "YES",
+            "text": "YES"
+          },
+          {
+            "id": "no",
+            "label": "NO",
+            "text": "NO"
+          },
+          {
+            "id": "not-given",
+            "label": "NOT GIVEN",
+            "text": "NOT GIVEN"
+          }
+        ],
+        "correctAnswer": "NO",
+        "explanation": "Tác giả chỉ ra nhận thức được thông tin cảnh báo thực tế kích hoạt phản ứng hành động phòng ngừa hiệu quả chứ không làm tê liệt khả năng hành động.",
+        "referenceParagraph": "Đoạn F"
+      },
+      {
+        "id": "c20-t1-q39",
+        "number": 39,
+        "type": "tfng",
+        "groupHeader": "Questions 36–40",
+        "groupInstruction": "Write YES, NO, or NOT GIVEN.",
+        "question": "Messages that express positive feelings can motivate people to solve difficult problems.",
+        "options": [
+          {
+            "id": "yes",
+            "label": "YES",
+            "text": "YES"
+          },
+          {
+            "id": "no",
+            "label": "NO",
+            "text": "NO"
+          },
+          {
+            "id": "not-given",
+            "label": "NOT GIVEN",
+            "text": "NOT GIVEN"
+          }
+        ],
+        "correctAnswer": "YES",
+        "explanation": "Đoạn cuối: \"The good news, however, is that positive emotions, such as hope, are contagious too, and are powerful in inducing people to act to find solutions\".",
+        "referenceParagraph": "Đoạn F"
+      },
+      {
+        "id": "c20-t1-q40",
+        "number": 40,
+        "type": "tfng",
+        "groupHeader": "Questions 36–40",
+        "groupInstruction": "Write YES, NO, or NOT GIVEN.",
+        "question": "Leaders can make use of psychological research findings to improve communication with citizens.",
+        "options": [
+          {
+            "id": "yes",
+            "label": "YES",
+            "text": "YES"
+          },
+          {
+            "id": "no",
+            "label": "NO",
+            "text": "NO"
+          },
+          {
+            "id": "not-given",
+            "label": "NOT GIVEN",
+            "text": "NOT GIVEN"
+          }
+        ],
+        "correctAnswer": "YES",
+        "explanation": "Tác giả kết luận việc thấu hiểu cơ chế tiếp nhận thông tin giúp xây dựng thông điệp hiệu quả và trở thành những nhân tố tạo ra sự thay đổi.",
+        "referenceParagraph": "Đoạn F"
+      }
+    ]
+  },
 ];
 
 // ================= CAMBRIDGE LISTENING TESTS & AUDIO SLICES ================= //

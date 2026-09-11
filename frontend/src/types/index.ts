@@ -451,7 +451,7 @@ export interface CambridgeReadingPassage {
   passageNumber: 1 | 2 | 3;
   title: string;
   subtitle?: string;
-  topic: 'Kiến Trúc & Đô Thị' | 'Trí Tuệ Nhân Tạo' | 'Môi Trường Sinh Thái' | 'Khoa Học Ứng Dụng' | 'Lịch Sử & Xã Hội';
+  topic: string;
   level: 'Passage 1 (Cơ bản)' | 'Passage 2 (Trung cấp)' | 'Passage 3 (Nâng cao)';
   estimatedMinutes: number;
   wordCount: number;

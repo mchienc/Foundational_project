@@ -6,7 +6,7 @@
 require('dotenv').config();
 const mysql = require('mysql2');
 
-const pool = mysql.createPool({
+const poolConfig = {
   host: process.env.DB_HOST,
   user: process.env.DB_USER,
   password: process.env.DB_PASSWORD,
@@ -15,7 +15,16 @@ const pool = mysql.createPool({
   waitForConnections: true,
   connectionLimit: 10,
   queueLimit: 0
-});
+};
+
+if (process.env.DB_SSL === 'true' || (process.env.DB_HOST && process.env.DB_HOST.includes('tidbcloud'))) {
+  poolConfig.ssl = {
+    minVersion: 'TLSv1.2',
+    rejectUnauthorized: true
+  };
+}
+
+const pool = mysql.createPool(poolConfig);
 
 // .promise() cho phép ta dùng async/await thay vì callback,
 // giúp code dễ đọc hơn rất nhiều.

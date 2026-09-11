@@ -25,7 +25,8 @@ export const ListeningReviewRoom: React.FC<ListeningReviewRoomProps> = ({
 
   // transcript is on test.transcript
   const transcriptLines = test.transcript || [];
-  const audioUrl = test.sections[0]?.audioFile ? `http://localhost:3000/audio/${test.sections[0].audioFile}` : '';
+  const audioBase = (import.meta as any).env?.VITE_AUDIO_URL || ((import.meta as any).env?.DEV ? 'http://localhost:3000/audio/' : '/audio/');
+  const audioUrl = test.sections[0]?.audioFile ? `${audioBase}${test.sections[0].audioFile}` : '';
   
   const bandScore = result.bandScore || 0;
   let bandColorClass = 'text-red-500';

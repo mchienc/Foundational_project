@@ -9,6 +9,7 @@
     "client": "npm --prefix frontend run dev",
     "server": "nodemon app.js",
     "client:dev": "npm --prefix frontend run dev",
+    "build": "npm --prefix frontend install && npm --prefix frontend run build",
     "client:build": "npm --prefix frontend run build",
     "client:preview": "npm --prefix frontend run preview",
     "db:seed:cambridge": "node scripts/seedCambridgeData.js",

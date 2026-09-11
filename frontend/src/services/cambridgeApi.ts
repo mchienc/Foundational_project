@@ -12,7 +12,7 @@ import {
   mockAnkiDecks,
 } from '../data/cambridgeMockData';
 
-const API_BASE = ((import.meta as any).env?.VITE_API_URL as string) || 'http://localhost:3000/api/cambridge';
+const API_BASE = ((import.meta as any).env?.VITE_API_URL as string) || ((import.meta as any).env?.DEV ? 'http://localhost:3000/api/cambridge' : '/api/cambridge');
 
 // Kiểm tra trạng thái kết nối tới Cơ sở dữ liệu MySQL
 export async function checkDatabaseHealth(): Promise<{

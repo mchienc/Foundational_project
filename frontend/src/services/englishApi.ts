@@ -21,7 +21,7 @@ import {
   sampleLeaderboard,
 } from '../data/englishMockData';
 
-const API_BASE_URL = 'http://localhost:3000/api/english';
+const API_BASE_URL = ((import.meta as any).env?.VITE_ENGLISH_API_URL as string) || ((import.meta as any).env?.DEV ? 'http://localhost:3000/api/english' : '/api/english');
 
 // Helper gọi fetch có timeout
 async function fetchWithTimeout(url: string, options: RequestInit = {}, timeoutMs = 3000): Promise<Response> {
