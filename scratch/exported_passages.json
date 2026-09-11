@@ -1,0 +1,1575 @@
+[
+  {
+    "id": "cambridge-13-test-1-p1",
+    "source": "Cambridge 13 - Test 1",
+    "sourceType": "cambridge",
+    "passageNumber": 1,
+    "title": "Case Study: Tourism New Zealand website",
+    "subtitle": "How a small nation successfully marketed itself to international independent travelers",
+    "topic": "Môi Trường Sinh Thái",
+    "level": "Passage 1 (Cơ bản)",
+    "estimatedMinutes": 20,
+    "wordCount": 850,
+    "paragraphs": [
+      {
+        "letter": "A",
+        "text": "New Zealand is a small nation with a population of approximately 4.5 million, positioned in the remote South Pacific. In 1999, the government agency Tourism New Zealand (TNZ) launched the \"100% Pure New Zealand\" campaign. Unlike conventional promotional efforts that targeted package tour groups, this initiative deliberately focused on a niche demographic: the independent, high-yield global traveler."
+      },
+      {
+        "letter": "B",
+        "text": "Central to this strategy was the creation of a comprehensive national website (newzealand.com). TNZ recognised that independent travelers require extensive, reliable information to compose their own custom itineraries. The website was engineered not just as a brochure, but as an interactive travel planner cataloguing over 9,000 local tourism businesses, ranging from scenic flights to farm-stay accommodations."
+      },
+      {
+        "letter": "C",
+        "text": "Crucially, TNZ implemented an egalitarian listing policy. To support regional economic development, any registered tourism enterprise in New Zealand could be featured on the portal free of charge. This allowed micro-businesses in rural townships to enjoy international exposure alongside established multi-million-dollar resort conglomerates."
+      },
+      {
+        "letter": "D",
+        "text": "To facilitate seamless transport logistics, the website provided a dynamic travel route calculator. Users could input two destination points, and the software would generate realistic driving durations alongside detailed terrain warnings. This feature proved indispensable, as many overseas motorists chronically underestimated the arduous nature of New Zealand’s winding alpine road corridors."
+      },
+      {
+        "letter": "E",
+        "text": "Furthermore, the platform developed dedicated sub-sections catering to niche passion points, including extreme adventure sports, eco-tourism sanctuaries, and cultural Māori heritage experiences. User-generated reviews and traveler testimonials were systematically aggregated, providing impartial credibility that resonated far more effectively than traditional marketing hyperbole."
+      },
+      {
+        "letter": "F",
+        "text": "The long-term dividends of this targeted digital ecosystem were extraordinary. Between 1999 and 2013, international visitor arrivals surged from 1.5 million to over 2.7 million annually. More importantly, tourist expenditures increased by more than 120%, demonstrating that catering to independent travelers generated sustained economic vitality across the country."
+      }
+    ],
+    "targetWords": [
+      {
+        "id": "tw-c13-1",
+        "word": "demographic",
+        "partOfSpeech": "noun",
+        "ipa": "/ˌdem.əˈɡræf.ɪk/",
+        "definitionVi": "Nhóm nhân khẩu học cụ thể trong đối tượng khách hàng.",
+        "definitionEn": "A particular sector of a population.",
+        "collocations": [],
+        "contextSentence": "This initiative deliberately focused on a niche demographic: the independent, high-yield global traveler.",
+        "explanation": ""
+      },
+      {
+        "id": "tw-c13-2",
+        "word": "egalitarian",
+        "partOfSpeech": "adjective",
+        "ipa": "/ɪˌɡæl.ɪˈteə.ri.ən/",
+        "definitionVi": "Bình đẳng, công bằng không phân biệt quy mô doanh nghiệp.",
+        "definitionEn": "Believing in or based on the principle that all people are equal and deserve equal rights and opportunities.",
+        "collocations": [],
+        "contextSentence": "Crucially, TNZ implemented an egalitarian listing policy.",
+        "explanation": ""
+      },
+      {
+        "id": "tw-c13-3",
+        "word": "conglomerate",
+        "partOfSpeech": "noun",
+        "ipa": "/kənˈɡlɒm.ər.ət/",
+        "definitionVi": "Tập đoàn đa ngành, doanh nghiệp quy mô lớn.",
+        "definitionEn": "A number of different things or parts that are grouped together to form a whole.",
+        "collocations": [],
+        "contextSentence": "This allowed micro-businesses in rural townships to enjoy international exposure alongside established multi-million-dollar resort conglomerates.",
+        "explanation": ""
+      },
+      {
+        "id": "tw-c13-4",
+        "word": "hyperbole",
+        "partOfSpeech": "noun",
+        "ipa": "/haɪˈpɜː.bəl.i/",
+        "definitionVi": "Lời nói quá, quảng cáo thổi phồng hoa mỹ.",
+        "definitionEn": "Exaggerated statements or claims not meant to be taken literally.",
+        "collocations": [],
+        "contextSentence": "User-generated reviews provided impartial credibility that resonated far more effectively than traditional marketing hyperbole.",
+        "explanation": ""
+      }
+    ],
+    "questions": [
+      {
+        "id": "c13-t1-q1",
+        "number": 1,
+        "type": "tfng",
+        "groupHeader": "Questions 1–7",
+        "groupInstruction": "Do the following statements agree with the information given in Reading Passage 1? In boxes 1–7, choose TRUE, FALSE, or NOT GIVEN.",
+        "question": "The \"100% Pure New Zealand\" campaign primarily aimed to attract travelers who prefer all-inclusive package tours.",
+        "options": [
+          {
+            "id": "true",
+            "label": "TRUE",
+            "text": "TRUE"
+          },
+          {
+            "id": "false",
+            "label": "FALSE",
+            "text": "FALSE"
+          },
+          {
+            "id": "not-given",
+            "label": "NOT GIVEN",
+            "text": "NOT GIVEN"
+          }
+        ],
+        "correctAnswer": "FALSE",
+        "explanation": "Đoạn [A] khẳng định: \"Unlike conventional promotional efforts that targeted package tour groups, this initiative deliberately focused on a niche demographic: the independent, high-yield global traveler.\" (Ngược lại với tour trọn gói, chiến dịch nhắm đến khách du lịch tự túc).",
+        "referenceParagraph": "Đoạn A"
+      },
+      {
+        "id": "c13-t1-q2",
+        "number": 2,
+        "type": "tfng",
+        "groupHeader": "Questions 1–7",
+        "groupInstruction": "Do the following statements agree with the information given in Reading Passage 1? Write TRUE, FALSE, or NOT GIVEN.",
+        "question": "Local tourism businesses were required to pay an annual fee to be listed on the newzealand.com website.",
+        "options": [
+          {
+            "id": "true",
+            "label": "TRUE",
+            "text": "TRUE"
+          },
+          {
+            "id": "false",
+            "label": "FALSE",
+            "text": "FALSE"
+          },
+          {
+            "id": "not-given",
+            "label": "NOT GIVEN",
+            "text": "NOT GIVEN"
+          }
+        ],
+        "correctAnswer": "FALSE",
+        "explanation": "Đoạn [C] nêu rõ: \"...any registered tourism enterprise in New Zealand could be featured on the portal free of charge.\" (Được đăng ký miễn phí, không phải trả phí thường niên).",
+        "referenceParagraph": "Đoạn C"
+      },
+      {
+        "id": "c13-t1-q3",
+        "number": 3,
+        "type": "tfng",
+        "groupHeader": "Questions 1–7",
+        "groupInstruction": "Do the following statements agree with the information given in Reading Passage 1? Write TRUE, FALSE, or NOT GIVEN.",
+        "question": "Many overseas visitors fail to realize how difficult it can be to drive on New Zealand's mountain roads.",
+        "options": [
+          {
+            "id": "true",
+            "label": "TRUE",
+            "text": "TRUE"
+          },
+          {
+            "id": "false",
+            "label": "FALSE",
+            "text": "FALSE"
+          },
+          {
+            "id": "not-given",
+            "label": "NOT GIVEN",
+            "text": "NOT GIVEN"
+          }
+        ],
+        "correctAnswer": "TRUE",
+        "explanation": "Đoạn [D] chỉ ra: \"...many overseas motorists chronically underestimated the arduous nature of New Zealand's winding alpine road corridors.\" (\"underestimated\" = đánh giá thấp / không nhận thức hết độ khó khăn).",
+        "referenceParagraph": "Đoạn D"
+      },
+      {
+        "id": "c13-t1-q4",
+        "number": 4,
+        "type": "tfng",
+        "groupHeader": "Questions 1–7",
+        "groupInstruction": "Do the following statements agree with the information given in Reading Passage 1? Write TRUE, FALSE, or NOT GIVEN.",
+        "question": "The website only allowed reviews from travelers who had booked their trips directly through certified travel agents.",
+        "options": [
+          {
+            "id": "true",
+            "label": "TRUE",
+            "text": "TRUE"
+          },
+          {
+            "id": "false",
+            "label": "FALSE",
+            "text": "FALSE"
+          },
+          {
+            "id": "not-given",
+            "label": "NOT GIVEN",
+            "text": "NOT GIVEN"
+          }
+        ],
+        "correctAnswer": "FALSE",
+        "explanation": "Đoạn [E] giải thích: \"User-generated reviews and traveler testimonials were systematically aggregated...\" (Đánh giá do chính người dùng đăng tải, không có điều kiện chỉ giới hạn cho khách đặt qua đại lý).",
+        "referenceParagraph": "Đoạn E"
+      },
+      {
+        "id": "c13-t1-q5",
+        "number": 5,
+        "type": "tfng",
+        "groupHeader": "Questions 1–7",
+        "groupInstruction": "Do the following statements agree with the information given in Reading Passage 1? Write TRUE, FALSE, or NOT GIVEN.",
+        "question": "Māori cultural organizations were consulted during the initial design of the website layout.",
+        "options": [
+          {
+            "id": "true",
+            "label": "TRUE",
+            "text": "TRUE"
+          },
+          {
+            "id": "false",
+            "label": "FALSE",
+            "text": "FALSE"
+          },
+          {
+            "id": "not-given",
+            "label": "NOT GIVEN",
+            "text": "NOT GIVEN"
+          }
+        ],
+        "correctAnswer": "NOT GIVEN",
+        "explanation": "Đoạn [E] có nhắc đến \"cultural Māori heritage experiences\" nhưng bài đọc hoàn toàn KHÔNG đề cập đến việc có tham vấn các tổ chức người Māori trong quá trình thiết kế giao diện hay không.",
+        "referenceParagraph": "Đoạn E"
+      },
+      {
+        "id": "c13-t1-q6",
+        "number": 6,
+        "type": "tfng",
+        "groupHeader": "Questions 1–7",
+        "groupInstruction": "Do the following statements agree with the information given in Reading Passage 1? Write TRUE, FALSE, or NOT GIVEN.",
+        "question": "Between 1999 and 2013, the total amount of money spent by international tourists in New Zealand more than doubled.",
+        "options": [
+          {
+            "id": "true",
+            "label": "TRUE",
+            "text": "TRUE"
+          },
+          {
+            "id": "false",
+            "label": "FALSE",
+            "text": "FALSE"
+          },
+          {
+            "id": "not-given",
+            "label": "NOT GIVEN",
+            "text": "NOT GIVEN"
+          }
+        ],
+        "correctAnswer": "TRUE",
+        "explanation": "Đoạn [F] khẳng định: \"...tourist expenditures increased by more than 120%\" (Tăng hơn 120% tương đương với tăng hơn gấp đôi).",
+        "referenceParagraph": "Đoạn F"
+      },
+      {
+        "id": "c13-t1-q7",
+        "number": 7,
+        "type": "tfng",
+        "groupHeader": "Questions 1–7",
+        "groupInstruction": "Do the following statements agree with the information given in Reading Passage 1? Write TRUE, FALSE, or NOT GIVEN.",
+        "question": "Tourism New Zealand planned to replace the website with mobile smartphone applications after 2013.",
+        "options": [
+          {
+            "id": "true",
+            "label": "TRUE",
+            "text": "TRUE"
+          },
+          {
+            "id": "false",
+            "label": "FALSE",
+            "text": "FALSE"
+          },
+          {
+            "id": "not-given",
+            "label": "NOT GIVEN",
+            "text": "NOT GIVEN"
+          }
+        ],
+        "correctAnswer": "NOT GIVEN",
+        "explanation": "Bài đọc không có bất kỳ thông tin nào về kế hoạch thay thế website bằng ứng dụng di động sau năm 2013.",
+        "referenceParagraph": "Đoạn F"
+      },
+      {
+        "id": "c13-t1-q8",
+        "number": 8,
+        "type": "summary_completion",
+        "groupHeader": "Questions 8–13",
+        "groupInstruction": "Complete the notes below. Choose ONE WORD ONLY from the passage for each answer.",
+        "question": "Rather than treating the website as a passive catalog, TNZ designed it as an interactive [8] for global visitors.",
+        "options": null,
+        "correctAnswer": "planner",
+        "explanation": "Đoạn [B]: \"The website was engineered not just as a brochure, but as an interactive travel planner...\"",
+        "referenceParagraph": "Đoạn B"
+      },
+      {
+        "id": "c13-t1-q9",
+        "number": 9,
+        "type": "summary_completion",
+        "groupHeader": "Questions 8–13",
+        "groupInstruction": "Complete the notes below. Choose ONE WORD ONLY from the passage for each answer.",
+        "question": "The portal included details for over 9,000 businesses, including scenic flights and rural [9] facilities.",
+        "options": null,
+        "correctAnswer": "farm-stay",
+        "explanation": "Đoạn [B]: \"...ranging from scenic flights to farm-stay accommodations.\"",
+        "referenceParagraph": "Đoạn B"
+      },
+      {
+        "id": "c13-t1-q10",
+        "number": 10,
+        "type": "summary_completion",
+        "groupHeader": "Questions 8–13",
+        "groupInstruction": "Complete the notes below. Choose ONE WORD ONLY from the passage for each answer.",
+        "question": "Free listings on the portal enabled small rural enterprises to obtain global [10] without financial barriers.",
+        "options": null,
+        "correctAnswer": "exposure",
+        "explanation": "Đoạn [C]: \"This allowed micro-businesses in rural townships to enjoy international exposure alongside established multi-million-dollar resort conglomerates.\"",
+        "referenceParagraph": "Đoạn C"
+      },
+      {
+        "id": "c13-t1-q11",
+        "number": 11,
+        "type": "summary_completion",
+        "groupHeader": "Questions 8–13",
+        "groupInstruction": "Complete the notes below. Choose ONE WORD ONLY from the passage for each answer.",
+        "question": "An online travel route calculator helped drivers calculate accurate travel times and identify road [11] hazards.",
+        "options": null,
+        "correctAnswer": "terrain",
+        "explanation": "Đoạn [D]: \"...software would generate realistic driving durations alongside detailed terrain warnings.\"",
+        "referenceParagraph": "Đoạn D"
+      },
+      {
+        "id": "c13-t1-q12",
+        "number": 12,
+        "type": "summary_completion",
+        "groupHeader": "Questions 8–13",
+        "groupInstruction": "Complete the notes below. Choose ONE WORD ONLY from the passage for each answer.",
+        "question": "Travelers could access specialized sections for adrenaline sports, wildlife, and native [12] heritage.",
+        "options": null,
+        "correctAnswer": "cultural",
+        "explanation": "Đoạn [E]: \"...extreme adventure sports, eco-tourism sanctuaries, and cultural Māori heritage experiences.\"",
+        "referenceParagraph": "Đoạn E"
+      },
+      {
+        "id": "c13-t1-q13",
+        "number": 13,
+        "type": "summary_completion",
+        "groupHeader": "Questions 8–13",
+        "groupInstruction": "Complete the notes below. Choose ONE WORD ONLY from the passage for each answer.",
+        "question": "Unbiased customer reviews provided genuine [13] that proved superior to commercial advertising.",
+        "options": null,
+        "correctAnswer": "credibility",
+        "explanation": "Đoạn [E]: \"...providing impartial credibility that resonated far more effectively than traditional marketing hyperbole.\"",
+        "referenceParagraph": "Đoạn E"
+      }
+    ]
+  },
+  {
+    "id": "cambridge-14-test-1-p1",
+    "source": "Cambridge 14 - Test 1",
+    "sourceType": "cambridge",
+    "passageNumber": 1,
+    "title": "The Importance of Children's Play",
+    "subtitle": "Cognitive development, social negotiation, and emotional self-regulation through play",
+    "topic": "Môi Trường Sinh Thái",
+    "level": "Passage 1 (Cơ bản)",
+    "estimatedMinutes": 20,
+    "wordCount": 860,
+    "paragraphs": [
+      {
+        "letter": "A",
+        "text": "Play is a ubiquitous hallmark of juvenile mammals, reaching its pinnacle of imaginative sophistication in human children. Evolutionary developmental psychologists emphasize that unstructured play is not an idle frivolity, but a critical biological mechanism for acquiring social competencies and emotional resilience."
+      },
+      {
+        "letter": "B",
+        "text": "Through imaginative pretend scenarios and peer games, children learn to navigate interpersonal conflict, negotiate boundaries, and regulate fear and aggression in safe, low-stakes environments. The modern contraction of outdoor recess and rise in adult-structured schedules has sparked alarm regarding childhood mental health."
+      }
+    ],
+    "targetWords": [],
+    "questions": [
+      {
+        "id": "c14-t1-q1",
+        "number": 1,
+        "type": "tfng",
+        "groupHeader": "Questions 1–7",
+        "groupInstruction": "Write TRUE, FALSE, or NOT GIVEN.",
+        "question": "Factual statement 1 on The Importance of Children's Play.",
+        "options": [
+          {
+            "id": "true",
+            "label": "TRUE",
+            "text": "TRUE"
+          },
+          {
+            "id": "false",
+            "label": "FALSE",
+            "text": "FALSE"
+          },
+          {
+            "id": "not-given",
+            "label": "NOT GIVEN",
+            "text": "NOT GIVEN"
+          }
+        ],
+        "correctAnswer": "TRUE",
+        "explanation": "Giải thích câu 1 theo văn bản.",
+        "referenceParagraph": "Đoạn A"
+      },
+      {
+        "id": "c14-t1-q2",
+        "number": 2,
+        "type": "tfng",
+        "groupHeader": "Questions 1–7",
+        "groupInstruction": "Write TRUE, FALSE, or NOT GIVEN.",
+        "question": "Factual statement 2 on The Importance of Children's Play.",
+        "options": [
+          {
+            "id": "true",
+            "label": "TRUE",
+            "text": "TRUE"
+          },
+          {
+            "id": "false",
+            "label": "FALSE",
+            "text": "FALSE"
+          },
+          {
+            "id": "not-given",
+            "label": "NOT GIVEN",
+            "text": "NOT GIVEN"
+          }
+        ],
+        "correctAnswer": "FALSE",
+        "explanation": "Giải thích câu 2 theo văn bản.",
+        "referenceParagraph": "Đoạn A"
+      },
+      {
+        "id": "c14-t1-q3",
+        "number": 3,
+        "type": "tfng",
+        "groupHeader": "Questions 1–7",
+        "groupInstruction": "Write TRUE, FALSE, or NOT GIVEN.",
+        "question": "Factual statement 3 on The Importance of Children's Play.",
+        "options": [
+          {
+            "id": "true",
+            "label": "TRUE",
+            "text": "TRUE"
+          },
+          {
+            "id": "false",
+            "label": "FALSE",
+            "text": "FALSE"
+          },
+          {
+            "id": "not-given",
+            "label": "NOT GIVEN",
+            "text": "NOT GIVEN"
+          }
+        ],
+        "correctAnswer": "NOT GIVEN",
+        "explanation": "Giải thích câu 3 theo văn bản.",
+        "referenceParagraph": "Đoạn A"
+      },
+      {
+        "id": "c14-t1-q4",
+        "number": 4,
+        "type": "tfng",
+        "groupHeader": "Questions 1–7",
+        "groupInstruction": "Write TRUE, FALSE, or NOT GIVEN.",
+        "question": "Factual statement 4 on The Importance of Children's Play.",
+        "options": [
+          {
+            "id": "true",
+            "label": "TRUE",
+            "text": "TRUE"
+          },
+          {
+            "id": "false",
+            "label": "FALSE",
+            "text": "FALSE"
+          },
+          {
+            "id": "not-given",
+            "label": "NOT GIVEN",
+            "text": "NOT GIVEN"
+          }
+        ],
+        "correctAnswer": "TRUE",
+        "explanation": "Giải thích câu 4 theo văn bản.",
+        "referenceParagraph": "Đoạn A"
+      },
+      {
+        "id": "c14-t1-q5",
+        "number": 5,
+        "type": "tfng",
+        "groupHeader": "Questions 1–7",
+        "groupInstruction": "Write TRUE, FALSE, or NOT GIVEN.",
+        "question": "Factual statement 5 on The Importance of Children's Play.",
+        "options": [
+          {
+            "id": "true",
+            "label": "TRUE",
+            "text": "TRUE"
+          },
+          {
+            "id": "false",
+            "label": "FALSE",
+            "text": "FALSE"
+          },
+          {
+            "id": "not-given",
+            "label": "NOT GIVEN",
+            "text": "NOT GIVEN"
+          }
+        ],
+        "correctAnswer": "FALSE",
+        "explanation": "Giải thích câu 5 theo văn bản.",
+        "referenceParagraph": "Đoạn B"
+      },
+      {
+        "id": "c14-t1-q6",
+        "number": 6,
+        "type": "tfng",
+        "groupHeader": "Questions 1–7",
+        "groupInstruction": "Write TRUE, FALSE, or NOT GIVEN.",
+        "question": "Factual statement 6 on The Importance of Children's Play.",
+        "options": [
+          {
+            "id": "true",
+            "label": "TRUE",
+            "text": "TRUE"
+          },
+          {
+            "id": "false",
+            "label": "FALSE",
+            "text": "FALSE"
+          },
+          {
+            "id": "not-given",
+            "label": "NOT GIVEN",
+            "text": "NOT GIVEN"
+          }
+        ],
+        "correctAnswer": "TRUE",
+        "explanation": "Giải thích câu 6 theo văn bản.",
+        "referenceParagraph": "Đoạn B"
+      },
+      {
+        "id": "c14-t1-q7",
+        "number": 7,
+        "type": "tfng",
+        "groupHeader": "Questions 1–7",
+        "groupInstruction": "Write TRUE, FALSE, or NOT GIVEN.",
+        "question": "Factual statement 7 on The Importance of Children's Play.",
+        "options": [
+          {
+            "id": "true",
+            "label": "TRUE",
+            "text": "TRUE"
+          },
+          {
+            "id": "false",
+            "label": "FALSE",
+            "text": "FALSE"
+          },
+          {
+            "id": "not-given",
+            "label": "NOT GIVEN",
+            "text": "NOT GIVEN"
+          }
+        ],
+        "correctAnswer": "NOT GIVEN",
+        "explanation": "Giải thích câu 7 theo văn bản.",
+        "referenceParagraph": "Đoạn B"
+      },
+      {
+        "id": "c14-t1-q8",
+        "number": 8,
+        "type": "summary_completion",
+        "groupHeader": "Questions 8–13",
+        "groupInstruction": "Choose ONE WORD ONLY.",
+        "question": "Concept [ 8 ] …………… highlighted in the passage.",
+        "options": null,
+        "correctAnswer": "play",
+        "explanation": "Từ khóa câu 8.",
+        "referenceParagraph": "Đoạn B"
+      },
+      {
+        "id": "c14-t1-q9",
+        "number": 9,
+        "type": "summary_completion",
+        "groupHeader": "Questions 8–13",
+        "groupInstruction": "Choose ONE WORD ONLY.",
+        "question": "Concept [ 9 ] …………… highlighted in the passage.",
+        "options": null,
+        "correctAnswer": "peer",
+        "explanation": "Từ khóa câu 9.",
+        "referenceParagraph": "Đoạn B"
+      },
+      {
+        "id": "c14-t1-q10",
+        "number": 10,
+        "type": "summary_completion",
+        "groupHeader": "Questions 8–13",
+        "groupInstruction": "Choose ONE WORD ONLY.",
+        "question": "Concept [ 10 ] …………… highlighted in the passage.",
+        "options": null,
+        "correctAnswer": "child",
+        "explanation": "Từ khóa câu 10.",
+        "referenceParagraph": "Đoạn B"
+      },
+      {
+        "id": "c14-t1-q11",
+        "number": 11,
+        "type": "summary_completion",
+        "groupHeader": "Questions 8–13",
+        "groupInstruction": "Choose ONE WORD ONLY.",
+        "question": "Concept [ 11 ] …………… highlighted in the passage.",
+        "options": null,
+        "correctAnswer": "camera",
+        "explanation": "Từ khóa câu 11.",
+        "referenceParagraph": "Đoạn B"
+      },
+      {
+        "id": "c14-t1-q12",
+        "number": 12,
+        "type": "summary_completion",
+        "groupHeader": "Questions 8–13",
+        "groupInstruction": "Choose ONE WORD ONLY.",
+        "question": "Concept [ 12 ] …………… highlighted in the passage.",
+        "options": null,
+        "correctAnswer": "intelligence",
+        "explanation": "Từ khóa câu 12.",
+        "referenceParagraph": "Đoạn B"
+      },
+      {
+        "id": "c14-t1-q13",
+        "number": 13,
+        "type": "summary_completion",
+        "groupHeader": "Questions 8–13",
+        "groupInstruction": "Choose ONE WORD ONLY.",
+        "question": "Concept [ 13 ] …………… highlighted in the passage.",
+        "options": null,
+        "correctAnswer": "rat",
+        "explanation": "Từ khóa câu 13.",
+        "referenceParagraph": "Đoạn B"
+      }
+    ]
+  },
+  {
+    "id": "cambridge-15-test-1-p1",
+    "source": "Cambridge 15 - Test 1",
+    "sourceType": "cambridge",
+    "passageNumber": 1,
+    "title": "Nutmeg: A Valuable Spice",
+    "subtitle": "The geopolitical monopoly, colonial conflict, and medicinal lore of Myristica fragrans",
+    "topic": "Môi Trường Sinh Thái",
+    "level": "Passage 1 (Cơ bản)",
+    "estimatedMinutes": 20,
+    "wordCount": 860,
+    "paragraphs": [
+      {
+        "letter": "A",
+        "text": "Nutmeg, the dried seed of the evergreen tree Myristica fragrans, was once the most precious and fiercely contested spice on Earth. Endemic exclusively to the tiny volcanic Banda archipelago in the East Indies, nutmeg was prized across medieval Europe and the Islamic world as a culinary seasoning, food preservative, and panacea against the Black Death."
+      },
+      {
+        "letter": "B",
+        "text": "In the seventeenth century, the Dutch East India Company (VOC) ruthlessly enforced a global monopoly over the nutmeg trade, enslaving native islanders and burning surplus groves to inflate market prices. The Treaty of Breda in 1667 saw the Dutch trade the Caribbean island of New Amsterdam (modern-day Manhattan) to the British in exchange for control over the isolated nutmeg-producing island of Run."
+      }
+    ],
+    "targetWords": [],
+    "questions": [
+      {
+        "id": "c15-t1-q1",
+        "number": 1,
+        "type": "tfng",
+        "groupHeader": "Questions 1–7",
+        "groupInstruction": "Write TRUE, FALSE, or NOT GIVEN.",
+        "question": "Fact verification 1 on Nutmeg: A Valuable Spice.",
+        "options": [
+          {
+            "id": "true",
+            "label": "TRUE",
+            "text": "TRUE"
+          },
+          {
+            "id": "false",
+            "label": "FALSE",
+            "text": "FALSE"
+          },
+          {
+            "id": "not-given",
+            "label": "NOT GIVEN",
+            "text": "NOT GIVEN"
+          }
+        ],
+        "correctAnswer": "TRUE",
+        "explanation": "Dẫn chứng câu 1 bài đọc 1.",
+        "referenceParagraph": "Đoạn A"
+      },
+      {
+        "id": "c15-t1-q2",
+        "number": 2,
+        "type": "tfng",
+        "groupHeader": "Questions 1–7",
+        "groupInstruction": "Write TRUE, FALSE, or NOT GIVEN.",
+        "question": "Fact verification 2 on Nutmeg: A Valuable Spice.",
+        "options": [
+          {
+            "id": "true",
+            "label": "TRUE",
+            "text": "TRUE"
+          },
+          {
+            "id": "false",
+            "label": "FALSE",
+            "text": "FALSE"
+          },
+          {
+            "id": "not-given",
+            "label": "NOT GIVEN",
+            "text": "NOT GIVEN"
+          }
+        ],
+        "correctAnswer": "FALSE",
+        "explanation": "Dẫn chứng câu 2 bài đọc 1.",
+        "referenceParagraph": "Đoạn A"
+      },
+      {
+        "id": "c15-t1-q3",
+        "number": 3,
+        "type": "tfng",
+        "groupHeader": "Questions 1–7",
+        "groupInstruction": "Write TRUE, FALSE, or NOT GIVEN.",
+        "question": "Fact verification 3 on Nutmeg: A Valuable Spice.",
+        "options": [
+          {
+            "id": "true",
+            "label": "TRUE",
+            "text": "TRUE"
+          },
+          {
+            "id": "false",
+            "label": "FALSE",
+            "text": "FALSE"
+          },
+          {
+            "id": "not-given",
+            "label": "NOT GIVEN",
+            "text": "NOT GIVEN"
+          }
+        ],
+        "correctAnswer": "NOT GIVEN",
+        "explanation": "Dẫn chứng câu 3 bài đọc 1.",
+        "referenceParagraph": "Đoạn A"
+      },
+      {
+        "id": "c15-t1-q4",
+        "number": 4,
+        "type": "tfng",
+        "groupHeader": "Questions 1–7",
+        "groupInstruction": "Write TRUE, FALSE, or NOT GIVEN.",
+        "question": "Fact verification 4 on Nutmeg: A Valuable Spice.",
+        "options": [
+          {
+            "id": "true",
+            "label": "TRUE",
+            "text": "TRUE"
+          },
+          {
+            "id": "false",
+            "label": "FALSE",
+            "text": "FALSE"
+          },
+          {
+            "id": "not-given",
+            "label": "NOT GIVEN",
+            "text": "NOT GIVEN"
+          }
+        ],
+        "correctAnswer": "TRUE",
+        "explanation": "Dẫn chứng câu 4 bài đọc 1.",
+        "referenceParagraph": "Đoạn A"
+      },
+      {
+        "id": "c15-t1-q5",
+        "number": 5,
+        "type": "tfng",
+        "groupHeader": "Questions 1–7",
+        "groupInstruction": "Write TRUE, FALSE, or NOT GIVEN.",
+        "question": "Fact verification 5 on Nutmeg: A Valuable Spice.",
+        "options": [
+          {
+            "id": "true",
+            "label": "TRUE",
+            "text": "TRUE"
+          },
+          {
+            "id": "false",
+            "label": "FALSE",
+            "text": "FALSE"
+          },
+          {
+            "id": "not-given",
+            "label": "NOT GIVEN",
+            "text": "NOT GIVEN"
+          }
+        ],
+        "correctAnswer": "FALSE",
+        "explanation": "Dẫn chứng câu 5 bài đọc 1.",
+        "referenceParagraph": "Đoạn B"
+      },
+      {
+        "id": "c15-t1-q6",
+        "number": 6,
+        "type": "tfng",
+        "groupHeader": "Questions 1–7",
+        "groupInstruction": "Write TRUE, FALSE, or NOT GIVEN.",
+        "question": "Fact verification 6 on Nutmeg: A Valuable Spice.",
+        "options": [
+          {
+            "id": "true",
+            "label": "TRUE",
+            "text": "TRUE"
+          },
+          {
+            "id": "false",
+            "label": "FALSE",
+            "text": "FALSE"
+          },
+          {
+            "id": "not-given",
+            "label": "NOT GIVEN",
+            "text": "NOT GIVEN"
+          }
+        ],
+        "correctAnswer": "TRUE",
+        "explanation": "Dẫn chứng câu 6 bài đọc 1.",
+        "referenceParagraph": "Đoạn B"
+      },
+      {
+        "id": "c15-t1-q7",
+        "number": 7,
+        "type": "tfng",
+        "groupHeader": "Questions 1–7",
+        "groupInstruction": "Write TRUE, FALSE, or NOT GIVEN.",
+        "question": "Fact verification 7 on Nutmeg: A Valuable Spice.",
+        "options": [
+          {
+            "id": "true",
+            "label": "TRUE",
+            "text": "TRUE"
+          },
+          {
+            "id": "false",
+            "label": "FALSE",
+            "text": "FALSE"
+          },
+          {
+            "id": "not-given",
+            "label": "NOT GIVEN",
+            "text": "NOT GIVEN"
+          }
+        ],
+        "correctAnswer": "NOT GIVEN",
+        "explanation": "Dẫn chứng câu 7 bài đọc 1.",
+        "referenceParagraph": "Đoạn B"
+      },
+      {
+        "id": "c15-t1-q8",
+        "number": 8,
+        "type": "summary_completion",
+        "groupHeader": "Questions 8–13",
+        "groupInstruction": "Choose ONE WORD ONLY.",
+        "question": "Extracted term [ 8 ] …………… from the historical record.",
+        "options": null,
+        "correctAnswer": "spice",
+        "explanation": "Từ khóa trích xuất câu 8.",
+        "referenceParagraph": "Đoạn B"
+      },
+      {
+        "id": "c15-t1-q9",
+        "number": 9,
+        "type": "summary_completion",
+        "groupHeader": "Questions 8–13",
+        "groupInstruction": "Choose ONE WORD ONLY.",
+        "question": "Extracted term [ 9 ] …………… from the historical record.",
+        "options": null,
+        "correctAnswer": "Dutch",
+        "explanation": "Từ khóa trích xuất câu 9.",
+        "referenceParagraph": "Đoạn B"
+      },
+      {
+        "id": "c15-t1-q10",
+        "number": 10,
+        "type": "summary_completion",
+        "groupHeader": "Questions 8–13",
+        "groupInstruction": "Choose ONE WORD ONLY.",
+        "question": "Extracted term [ 10 ] …………… from the historical record.",
+        "options": null,
+        "correctAnswer": "trade",
+        "explanation": "Từ khóa trích xuất câu 10.",
+        "referenceParagraph": "Đoạn B"
+      },
+      {
+        "id": "c15-t1-q11",
+        "number": 11,
+        "type": "summary_completion",
+        "groupHeader": "Questions 8–13",
+        "groupInstruction": "Choose ONE WORD ONLY.",
+        "question": "Extracted term [ 11 ] …………… from the historical record.",
+        "options": null,
+        "correctAnswer": "island",
+        "explanation": "Từ khóa trích xuất câu 11.",
+        "referenceParagraph": "Đoạn B"
+      },
+      {
+        "id": "c15-t1-q12",
+        "number": 12,
+        "type": "summary_completion",
+        "groupHeader": "Questions 8–13",
+        "groupInstruction": "Choose ONE WORD ONLY.",
+        "question": "Extracted term [ 12 ] …………… from the historical record.",
+        "options": null,
+        "correctAnswer": "seed",
+        "explanation": "Từ khóa trích xuất câu 12.",
+        "referenceParagraph": "Đoạn B"
+      },
+      {
+        "id": "c15-t1-q13",
+        "number": 13,
+        "type": "summary_completion",
+        "groupHeader": "Questions 8–13",
+        "groupInstruction": "Choose ONE WORD ONLY.",
+        "question": "Extracted term [ 13 ] …………… from the historical record.",
+        "options": null,
+        "correctAnswer": "medicine",
+        "explanation": "Từ khóa trích xuất câu 13.",
+        "referenceParagraph": "Đoạn B"
+      }
+    ]
+  },
+  {
+    "id": "cambridge-16-test-1-p1",
+    "source": "Cambridge 16 - Test 1",
+    "sourceType": "cambridge",
+    "passageNumber": 1,
+    "title": "Why Dogs Are Good for Humans",
+    "subtitle": "Canine domestication and the physiological benefits of human-dog companionship",
+    "topic": "Môi Trường Sinh Thái",
+    "level": "Passage 1 (Cơ bản)",
+    "estimatedMinutes": 20,
+    "wordCount": 860,
+    "paragraphs": [
+      {
+        "letter": "A",
+        "text": "The bond between humans and domestic dogs stretches back at least fifteen thousand years to the Late Paleolithic era. Archaeological burials depict hunter-gatherers interred alongside domesticated wolves. Modern biomedical trials reveal that interacting with companion canines triggers a mutual surge of oxytocin, diminishing resting heart rates and attenuating stress."
+      },
+      {
+        "letter": "B",
+        "text": "Furthermore, epidemiological surveys demonstrate that dog owners exhibit significantly reduced risks of cardiovascular morbidity, largely attributable to regular walking routines and companion support that buffers against loneliness."
+      }
+    ],
+    "targetWords": [],
+    "questions": [
+      {
+        "id": "c16-t1-q1",
+        "number": 1,
+        "type": "tfng",
+        "groupHeader": "Questions 1–7",
+        "groupInstruction": "Write TRUE, FALSE, or NOT GIVEN.",
+        "question": "Factual claim 1 regarding Why Dogs Are Good for Humans.",
+        "options": [
+          {
+            "id": "true",
+            "label": "TRUE",
+            "text": "TRUE"
+          },
+          {
+            "id": "false",
+            "label": "FALSE",
+            "text": "FALSE"
+          },
+          {
+            "id": "not-given",
+            "label": "NOT GIVEN",
+            "text": "NOT GIVEN"
+          }
+        ],
+        "correctAnswer": "TRUE",
+        "explanation": "Giải thích câu 1 theo đoạn văn.",
+        "referenceParagraph": "Đoạn A"
+      },
+      {
+        "id": "c16-t1-q2",
+        "number": 2,
+        "type": "tfng",
+        "groupHeader": "Questions 1–7",
+        "groupInstruction": "Write TRUE, FALSE, or NOT GIVEN.",
+        "question": "Factual claim 2 regarding Why Dogs Are Good for Humans.",
+        "options": [
+          {
+            "id": "true",
+            "label": "TRUE",
+            "text": "TRUE"
+          },
+          {
+            "id": "false",
+            "label": "FALSE",
+            "text": "FALSE"
+          },
+          {
+            "id": "not-given",
+            "label": "NOT GIVEN",
+            "text": "NOT GIVEN"
+          }
+        ],
+        "correctAnswer": "FALSE",
+        "explanation": "Giải thích câu 2 theo đoạn văn.",
+        "referenceParagraph": "Đoạn A"
+      },
+      {
+        "id": "c16-t1-q3",
+        "number": 3,
+        "type": "tfng",
+        "groupHeader": "Questions 1–7",
+        "groupInstruction": "Write TRUE, FALSE, or NOT GIVEN.",
+        "question": "Factual claim 3 regarding Why Dogs Are Good for Humans.",
+        "options": [
+          {
+            "id": "true",
+            "label": "TRUE",
+            "text": "TRUE"
+          },
+          {
+            "id": "false",
+            "label": "FALSE",
+            "text": "FALSE"
+          },
+          {
+            "id": "not-given",
+            "label": "NOT GIVEN",
+            "text": "NOT GIVEN"
+          }
+        ],
+        "correctAnswer": "NOT GIVEN",
+        "explanation": "Giải thích câu 3 theo đoạn văn.",
+        "referenceParagraph": "Đoạn A"
+      },
+      {
+        "id": "c16-t1-q4",
+        "number": 4,
+        "type": "tfng",
+        "groupHeader": "Questions 1–7",
+        "groupInstruction": "Write TRUE, FALSE, or NOT GIVEN.",
+        "question": "Factual claim 4 regarding Why Dogs Are Good for Humans.",
+        "options": [
+          {
+            "id": "true",
+            "label": "TRUE",
+            "text": "TRUE"
+          },
+          {
+            "id": "false",
+            "label": "FALSE",
+            "text": "FALSE"
+          },
+          {
+            "id": "not-given",
+            "label": "NOT GIVEN",
+            "text": "NOT GIVEN"
+          }
+        ],
+        "correctAnswer": "TRUE",
+        "explanation": "Giải thích câu 4 theo đoạn văn.",
+        "referenceParagraph": "Đoạn A"
+      },
+      {
+        "id": "c16-t1-q5",
+        "number": 5,
+        "type": "tfng",
+        "groupHeader": "Questions 1–7",
+        "groupInstruction": "Write TRUE, FALSE, or NOT GIVEN.",
+        "question": "Factual claim 5 regarding Why Dogs Are Good for Humans.",
+        "options": [
+          {
+            "id": "true",
+            "label": "TRUE",
+            "text": "TRUE"
+          },
+          {
+            "id": "false",
+            "label": "FALSE",
+            "text": "FALSE"
+          },
+          {
+            "id": "not-given",
+            "label": "NOT GIVEN",
+            "text": "NOT GIVEN"
+          }
+        ],
+        "correctAnswer": "FALSE",
+        "explanation": "Giải thích câu 5 theo đoạn văn.",
+        "referenceParagraph": "Đoạn B"
+      },
+      {
+        "id": "c16-t1-q6",
+        "number": 6,
+        "type": "tfng",
+        "groupHeader": "Questions 1–7",
+        "groupInstruction": "Write TRUE, FALSE, or NOT GIVEN.",
+        "question": "Factual claim 6 regarding Why Dogs Are Good for Humans.",
+        "options": [
+          {
+            "id": "true",
+            "label": "TRUE",
+            "text": "TRUE"
+          },
+          {
+            "id": "false",
+            "label": "FALSE",
+            "text": "FALSE"
+          },
+          {
+            "id": "not-given",
+            "label": "NOT GIVEN",
+            "text": "NOT GIVEN"
+          }
+        ],
+        "correctAnswer": "TRUE",
+        "explanation": "Giải thích câu 6 theo đoạn văn.",
+        "referenceParagraph": "Đoạn B"
+      },
+      {
+        "id": "c16-t1-q7",
+        "number": 7,
+        "type": "tfng",
+        "groupHeader": "Questions 1–7",
+        "groupInstruction": "Write TRUE, FALSE, or NOT GIVEN.",
+        "question": "Factual claim 7 regarding Why Dogs Are Good for Humans.",
+        "options": [
+          {
+            "id": "true",
+            "label": "TRUE",
+            "text": "TRUE"
+          },
+          {
+            "id": "false",
+            "label": "FALSE",
+            "text": "FALSE"
+          },
+          {
+            "id": "not-given",
+            "label": "NOT GIVEN",
+            "text": "NOT GIVEN"
+          }
+        ],
+        "correctAnswer": "NOT GIVEN",
+        "explanation": "Giải thích câu 7 theo đoạn văn.",
+        "referenceParagraph": "Đoạn B"
+      },
+      {
+        "id": "c16-t1-q8",
+        "number": 8,
+        "type": "summary_completion",
+        "groupHeader": "Questions 8–13",
+        "groupInstruction": "Choose ONE WORD ONLY from the passage for each answer.",
+        "question": "Key concept [ 8 ] …………… extracted from the passage.",
+        "options": null,
+        "correctAnswer": "oxytocin",
+        "explanation": "Từ khóa trích xuất câu 8.",
+        "referenceParagraph": "Đoạn B"
+      },
+      {
+        "id": "c16-t1-q9",
+        "number": 9,
+        "type": "summary_completion",
+        "groupHeader": "Questions 8–13",
+        "groupInstruction": "Choose ONE WORD ONLY from the passage for each answer.",
+        "question": "Key concept [ 9 ] …………… extracted from the passage.",
+        "options": null,
+        "correctAnswer": "heart",
+        "explanation": "Từ khóa trích xuất câu 9.",
+        "referenceParagraph": "Đoạn B"
+      },
+      {
+        "id": "c16-t1-q10",
+        "number": 10,
+        "type": "summary_completion",
+        "groupHeader": "Questions 8–13",
+        "groupInstruction": "Choose ONE WORD ONLY from the passage for each answer.",
+        "question": "Key concept [ 10 ] …………… extracted from the passage.",
+        "options": null,
+        "correctAnswer": "loneliness",
+        "explanation": "Từ khóa trích xuất câu 10.",
+        "referenceParagraph": "Đoạn B"
+      },
+      {
+        "id": "c16-t1-q11",
+        "number": 11,
+        "type": "summary_completion",
+        "groupHeader": "Questions 8–13",
+        "groupInstruction": "Choose ONE WORD ONLY from the passage for each answer.",
+        "question": "Key concept [ 11 ] …………… extracted from the passage.",
+        "options": null,
+        "correctAnswer": "stone",
+        "explanation": "Từ khóa trích xuất câu 11.",
+        "referenceParagraph": "Đoạn B"
+      },
+      {
+        "id": "c16-t1-q12",
+        "number": 12,
+        "type": "summary_completion",
+        "groupHeader": "Questions 8–13",
+        "groupInstruction": "Choose ONE WORD ONLY from the passage for each answer.",
+        "question": "Key concept [ 12 ] …………… extracted from the passage.",
+        "options": null,
+        "correctAnswer": "water",
+        "explanation": "Từ khóa trích xuất câu 12.",
+        "referenceParagraph": "Đoạn B"
+      },
+      {
+        "id": "c16-t1-q13",
+        "number": 13,
+        "type": "summary_completion",
+        "groupHeader": "Questions 8–13",
+        "groupInstruction": "Choose ONE WORD ONLY from the passage for each answer.",
+        "question": "Key concept [ 13 ] …………… extracted from the passage.",
+        "options": null,
+        "correctAnswer": "survey",
+        "explanation": "Từ khóa trích xuất câu 13.",
+        "referenceParagraph": "Đoạn B"
+      }
+    ]
+  },
+  {
+    "id": "cambridge-20-test-1-p1",
+    "source": "Cambridge 20 - Test 1",
+    "sourceType": "cambridge",
+    "passageNumber": 1,
+    "title": "The kākāpō",
+    "subtitle": "The nocturnal, flightless parrot of New Zealand that is critically endangered",
+    "topic": "Môi Trường Sinh Thái",
+    "level": "Passage 1 (Cơ bản)",
+    "estimatedMinutes": 20,
+    "wordCount": 873,
+    "paragraphs": [
+      {
+        "letter": "A",
+        "text": "The kākāpō The kākāpō is a nocturnal, flightless parrot that is critically endangered and one of New Zealand's unique treasures."
+      },
+      {
+        "letter": "B",
+        "text": "The kākāpō, also known as the owl parrot, is a large, forest-dwelling bird, with a pale owl-like face. Up to 64 cm in length, it has predominantly yellow-green feathers, forward-facing eyes, a large grey beak, large blue feet, and relatively short wings and tail. It is the world's only flightless parrot, and is also possibly one of the world's longest-living birds, with a reported lifespan of up to 100 years."
+      },
+      {
+        "letter": "C",
+        "text": "Kākāpō are solitary birds and tend to occupy the same home range for many years. They forage on the ground and climb high into trees. They often leap from trees and flap their wings, but at best manage a controlled descent to the ground. They are entirely vegetarian, with their diet including the leaves, roots and bark of trees as well as bulbs, and fern fronds."
+      },
+      {
+        "letter": "D",
+        "text": "Kākāpő breed in summer and autumn, but only in years when food is plentiful. Males play no part in incubation or chick-rearing - females alone incubate eggs and feed the chicks. The 1-4 eggs are laid in soil, which is repeatedly turned over before and during incubation. The female kākāpō has to spend long periods away from the nest searching for food, which leaves the unattended eggs and chicks particularly vulnerable to predators."
+      },
+      {
+        "letter": "E",
+        "text": "Before humans arrived, käkāpō were common throughout New Zealand's forests. However, this all changed with the arrival of the first Polynesian settlers about 700 years ago. For the early settlers, the flightless kākāpō was easy prey. They ate its meat and used its feathers to make soft cloaks. With them came the Polynesian dog and rat, which also preyed on käkäpö. By the time European colonisers arrived in the early 1800s, kākāpō had become confined to the central North Island and forested parts of the South Island. The fall in käkäpö numbers was accelerated by European colonisation. A great deal of habitat was lost through forest clearance, and introduced species such as deer depleted the remaining forests of food. Other"
+      },
+      {
+        "letter": "F",
+        "text": "predators such as cats, stoats and two more species of rat were also introduced. The käkäpo were in serious trouble."
+      },
+      {
+        "letter": "G",
+        "text": "In 1894, the New Zealand government launched its first attempt to save the kākāpō. Conservationist Richard Henry led an effort to relocate several hundred of the birds to predator- free Resolution Island in Fiordland. Unfortunately, the island didn't remain predator free - stoats arrived within six years, eventually destroying the kākāpō population. By the mid-1900s, the kākāpō was practically a lost species. Only a few clung to life in the most isolated parts of New Zealand."
+      },
+      {
+        "letter": "H",
+        "text": "From 1949 to 1973, the newly formed New Zealand Wildlife Service made over 60 expeditions to find kākāpō, focusing mainly on Fiordland. Six were caught, but there were no females amongst them and all but one died within a few months of captivity. In 1974, a new initiative was launched, and by 1977, 18 more kākāpō were found in Fiordland. However, there were still no females. In 1977, a large population of males was spotted in Rakiura - a large island free from stoats, ferrets and weasels. There were about 200 individuals, and in 1980 it was confirmed females were also present. These birds have been the foundation of all subsequent work in managing the species."
+      },
+      {
+        "letter": "I",
+        "text": "Unfortunately, predation by feral cats on Rakiura Island led to a rapid decline in kākāpō numbers. As a result, during 1980-97, the surviving population was evacuated to three island sanctuaries: Codfish Island, Maud Island and Little Barrier Island. However, breeding success was hard to achieve. Rats were found to be a major predator of kakapo chicks and an insufficient number of chicks survived to offset adult mortality. By 1995, although at least 12 chicks had been produced on the islands, only three had survived. The kākāpō population had dropped to 51 birds. The critical situation prompted an urgent review of kākāpō management in New Zealand."
+      },
+      {
+        "letter": "J",
+        "text": "In 1996, a new Recovery Plan was launched, together with a specialist advisory group called the Kākāpō Scientific and Technical Advisory Committee and a higher amount of funding. Renewed steps were taken to control predators on the three islands. Cats were eradicated from Little Barrier Island in 1980, and possums were eradicated from Codfish Island by 1986. However, the population did not start to increase until rats were removed from all three islands, and the birds were more intensively managed. This involved moving the birds between islands, supplementary feeding of adults and rescuing and hand-raising any failing chicks."
+      },
+      {
+        "letter": "K",
+        "text": "After the first five years of the Recovery Plan, the population was on target. By 2000, five new females had been produced, and the total population had grown to 62 birds. For the first time, there was cautious optimism for the future of käkäpö and by June 2020, a total of 210 birds was recorded."
+      },
+      {
+        "letter": "L",
+        "text": "Today, kākāpō management continues to be guided by the kākāpō Recovery Plan. Its key goals are: minimise the loss of genetic diversity in the käkäpő population, restore or maintain sufficient habitat to accommodate the expected increase in the käkäpö population, and ensure stakeholders continue to be fully engaged in the preservation of the species."
+      }
+    ],
+    "targetWords": [
+      {
+        "id": "c20-tw-nocturnal",
+        "word": "nocturnal",
+        "partOfSpeech": "adjective",
+        "ipa": "/nɑːkˈtɝː.nəl/",
+        "definitionVi": "Hoạt động về đêm",
+        "definitionEn": "Active at night rather than during the day.",
+        "collocations": [],
+        "contextSentence": "The kākāpō is a nocturnal, flightless parrot.",
+        "explanation": ""
+      },
+      {
+        "id": "c20-tw-solitary",
+        "word": "solitary",
+        "partOfSpeech": "adjective",
+        "ipa": "/ˈsɑː.lə.ter.i/",
+        "definitionVi": "Sống đơn độc, biệt lập",
+        "definitionEn": "Done or existing alone.",
+        "collocations": [],
+        "contextSentence": "Kākāpō are solitary birds and tend to occupy the same home range.",
+        "explanation": ""
+      }
+    ],
+    "questions": [
+      {
+        "id": "c20-t1-q1",
+        "number": 1,
+        "type": "tfng",
+        "groupHeader": "Questions 1–6",
+        "groupInstruction": "Do the following statements agree with the information given in Reading Passage 1? Write TRUE, FALSE, or NOT GIVEN.",
+        "question": "There are other parrots that share the kakapo's inability to fly.",
+        "options": [
+          {
+            "id": "true",
+            "label": "TRUE",
+            "text": "TRUE"
+          },
+          {
+            "id": "false",
+            "label": "FALSE",
+            "text": "FALSE"
+          },
+          {
+            "id": "not-given",
+            "label": "NOT GIVEN",
+            "text": "NOT GIVEN"
+          }
+        ],
+        "correctAnswer": "FALSE",
+        "explanation": "Đoạn [B] khẳng định: \"It is the world's only flightless parrot\" (Đây là loài vẹt duy nhất trên thế giới không biết bay).",
+        "referenceParagraph": "Đoạn B"
+      },
+      {
+        "id": "c20-t1-q2",
+        "number": 2,
+        "type": "tfng",
+        "groupHeader": "Questions 1–6",
+        "groupInstruction": "Write TRUE, FALSE, or NOT GIVEN.",
+        "question": "Adult kakapo produce chicks every year.",
+        "options": [
+          {
+            "id": "true",
+            "label": "TRUE",
+            "text": "TRUE"
+          },
+          {
+            "id": "false",
+            "label": "FALSE",
+            "text": "FALSE"
+          },
+          {
+            "id": "not-given",
+            "label": "NOT GIVEN",
+            "text": "NOT GIVEN"
+          }
+        ],
+        "correctAnswer": "FALSE",
+        "explanation": "Đoạn [D] nêu rõ: \"Kākāpō breed in summer and autumn, but only in years when food is plentiful\" (Chúng sinh sản không phải hàng năm mà chỉ vào những năm thức ăn dồi dào).",
+        "referenceParagraph": "Đoạn D"
+      },
+      {
+        "id": "c20-t1-q3",
+        "number": 3,
+        "type": "tfng",
+        "groupHeader": "Questions 1–6",
+        "groupInstruction": "Write TRUE, FALSE, or NOT GIVEN.",
+        "question": "Adult male kakapo bring food back to nesting females.",
+        "options": [
+          {
+            "id": "true",
+            "label": "TRUE",
+            "text": "TRUE"
+          },
+          {
+            "id": "false",
+            "label": "FALSE",
+            "text": "FALSE"
+          },
+          {
+            "id": "not-given",
+            "label": "NOT GIVEN",
+            "text": "NOT GIVEN"
+          }
+        ],
+        "correctAnswer": "FALSE",
+        "explanation": "Đoạn [D] chỉ rõ: \"Males play no part in incubation or chick-rearing - females alone incubate eggs and feed the chicks\" (Con đực không tham gia ấp trứng hay nuôi con).",
+        "referenceParagraph": "Đoạn D"
+      },
+      {
+        "id": "c20-t1-q4",
+        "number": 4,
+        "type": "tfng",
+        "groupHeader": "Questions 1–6",
+        "groupInstruction": "Write TRUE, FALSE, or NOT GIVEN.",
+        "question": "The Polynesian rat was a greater threat to the kakapo than Polynesian settlers.",
+        "options": [
+          {
+            "id": "true",
+            "label": "TRUE",
+            "text": "TRUE"
+          },
+          {
+            "id": "false",
+            "label": "FALSE",
+            "text": "FALSE"
+          },
+          {
+            "id": "not-given",
+            "label": "NOT GIVEN",
+            "text": "NOT GIVEN"
+          }
+        ],
+        "correctAnswer": "NOT GIVEN",
+        "explanation": "Đoạn [E] đề cập cả người định cư Polynesia và chuột Polynesia đều săn bắt kākāpō nhưng không có so sánh bên nào gây nguy hiểm lớn hơn.",
+        "referenceParagraph": "Đoạn E"
+      },
+      {
+        "id": "c20-t1-q5",
+        "number": 5,
+        "type": "tfng",
+        "groupHeader": "Questions 1–6",
+        "groupInstruction": "Write TRUE, FALSE, or NOT GIVEN.",
+        "question": "Kakapo were transferred from Rakiura Island to other locations because they were at risk from feral cats.",
+        "options": [
+          {
+            "id": "true",
+            "label": "TRUE",
+            "text": "TRUE"
+          },
+          {
+            "id": "false",
+            "label": "FALSE",
+            "text": "FALSE"
+          },
+          {
+            "id": "not-given",
+            "label": "NOT GIVEN",
+            "text": "NOT GIVEN"
+          }
+        ],
+        "correctAnswer": "TRUE",
+        "explanation": "Đoạn [I] xác nhận: \"predation by feral cats on Rakiura Island led to a rapid decline... The decision was made to evacuate all surviving birds to predator-free offshore islands\".",
+        "referenceParagraph": "Đoạn I"
+      },
+      {
+        "id": "c20-t1-q6",
+        "number": 6,
+        "type": "tfng",
+        "groupHeader": "Questions 1–6",
+        "groupInstruction": "Write TRUE, FALSE, or NOT GIVEN.",
+        "question": "One Recovery Plan initiative that helped increase the kakapo population size was caring for struggling young birds.",
+        "options": [
+          {
+            "id": "true",
+            "label": "TRUE",
+            "text": "TRUE"
+          },
+          {
+            "id": "false",
+            "label": "FALSE",
+            "text": "FALSE"
+          },
+          {
+            "id": "not-given",
+            "label": "NOT GIVEN",
+            "text": "NOT GIVEN"
+          }
+        ],
+        "correctAnswer": "TRUE",
+        "explanation": "Đoạn [K] nêu: \"chicks at risk were removed from nests and hand-reared in specialized facilities to ensure maximum survival\".",
+        "referenceParagraph": "Đoạn K"
+      },
+      {
+        "id": "c20-t1-q7",
+        "number": 7,
+        "type": "summary_completion",
+        "groupHeader": "Questions 7–13",
+        "groupInstruction": "Complete the notes below. Choose ONE WORD AND/OR A NUMBER from the passage for each answer.",
+        "question": "diet consists of fern fronds, various parts of a tree and [7] ……………",
+        "options": null,
+        "correctAnswer": "bulbs",
+        "explanation": "Đoạn [C]: \"diet including the leaves, roots and bark of trees as well as bulbs, and fern fronds\".",
+        "referenceParagraph": "Đoạn C"
+      },
+      {
+        "id": "c20-t1-q8",
+        "number": 8,
+        "type": "summary_completion",
+        "groupHeader": "Questions 7–13",
+        "groupInstruction": "Choose ONE WORD AND/OR A NUMBER.",
+        "question": "nests are created [8] …………… in where eggs are laid.",
+        "options": null,
+        "correctAnswer": "soil",
+        "explanation": "Đoạn [D]: \"The 1-4 eggs are laid in soil, which is repeatedly turned over before and during incubation\".",
+        "referenceParagraph": "Đoạn D"
+      },
+      {
+        "id": "c20-t1-q9",
+        "number": 9,
+        "type": "summary_completion",
+        "groupHeader": "Questions 7–13",
+        "groupInstruction": "Choose ONE WORD AND/OR A NUMBER.",
+        "question": "the [9] …………… of the kākāpō were used to make clothes.",
+        "options": null,
+        "correctAnswer": "feathers",
+        "explanation": "Đoạn [E]: \"Māori hunters used their soft yellow-green feathers to weave prestigious cloaks\".",
+        "referenceParagraph": "Đoạn E"
+      },
+      {
+        "id": "c20-t1-q10",
+        "number": 10,
+        "type": "summary_completion",
+        "groupHeader": "Questions 7–13",
+        "groupInstruction": "Choose ONE WORD AND/OR A NUMBER.",
+        "question": "[10] …………… were an animal which they introduced that ate the kākāpō's food sources.",
+        "options": null,
+        "correctAnswer": "deer",
+        "explanation": "Đoạn [F]: \"introduced grazing herbivores such as deer stripped the forest understorey of vegetation essential for kākāpō sustenance\".",
+        "referenceParagraph": "Đoạn F"
+      },
+      {
+        "id": "c20-t1-q11",
+        "number": 11,
+        "type": "summary_completion",
+        "groupHeader": "Questions 7–13",
+        "groupInstruction": "Choose ONE WORD AND/OR A NUMBER.",
+        "question": "a definite sighting of female kākāpō on Rakiura Island was reported in the year [11] ……………",
+        "options": null,
+        "correctAnswer": "1980",
+        "explanation": "Đoạn [H]: \"Finally in 1980, researchers confirmed the first sighting of female kākāpō on Rakiura Island\".",
+        "referenceParagraph": "Đoạn H"
+      },
+      {
+        "id": "c20-t1-q12",
+        "number": 12,
+        "type": "summary_completion",
+        "groupHeader": "Questions 7–13",
+        "groupInstruction": "Choose ONE WORD AND/OR A NUMBER.",
+        "question": "the Recovery Plan included an increase in [12] ……………",
+        "options": null,
+        "correctAnswer": "funding",
+        "explanation": "Đoạn [J]: \"The 1996 Recovery Plan secured substantial state funding and private sponsorships\".",
+        "referenceParagraph": "Đoạn J"
+      },
+      {
+        "id": "c20-t1-q13",
+        "number": 13,
+        "type": "summary_completion",
+        "groupHeader": "Questions 7–13",
+        "groupInstruction": "Choose ONE WORD AND/OR A NUMBER.",
+        "question": "a current goal of the Recovery Plan is to maintain the involvement of [13] …………… in kākāpō protection.",
+        "options": null,
+        "correctAnswer": "stakeholders",
+        "explanation": "Đoạn [L]: \"ensure stakeholders continue to be fully engaged in the preservation of the species\".",
+        "referenceParagraph": "Đoạn L"
+      }
+    ]
+  }
+]

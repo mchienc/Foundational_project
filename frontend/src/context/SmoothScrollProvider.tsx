@@ -1,7 +1,7 @@
 // frontend/src/context/SmoothScrollProvider.tsx
 // Cấu hình Lenis Smooth Scroll đồng bộ với GSAP Ticker & ScrollTrigger chuẩn 60/120FPS
 
-import React, { createContext, useContext, useEffect, useRef, useState } from 'react';
+import React, { createContext, useContext, useEffect, useRef, useState, useCallback, useMemo } from 'react';
 import Lenis from 'lenis';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
@@ -78,7 +78,7 @@ export const SmoothScrollProvider: React.FC<SmoothScrollProviderProps> = ({
     };
   }, [enabled]);
 
-  const scrollTo = (target: string | HTMLElement | number, options?: Record<string, any>) => {
+  const scrollTo = useCallback((target: string | HTMLElement | number, options?: Record<string, any>) => {
     if (lenisRef.current) {
       lenisRef.current.scrollTo(target, options);
     } else if (typeof target === 'number') {
@@ -89,18 +89,25 @@ export const SmoothScrollProvider: React.FC<SmoothScrollProviderProps> = ({
     } else if (target instanceof HTMLElement) {
       target.scrollIntoView({ behavior: 'smooth' });
     }
-  };
+  }, []);
 
-  const stop = () => {
+  const stop = useCallback(() => {
     lenisRef.current?.stop();
-  };
+  }, []);
 
-  const start = () => {
+  const start = useCallback(() => {
     lenisRef.current?.start();
-  };
+  }, []);
+
+  const value = useMemo(() => ({
+    lenis: lenisInstance,
+    scrollTo,
+    stop,
+    start
+  }), [lenisInstance, scrollTo, stop, start]);
 
   return (
-    <SmoothScrollContext.Provider value={{ lenis: lenisInstance, scrollTo, stop, start }}>
+    <SmoothScrollContext.Provider value={value}>
       {children}
     </SmoothScrollContext.Provider>
   );

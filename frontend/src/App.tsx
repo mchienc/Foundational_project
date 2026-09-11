@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Screen, Course, User, ToastMessage, ReadingSessionConfig } from './types';
+import { Screen, Course, User, ToastMessage, ReadingSessionConfig, ListeningExamResult } from './types';
 import { sampleCourses, initialUserStats } from './data/mockData';
 import { Navbar } from './components/common/Navbar';
 import { ToastContainer } from './components/common/ToastContainer';
@@ -13,10 +13,15 @@ import { ReadingTestRoom } from './modules/reading/ReadingTestRoom';
 import { IELTSComputerExamRoom } from './modules/exam/IELTSComputerExamRoom';
 import { MistakeVaultView } from './modules/mistakes/MistakeVaultView';
 import { mockReadingPassages } from './data/cambridgeMockData';
+import { mockListeningFullTests } from './data/mockListeningTests';
 import { ListeningLibrary } from './modules/listening/ListeningLibrary';
 import { ListeningDictationRoom } from './modules/listening/ListeningDictationRoom';
+import { IELTSListeningExamRoom } from './modules/listening-exam/IELTSListeningExamRoom';
+import { ListeningReviewRoom } from './modules/listening-exam/ListeningReviewRoom';
 import { AnkiWorkspace } from './modules/anki/AnkiWorkspace';
 import { AnkiFlashcardPlayer } from './modules/anki/AnkiFlashcardPlayer';
+import { WritingTask1Studio } from './modules/writing/WritingTask1Studio';
+import { SpeakingMockRoom } from './modules/speaking/SpeakingMockRoom';
 import { AcademicLandingPage } from './components/marketing/AcademicLandingPage';
 import { englishApi } from './services/englishApi';
 import { AuthProvider, useAuth } from './context/AuthContext';
@@ -116,6 +121,8 @@ const AppContent: React.FC = () => {
 
   // Active Cambridge Listening Test ID
   const [selectedListeningTestId, setSelectedListeningTestId] = useState<string>('cambridge-18-listening-p4');
+  const [selectedListeningFullTestId, setSelectedListeningFullTestId] = useState<string>('cam18-test1-listening');
+  const [listeningExamResult, setListeningExamResult] = useState<ListeningExamResult | null>(null);
 
   // Active Anki Deck ID and Study mode
   const [selectedAnkiDeckId, setSelectedAnkiDeckId] = useState<string | null>(null);
@@ -428,6 +435,11 @@ const AppContent: React.FC = () => {
               setCurrentScreen('listening-test');
               window.scrollTo({ top: 0, behavior: 'smooth' });
             }}
+            onSelectFullTest={(testId) => {
+              setSelectedListeningFullTestId(testId);
+              setCurrentScreen('listening-exam');
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+            }}
             onNavigateAnki={() => {
               setCurrentScreen('anki');
               setIsStudyingAnki(false);
@@ -450,6 +462,70 @@ const AppContent: React.FC = () => {
               setIsStudyingAnki(false);
               window.scrollTo({ top: 0, behavior: 'smooth' });
             }}
+          />
+        );
+
+      case 'listening-exam': {
+        const listeningTest = mockListeningFullTests.find((t) => t.id === selectedListeningFullTestId) || mockListeningFullTests[0];
+        return (
+          <IELTSListeningExamRoom
+            test={listeningTest}
+            onExit={() => {
+              setCurrentScreen('listening');
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+            }}
+            onSubmitComplete={(result) => {
+              setListeningExamResult(result);
+              setCurrentScreen('listening-review');
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+            }}
+            onNotify={addToast}
+          />
+        );
+      }
+
+      case 'listening-review': {
+        const listeningTest = mockListeningFullTests.find((t) => t.id === selectedListeningFullTestId) || mockListeningFullTests[0];
+        if (!listeningExamResult) {
+          setCurrentScreen('listening');
+          return null;
+        }
+        return (
+          <ListeningReviewRoom
+            test={listeningTest}
+            result={listeningExamResult}
+            onBackToLibrary={() => {
+              setCurrentScreen('listening');
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+            }}
+            onRetakeTest={() => {
+              setListeningExamResult(null);
+              setCurrentScreen('listening-exam');
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+            }}
+          />
+        );
+      }
+
+      case 'writing':
+        return (
+          <WritingTask1Studio
+            onBack={() => {
+              setCurrentScreen('reading');
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+            }}
+            onNotify={addToast}
+          />
+        );
+
+      case 'speaking':
+        return (
+          <SpeakingMockRoom
+            onBack={() => {
+              setCurrentScreen('reading');
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+            }}
+            onNotify={addToast}
           />
         );
 
@@ -537,8 +613,8 @@ const AppContent: React.FC = () => {
       {/* Dynamic Customizable Soft Atmosphere Background */}
       <SoftAtmosphereBackground />
 
-      {/* Student LMS Navigation: Only displayed in authenticated workspace and outside of computer exam room */}
-      {currentScreen !== 'landing' && currentScreen !== 'computer-exam' && (
+      {/* Student LMS Navigation: Only displayed in authenticated workspace and outside of exam rooms */}
+      {currentScreen !== 'landing' && currentScreen !== 'computer-exam' && currentScreen !== 'listening-exam' && (
         <Navbar
           currentScreen={currentScreen}
           onSelectScreen={handleScreenNavigate}
@@ -589,7 +665,7 @@ const AppContent: React.FC = () => {
       <ToastContainer toasts={toasts} onDismiss={removeToast} />
 
       {/* Student LMS Workspace Footer */}
-      {currentScreen !== 'landing' && currentScreen !== 'computer-exam' && (
+      {currentScreen !== 'landing' && currentScreen !== 'computer-exam' && currentScreen !== 'listening-exam' && (
         <footer className="mt-auto border-t border-stone-200/80 bg-white/85 backdrop-blur-md py-8">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-stone-500">
             <div className="flex items-center gap-3 font-sans">

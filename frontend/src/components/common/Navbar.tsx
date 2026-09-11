@@ -15,6 +15,8 @@ import {
   Menu,
   X,
   Globe,
+  PenLine,
+  Mic,
 } from 'lucide-react';
 import { Screen, UserStats, User } from '../../types';
 import { Button } from './Button';
@@ -53,8 +55,18 @@ export const Navbar: React.FC<NavbarProps> = ({
     },
     {
       id: 'listening',
-      label: 'Luyện Nghe Dictation',
+      label: 'Luyện Nghe IELTS',
       icon: <Headphones size={15} />,
+    },
+    {
+      id: 'writing',
+      label: 'Writing Task 1',
+      icon: <PenLine size={15} />,
+    },
+    {
+      id: 'speaking',
+      label: 'Speaking Mock',
+      icon: <Mic size={15} />,
     },
     {
       id: 'anki',
@@ -111,7 +123,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             const isActive =
               currentScreen === link.id ||
               (link.id === 'reading' && (currentScreen === 'reading-test' || currentScreen === 'library' || currentScreen === 'reader')) ||
-              (link.id === 'listening' && currentScreen === 'listening-test') ||
+              (link.id === 'listening' && (currentScreen === 'listening-test' || currentScreen === 'listening-exam' || currentScreen === 'listening-review')) ||
               (link.id === 'anki' && currentScreen === 'vault');
 
             return (

@@ -123,6 +123,8 @@ export type Screen =
   | 'mistake-vault'
   | 'listening'
   | 'listening-test'
+  | 'listening-exam'
+  | 'listening-review'
   | 'anki'
   | 'library'
   | 'reader'
@@ -542,3 +544,131 @@ export interface ExamNote {
   timestamp: number;
 }
 
+// ================= IELTS Listening Full Test Types ================= //
+
+export type ListeningQuestionType =
+  | 'form_completion'
+  | 'multiple_choice'
+  | 'matching'
+  | 'map_labeling'
+  | 'note_completion'
+  | 'table_completion'
+  | 'sentence_completion';
+
+export interface ListeningQuestionOption {
+  id: string;
+  label: string;
+  text: string;
+}
+
+export interface ListeningQuestion {
+  id: string;
+  number: number;
+  sectionNumber: 1 | 2 | 3 | 4;
+  type: ListeningQuestionType;
+  groupHeader?: string;
+  groupInstruction?: string;
+  prompt: string;
+  options?: ListeningQuestionOption[];
+  correctAnswer: string;
+  acceptableAnswers?: string[];
+  explanation?: string;
+}
+
+export interface ListeningSection {
+  id?: string;
+  sectionNumber: 1 | 2 | 3 | 4;
+  title: string;
+  context: string;
+  instructions: string;
+  audioFile: string;
+  questions: ListeningQuestion[];
+}
+
+export interface TranscriptLine {
+  id: string;
+  start: number;
+  end: number;
+  speaker?: string;
+  text: string;
+  answerForQuestion?: number;
+  explanation?: string;
+}
+
+export interface ListeningFullTest {
+  id: string;
+  source: string;
+  book: string;
+  testNumber: 1 | 2 | 3 | 4;
+  totalSections: 4;
+  estimatedMinutes: number;
+  sections: ListeningSection[];
+  transcript: TranscriptLine[];
+}
+
+export interface ListeningExamResult {
+  testId: string;
+  userAnswers: Record<string, string>;
+  correctCount: number;
+  totalCount: number;
+  bandScore: number;
+  sectionScores: { section: number; correct: number; total: number }[];
+  completedAt: string;
+}
+
+// ================= Writing Task 1 Types ================= //
+
+export type ChartType = 'line' | 'bar' | 'pie' | 'table' | 'process' | 'map' | 'mixed';
+
+export interface WritingTask1Prompt {
+  id: string;
+  source: string;
+  chartType: ChartType;
+  chartImageUrl: string;
+  taskText: string;
+  timeLimit: number;
+  minWords: number;
+  sentenceExamples: {
+    original: string;
+    band65: string;
+    band75: string;
+    band85: string;
+  }[];
+}
+
+// ================= Speaking Mock Test Types ================= //
+
+export type SpeakingState =
+  | 'IDLE'
+  | 'EXAMINER_SPEAKING'
+  | 'CANDIDATE_PREPARING'
+  | 'CANDIDATE_SPEAKING'
+  | 'EVALUATING';
+
+export interface SpeakingQuestion {
+  id: string;
+  part: 1 | 2 | 3;
+  type: 'interview' | 'cue_card' | 'discussion';
+  question: string;
+  cueCardBullets?: string[];
+  prepTimeSeconds?: number;
+  maxAnswerSeconds: number;
+}
+
+export interface SpeakingMockTest {
+  id: string;
+  source: string;
+  topic: string;
+  part1Questions: SpeakingQuestion[];
+  part2CueCard: SpeakingQuestion;
+  part3Questions: SpeakingQuestion[];
+}
+
+export interface SpeakingAnswerRecord {
+  questionId: string;
+  transcript: string;
+  wordCount: number;
+  durationSeconds: number;
+  wpm: number;
+  fillerWords: { word: string; count: number }[];
+}

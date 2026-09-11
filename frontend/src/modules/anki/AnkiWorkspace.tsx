@@ -9,9 +9,11 @@ import {
   Play,
   Search,
   ArrowRight,
+  Download,
 } from 'lucide-react';
 import { useAnki } from '../../context/AnkiContext';
 import { AudioPlayButton } from '../../components/shared/AudioPlayButton';
+import { AnkiExportPanel } from './AnkiExportPanel';
 
 interface AnkiWorkspaceProps {
   onStartStudy: (deckId?: string) => void;
@@ -27,6 +29,7 @@ export const AnkiWorkspace: React.FC<AnkiWorkspaceProps> = ({
   const { decks, cards, totalDueCount, getCardsForDeck } = useAnki();
   const [selectedDeckForPreview, setSelectedDeckForPreview] = useState<string>('deck-personal');
   const [searchQuery, setSearchQuery] = useState<string>('');
+  const [showExport, setShowExport] = useState<boolean>(false);
 
   const totalLearningCount = cards.filter((c) => c.status === 'learning' || c.status === 'new').length;
   const totalMasteredCount = cards.filter((c) => c.status === 'mastered').length;
@@ -70,25 +73,46 @@ export const AnkiWorkspace: React.FC<AnkiWorkspaceProps> = ({
           </p>
         </div>
 
-        {/* Big CTA: Study All Due Cards */}
-        {totalDueCount > 0 ? (
+        {/* Actions: Study All & Export Anki */}
+        <div className="flex flex-wrap items-center gap-3 shrink-0">
           <button
-            onClick={() => onStartStudy()}
-            className="inline-flex items-center gap-2.5 px-6 py-3.5 rounded-2xl bg-[#D97706] hover:bg-[#B45309] text-white text-xs sm:text-sm font-bold uppercase tracking-normal shadow-md shadow-amber-600/20 active:scale-95 transition-all cursor-pointer shrink-0"
+            onClick={() => setShowExport(!showExport)}
+            className={`inline-flex items-center gap-2 px-5 py-3.5 rounded-2xl text-xs sm:text-sm font-bold uppercase tracking-normal transition-all cursor-pointer border ${
+              showExport 
+                ? 'bg-amber-100 border-amber-300 text-amber-900 shadow-xs' 
+                : 'bg-white hover:bg-stone-100 border-stone-200 text-stone-700 shadow-xs'
+            }`}
           >
-            <Play size={16} className="fill-white" />
-            <span>Ôn Tập Tất Cả Thẻ Đến Hạn ({totalDueCount})</span>
+            <Download size={16} className={showExport ? 'text-amber-800' : 'text-stone-500'} />
+            <span>{showExport ? 'Ẩn Xuất Dữ Liệu' : 'Xuất Thẻ Anki'}</span>
           </button>
-        ) : (
-          <button
-            onClick={() => onStartStudy()}
-            className="inline-flex items-center gap-2.5 px-6 py-3.5 rounded-2xl bg-[#064E3B] hover:bg-[#022C22] text-amber-300 text-xs sm:text-sm font-bold uppercase tracking-normal shadow-xs active:scale-95 transition-all cursor-pointer shrink-0"
-          >
-            <Play size={16} className="fill-amber-300" />
-            <span>Ôn Luyện Tự Do (Tất Cả Bộ Bài)</span>
-          </button>
-        )}
+
+          {totalDueCount > 0 ? (
+            <button
+              onClick={() => onStartStudy()}
+              className="inline-flex items-center gap-2.5 px-6 py-3.5 rounded-2xl bg-[#D97706] hover:bg-[#B45309] text-white text-xs sm:text-sm font-bold uppercase tracking-normal shadow-md shadow-amber-600/20 active:scale-95 transition-all cursor-pointer"
+            >
+              <Play size={16} className="fill-white" />
+              <span>Ôn Tập Tất Cả Thẻ Đến Hạn ({totalDueCount})</span>
+            </button>
+          ) : (
+            <button
+              onClick={() => onStartStudy()}
+              className="inline-flex items-center gap-2.5 px-6 py-3.5 rounded-2xl bg-[#064E3B] hover:bg-[#022C22] text-amber-300 text-xs sm:text-sm font-bold uppercase tracking-normal shadow-xs active:scale-95 transition-all cursor-pointer"
+            >
+              <Play size={16} className="fill-amber-300" />
+              <span>Ôn Luyện Tự Do (Tất Cả Bộ Bài)</span>
+            </button>
+          )}
+        </div>
       </div>
+
+      {/* Anki Export Panel (Conditional) */}
+      {showExport && (
+        <div className="animate-in fade-in slide-in-from-top-4 duration-300">
+          <AnkiExportPanel />
+        </div>
+      )}
 
       {/* Global Learning Metrics Grid */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
