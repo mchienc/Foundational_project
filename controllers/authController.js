@@ -2,7 +2,7 @@
 // Controller chứa logic xử lý: nhận dữ liệu từ request, thao tác với DB,
 // rồi trả kết quả (render trang hoặc redirect).
 
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcryptjs');
 const db = require('../config/db');
 
 // Hiển thị trang đăng ký

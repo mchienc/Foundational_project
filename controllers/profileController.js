@@ -2,7 +2,7 @@
 // Trang cá nhân học viên: xem thống kê, chỉnh sửa hồ sơ, đổi mật khẩu
 
 const db = require('../config/db');
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcryptjs');
 
 // Trang Profile cá nhân
 async function showProfile(req, res) {
