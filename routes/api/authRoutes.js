@@ -1,5 +1,5 @@
-﻿// routes/api/authRoutes.js
-// RESTful API routes cho đăng nhập, đăng ký tài khoản học viên và quản trị viên
+// routes/api/authRoutes.js
+// RESTful API routes cho đăng nhập, đăng ký, Google Sign-in và Quên mật khẩu
 
 const express = require('express');
 const router = express.Router();
@@ -7,6 +7,9 @@ const authController = require('../../controllers/authController');
 
 router.post('/login', authController.apiLogin);
 router.post('/register', authController.apiRegister);
+router.post('/google-login', authController.apiGoogleLogin);
+router.post('/forgot-password', authController.apiForgotPassword);
+router.post('/reset-password', authController.apiResetPassword);
 router.get('/me', authController.apiMe);
 router.post('/logout', authController.apiLogout);
 

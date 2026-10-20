@@ -231,6 +231,12 @@ const AppContent: React.FC = () => {
       return;
     }
 
+    // Role-based Access Control (RBAC): Chặn học viên thường truy cập Cổng Quản Trị
+    if (screen === 'admin' && user?.role !== 'admin') {
+      addToast('Bạn cần tài khoản có quyền Quản trị viên (Admin) để truy cập Cổng Quản Trị.', 'error');
+      return;
+    }
+
     if (screen === 'anki') {
       setIsStudyingAnki(false);
     }

@@ -3,7 +3,7 @@ import { User } from '../types';
 
 interface AuthModalConfig {
   isOpen: boolean;
-  tab: 'login' | 'register';
+  tab: 'login' | 'register' | 'forgot';
   title: string;
   subtitle: string;
 }
@@ -15,7 +15,7 @@ interface AuthContextType {
   logout: () => void;
   requireAuth: (actionName?: string) => boolean;
   openAuthModal: (
-    tab?: 'login' | 'register',
+    tab?: 'login' | 'register' | 'forgot',
     title?: string,
     subtitle?: string
   ) => void;
@@ -89,7 +89,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const openAuthModal = (
-    tab: 'login' | 'register' = 'login',
+    tab: 'login' | 'register' | 'forgot' = 'login',
     title?: string,
     subtitle?: string
   ) => {

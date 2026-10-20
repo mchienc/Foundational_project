@@ -154,6 +154,15 @@ export const Navbar: React.FC<NavbarProps> = ({
                 <span className="text-xs font-bold text-stone-100 hidden md:inline max-w-[110px] truncate">
                   {currentUser.full_name}
                 </span>
+                {currentUser.role === 'admin' ? (
+                  <span className="px-2 py-0.5 rounded-full text-[10px] font-mono font-extrabold bg-amber-400 text-stone-950 uppercase shadow-xs">
+                    Admin
+                  </span>
+                ) : (
+                  <span className="px-2 py-0.5 rounded-full text-[10px] font-mono font-semibold bg-emerald-800/80 text-amber-200 border border-emerald-700">
+                    Học Viên
+                  </span>
+                )}
                 <ChevronDown size={14} className="text-stone-300" />
               </button>
 

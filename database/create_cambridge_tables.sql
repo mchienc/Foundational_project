@@ -3,6 +3,20 @@
 -- Lưu trữ chuẩn hóa các bài thi Cambridge 16-19, Dictation và Anki SRS
 -- =====================================================================
 
+-- 0. Bảng Người Dùng & Phân Quyền (Users & Role-Based Access Control)
+CREATE TABLE IF NOT EXISTS users (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    full_name VARCHAR(255) NOT NULL,
+    email VARCHAR(255) NOT NULL UNIQUE,
+    password VARCHAR(255) NOT NULL,
+    role ENUM('student', 'admin') DEFAULT 'student',
+    reset_token VARCHAR(255) DEFAULT NULL,
+    reset_token_expiry DATETIME DEFAULT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    INDEX idx_email (email),
+    INDEX idx_role (role)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 -- 1. Bảng Bài Đọc Cambridge (Reading Passages)
 CREATE TABLE IF NOT EXISTS cambridge_reading_passages (
     id VARCHAR(100) PRIMARY KEY,
