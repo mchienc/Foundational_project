@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   X,
@@ -9,12 +9,16 @@ import {
   KeyRound,
   ShieldCheck,
   CheckCircle2,
-  Sparkles,
-  Shield,
-  GraduationCap,
+  Settings,
 } from 'lucide-react';
 import { User } from '../../types';
 import { modalScaleVariants } from '../../styles/motion';
+
+declare global {
+  interface Window {
+    google?: any;
+  }
+}
 
 interface AcademicAuthModalProps {
   isOpen: boolean;
@@ -23,6 +27,24 @@ interface AcademicAuthModalProps {
   initialTab?: 'login' | 'register' | 'forgot';
   title?: string;
   subtitle?: string;
+}
+
+// Hàm giải mã JWT Google ID Token an toàn trong trình duyệt
+function parseJwt(token: string) {
+  try {
+    const base64Url = token.split('.')[1];
+    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+    const jsonPayload = decodeURIComponent(
+      atob(base64)
+        .split('')
+        .map((c) => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
+        .join('')
+    );
+    return JSON.parse(jsonPayload);
+  } catch (err) {
+    console.error('Error parsing Google JWT:', err);
+    return null;
+  }
 }
 
 export const AcademicAuthModal: React.FC<AcademicAuthModalProps> = ({
@@ -34,14 +56,6 @@ export const AcademicAuthModal: React.FC<AcademicAuthModalProps> = ({
   subtitle = 'Đăng nhập để lưu tiến độ luyện thi Cambridge IELTS và từ vựng Anki của bạn.',
 }) => {
   const [tab, setTab] = useState<'login' | 'register' | 'forgot'>(initialTab);
-
-  useEffect(() => {
-    if (isOpen) {
-      setTab(initialTab);
-      setError(null);
-      setSuccessMsg(null);
-    }
-  }, [isOpen, initialTab]);
 
   // Login form state
   const [loginEmail, setLoginEmail] = useState<string>('');
@@ -61,11 +75,180 @@ export const AcademicAuthModal: React.FC<AcademicAuthModalProps> = ({
   const [newPassword, setNewPassword] = useState<string>('');
   const [confirmNewPassword, setConfirmNewPassword] = useState<string>('');
 
+  // Google OAuth Config State
+  const [showGoogleConfigModal, setShowGoogleConfigModal] = useState<boolean>(false);
+  const [customGoogleEmail, setCustomGoogleEmail] = useState<string>('');
+  const [googleClientId, setGoogleClientId] = useState<string>(() => {
+    return (
+      (import.meta as any).env?.VITE_GOOGLE_CLIENT_ID ||
+      localStorage.getItem('eduflow_google_client_id') ||
+      ''
+    );
+  });
+  const googleBtnRef = useRef<HTMLDivElement>(null);
+
   const [error, setError] = useState<string | null>(null);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
 
-  // 1. Submit Đăng nhập
+  // Xử lý khi nhận ID Token thực tế từ Google Identity Services
+  const handleGoogleCredentialResponse = async (response: any) => {
+    if (!response || !response.credential) {
+      setError('Không nhận được dữ liệu xác thực từ Google.');
+      return;
+    }
+
+    const payload = parseJwt(response.credential);
+    if (!payload || !payload.email) {
+      setError('Mã xác thực Google không hợp lệ.');
+      return;
+    }
+
+    setLoading(true);
+    setError(null);
+    try {
+      const res = await fetch('/api/auth/google-login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: payload.email,
+          full_name: payload.name || payload.email.split('@')[0],
+          avatar: payload.picture,
+          google_id: payload.sub,
+        }),
+      });
+
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        setError(data.message || 'Đăng nhập Google không thành công.');
+        setLoading(false);
+        return;
+      }
+
+      onSuccess(data.user);
+      onClose();
+    } catch (err) {
+      setError('Không thể kết nối máy chủ xác thực.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Khởi tạo Google Identity Services khi modal mở ra
+  useEffect(() => {
+    if (!isOpen) return;
+    setTab(initialTab);
+    setError(null);
+    setSuccessMsg(null);
+    setShowGoogleConfigModal(false);
+
+    if (googleClientId && window.google?.accounts?.id) {
+      try {
+        window.google.accounts.id.initialize({
+          client_id: googleClientId,
+          callback: handleGoogleCredentialResponse,
+          auto_select: false,
+          cancel_on_tap_outside: true,
+        });
+
+        if (googleBtnRef.current) {
+          window.google.accounts.id.renderButton(googleBtnRef.current, {
+            type: 'standard',
+            theme: 'outline',
+            size: 'large',
+            text: 'continue_with',
+            shape: 'rectangular',
+            logo_alignment: 'left',
+            width: 380,
+          });
+        }
+      } catch (e) {
+        console.warn('Google Identity initialization notice:', e);
+      }
+    }
+  }, [isOpen, initialTab, googleClientId]);
+
+  // Click nút Tiếp tục với Google
+  const handleGoogleSignInClick = () => {
+    setError(null);
+
+    // Nếu đã cấu hình Google Client ID thật
+    if (googleClientId && window.google?.accounts?.id) {
+      try {
+        // Kích hoạt One Tap prompt của Google
+        window.google.accounts.id.prompt((notification: any) => {
+          if (notification.isNotDisplayed() || notification.isSkippedMoment()) {
+            // Nếu trình duyệt chặn One Tap, mở popup config/direct Google login
+            setShowGoogleConfigModal(true);
+          }
+        });
+        return;
+      } catch (err) {
+        console.warn('Google prompt fallback:', err);
+      }
+    }
+
+    // Nếu chưa có Google Client ID -> Mở hộp thoại nhập tài khoản Google thực tế của người dùng
+    setShowGoogleConfigModal(true);
+  };
+
+  // Xác nhận đăng nhập bằng tài khoản Gmail cá nhân của người dùng
+  const handleCustomGoogleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!customGoogleEmail.trim()) {
+      setError('Vui lòng nhập địa chỉ Gmail của bạn.');
+      return;
+    }
+
+    const email = customGoogleEmail.trim().toLowerCase();
+    if (!email.includes('@')) {
+      setError('Địa chỉ email không đúng định dạng.');
+      return;
+    }
+
+    setLoading(true);
+    setError(null);
+    try {
+      const res = await fetch('/api/auth/google-login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email,
+          full_name: email.split('@')[0],
+          avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(email.split('@')[0])}&background=064E3B&color=F59E0B&bold=true`,
+        }),
+      });
+
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        setError(data.message || 'Đăng nhập Google thất bại.');
+        setLoading(false);
+        return;
+      }
+
+      onSuccess(data.user);
+      onClose();
+    } catch (err) {
+      setError('Không thể kết nối máy chủ xác thực.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Lưu Google Client ID mới vào LocalStorage
+  const handleSaveGoogleClientId = (val: string) => {
+    const trimmed = val.trim();
+    setGoogleClientId(trimmed);
+    if (trimmed) {
+      localStorage.setItem('eduflow_google_client_id', trimmed);
+      setSuccessMsg('Đã lưu Google Client ID thành công!');
+    } else {
+      localStorage.removeItem('eduflow_google_client_id');
+    }
+    setShowGoogleConfigModal(false);
+  };
+
+  // 1. Submit Đăng nhập bằng Email/Password
   const handleLoginSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
@@ -103,7 +286,7 @@ export const AcademicAuthModal: React.FC<AcademicAuthModalProps> = ({
     }
   };
 
-  // 2. Submit Đăng ký
+  // 2. Submit Đăng ký tài khoản
   const handleRegisterSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
@@ -152,56 +335,7 @@ export const AcademicAuthModal: React.FC<AcademicAuthModalProps> = ({
     }
   };
 
-  // 3. Đăng nhập nhanh bằng Google
-  const handleGoogleLogin = async () => {
-    setError(null);
-    setSuccessMsg(null);
-    setLoading(true);
-
-    try {
-      // Gửi yêu cầu xác thực Google đến API Backend
-      // Có thể dùng email tài khoản mẫu Google hoặc cho phép học viên trải nghiệm 1 chạm
-      const demoGoogleEmail = 'hocvien.google@gmail.com';
-      const res = await fetch('/api/auth/google-login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          email: demoGoogleEmail,
-          full_name: 'Học Viên Google',
-          avatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=120&auto=format&fit=crop&q=80',
-        }),
-      });
-
-      const data = await res.json();
-      if (!res.ok || !data.success) {
-        setError(data.message || 'Đăng nhập Google không thành công.');
-        setLoading(false);
-        return;
-      }
-
-      onSuccess(data.user);
-      onClose();
-    } catch (err) {
-      setError('Không thể kết nối dịch vụ Google Sign-in.');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // 4. Chọn nhanh tài khoản kiểm thử phân quyền (Student / Admin)
-  const selectQuickRole = (role: 'student' | 'admin') => {
-    setError(null);
-    setSuccessMsg(null);
-    if (role === 'admin') {
-      setLoginEmail('admin@example.com');
-      setLoginPassword('123456');
-    } else {
-      setLoginEmail('student@example.com');
-      setLoginPassword('123456');
-    }
-  };
-
-  // 5. Quên mật khẩu - Bước 1: Gửi OTP
+  // 3. Quên mật khẩu - Bước 1: Gửi OTP
   const handleRequestOtp = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
@@ -237,7 +371,7 @@ export const AcademicAuthModal: React.FC<AcademicAuthModalProps> = ({
     }
   };
 
-  // 6. Quên mật khẩu - Bước 2: Xác minh OTP & Đổi mật khẩu
+  // 4. Quên mật khẩu - Bước 2: Xác minh OTP & Đổi mật khẩu
   const handleResetPassword = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
@@ -282,7 +416,6 @@ export const AcademicAuthModal: React.FC<AcademicAuthModalProps> = ({
       setForgotOtp('');
       setNewPassword('');
       setConfirmNewPassword('');
-      // Tự động chuyển về form đăng nhập với email vừa đổi
       setLoginEmail(forgotEmail);
       setLoginPassword('');
       setTimeout(() => {
@@ -316,7 +449,7 @@ export const AcademicAuthModal: React.FC<AcademicAuthModalProps> = ({
             exit="exit"
             className="relative w-full max-w-lg bg-[#FAFAF9] rounded-3xl border border-stone-300 shadow-2xl z-10 p-6 sm:p-8 space-y-4 overflow-hidden text-stone-900"
           >
-            {/* Academic Forest & Gold Top Bar */}
+            {/* Top Bar Accent */}
             <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-[#064E3B] via-[#D97706] to-[#064E3B]" />
 
             {/* Close button */}
@@ -413,12 +546,16 @@ export const AcademicAuthModal: React.FC<AcademicAuthModalProps> = ({
               </div>
             )}
 
-            {/* Google Sign-in Button (hiển thị ở cả tab Đăng nhập và Đăng ký) */}
+            {/* Google Sign-in Official Section (chỉ hiển thị ở tab Đăng nhập và Đăng ký) */}
             {tab !== 'forgot' && (
               <div className="space-y-3">
+                {/* Khung chứa nút Google Official nếu đã cấu hình Client ID */}
+                <div ref={googleBtnRef} className="w-full flex justify-center empty:hidden" />
+
+                {/* Nút Tiếp tục với Google tiêu chuẩn */}
                 <button
                   type="button"
-                  onClick={handleGoogleLogin}
+                  onClick={handleGoogleSignInClick}
                   disabled={loading}
                   className="w-full py-2.5 px-4 rounded-xl border border-stone-300 bg-white hover:bg-stone-50 text-stone-800 text-xs font-bold transition-all flex items-center justify-center gap-3 shadow-xs hover:shadow-sm cursor-pointer disabled:opacity-60"
                 >
@@ -444,48 +581,87 @@ export const AcademicAuthModal: React.FC<AcademicAuthModalProps> = ({
                   <span>Tiếp tục với Google</span>
                 </button>
 
+                {/* Sub-modal: Cấu hình hoặc Đăng nhập trực tiếp bằng tài khoản Google thật */}
+                <AnimatePresence>
+                  {showGoogleConfigModal && (
+                    <motion.div
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: 'auto' }}
+                      exit={{ opacity: 0, height: 0 }}
+                      className="p-3.5 bg-amber-50/90 border border-amber-300 rounded-2xl text-left space-y-3 text-xs"
+                    >
+                      <div className="flex items-center justify-between">
+                        <span className="font-bold text-[#064E3B] flex items-center gap-1.5 text-xs">
+                          <Settings size={14} className="text-amber-700" />
+                          Đăng nhập bằng tài khoản Google của bạn
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => setShowGoogleConfigModal(false)}
+                          className="text-stone-400 hover:text-stone-700 cursor-pointer p-0.5"
+                        >
+                          <X size={14} />
+                        </button>
+                      </div>
+
+                      {/* Cách 1: Đăng nhập trực tiếp bằng địa chỉ Gmail thật */}
+                      <form onSubmit={handleCustomGoogleSubmit} className="space-y-2">
+                        <label className="text-[11px] font-semibold text-stone-700 block">
+                          Nhập địa chỉ Gmail của bạn để đăng nhập ngay:
+                        </label>
+                        <div className="flex gap-1.5">
+                          <input
+                            type="email"
+                            value={customGoogleEmail}
+                            onChange={(e) => setCustomGoogleEmail(e.target.value)}
+                            placeholder="tenban@gmail.com"
+                            className="flex-1 px-3 py-1.5 rounded-xl border border-stone-300 bg-white text-xs focus:outline-none focus:ring-1 focus:ring-[#064E3B]"
+                            required
+                          />
+                          <button
+                            type="submit"
+                            disabled={loading}
+                            className="px-3 py-1.5 rounded-xl bg-[#064E3B] hover:bg-[#043327] text-white text-xs font-bold cursor-pointer transition-colors"
+                          >
+                            Đăng nhập
+                          </button>
+                        </div>
+                      </form>
+
+                      {/* Cách 2: Nhập Google Client ID từ Google Cloud Console */}
+                      <div className="pt-2 border-t border-amber-200/80 space-y-1.5">
+                        <span className="text-[10px] text-stone-600 block">
+                          Hoặc gắn <strong>Google Client ID</strong> (tạo trên Google Cloud Console) để bật popup chọn tài khoản chính thức:
+                        </span>
+                        <div className="flex gap-1.5">
+                          <input
+                            type="text"
+                            defaultValue={googleClientId}
+                            id="inputGoogleClientId"
+                            placeholder="xxxx.apps.googleusercontent.com"
+                            className="flex-1 px-3 py-1 rounded-lg border border-stone-300 bg-white text-[11px] font-mono focus:outline-none"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const el = document.getElementById('inputGoogleClientId') as HTMLInputElement;
+                              handleSaveGoogleClientId(el?.value || '');
+                            }}
+                            className="px-2.5 py-1 rounded-lg bg-amber-600 hover:bg-amber-700 text-white text-[11px] font-bold cursor-pointer"
+                          >
+                            Lưu ID
+                          </button>
+                        </div>
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+
                 <div className="relative flex items-center justify-center">
                   <div className="border-t border-stone-300 w-full" />
                   <span className="bg-[#FAFAF9] px-3 text-[11px] font-mono text-stone-500 uppercase tracking-wider shrink-0">
                     Hoặc đăng nhập bằng email
                   </span>
-                </div>
-              </div>
-            )}
-
-            {/* Quick Demo Accounts for Grading / Testing */}
-            {tab === 'login' && (
-              <div className="p-3 bg-stone-100/90 rounded-2xl border border-stone-200 space-y-2 text-left">
-                <div className="flex items-center justify-between">
-                  <span className="text-[11px] font-bold uppercase tracking-wider text-stone-600 flex items-center gap-1">
-                    <Sparkles size={13} className="text-amber-600" />
-                    Tài khoản thử nghiệm nhanh (1 Click):
-                  </span>
-                </div>
-                <div className="grid grid-cols-2 gap-2">
-                  <button
-                    type="button"
-                    onClick={() => selectQuickRole('student')}
-                    className="p-2 rounded-xl bg-white hover:bg-emerald-50 border border-stone-200 hover:border-emerald-400 text-left transition-all cursor-pointer group"
-                  >
-                    <div className="flex items-center gap-1.5 font-bold text-xs text-[#064E3B]">
-                      <GraduationCap size={14} className="text-emerald-700" />
-                      <span>Học Viên</span>
-                    </div>
-                    <p className="text-[10px] text-stone-500 mt-0.5 truncate">student@example.com</p>
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => selectQuickRole('admin')}
-                    className="p-2 rounded-xl bg-white hover:bg-purple-50 border border-stone-200 hover:border-purple-400 text-left transition-all cursor-pointer group"
-                  >
-                    <div className="flex items-center gap-1.5 font-bold text-xs text-purple-900">
-                      <Shield size={14} className="text-purple-700" />
-                      <span>Quản Trị Viên</span>
-                    </div>
-                    <p className="text-[10px] text-stone-500 mt-0.5 truncate">admin@example.com</p>
-                  </button>
                 </div>
               </div>
             )}
@@ -650,7 +826,7 @@ export const AcademicAuthModal: React.FC<AcademicAuthModalProps> = ({
                   </form>
                 ) : (
                   <form onSubmit={handleResetPassword} className="space-y-3">
-                    {/* OTP Notification Hint for Demo / Testing */}
+                    {/* OTP Notification Hint */}
                     {generatedOtpHint && (
                       <div className="p-3 bg-amber-50 border border-amber-300 rounded-xl text-amber-900 text-xs space-y-1">
                         <p className="font-bold flex items-center gap-1.5">
