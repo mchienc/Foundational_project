@@ -20,4 +20,9 @@ router.delete('/users/:id', adminController.deleteUser);
 // 5. Bảng điểm nộp bài khảo thí toàn sàn
 router.get('/exam-results', adminController.getAllExamResults);
 
+// 6. Quản lý kho đề thi Cambridge
+router.get('/tests', adminController.getCambridgeTests);
+router.put('/tests/:id/status', adminController.toggleTestStatus);
+router.put('/tests/:id', adminController.updateCambridgeTest);
+
 module.exports = router;

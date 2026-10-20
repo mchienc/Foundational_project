@@ -222,3 +222,127 @@ exports.getAllExamResults = async (req, res) => {
     res.status(500).json({ success: false, message: 'Lỗi máy chủ khi lấy bảng điểm.' });
   }
 };
+
+// ================= CHỨC NĂNG QUẢN LÝ KHO ĐỀ THI CAMBRIDGE ================= //
+
+function generateDefaultTestAnswers(book, testNumber) {
+  const types = ['tfng', 'tfng', 'tfng', 'tfng', 'mcq', 'mcq', 'mcq', 'fill_blank', 'fill_blank', 'fill_blank'];
+  const questions = [];
+  for (let i = 1; i <= 40; i++) {
+    const qType = types[(i - 1) % types.length];
+    let defaultAns = 'TRUE';
+    let defaultAcceptable = '';
+    let explanation = `Trích dẫn chứng cứ cho câu ${i} từ đoạn văn/audio tương ứng trong ${book} Test ${testNumber}.`;
+    if (qType === 'tfng') {
+      defaultAns = i % 3 === 1 ? 'TRUE' : i % 3 === 2 ? 'FALSE' : 'NOT GIVEN';
+      defaultAcceptable = defaultAns === 'TRUE' ? 'T' : defaultAns === 'FALSE' ? 'F' : 'NG';
+    } else if (qType === 'mcq') {
+      const letters = ['A', 'B', 'C', 'D'];
+      defaultAns = letters[(i - 1) % 4];
+    } else {
+      const sampleWords = ['technology', 'environment', 'sustainable', 'infrastructure', 'efficiency', 'architecture', 'temperature', 'biodiversity'];
+      defaultAns = sampleWords[(i - 1) % sampleWords.length];
+      defaultAcceptable = defaultAns;
+    }
+
+    questions.push({
+      number: i,
+      type: qType === 'tfng' ? 'TRUE / FALSE / NOT GIVEN' : qType === 'mcq' ? 'Trắc nghiệm (MCQ)' : 'Điền từ (Completion)',
+      correctAnswer: defaultAns,
+      acceptableAnswers: defaultAcceptable,
+      explanation,
+    });
+  }
+  return questions;
+}
+
+const CAMBRIDGE_BOOKS = [20, 19, 18, 16, 15, 14, 13];
+let memoryCambridgeTests = [];
+
+CAMBRIDGE_BOOKS.forEach((bookNum) => {
+  for (let t = 1; t <= 4; t++) {
+    const bookTitle = `Cambridge ${bookNum}`;
+    memoryCambridgeTests.push({
+      id: `cam-${bookNum}-${t}`,
+      book: bookTitle,
+      testNumber: t,
+      passagesCount: 3,
+      questionsCount: 40,
+      durationMinutes: 60,
+      status: 'Sẵn Sàng', // 'Sẵn Sàng' | 'Tạm Khóa'
+      questions: generateDefaultTestAnswers(bookTitle, t),
+    });
+  }
+});
+
+// 6. Lấy danh sách kho đề Cambridge cùng trạng thái và ngân hàng câu hỏi
+exports.getCambridgeTests = async (req, res) => {
+  try {
+    res.json({
+      success: true,
+      count: memoryCambridgeTests.length,
+      data: memoryCambridgeTests,
+    });
+  } catch (error) {
+    console.error('getCambridgeTests error:', error);
+    res.status(500).json({ success: false, message: 'Lỗi máy chủ khi lấy danh sách đề thi.' });
+  }
+};
+
+// 7. Bật/Tắt trạng thái đề thi (Active <-> Inactive / Sẵn Sàng <-> Tạm Khóa)
+exports.toggleTestStatus = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const testIndex = memoryCambridgeTests.findIndex((t) => t.id === id);
+
+    if (testIndex === -1) {
+      return res.status(404).json({ success: false, message: 'Không tìm thấy bộ đề thi.' });
+    }
+
+    const currentStatus = memoryCambridgeTests[testIndex].status;
+    const newStatus = currentStatus === 'Sẵn Sàng' ? 'Tạm Khóa' : 'Sẵn Sàng';
+    memoryCambridgeTests[testIndex].status = newStatus;
+
+    res.json({
+      success: true,
+      message: `Đã chuyển trạng thái đề "${memoryCambridgeTests[testIndex].book} - Test ${memoryCambridgeTests[testIndex].testNumber}" sang: ${newStatus}`,
+      data: memoryCambridgeTests[testIndex],
+    });
+  } catch (error) {
+    console.error('toggleTestStatus error:', error);
+    res.status(500).json({ success: false, message: 'Lỗi máy chủ khi đổi trạng thái đề thi.' });
+  }
+};
+
+// 8. Chỉnh sửa cấu hình bộ đề & đính chính đáp án câu hỏi
+exports.updateCambridgeTest = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { durationMinutes, status, questions } = req.body;
+
+    const testIndex = memoryCambridgeTests.findIndex((t) => t.id === id);
+    if (testIndex === -1) {
+      return res.status(404).json({ success: false, message: 'Không tìm thấy bộ đề thi.' });
+    }
+
+    if (durationMinutes !== undefined) {
+      memoryCambridgeTests[testIndex].durationMinutes = Number(durationMinutes);
+    }
+    if (status && ['Sẵn Sàng', 'Tạm Khóa'].includes(status)) {
+      memoryCambridgeTests[testIndex].status = status;
+    }
+    if (Array.isArray(questions)) {
+      memoryCambridgeTests[testIndex].questions = questions;
+    }
+
+    res.json({
+      success: true,
+      message: `Đã lưu đính chính đáp án và cấu hình bộ đề "${memoryCambridgeTests[testIndex].book} - Test ${memoryCambridgeTests[testIndex].testNumber}" thành công!`,
+      data: memoryCambridgeTests[testIndex],
+    });
+  } catch (error) {
+    console.error('updateCambridgeTest error:', error);
+    res.status(500).json({ success: false, message: 'Lỗi máy chủ khi cập nhật bộ đề.' });
+  }
+};
+
