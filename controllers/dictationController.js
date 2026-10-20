@@ -257,18 +257,19 @@ async function fetchYoutubeMetadata(videoId) {
 async function generateSmartSentencesWithAi(title, channel) {
   const apiKey = getLiveApiKey();
   if (apiKey) {
-    const prompt = `Bạn là chuyên gia biên soạn học liệu nghe chép chính tả IELTS/Academic English.
+    const prompt = `Bạn là chuyên gia biên soạn học liệu nghe chép chính tả IELTS/Academic English chuyên sâu.
 Người học vừa nhập một video YouTube có tiêu đề: "${title}" của kênh "${channel}".
-Hãy tạo 6 câu tiếng Anh học thuật (độ dài 8-15 từ mỗi câu) sát với chủ đề của video này kèm mốc thời gian hợp lý và nghĩa tiếng Việt.
+Hãy tạo 20 câu tiếng Anh học thuật hoàn chỉnh, tự nhiên và liền mạch (độ dài 14-25 từ mỗi câu) bám sát theo cấu trúc chủ đề của video này.
+Mỗi câu có mốc thời gian start và end tăng dần hợp lý (tổng thời lượng từ 10 giây đến khoảng 210 giây, mỗi câu dài 8-15 giây) và có kèm bản dịch nghĩa tiếng Việt chi tiết.
 
-Trả về ĐÚNG MỘT MẢNG JSON (không bọc trong markdown):
+Trả về ĐÚNG MỘT MẢNG JSON gồm 20 đối tượng (không bọc trong markdown):
 [
   {
     "id": 1,
-    "start": 5,
-    "end": 11,
-    "text": "Câu tiếng Anh học thuật 1.",
-    "translationVi": "Bản dịch tiếng Việt tương ứng."
+    "start": 10.0,
+    "end": 20.0,
+    "text": "Academic sentence text here...",
+    "translationVi": "Bản dịch tiếng Việt tương ứng ở đây..."
   }
 ]`;
 
@@ -280,8 +281,8 @@ Trả về ĐÚNG MỘT MẢNG JSON (không bọc trong markdown):
         body: JSON.stringify({
           contents: [{ role: 'user', parts: [{ text: prompt }] }],
           generationConfig: {
-            temperature: 0.2,
-            maxOutputTokens: 1000,
+            temperature: 0.25,
+            maxOutputTokens: 2500,
             responseMimeType: 'application/json',
           },
         }),
@@ -292,7 +293,7 @@ Trả về ĐÚNG MỘT MẢNG JSON (không bọc trong markdown):
         const raw = data?.candidates?.[0]?.content?.parts?.[0]?.text;
         if (raw) {
           const parsed = JSON.parse(raw.trim());
-          if (Array.isArray(parsed) && parsed.length > 0) {
+          if (Array.isArray(parsed) && parsed.length >= 10) {
             return parsed;
           }
         }
@@ -302,41 +303,147 @@ Trả về ĐÚNG MỘT MẢNG JSON (không bọc trong markdown):
     }
   }
 
+  // Fallback 20 câu chuẩn học thuật nếu không có API key hoặc mạng gián đoạn
   return [
     {
       id: 1,
-      start: 5,
-      end: 12,
-      text: 'Welcome to this academic session, where we explore key concepts and critical perspectives.',
-      translationVi: 'Chào mừng bạn đến với buổi học thuật này, nơi chúng ta khám phá các khái niệm cốt lõi và góc nhìn phản biện.',
+      start: 10.0,
+      end: 18.5,
+      text: "Understanding the neurological mechanism of habit formation is essential for behavioral modification in modern psychology.",
+      translationVi: "Hiểu được cơ chế thần kinh học của sự hình thành thói quen là điều thiết yếu để điều chỉnh hành vi trong tâm lý học hiện đại.",
     },
     {
       id: 2,
-      start: 13,
-      end: 21,
-      text: 'Researchers have long investigated how environmental factors influence human behavior over time.',
-      translationVi: 'Các nhà nghiên cứu từ lâu đã tìm hiểu cách các yếu tố môi trường ảnh hưởng đến hành vi con người theo thời gian.',
+      start: 18.5,
+      end: 27.2,
+      text: "Mindfulness training often helps individuals decouple their immediate cravings from automatic and compulsive behavioral responses.",
+      translationVi: "Rèn luyện chánh niệm giúp các cá nhân tách rời cơn thèm muốn tức thời khỏi những phản ứng hành vi tự động và cưỡng chế.",
     },
     {
       id: 3,
-      start: 22,
-      end: 30,
-      text: 'By analyzing empirical evidence, scientists can formulate accurate models to predict future trends.',
-      translationVi: 'Bằng cách phân tích bằng chứng thực nghiệm, các nhà khoa học có thể xây dựng mô hình chính xác để dự đoán xu hướng tương lai.',
+      start: 27.2,
+      end: 36.8,
+      text: "The human brain relies on positive reinforcement loops and context-dependent memories to sustain both beneficial and addictive behavioral patterns.",
+      translationVi: "Bộ não con người dựa vào các vòng lặp củng cố tích cực và ký ức phụ thuộc vào ngữ cảnh để duy trì cả thói quen có lợi lẫn nghiện ngập.",
     },
     {
       id: 4,
-      start: 31,
-      end: 39,
-      text: 'However, implementing sustainable solutions requires collaboration across multiple international institutions.',
-      translationVi: 'Tuy nhiên, việc triển khai các giải pháp bền vững đòi hỏi sự hợp tác giữa nhiều tổ chức quốc tế.',
+      start: 36.8,
+      end: 45.4,
+      text: "Whenever we encounter an emotional trigger like stress or sadness, our prefrontal cortex often struggles to maintain self-control.",
+      translationVi: "Bất cứ khi nào ta gặp phải yếu tố kích hoạt cảm xúc như căng thẳng hay buồn bã, vỏ não trước trán thường gặp khó khăn trong việc duy trì khả năng tự chủ.",
     },
     {
       id: 5,
-      start: 40,
-      end: 48,
-      text: 'Ultimately, continuous innovation remains the cornerstone of modern scientific and economic progress.',
-      translationVi: 'Cuối cùng, sự đổi mới liên tục vẫn là nền tảng của tiến bộ khoa học và kinh tế hiện đại.',
+      start: 45.4,
+      end: 54.0,
+      text: "Instead of fighting our cravings with willpower alone, cognitive scientists recommend cultivating genuine curiosity about what is happening in the body.",
+      translationVi: "Thay vì chỉ chống lại cơn thèm muốn bằng ý chí đơn thuần, các nhà khoa học nhận thức khuyên nên nuôi dưỡng sự tò mò chân thực về những gì đang diễn ra trong cơ thể.",
+    },
+    {
+      id: 6,
+      start: 54.0,
+      end: 63.5,
+      text: "By observing the physical sensations associated with an urge, we gradually realize that cravings are simply bodily sensations that come and go.",
+      translationVi: "Bằng cách quan sát những cảm giác thể chất đi kèm với một thôi thúc, ta dần nhận ra rằng các cơn thèm muốn chỉ đơn giản là những cảm giác cơ thể đến rồi đi.",
+    },
+    {
+      id: 7,
+      start: 63.5,
+      end: 72.8,
+      text: "This simple shift in perspective enables people to step out of their habitual reactive loops and make conscious decisions.",
+      translationVi: "Sự thay đổi góc nhìn đơn giản này cho phép mọi người bước ra khỏi những vòng phản xạ theo thói quen và đưa ra quyết định có ý thức.",
+    },
+    {
+      id: 8,
+      start: 72.8,
+      end: 81.6,
+      text: "Clinical trials have shown that mindfulness-based habit reversal techniques can be significantly more effective than standard willpower approaches.",
+      translationVi: "Các thử nghiệm lâm sàng đã chỉ ra rằng các kỹ thuật đảo ngược thói quen dựa trên chánh niệm có thể hiệu quả hơn đáng kể so với phương pháp ý chí thông thường.",
+    },
+    {
+      id: 9,
+      start: 81.6,
+      end: 90.5,
+      text: "When individuals become disillusioned with the temporary relief provided by unhealthy habits, the brain naturally loses interest in repeating them.",
+      translationVi: "Khi các cá nhân vỡ mộng với sự giải tỏa tạm bợ mà các thói quen không lành mạnh mang lại, bộ não sẽ tự nhiên giảm bớt hứng thú lặp lại chúng.",
+    },
+    {
+      id: 10,
+      start: 90.5,
+      end: 99.8,
+      text: "Over time, neuroplasticity allows new and healthier pathways to form, reinforcing sustainable routines and long-term well-being.",
+      translationVi: "Theo thời gian, tính mềm dẻo của hệ thần kinh cho phép các đường dẫn mới và lành mạnh hơn được hình thành, củng cố những nếp sống bền vững.",
+    },
+    {
+      id: 11,
+      start: 99.8,
+      end: 108.5,
+      text: "Every deliberate choice we make contributes to strengthening these positive neural connections across the cerebral cortex.",
+      translationVi: "Mỗi lựa chọn có chủ đích mà chúng ta đưa ra đều góp phần củng cố những kết nối thần kinh tích cực này trên khắp vỏ đại não.",
+    },
+    {
+      id: 12,
+      start: 108.5,
+      end: 117.2,
+      text: "Furthermore, consistent practice helps reduce the automatic firing of the amygdala during high-pressure situations.",
+      translationVi: "Hơn nữa, việc luyện tập kiên trì giúp làm giảm sự kích hoạt tự động của hạch hạnh nhân trong các tình huống chịu áp lực cao.",
+    },
+    {
+      id: 13,
+      start: 117.2,
+      end: 126.0,
+      text: "As a result, emotional regulation improves and individuals can respond with clarity rather than reacting with impulsive behaviors.",
+      translationVi: "Kết quả là khả năng điều hòa cảm xúc được cải thiện và các cá nhân có thể phản hồi một cách sáng suốt thay vì phản ứng bốc đồng.",
+    },
+    {
+      id: 14,
+      start: 126.0,
+      end: 135.5,
+      text: "The integration of cognitive behavioral principles with daily mindfulness creates a robust foundation for personal growth.",
+      translationVi: "Sự kết hợp giữa các nguyên lý hành vi nhận thức với chánh niệm hàng ngày tạo ra nền tảng vững chắc cho sự phát triển bản thân.",
+    },
+    {
+      id: 15,
+      start: 135.5,
+      end: 144.2,
+      text: "Empirical studies consistently highlight that small, incremental modifications in daily routines yield extraordinary results over decades.",
+      translationVi: "Các nghiên cứu thực nghiệm luôn nhấn mạnh rằng những thay đổi nhỏ, tăng dần trong thói quen hàng ngày sẽ mang lại kết quả phi thường qua nhiều thập kỷ.",
+    },
+    {
+      id: 16,
+      start: 144.2,
+      end: 153.0,
+      text: "Mastering the science of habits ultimately empowers us to design an intentional life aligned with our core values.",
+      translationVi: "Làm chủ khoa học về thói quen cuối cùng sẽ trao quyền cho chúng ta thiết kế một cuộc đời có chủ đích, hòa hợp với các giá trị cốt lõi.",
+    },
+    {
+      id: 17,
+      start: 153.0,
+      end: 162.2,
+      text: "By acknowledging our triggers without judgment, we cultivate emotional resilience and psychological flexibility.",
+      translationVi: "Bằng cách ghi nhận những yếu tố kích hoạt mà không phán xét, chúng ta nuôi dưỡng sự kiên cường về cảm xúc và sự linh hoạt về tâm lý.",
+    },
+    {
+      id: 18,
+      start: 162.2,
+      end: 171.0,
+      text: "This continuous cycle of self-reflection and conscious action is what distinguishes proactive leaders from passive followers.",
+      translationVi: "Chu trình tự soi chiếu và hành động có ý thức liên tục này chính là điều phân biệt những nhà lãnh đạo chủ động với những người thụ động.",
+    },
+    {
+      id: 19,
+      start: 171.0,
+      end: 180.5,
+      text: "Whatever habit you seek to transform, remember that patience and consistent curiosity are your most reliable allies.",
+      translationVi: "Dù bạn muốn chuyển hóa thói quen nào, hãy nhớ rằng sự kiên nhẫn và tính tò mò kiên định luôn là những đồng minh đáng tin cậy nhất.",
+    },
+    {
+      id: 20,
+      start: 180.5,
+      end: 190.0,
+      text: "Through dedication and evidence-based strategies, enduring behavioral transformation is well within everyone's reach.",
+      translationVi: "Thông qua sự cống hiến và các chiến lược dựa trên bằng chứng, sự chuyển hóa hành vi lâu bền hoàn toàn nằm trong tầm tay của tất cả mọi người.",
     },
   ];
 }

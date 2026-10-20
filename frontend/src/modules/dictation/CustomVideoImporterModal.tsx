@@ -67,7 +67,9 @@ export const CustomVideoImporterModal: React.FC<CustomVideoImporterModalProps> =
     let isMounted = true;
     setIsExtracting(true);
 
-    const matchedCurated = mockDictationLessons.find((l) => l.youtubeId === videoId);
+    const matchedCurated = mockDictationLessons.find(
+      (l) => l.youtubeId.toLowerCase() === videoId.toLowerCase()
+    );
 
     fetch('/api/dictation/extract-youtube', {
       method: 'POST',
@@ -78,7 +80,12 @@ export const CustomVideoImporterModal: React.FC<CustomVideoImporterModalProps> =
       .then((json) => {
         if (!isMounted) return;
         const payload = json?.data || json;
-        if (payload && Array.isArray(payload.sentences) && payload.sentences.length > 0) {
+        if (matchedCurated && (!payload?.sentences || payload.sentences.length < 10)) {
+          setTitle(matchedCurated.title);
+          setChannel(matchedCurated.channel);
+          setAutoSentences(matchedCurated.sentences);
+          setExtractSourceLabel('YouTube Official Captions');
+        } else if (payload && Array.isArray(payload.sentences) && payload.sentences.length > 0) {
           if (payload.title) setTitle(payload.title);
           if (payload.channel) setChannel(payload.channel);
           setAutoSentences(payload.sentences);
