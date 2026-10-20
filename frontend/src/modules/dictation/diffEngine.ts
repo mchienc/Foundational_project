@@ -373,13 +373,49 @@ export function parseCustomTranscriptInput(rawInput: string): DictationSentence[
           vttSentences.push({
             id: vttSentences.length + 1,
             start: startSec,
-            end: Math.max(endSec, startSec + 2),
+            end: Math.max(endSec, startSec + 1.5),
             text: contentLines,
           });
         }
       }
     }
-    if (vttSentences.length > 0) return vttSentences;
+    if (vttSentences.length > 0) {
+      // Tự động gộp các dòng phụ đề ngắn của VTT/SRT thành câu dài chuẩn (12-25 từ)
+      const mergedVtt: DictationSentence[] = [];
+      let curText = '';
+      let curStart: number | null = null;
+      let curEnd = 0;
+
+      for (const cue of vttSentences) {
+        if (curStart === null) curStart = cue.start;
+        curEnd = cue.end;
+        curText = curText ? `${curText} ${cue.text}` : cue.text;
+
+        const wc = curText.split(/\s+/).length;
+        const endsWithPunct = /[.?!]["']?$/.test(cue.text);
+        const dur = curEnd - curStart;
+
+        if ((endsWithPunct && wc >= 12 && dur >= 5.5) || wc >= 24 || dur >= 14) {
+          mergedVtt.push({
+            id: mergedVtt.length + 1,
+            start: Number(curStart.toFixed(1)),
+            end: Number(curEnd.toFixed(1)),
+            text: curText.replace(/\s+/g, ' ').trim(),
+          });
+          curText = '';
+          curStart = null;
+        }
+      }
+      if (curText && curStart !== null) {
+        mergedVtt.push({
+          id: mergedVtt.length + 1,
+          start: Number(curStart.toFixed(1)),
+          end: Number(curEnd.toFixed(1)),
+          text: curText.replace(/\s+/g, ' ').trim(),
+        });
+      }
+      return mergedVtt;
+    }
   }
 
   // 3. Kiểm tra định dạng "00:12 - 00:18: Sentence text" trên từng dòng
@@ -430,4 +466,30 @@ export function parseCustomTranscriptInput(rawInput: string): DictationSentence[
     currentClock += duration + 1;
     return item;
   });
+}
+
+/**
+ * Gộp danh sách câu theo hệ số độ dài đoạn chép (1 = Chuẩn, 2 = Gộp 2 câu dài, 3 = Gộp 3 câu thành đoạn văn)
+ */
+export function mergeSentencesByChunkSize(
+  sentences: DictationSentence[],
+  chunkSize: 1 | 2 | 3
+): DictationSentence[] {
+  if (chunkSize === 1 || sentences.length === 0) return sentences;
+  const grouped: DictationSentence[] = [];
+  for (let i = 0; i < sentences.length; i += chunkSize) {
+    const slice = sentences.slice(i, i + chunkSize);
+    if (slice.length === 0) continue;
+    grouped.push({
+      id: grouped.length + 1,
+      start: slice[0].start,
+      end: slice[slice.length - 1].end,
+      text: slice.map((s) => s.text).join(' '),
+      translationVi: slice
+        .map((s) => s.translationVi)
+        .filter(Boolean)
+        .join(' ') || undefined,
+    });
+  }
+  return grouped;
 }

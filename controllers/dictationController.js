@@ -358,23 +358,38 @@ exports.extractYoutubeTranscript = async (req, res) => {
       : await fetchYoutubeMetadata(cleanId);
 
     if (realCaptions && realCaptions.length > 0) {
-      return res.json({
+      const payload = {
         videoId: cleanId,
         title: meta.title,
         channel: meta.channel,
         sourceType: trackType || 'youtube_captions',
         sentences: realCaptions,
+      };
+      return res.json({
+        success: true,
+        source:
+          trackType === 'youtube_auto_captions'
+            ? 'YouTube Auto Captions (InnerTube)'
+            : 'YouTube Official Captions (InnerTube)',
+        ...payload,
+        data: payload,
       });
     }
 
     // Nếu video không có phụ đề công khai, dùng AI tạo kịch bản mẫu
     const aiSentences = await generateSmartSentencesWithAi(meta.title, meta.channel);
-    return res.json({
+    const fallbackPayload = {
       videoId: cleanId,
       title: meta.title,
       channel: meta.channel,
       sourceType: 'ai_heuristic',
       sentences: aiSentences,
+    };
+    return res.json({
+      success: true,
+      source: 'AI Academic Generator',
+      ...fallbackPayload,
+      data: fallbackPayload,
     });
   } catch (err) {
     console.error('[Dictation] extractYoutubeTranscript error:', err);
