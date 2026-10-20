@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   ArrowLeft,
   Sparkles,
@@ -19,7 +19,6 @@ interface AnkiFlashcardPlayerProps {
 export const AnkiFlashcardPlayer: React.FC<AnkiFlashcardPlayerProps> = ({
   deckId,
   onBackToWorkspace,
-  onEarnXp,
   onNotify,
 }) => {
   const { cards, decks, rateCard, getDueCardsForDeck, getCardsForDeck } = useAnki();
@@ -42,6 +41,10 @@ export const AnkiFlashcardPlayer: React.FC<AnkiFlashcardPlayerProps> = ({
   const [isSessionCompleted, setIsSessionCompleted] = useState<boolean>(false);
   const [ratingAction, setRatingAction] = useState<{ rating: AnkiRating; timestamp: number } | null>(null);
 
+  // Chống lỗi spam click / bấm phím liên tục khi animation chưa kết thúc
+  const [isRatingProcessing, setIsRatingProcessing] = useState<boolean>(false);
+  const isRatingProcessingRef = useRef<boolean>(false);
+
   const currentCard: AnkiCard | undefined = studyCards[currentIndex];
 
   // Calculate next interval labels for 4 SM-2 buttons
@@ -50,7 +53,7 @@ export const AnkiFlashcardPlayer: React.FC<AnkiFlashcardPlayerProps> = ({
   // Keyboard shortcut listener: Space to flip, 1-4 to rate
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (isSessionCompleted || !currentCard) return;
+      if (isSessionCompleted || !currentCard || isRatingProcessingRef.current) return;
 
       // Space: Flip to answer
       if (e.code === 'Space') {
@@ -81,23 +84,20 @@ export const AnkiFlashcardPlayer: React.FC<AnkiFlashcardPlayerProps> = ({
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isFlipped, currentCard, isSessionCompleted]);
+  }, [isFlipped, currentCard, isSessionCompleted, isRatingProcessing]);
 
   const handleRate = (rating: AnkiRating) => {
-    if (!currentCard) return;
+    if (!currentCard || isRatingProcessingRef.current) return;
+
+    // Khóa tránh spam
+    isRatingProcessingRef.current = true;
+    setIsRatingProcessing(true);
 
     rateCard(currentCard.id, rating);
     setReviewedCount((prev) => prev + 1);
 
     // Kích hoạt animation Swipe trên thẻ 3D
     setRatingAction({ rating, timestamp: Date.now() });
-
-    // Give feedback based on effort
-    if (rating === 'good' || rating === 'easy') {
-      onEarnXp?.(10, `Ghi nhớ tốt thẻ từ vựng Anki`);
-    } else {
-      onEarnXp?.(5, `Củng cố lại thẻ từ vựng Anki`);
-    }
   };
 
   const handleSwipeComplete = () => {
@@ -105,9 +105,12 @@ export const AnkiFlashcardPlayer: React.FC<AnkiFlashcardPlayerProps> = ({
     if (currentIndex < studyCards.length - 1) {
       setCurrentIndex((prev) => prev + 1);
       setIsFlipped(false);
+      isRatingProcessingRef.current = false;
+      setIsRatingProcessing(false);
     } else {
       setIsSessionCompleted(true);
-      onEarnXp?.(30, 'Hoàn thành phiên ôn tập Anki!');
+      isRatingProcessingRef.current = false;
+      setIsRatingProcessing(false);
       onNotify?.('Xuất sắc! Bạn đã hoàn thành toàn bộ các thẻ trong phiên này.', 'success');
     }
   };
@@ -119,6 +122,8 @@ export const AnkiFlashcardPlayer: React.FC<AnkiFlashcardPlayerProps> = ({
     setIsFlipped(false);
     setReviewedCount(0);
     setIsSessionCompleted(false);
+    isRatingProcessingRef.current = false;
+    setIsRatingProcessing(false);
   };
 
   // When no cards exist at all
@@ -239,13 +244,16 @@ export const AnkiFlashcardPlayer: React.FC<AnkiFlashcardPlayerProps> = ({
 
         {/* 4 Anki SM-2 Action Buttons (Only visible when flipped) */}
         {isFlipped && buttonLabels && (
-          <div className="space-y-3 animate-in fade-in duration-150">
+          <div className="space-y-3 animate-in fade-in duration-150 pt-2">
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
               {/* 1. Again */}
               <button
                 type="button"
+                disabled={isRatingProcessing}
                 onClick={() => handleRate('again')}
-                className="p-3.5 rounded-2xl bg-red-600 hover:bg-red-700 text-white font-sans text-center transition-all shadow-xs hover:shadow-md active:scale-95 cursor-pointer flex flex-col items-center justify-center"
+                className={`p-3.5 rounded-2xl bg-red-600 hover:bg-red-700 text-white font-sans text-center transition-all shadow-xs hover:shadow-md flex flex-col items-center justify-center ${
+                  isRatingProcessing ? 'opacity-50 cursor-not-allowed' : 'active:scale-95 cursor-pointer'
+                }`}
               >
                 <span className="text-xs font-bold uppercase tracking-wider block">1. Again</span>
                 <span className="text-[11px] font-mono opacity-90 block">
@@ -256,8 +264,11 @@ export const AnkiFlashcardPlayer: React.FC<AnkiFlashcardPlayerProps> = ({
               {/* 2. Hard */}
               <button
                 type="button"
+                disabled={isRatingProcessing}
                 onClick={() => handleRate('hard')}
-                className="p-3.5 rounded-2xl bg-[#D97706] hover:bg-[#B45309] text-white font-sans text-center transition-all shadow-xs hover:shadow-md active:scale-95 cursor-pointer flex flex-col items-center justify-center"
+                className={`p-3.5 rounded-2xl bg-[#D97706] hover:bg-[#B45309] text-white font-sans text-center transition-all shadow-xs hover:shadow-md flex flex-col items-center justify-center ${
+                  isRatingProcessing ? 'opacity-50 cursor-not-allowed' : 'active:scale-95 cursor-pointer'
+                }`}
               >
                 <span className="text-xs font-bold uppercase tracking-wider block">2. Hard</span>
                 <span className="text-[11px] font-mono opacity-90 block">
@@ -268,8 +279,11 @@ export const AnkiFlashcardPlayer: React.FC<AnkiFlashcardPlayerProps> = ({
               {/* 3. Good */}
               <button
                 type="button"
+                disabled={isRatingProcessing}
                 onClick={() => handleRate('good')}
-                className="p-3.5 rounded-2xl bg-emerald-700 hover:bg-emerald-800 text-white font-sans text-center transition-all shadow-xs hover:shadow-md active:scale-95 cursor-pointer flex flex-col items-center justify-center"
+                className={`p-3.5 rounded-2xl bg-emerald-700 hover:bg-emerald-800 text-white font-sans text-center transition-all shadow-xs hover:shadow-md flex flex-col items-center justify-center ${
+                  isRatingProcessing ? 'opacity-50 cursor-not-allowed' : 'active:scale-95 cursor-pointer'
+                }`}
               >
                 <span className="text-xs font-bold uppercase tracking-wider block">3. Good</span>
                 <span className="text-[11px] font-mono opacity-90 block">
@@ -280,8 +294,11 @@ export const AnkiFlashcardPlayer: React.FC<AnkiFlashcardPlayerProps> = ({
               {/* 4. Easy */}
               <button
                 type="button"
+                disabled={isRatingProcessing}
                 onClick={() => handleRate('easy')}
-                className="p-3.5 rounded-2xl bg-[#064E3B] hover:bg-[#022C22] text-amber-300 hover:text-white font-sans text-center transition-all shadow-xs hover:shadow-md active:scale-95 cursor-pointer border border-emerald-800 flex flex-col items-center justify-center"
+                className={`p-3.5 rounded-2xl bg-[#064E3B] hover:bg-[#022C22] text-amber-300 hover:text-white font-sans text-center transition-all shadow-xs hover:shadow-md border border-emerald-800 flex flex-col items-center justify-center ${
+                  isRatingProcessing ? 'opacity-50 cursor-not-allowed' : 'active:scale-95 cursor-pointer'
+                }`}
               >
                 <span className="text-xs font-bold uppercase tracking-wider block">4. Easy</span>
                 <span className="text-[11px] font-mono opacity-90 block">
@@ -302,4 +319,3 @@ export const AnkiFlashcardPlayer: React.FC<AnkiFlashcardPlayerProps> = ({
     </div>
   );
 };
-
