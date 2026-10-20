@@ -1,6 +1,34 @@
 // controllers/ankiAiController.js
 // Huấn luyện viên IELTS 9.0 & Chuyên gia Anki Cloze Deletion tự động bằng Gemini AI
 
+const fs = require('fs');
+const path = require('path');
+
+function getLiveApiKey() {
+  let key = process.env.GEMINI_API_KEY;
+  if (key && key.trim()) {
+    return key.replace(/["']/g, '').trim();
+  }
+
+  // Đọc trực tiếp từ file .env nếu server Node chưa được restart
+  try {
+    const envPath = path.resolve(__dirname, '../.env');
+    if (fs.existsSync(envPath)) {
+      const content = fs.readFileSync(envPath, 'utf8');
+      const match = content.match(/GEMINI_API_KEY=["']?([^"'\r\n]+)/);
+      if (match && match[1]) {
+        const found = match[1].trim();
+        process.env.GEMINI_API_KEY = found;
+        return found;
+      }
+    }
+  } catch (err) {
+    console.warn('Cannot read .env dynamically:', err.message);
+  }
+
+  return '';
+}
+
 const SYSTEM_PROMPT = `Bạn là một huấn luyện viên IELTS 9.0 và chuyên gia ngôn ngữ học thuật. Nhiệm vụ của bạn là chuyển đổi từ vựng, cụm từ hoặc câu văn do tôi cung cấp thành thẻ Anki Cloze Deletion tối ưu cho band 8.0+.
 
 Khi tôi nhập một từ vựng, một cụm từ, hoặc một câu văn:
@@ -114,7 +142,7 @@ exports.generateAnkiCloze = async (req, res) => {
       });
     }
 
-    const apiKey = (customApiKey || process.env.GEMINI_API_KEY || '').replace(/["']/g, '').trim();
+    const apiKey = (customApiKey || getLiveApiKey()).replace(/["']/g, '').trim();
 
     // Nếu có API Key, thử gọi danh sách các model Gemini thế hệ mới
     if (apiKey) {
