@@ -37,7 +37,13 @@ app.set('views', path.join(__dirname, 'views'));
 app.use(express.urlencoded({ extended: true })); // đọc dữ liệu từ form (req.body)
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public'))); // phục vụ file css/js/ảnh tĩnh
-app.use('/audio', express.static(path.join(__dirname, 'audio'))); // phục vụ file âm thanh Cambridge IELTS
+// Phục vụ file âm thanh: Tự động redirect sang CDN nếu có cấu hình R2_PUBLIC_URL
+app.use('/audio', (req, res, next) => {
+  if (process.env.R2_PUBLIC_URL) {
+    return res.redirect(`${process.env.R2_PUBLIC_URL.replace(/\/$/, '')}${req.url}`);
+  }
+  next();
+}, express.static(path.join(__dirname, 'audio')));
 app.use(methodOverride('_method')); // cho phép dùng PUT/DELETE trong form HTML
 
 app.use(session({
