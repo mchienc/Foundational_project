@@ -1041,5 +1041,254 @@ module.exports = {
         "translationVi": "Béo phì và hút thuốc là một trong những nguyên nhân hàng đầu có thể phòng ngừa gây ra bệnh tật và tử vong trên toàn thế giới."
       }
     ]
+  },
+  "g85wsxe1gau": {
+    "youtubeId": "g85WsxE1gAU",
+    "title": "How Long It Takes To Change Your Life? | Nwal Hadaki | TEDxSaf",
+    "channel": "TEDx Talks (Nwal Hadaki)",
+    "level": "B2",
+    "topic": "Khoa học",
+    "sentences": [
+      {
+        "id": 1,
+        "start": 13.8,
+        "end": 25.6,
+        "text": "Have you ever thought to yourself before going to sleep? Tomorrow is the day I’ll change, tomorrow is the day I’ll get up early in the morning,"
+      },
+      {
+        "id": 2,
+        "start": 25.8,
+        "end": 31.9,
+        "text": "have a healthy breakfast, go for a morning jog, breath fresh air."
+      },
+      {
+        "id": 3,
+        "start": 32.3,
+        "end": 41.2,
+        "text": "Tomorrow is the day, I want to change to who I really want to be, “The best version of myself”."
+      },
+      {
+        "id": 4,
+        "start": 41.4,
+        "end": 54.4,
+        "text": "Well, change doesn’t come easy. You have to incorporate certain habits in your life that all eventually lead to you becoming the best version of yourself."
+      },
+      {
+        "id": 5,
+        "start": 55.1,
+        "end": 60.9,
+        "text": "You also have to eliminate certain habits that are hindering your path."
+      },
+      {
+        "id": 6,
+        "start": 61.9,
+        "end": 68.8,
+        "text": "Well, how long will it take you to form a new habit or get rid of an old one?"
+      },
+      {
+        "id": 7,
+        "start": 69.6,
+        "end": 80.6,
+        "text": "Most people will tell you it takes exactly 21 days for a person to form a habit or get rid of an old one."
+      },
+      {
+        "id": 8,
+        "start": 81.4,
+        "end": 90.2,
+        "text": "I remember once in highschool, when my teachers told me: “It takes exactly 21 days for me to form a new habit”."
+      },
+      {
+        "id": 9,
+        "start": 90.9,
+        "end": 97.1,
+        "text": "And I thought, this is my chance to become a bed maker."
+      },
+      {
+        "id": 10,
+        "start": 97.6,
+        "end": 107.4,
+        "text": "I thought that for the next 21 days, instead of getting up every day and yelling: “Mom, please don’t forget to make my bed today”."
+      },
+      {
+        "id": 11,
+        "start": 107.4,
+        "end": 116.2,
+        "text": "I thought I’ll do it myself. Day by day, early in the morning, 6 a.m."
+      },
+      {
+        "id": 12,
+        "start": 116.5,
+        "end": 124.6,
+        "text": "Even on days I was running late, I got up every morning and I made my bed."
+      },
+      {
+        "id": 13,
+        "start": 125.3,
+        "end": 140.6,
+        "text": "And I hated every seconds of it. And by day 22 I opened my eyes and the first thing I did was say “Mom” “please don’t forget to make my bed today”."
+      },
+      {
+        "id": 14,
+        "start": 141.4,
+        "end": 153.5,
+        "text": "I quit. and of course that was expected. And I thought, okay, maybe I’m just gonna be a little bit worse at life than bed makers."
+      },
+      {
+        "id": 15,
+        "start": 154,
+        "end": 170.1,
+        "text": "Whatever, I do not exaggerate, if I say that this 21 day theory is the most famous myth in the world of self-development"
+      },
+      {
+        "id": 16,
+        "start": 171.1,
+        "end": 182.4,
+        "text": "Let’s dive a little into our theory to understand where the number 21 came from and the reasons for its spread in self-developmental books and courses."
+      },
+      {
+        "id": 17,
+        "start": 183.4,
+        "end": 193.5,
+        "text": "Dr. Maxwell Maltz was a plastic surgeon in the 1950s, when he began noticing a strange pattern among his patients."
+      },
+      {
+        "id": 18,
+        "start": 193.7,
+        "end": 206,
+        "text": "for example, in a nose job, he saw that the patient took exactly 21 days to get used to start seeing his or her new nose."
+      },
+      {
+        "id": 19,
+        "start": 206.8,
+        "end": 221.5,
+        "text": "He also noticed that if a patient had an arm or leg amputated, the patient would acknowledge the feeling of their new limb for exactly 21 days before starting to get used"
+      },
+      {
+        "id": 20,
+        "start": 221.8,
+        "end": 236.2,
+        "text": "with their new condition. Dr.Maltz published his theory in a book that went very famous in that era and sold over 30 million copies."
+      },
+      {
+        "id": 21,
+        "start": 236.4,
+        "end": 245.5,
+        "text": "And here, the conflict started brewing and it makes sense why people were starting to believe his theory."
+      },
+      {
+        "id": 22,
+        "start": 245.8,
+        "end": 262.5,
+        "text": "why? Number one, the number 21 is considered a short period of time and that’s also considered a short of temptation which means something you can do."
+      },
+      {
+        "id": 23,
+        "start": 263.3,
+        "end": 274,
+        "text": "Number two, the number 21 is also long enough to be believable a difficult challenge but not impossible."
+      },
+      {
+        "id": 24,
+        "start": 274.4,
+        "end": 280.7,
+        "text": "I mean, who wouldn’t love to change their whole life within just 21 days."
+      },
+      {
+        "id": 25,
+        "start": 280.8,
+        "end": 288.6,
+        "text": "Wouldn’t you love to start waking up early in the morning every day? Wouldn’t you love to start cooking healthy recipes?"
+      },
+      {
+        "id": 26,
+        "start": 288.6,
+        "end": 296.5,
+        "text": "wouldn’t you love to start drinking weird smoothies? And all within less than one month!"
+      },
+      {
+        "id": 27,
+        "start": 297.1,
+        "end": 305.7,
+        "text": "We’d go for it in a heartbeat. So is it true? Can we really change our lives within 21 days?"
+      },
+      {
+        "id": 28,
+        "start": 305.8,
+        "end": 315.6,
+        "text": "I know that sounds very exciting, but there are actually a few factors you’d have to consider to be able to estimate the time and it will take you"
+      },
+      {
+        "id": 29,
+        "start": 315.8,
+        "end": 328.6,
+        "text": "to form a new habit or to get rid of an old toxic one. Number one, is the complexity of your goal If I decide to start eating fruit daily"
+      },
+      {
+        "id": 30,
+        "start": 328.8,
+        "end": 339.1,
+        "text": "which is considered a simple habit, I’d probably take less time than if I want to acquire a complex athletic skill, like a tennis serve."
+      },
+      {
+        "id": 31,
+        "start": 340,
+        "end": 356.3,
+        "text": "Number two, behavior consistency affects the speed of acquisition. Me repeating a certain behavior for 3 minutes a day is different than my friend repeating the same behavior"
+      },
+      {
+        "id": 32,
+        "start": 356.6,
+        "end": 362.7,
+        "text": "for 30 minutes a day. So, we want to clear things up."
+      },
+      {
+        "id": 33,
+        "start": 363.2,
+        "end": 370.2,
+        "text": "How long will it takes us to form a new habit or get rid of an old one?"
+      },
+      {
+        "id": 34,
+        "start": 370.8,
+        "end": 377.1,
+        "text": "And is there a reliable study that we can depend on? Answer is yes."
+      },
+      {
+        "id": 35,
+        "start": 377.4,
+        "end": 385.2,
+        "text": "There is a famous study by the psychologist “Philippe Lally”, titled “how our habits formed”."
+      },
+      {
+        "id": 36,
+        "start": 385.2,
+        "end": 398.7,
+        "text": "The study followed 96 people over a period of 12 weeks. Each person chose a new 12-week habit to work on, such as, drinking 3 cups of water before lunch"
+      },
+      {
+        "id": 37,
+        "start": 398.7,
+        "end": 414.2,
+        "text": "or running for 15 minutes after dinner. After 12 weeks, the data was analyzed to determine the time needed to move from the old habit to start subconsciously carrying out the new one."
+      },
+      {
+        "id": 38,
+        "start": 414.9,
+        "end": 427.2,
+        "text": "And after 12 weeks, we found that it took approximately two to eight months, in order for the task to become a habit."
+      },
+      {
+        "id": 39,
+        "start": 427.6,
+        "end": 438,
+        "text": "And 66 days to be exact. The difference in time it took to form a habit was largely due to the task itself,"
+      },
+      {
+        "id": 40,
+        "start": 438.5,
+        "end": 451.3,
+        "text": "the person, and their circumstances, as some were able to form the habit within 18 days while other is took 254 days."
+      }
+    ]
   }
 };

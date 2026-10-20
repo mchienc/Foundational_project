@@ -40,12 +40,19 @@ function mergeCaptionsIntoSentences(rawSegments) {
   const cleanedSegments = [];
   for (let i = 0; i < rawSegments.length; i++) {
     const seg = rawSegments[i];
-    const cleanText = decodeHtmlEntities(seg.text || '')
+    let cleanText = decodeHtmlEntities(seg.text || '')
       .replace(/\[.*?\]/g, '') // Bỏ [Music], [Applause]
       .replace(/\((?:Laughter|Applause|Music|Cheering|Sighs|inaudible)[^)]*\)/gi, '')
-      .replace(/♪/g, '')
-      .trim();
+      .replace(/♪/g, '');
 
+    // Loại bỏ các đoạn tín chỉ dịch thuật / kiểm duyệt ở đầu video YouTube (Transcriber, Reviewer)
+    if (/^(?:Transcriber|Reviewer|Translated by|Subtitles by|Captions by)/i.test(cleanText)) {
+      cleanText = cleanText
+        .replace(/(?:Transcriber|Reviewer|Translated by|Subtitles by|Captions by):?[^\n\r]+/gi, '')
+        .trim();
+    }
+
+    cleanText = cleanText.trim();
     if (!cleanText) continue;
 
     const start = Number(seg.start);
