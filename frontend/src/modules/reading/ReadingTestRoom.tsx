@@ -24,6 +24,7 @@ import {
   getReadingPassageById,
   submitReadingExamToDatabase,
 } from '../../services/cambridgeApi';
+import { ReadingAiExplainer } from '../../components/reading/ReadingAiExplainer';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { useGSAP } from '@gsap/react';
@@ -138,6 +139,12 @@ export const ReadingTestRoom: React.FC<ReadingTestRoomProps> = ({
   const [userAnswers, setUserAnswers] = useState<Record<string, string>>({});
   const [checkedQuestions, setCheckedQuestions] = useState<Record<string, boolean>>({});
   const [flaggedQuestions, setFlaggedQuestions] = useState<Record<string, boolean>>({});
+
+  // Dẫn chứng được làm nổi bật & định vị bởi AI (Gemini 9.0)
+  const [highlightedEvidence, setHighlightedEvidence] = useState<{
+    letter: string;
+    quote: string;
+  } | null>(null);
 
   // Exam submission state
   const [isSubmitted, setIsSubmitted] = useState<boolean>(false);
@@ -341,6 +348,67 @@ export const ReadingTestRoom: React.FC<ReadingTestRoomProps> = ({
         }, 1200);
       }
     }, 50);
+  };
+
+  // Cuộn mượt và làm nổi bật đoạn văn chứa dẫn chứng từ AI
+  const handleLocateEvidence = (quote: string, letter: string) => {
+    setHighlightedEvidence({ letter, quote });
+    setTimeout(() => {
+      const paraEl = document.getElementById(`para-${letter}`);
+      if (paraEl) {
+        paraEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        paraEl.classList.add('ring-4', 'ring-amber-400', 'bg-amber-100/60', 'transition-all');
+        setTimeout(() => {
+          paraEl.classList.remove('ring-4', 'ring-amber-400', 'bg-amber-100/60');
+        }, 4000);
+      }
+    }, 50);
+  };
+
+  // Helper tô màu câu dẫn chứng bên trong nội dung đoạn văn
+  const renderParagraphWithHighlight = (text: string, quote?: string) => {
+    if (!quote || !text) return text;
+    const cleanQuote = quote.trim().replace(/^["']|["']$/g, '');
+    if (!cleanQuote || cleanQuote.length < 5) return text;
+
+    const lowerText = text.toLowerCase();
+    const lowerQuote = cleanQuote.toLowerCase();
+    const matchIdx = lowerText.indexOf(lowerQuote);
+
+    if (matchIdx !== -1) {
+      const before = text.slice(0, matchIdx);
+      const matched = text.slice(matchIdx, matchIdx + cleanQuote.length);
+      const after = text.slice(matchIdx + cleanQuote.length);
+      return (
+        <>
+          {before}
+          <mark className="bg-amber-300 text-stone-900 font-semibold px-1 rounded shadow-2xs">
+            {matched}
+          </mark>
+          {after}
+        </>
+      );
+    }
+
+    // Nếu không khớp toàn bộ (do khác ký tự khoảng trắng), thử so khớp 35 ký tự đầu
+    const subQuote = cleanQuote.slice(0, 35).trim();
+    const subIdx = lowerText.indexOf(subQuote.toLowerCase());
+    if (subIdx !== -1) {
+      const before = text.slice(0, subIdx);
+      const matched = text.slice(subIdx, subIdx + subQuote.length);
+      const after = text.slice(subIdx + subQuote.length);
+      return (
+        <>
+          {before}
+          <mark className="bg-amber-300 text-stone-900 font-semibold px-1 rounded shadow-2xs">
+            {matched}
+          </mark>
+          {after}
+        </>
+      );
+    }
+
+    return text;
   };
 
   const checkIsCorrect = (q: CambridgeReadingQuestion, answer: string): boolean => {
@@ -729,21 +797,34 @@ export const ReadingTestRoom: React.FC<ReadingTestRoomProps> = ({
           {/* Paragraphs with Section Letters */}
           {/* Paragraphs with Section Letters (Paragraph Focus Reveal) */}
           <div className={`space-y-6 text-stone-800 font-serif ${fontClasses[fontSize]}`}>
-            {currentPassage.paragraphs.map((p, idx) => (
-              <div
-                key={p.letter}
-                className={`reading-paragraph relative flex items-start gap-3 sm:gap-4 transition-opacity duration-300 will-change-transform ${
-                  idx === 0 ? 'opacity-100' : 'opacity-40'
-                }`}
-              >
-                <span className="sticky top-2 shrink-0 w-7 h-7 rounded-lg bg-stone-100 text-[#064E3B] border border-stone-300 font-sans font-bold text-xs flex items-center justify-center select-none shadow-2xs">
-                  {p.letter}
-                </span>
-                <p className="flex-1 leading-relaxed text-justify sm:text-left">
-                  {p.text}
-                </p>
-              </div>
-            ))}
+            {currentPassage.paragraphs.map((p, idx) => {
+              const isTargetPara = highlightedEvidence?.letter === p.letter;
+              return (
+                <div
+                  key={p.letter}
+                  id={`para-${p.letter}`}
+                  className={`reading-paragraph relative flex items-start gap-3 sm:gap-4 transition-all duration-300 will-change-transform rounded-2xl ${
+                    idx === 0 ? 'opacity-100' : 'opacity-40'
+                  } ${isTargetPara ? '!opacity-100 ring-2 ring-amber-400 bg-amber-50/60 p-2.5 -mx-2.5' : ''}`}
+                >
+                  <span
+                    className={`sticky top-2 shrink-0 w-7 h-7 rounded-lg border font-sans font-bold text-xs flex items-center justify-center select-none shadow-2xs transition-colors ${
+                      isTargetPara
+                        ? 'bg-amber-500 text-white border-amber-600'
+                        : 'bg-stone-100 text-[#064E3B] border border-stone-300'
+                    }`}
+                  >
+                    {p.letter}
+                  </span>
+                  <p className="flex-1 leading-relaxed text-justify sm:text-left">
+                    {renderParagraphWithHighlight(
+                      p.text,
+                      isTargetPara ? highlightedEvidence?.quote : undefined
+                    )}
+                  </p>
+                </div>
+              );
+            })}
           </div>
         </section>
 
@@ -1135,11 +1216,35 @@ export const ReadingTestRoom: React.FC<ReadingTestRoomProps> = ({
 
                         {/* Academic Explanation Box (Shown when checked or exam submitted) */}
                         {isChecked && (
-                          <div className="p-3 rounded-xl bg-white border border-stone-200 text-xs text-stone-700 space-y-1 mt-2">
-                            <span className="font-bold text-amber-900 block font-mono text-[10px] uppercase">
-                              Luận Cứ Từ {q.referenceParagraph}:
-                            </span>
-                            <p className="leading-relaxed font-sans">{q.explanation}</p>
+                          <div className="space-y-2 mt-2">
+                            <div className="p-3 rounded-xl bg-white border border-stone-200 text-xs text-stone-700 space-y-1">
+                              <span className="font-bold text-amber-900 block font-mono text-[10px] uppercase">
+                                Luận Cứ Cơ Bản: Đoạn {q.referenceParagraph || 'A'}
+                              </span>
+                              <p className="leading-relaxed font-sans">{q.explanation}</p>
+                            </div>
+
+                            {/* Gemini 9.0 AI Evidence & Trap Explainer */}
+                            <ReadingAiExplainer
+                              passageTitle={currentPassage.title}
+                              paragraphLetter={q.referenceParagraph || 'A'}
+                              paragraphText={
+                                currentPassage.paragraphs?.find(
+                                  (p) => p.letter === q.referenceParagraph
+                                )?.text ||
+                                currentPassage.paragraphs?.[0]?.text ||
+                                ''
+                              }
+                              questionNumber={q.number}
+                              questionType={q.type}
+                              questionText={q.question}
+                              options={q.options}
+                              userAnswer={userAnswers[q.id]}
+                              correctAnswer={q.correctAnswer}
+                              explanation={q.explanation}
+                              onLocateEvidence={handleLocateEvidence}
+                              onNotify={onNotify}
+                            />
                           </div>
                         )}
                       </div>

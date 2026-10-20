@@ -42,6 +42,8 @@ function getLiveApiKey() {
   return '';
 }
 
+exports.getLiveApiKey = getLiveApiKey;
+
 const SYSTEM_PROMPT = `Bạn là một huấn luyện viên IELTS 9.0 và chuyên gia ngôn ngữ học thuật. Nhiệm vụ của bạn là chuyển đổi từ vựng, cụm từ hoặc câu văn do tôi cung cấp thành thẻ Anki Cloze Deletion tối ưu cho band 8.0+.
 
 Khi tôi nhập một từ vựng, một cụm từ, hoặc một câu văn:

@@ -351,3 +351,56 @@ export async function submitAnkiReviewToDatabase(
     return false;
   }
 }
+
+
+// ==================== 4. AI READING EXPLAINER & EVIDENCE LOCATOR ====================
+
+export interface ReadingAiExplainRequest {
+  passageTitle: string;
+  paragraphLetter?: string;
+  paragraphText: string;
+  questionNumber: number;
+  questionType: string;
+  questionText: string;
+  options?: Array<{ id?: string; label?: string; text: string }>;
+  userAnswer?: string;
+  correctAnswer: string;
+  explanation?: string;
+}
+
+export interface ReadingAiExplainResponse {
+  evidenceQuote: string;
+  paragraphLetter: string;
+  paraphraseAnalysis: Array<{
+    questionKeyword: string;
+    passageMatch: string;
+    note: string;
+  }>;
+  coreReason: string;
+  trapExplanation: string;
+  keyVocabulary?: {
+    collocation: string;
+    vietnameseHint: string;
+    clozeSentence: string;
+  };
+}
+
+export async function fetchReadingQuestionAiExplanation(
+  payload: ReadingAiExplainRequest
+): Promise<{ success: boolean; data?: ReadingAiExplainResponse; source?: string; message?: string }> {
+  try {
+    const res = await fetch(`${API_BASE}/reading/explain-question`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    });
+    const json = await res.json();
+    return json;
+  } catch (err: any) {
+    console.warn('⚠️ Lỗi gọi AI giải thích câu hỏi Reading:', err);
+    return {
+      success: false,
+      message: err.message || 'Không thể kết nối dịch vụ AI',
+    };
+  }
+}

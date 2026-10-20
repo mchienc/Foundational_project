@@ -4,11 +4,13 @@
 const express = require('express');
 const router = express.Router();
 const cambridgeController = require('../../controllers/cambridgeController');
+const readingAiController = require('../../controllers/readingAiController');
 
 // 1. Phân hệ Cambridge Reading
 router.get('/reading', cambridgeController.getReadingPassages);
 router.get('/reading/:id', cambridgeController.getReadingPassageById);
 router.post('/reading/:id/submit', cambridgeController.submitExam);
+router.post('/reading/explain-question', readingAiController.explainReadingQuestion);
 
 // 2. Phân hệ Cambridge Listening & Dictation
 router.get('/listening', cambridgeController.getListeningTests);
