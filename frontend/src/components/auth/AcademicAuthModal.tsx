@@ -79,10 +79,12 @@ export const AcademicAuthModal: React.FC<AcademicAuthModalProps> = ({
   const [showGoogleConfigModal, setShowGoogleConfigModal] = useState<boolean>(false);
   const [customGoogleEmail, setCustomGoogleEmail] = useState<string>('');
   const [googleClientId, setGoogleClientId] = useState<string>(() => {
+    const fromEnv = (import.meta as any).env?.VITE_GOOGLE_CLIENT_ID;
+    const cleanEnv = fromEnv ? String(fromEnv).replace(/["']/g, '').trim() : '';
     return (
-      (import.meta as any).env?.VITE_GOOGLE_CLIENT_ID ||
+      cleanEnv ||
       localStorage.getItem('eduflow_google_client_id') ||
-      ''
+      '525873015033-aa5pn19b51kg3etqlddc5ltuag8a4frf.apps.googleusercontent.com'
     );
   });
   const googleBtnRef = useRef<HTMLDivElement>(null);
@@ -172,23 +174,75 @@ export const AcademicAuthModal: React.FC<AcademicAuthModalProps> = ({
   const handleGoogleSignInClick = () => {
     setError(null);
 
-    // Nếu đã cấu hình Google Client ID thật
-    if (googleClientId && window.google?.accounts?.id) {
+    const activeClientId = googleClientId.trim();
+
+    // 1. Thử nghiệm mở Google OAuth Popup tương tác chính thức
+    if (activeClientId && window.google?.accounts?.oauth2) {
       try {
-        // Kích hoạt One Tap prompt của Google
+        const tokenClient = window.google.accounts.oauth2.initTokenClient({
+          client_id: activeClientId,
+          scope: 'email profile openid',
+          callback: async (tokenResponse: any) => {
+            if (tokenResponse?.error) {
+              setError(`Google Sign-In: ${tokenResponse.error_description || tokenResponse.error}`);
+              return;
+            }
+            if (tokenResponse?.access_token) {
+              setLoading(true);
+              try {
+                const userRes = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
+                  headers: { Authorization: `Bearer ${tokenResponse.access_token}` },
+                });
+                const googleUser = await userRes.json();
+                if (googleUser && googleUser.email) {
+                  const res = await fetch('/api/auth/google-login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                      email: googleUser.email,
+                      full_name: googleUser.name || googleUser.email.split('@')[0],
+                      avatar: googleUser.picture,
+                      google_id: googleUser.sub,
+                    }),
+                  });
+                  const data = await res.json();
+                  if (data.success && data.user) {
+                    onSuccess(data.user);
+                    onClose();
+                  } else {
+                    setError(data.message || 'Đăng nhập Google thất bại.');
+                  }
+                }
+              } catch (fetchErr) {
+                setError('Không thể lấy thông tin hồ sơ từ Google.');
+              } finally {
+                setLoading(false);
+              }
+            }
+          },
+        });
+        tokenClient.requestAccessToken({ prompt: 'select_account' });
+        return;
+      } catch (err: any) {
+        console.warn('Google initTokenClient notice:', err);
+      }
+    }
+
+    // 2. Kích hoạt Google One Tap nếu OAuth2 token client chưa sẵn sàng
+    if (activeClientId && window.google?.accounts?.id) {
+      try {
         window.google.accounts.id.prompt((notification: any) => {
           if (notification.isNotDisplayed() || notification.isSkippedMoment()) {
-            // Nếu trình duyệt chặn One Tap, mở popup config/direct Google login
             setShowGoogleConfigModal(true);
           }
         });
         return;
       } catch (err) {
-        console.warn('Google prompt fallback:', err);
+        console.warn('Google One Tap notice:', err);
       }
     }
 
-    // Nếu chưa có Google Client ID -> Mở hộp thoại nhập tài khoản Google thực tế của người dùng
+    // 3. Fallback mở modal xác thực trực tiếp
     setShowGoogleConfigModal(true);
   };
 
