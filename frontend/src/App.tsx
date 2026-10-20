@@ -118,9 +118,10 @@ const AppContent: React.FC = () => {
   });
   const [selectedComputerExamGroup, setSelectedComputerExamGroup] = useState<CambridgeTestGroup | null>(null);
 
-  // Active Cambridge Listening Test ID
+  // Active Cambridge Listening Test ID & Mode ('exam' vs 'practice')
   const [selectedListeningTestId, setSelectedListeningTestId] = useState<string>('cambridge-18-listening-p4');
-  const [selectedListeningFullTestId, setSelectedListeningFullTestId] = useState<string>('cam18-test1-listening');
+  const [selectedListeningFullTestId, setSelectedListeningFullTestId] = useState<string>('c20-t1');
+  const [listeningExamMode, setListeningExamMode] = useState<'exam' | 'practice'>('exam');
   const [listeningExamResult, setListeningExamResult] = useState<ListeningExamResult | null>(null);
 
   // Active Anki Deck ID and Study mode
@@ -409,8 +410,9 @@ const AppContent: React.FC = () => {
               setCurrentScreen('listening-test');
               window.scrollTo({ top: 0, behavior: 'smooth' });
             }}
-            onSelectFullTest={(testId) => {
+            onSelectFullTest={(testId, mode = 'exam') => {
               setSelectedListeningFullTestId(testId);
+              setListeningExamMode(mode);
               setCurrentScreen('listening-exam');
               window.scrollTo({ top: 0, behavior: 'smooth' });
             }}
@@ -444,6 +446,7 @@ const AppContent: React.FC = () => {
         return (
           <IELTSListeningExamRoom
             test={listeningTest}
+            examMode={listeningExamMode}
             onExit={() => {
               setCurrentScreen('listening');
               window.scrollTo({ top: 0, behavior: 'smooth' });

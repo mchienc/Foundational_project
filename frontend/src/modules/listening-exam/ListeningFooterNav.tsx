@@ -1,150 +1,205 @@
 import React, { useRef } from 'react';
-import { Clock, EyeOff, Eye, ChevronLeft, ChevronRight, Bookmark } from 'lucide-react';
-import { ListeningSection } from '../../types';
+import { ChevronLeft, ChevronRight, Bookmark } from 'lucide-react';
+import { ListeningSection, ContrastMode } from '../../types';
 import { useListeningStore } from '../../store/useListeningStore';
 
 interface ListeningFooterNavProps {
   sections: ListeningSection[];
   currentSection: number;
-  onScrollToQuestion: (questionNumber: number) => void;
-  onSubmit: () => void;
-  timeLeft: number; // seconds
-  isTimeHidden: boolean;
-  onToggleHideTime: () => void;
+  activeQuestionNumber?: number | null;
+  onSelectSection: (sectionNumber: number) => void;
+  onScrollToQuestion: (questionNumber: number, sectionNumber: number) => void;
+  contrastMode?: ContrastMode;
 }
-
-const SECTION_FILLED = [
-  'bg-amber-600 text-white border-amber-600',
-  'bg-teal-600 text-white border-teal-600',
-  'bg-blue-600 text-white border-blue-600',
-  'bg-purple-600 text-white border-purple-600',
-];
 
 export const ListeningFooterNav: React.FC<ListeningFooterNavProps> = ({
   sections,
   currentSection,
+  activeQuestionNumber,
+  onSelectSection,
   onScrollToQuestion,
-  onSubmit,
-  timeLeft,
-  isTimeHidden,
-  onToggleHideTime,
+  contrastMode = 'standard',
 }) => {
   const scrollRef = useRef<HTMLDivElement>(null);
-  
+
   const userAnswers = useListeningStore((state) => state.userAnswers) || {};
   const reviewFlags = useListeningStore((state) => state.reviewFlags) || new Set();
 
   const handleWheel = (e: React.WheelEvent<HTMLDivElement>) => {
-    if (scrollRef.current) {
+    if (scrollRef.current && e.deltaY !== 0) {
       scrollRef.current.scrollLeft += e.deltaY;
     }
   };
 
-  const scrollLeft = () => {
+  const scrollPalette = (dir: 'left' | 'right') => {
     if (scrollRef.current) {
-      scrollRef.current.scrollBy({ left: -200, behavior: 'smooth' });
+      scrollRef.current.scrollBy({
+        left: dir === 'left' ? -240 : 240,
+        behavior: 'smooth',
+      });
     }
   };
 
-  const scrollRight = () => {
-    if (scrollRef.current) {
-      scrollRef.current.scrollBy({ left: 200, behavior: 'smooth' });
-    }
-  };
+  const isHighContrast = contrastMode === 'high-contrast';
+  const isInverted = contrastMode === 'inverted';
 
-  const formatTime = (seconds: number) => {
-    const m = Math.floor(seconds / 60);
-    const s = seconds % 60;
-    return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
-  };
+  const footerBg = isHighContrast
+    ? 'bg-black border-t-2 border-yellow-400 text-yellow-300'
+    : isInverted
+    ? 'bg-[#022C22] border-t border-emerald-700 text-slate-100'
+    : 'bg-white border-t border-stone-200 text-stone-900 shadow-lg';
 
-  const getQuestionState = (qId: string, sectionIndex: number) => {
-    const isAnswered = !!userAnswers[qId];
-    
-    if (isAnswered) {
-      return SECTION_FILLED[sectionIndex % 4];
-    }
-    return 'bg-white border-stone-300 text-stone-600 hover:border-stone-400';
-  };
+  const totalAnswered = Object.values(userAnswers).filter((v) => v && v.trim().length > 0).length;
+  const totalFlagged = reviewFlags.size || 0;
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 bg-[#064E3B] text-white shadow-lg border-t border-[#064E3B]/80 font-sans z-50">
-      <div className="max-w-[1400px] mx-auto px-4 h-24 flex items-center gap-6">
-        {/* Clock Side */}
-        <div className="flex flex-col items-center min-w-[120px] bg-white/10 rounded-xl p-3">
-          <div className="flex items-center gap-2 mb-1">
-            <Clock size={16} className={timeLeft < 300 ? 'text-red-400' : 'text-stone-300'} />
-            <span className={`font-mono text-xl font-bold ${isTimeHidden ? 'opacity-0' : ''} ${timeLeft < 300 ? 'text-red-400' : 'text-white'}`}>
-              {formatTime(timeLeft)}
-            </span>
-          </div>
-          <button
-            onClick={onToggleHideTime}
-            className="flex items-center gap-1 text-xs text-stone-300 hover:text-white transition-colors"
-          >
-            {isTimeHidden ? <Eye size={12} /> : <EyeOff size={12} />}
-            {isTimeHidden ? 'Show Time' : 'Hide Time'}
-          </button>
-        </div>
+    <footer
+      data-lenis-prevent="true"
+      className={`w-full px-4 sm:px-6 py-2.5 flex flex-col md:flex-row items-center justify-between gap-3 font-sans shrink-0 z-30 transition-colors ${footerBg}`}
+    >
+      {/* Left: Previous / Next Part Buttons */}
+      <div className="flex items-center gap-2 shrink-0">
+        <button
+          type="button"
+          disabled={currentSection <= 1}
+          onClick={() => onSelectSection(Math.max(1, currentSection - 1))}
+          className={`flex items-center gap-1 px-3 py-1.5 rounded-xl font-bold text-xs transition-all cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed ${
+            isHighContrast
+              ? 'border border-yellow-400 text-yellow-400 hover:bg-yellow-400/20'
+              : isInverted
+              ? 'border border-emerald-600 text-emerald-200 hover:bg-emerald-800'
+              : 'bg-stone-100 hover:bg-stone-200 text-stone-700'
+          }`}
+        >
+          <ChevronLeft size={14} />
+          <span>Part trước</span>
+        </button>
 
-        {/* Scroll Nav */}
-        <button onClick={scrollLeft} className="p-2 hover:bg-white/10 rounded-full transition-colors text-white/70 hover:text-white">
-          <ChevronLeft size={24} />
+        <button
+          type="button"
+          disabled={currentSection >= 4}
+          onClick={() => onSelectSection(Math.min(4, currentSection + 1))}
+          className={`flex items-center gap-1 px-3 py-1.5 rounded-xl font-bold text-xs transition-all cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed ${
+            isHighContrast
+              ? 'border border-yellow-400 text-yellow-400 hover:bg-yellow-400/20'
+              : isInverted
+              ? 'border border-emerald-600 text-emerald-200 hover:bg-emerald-800'
+              : 'bg-stone-100 hover:bg-stone-200 text-stone-700'
+          }`}
+        >
+          <span>Part sau</span>
+          <ChevronRight size={14} />
+        </button>
+      </div>
+
+      {/* Center: 40 Questions Grouped by Part 1 - 4 */}
+      <div className="flex-1 max-w-5xl flex items-center gap-1 min-w-0">
+        <button
+          type="button"
+          onClick={() => scrollPalette('left')}
+          className="p-1.5 rounded-lg shrink-0 text-stone-500 hover:text-stone-900 hover:bg-stone-100 cursor-pointer"
+        >
+          <ChevronLeft size={16} />
         </button>
 
         <div
           ref={scrollRef}
           onWheel={handleWheel}
-          className="flex-1 flex overflow-x-auto hide-scrollbar items-center gap-8 py-2 scroll-smooth"
+          className="flex-1 overflow-x-auto py-1 overscroll-contain"
           style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
         >
-          {sections.map((section, sIndex) => (
-            <div key={section.sectionNumber} className="flex flex-col gap-2 shrink-0">
-              <span className={`text-xs uppercase tracking-wider px-1 ${sIndex + 1 === currentSection ? 'text-amber-300 font-bold' : 'text-white/70 font-medium'}`}>
-                {section.title}
-              </span>
-              <div className="flex gap-2">
-                {section.questions.map((q) => {
-                  const isFlagged = reviewFlags.has ? reviewFlags.has(q.id) : false;
-                  return (
-                    <button
-                      key={q.id}
-                      onClick={() => onScrollToQuestion(q.number)}
-                      className={`relative w-10 h-10 flex items-center justify-center rounded-lg border-2 font-medium text-sm transition-all ${getQuestionState(q.id, sIndex)}`}
-                    >
-                      {q.number}
-                      {isFlagged && (
-                        <div className="absolute -top-2 -right-2 bg-red-500 rounded-full p-0.5 shadow-sm">
-                          <Bookmark size={10} className="text-white" fill="currentColor" />
-                        </div>
-                      )}
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-          ))}
+          <div className="flex items-center gap-4 min-w-max px-1">
+            {sections.map((section) => {
+              const isCurrentPart = section.sectionNumber === currentSection;
+              return (
+                <div
+                  key={section.sectionNumber}
+                  className={`flex items-center gap-1.5 px-2.5 py-1 rounded-xl border transition-all ${
+                    isCurrentPart
+                      ? isHighContrast
+                        ? 'border-yellow-400 bg-yellow-400/10'
+                        : isInverted
+                        ? 'border-emerald-500 bg-emerald-900/50'
+                        : 'border-[#064E3B]/40 bg-emerald-50/50'
+                      : 'border-transparent'
+                  }`}
+                >
+                  <button
+                    type="button"
+                    onClick={() => onSelectSection(section.sectionNumber)}
+                    className={`text-[11px] font-mono font-bold uppercase mr-1 cursor-pointer ${
+                      isCurrentPart
+                        ? isHighContrast
+                          ? 'text-yellow-400'
+                          : isInverted
+                          ? 'text-amber-300'
+                          : 'text-[#064E3B]'
+                        : 'text-stone-400 hover:text-stone-700'
+                    }`}
+                  >
+                    P{section.sectionNumber}
+                  </button>
+
+                  {section.questions.map((q) => {
+                    const isAnswered = Boolean(userAnswers[q.id]?.trim());
+                    const isFlagged = reviewFlags.has ? reviewFlags.has(q.id) : false;
+                    const isActive = activeQuestionNumber === q.number;
+
+                    return (
+                      <button
+                        key={q.id}
+                        type="button"
+                        onClick={() => onScrollToQuestion(q.number, section.sectionNumber)}
+                        className={`relative w-7 h-7 sm:w-8 sm:h-8 rounded-lg font-mono text-xs font-bold transition-all cursor-pointer flex items-center justify-center ${
+                          isActive ? 'ring-2 ring-amber-500 scale-110 z-10' : ''
+                        } ${
+                          isAnswered
+                            ? isHighContrast
+                              ? 'bg-yellow-400 text-black'
+                              : isInverted
+                              ? 'bg-emerald-500 text-white'
+                              : 'bg-[#064E3B] text-white'
+                            : isHighContrast
+                            ? 'border border-yellow-400/40 text-yellow-400/80'
+                            : isInverted
+                            ? 'border border-emerald-700 text-emerald-300'
+                            : 'bg-stone-100 border border-stone-300 text-stone-600 hover:bg-stone-200'
+                        } ${isFlagged ? 'border-2 border-amber-500 ring-1 ring-amber-400' : ''}`}
+                        title={`Câu ${q.number} (Part ${section.sectionNumber})`}
+                      >
+                        {q.number}
+                        {isFlagged && (
+                          <span className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-amber-500 border border-white" />
+                        )}
+                      </button>
+                    );
+                  })}
+                </div>
+              );
+            })}
+          </div>
         </div>
 
-        <button onClick={scrollRight} className="p-2 hover:bg-white/10 rounded-full transition-colors text-white/70 hover:text-white">
-          <ChevronRight size={24} />
+        <button
+          type="button"
+          onClick={() => scrollPalette('right')}
+          className="p-1.5 rounded-lg shrink-0 text-stone-500 hover:text-stone-900 hover:bg-stone-100 cursor-pointer"
+        >
+          <ChevronRight size={16} />
         </button>
-
-        {/* Submit */}
-        <div className="pl-4 border-l border-white/20">
-          <button
-            onClick={onSubmit}
-            className="px-6 py-3 bg-[#D97706] hover:bg-[#D97706]/90 text-white font-medium rounded-xl transition-colors whitespace-nowrap active:scale-95"
-          >
-            Submit Test
-          </button>
-        </div>
       </div>
-      <style>{`
-        .hide-scrollbar::-webkit-scrollbar {
-          display: none;
-        }
-      `}</style>
-    </div>
+
+      {/* Right: Summary Status */}
+      <div className="flex items-center gap-3 shrink-0 text-xs font-mono">
+        <span className="flex items-center gap-1">
+          <span className="w-3 h-3 rounded bg-[#064E3B] inline-block" />
+          <span className="text-[11px] opacity-80">Đã làm ({totalAnswered}/40)</span>
+        </span>
+        <span className="flex items-center gap-1">
+          <Bookmark size={12} className="text-amber-500" />
+          <span className="text-[11px] text-amber-600 font-bold">Review ({totalFlagged})</span>
+        </span>
+      </div>
+    </footer>
   );
 };

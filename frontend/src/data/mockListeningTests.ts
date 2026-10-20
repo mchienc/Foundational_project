@@ -1,225 +1,665 @@
-import { ListeningFullTest, ListeningQuestion, ListeningQuestionType } from '../types';
+import { ListeningFullTest, ListeningQuestion, ListeningSection, TranscriptLine } from '../types';
 
-// Helper to generate boilerplate questions to save space while ensuring 40 questions exist
-const generateQuestions = (start: number, end: number, section: 1 | 2 | 3 | 4, type: ListeningQuestionType): ListeningQuestion[] => {
-  return Array.from({ length: end - start + 1 }).map((_, i) => ({
-    id: `q${start + i}`,
-    number: start + i,
-    sectionNumber: section,
-    type,
-    prompt: `Question ${start + i} prompt`,
-    correctAnswer: 'answer',
-    acceptableAnswers: ['answer'],
-  }));
-};
+const cam18Section1Questions: ListeningQuestion[] = [
+  {
+    id: 'q1',
+    number: 1,
+    sectionNumber: 1,
+    type: 'form_completion',
+    groupHeader: 'Questions 1–10: Transport Survey (Postcode: DW30 7YZ)',
+    groupInstruction: 'Complete the notes below. Write ONE WORD AND/OR A NUMBER for each answer.',
+    prompt: 'Heard about survey from a ___ at the community centre',
+    correctAnswer: 'neighbour',
+    acceptableAnswers: ['neighbor'],
+    explanation: 'Sadie mentions her neighbour told her about the transport survey.',
+  },
+  {
+    id: 'q2',
+    number: 2,
+    sectionNumber: 1,
+    type: 'form_completion',
+    groupHeader: 'Questions 1–10: Transport Survey (Postcode: DW30 7YZ)',
+    prompt: 'Occupation: works as a ___ in the city centre',
+    correctAnswer: 'dentist',
+    explanation: 'She states she works at a dental clinic as a dentist.',
+  },
+  {
+    id: 'q3',
+    number: 3,
+    sectionNumber: 1,
+    type: 'form_completion',
+    groupHeader: 'Questions 1–10: Transport Survey (Postcode: DW30 7YZ)',
+    prompt: 'Reason for visiting town today: to go to the ___',
+    correctAnswer: 'hairdresser',
+    acceptableAnswers: ["hairdresser's", 'hairdressers'],
+    explanation: 'She came into town specifically for a haircut appointment.',
+  },
+  {
+    id: 'q4',
+    number: 4,
+    sectionNumber: 1,
+    type: 'form_completion',
+    groupHeader: 'Questions 1–10: Transport Survey (Postcode: DW30 7YZ)',
+    prompt: 'Usual bus stop is opposite the ___ on Station Road',
+    correctAnswer: 'bakery',
+    explanation: 'She catches the 712 bus right across from the bakery.',
+  },
+  {
+    id: 'q5',
+    number: 5,
+    sectionNumber: 1,
+    type: 'form_completion',
+    groupHeader: 'Questions 1–10: Transport Survey (Postcode: DW30 7YZ)',
+    prompt: 'Monthly bus pass costs £___',
+    correctAnswer: '65',
+    acceptableAnswers: ['sixty-five'],
+    explanation: 'The price increased from £58 to £65 this month.',
+  },
+  {
+    id: 'q6',
+    number: 6,
+    sectionNumber: 1,
+    type: 'form_completion',
+    groupHeader: 'Questions 1–10: Transport Survey (Postcode: DW30 7YZ)',
+    prompt: 'Main complaint: buses are frequently late in the ___',
+    correctAnswer: 'evening',
+    acceptableAnswers: ['evenings'],
+    explanation: 'Morning services are punctual, but evening buses are often delayed.',
+  },
+  {
+    id: 'q7',
+    number: 7,
+    sectionNumber: 1,
+    type: 'form_completion',
+    groupHeader: 'Questions 1–10: Transport Survey (Postcode: DW30 7YZ)',
+    prompt: 'Stopped cycling to work because of heavy ___ on the main road',
+    correctAnswer: 'traffic',
+    explanation: 'She felt unsafe due to the volume of traffic during rush hour.',
+  },
+  {
+    id: 'q8',
+    number: 8,
+    sectionNumber: 1,
+    type: 'form_completion',
+    groupHeader: 'Questions 1–10: Transport Survey (Postcode: DW30 7YZ)',
+    prompt: 'No longer drives to work because ___ charges are too high',
+    correctAnswer: 'parking',
+    explanation: 'City centre car parks doubled their daily parking fees.',
+  },
+  {
+    id: 'q9',
+    number: 9,
+    sectionNumber: 1,
+    type: 'form_completion',
+    groupHeader: 'Questions 1–10: Transport Survey (Postcode: DW30 7YZ)',
+    prompt: 'Suggested improvement: add a covered ___ at the bus stop',
+    correctAnswer: 'shelter',
+    explanation: 'Passengers currently have nowhere to stand when it rains.',
+  },
+  {
+    id: 'q10',
+    number: 10,
+    sectionNumber: 1,
+    type: 'form_completion',
+    groupHeader: 'Questions 1–10: Transport Survey (Postcode: DW30 7YZ)',
+    prompt: 'Contact surname spelling: ___',
+    correctAnswer: 'Henderson',
+    acceptableAnswers: ['HENDERSON'],
+    explanation: 'Spelled H-E-N-D-E-R-S-O-N.',
+  },
+];
+
+const cam18Section2Questions: ListeningQuestion[] = [
+  {
+    id: 'q11',
+    number: 11,
+    sectionNumber: 2,
+    type: 'multiple_choice',
+    groupHeader: 'Questions 11–15: Becoming a Volunteer for ACE',
+    groupInstruction: 'Choose the correct letter, A, B or C.',
+    prompt: 'Why does the speaker apologise about the seats?',
+    options: [
+      { id: 'A', label: 'A', text: 'They are too small for adults.' },
+      { id: 'B', label: 'B', text: 'There are not enough of them.' },
+      { id: 'C', label: 'C', text: 'Some of them are very close together.' },
+    ],
+    correctAnswer: 'C',
+    explanation: 'Extra chairs had to be squeezed in, making the rows cramped.',
+  },
+  {
+    id: 'q12',
+    number: 12,
+    sectionNumber: 2,
+    type: 'multiple_choice',
+    groupHeader: 'Questions 11–15: Becoming a Volunteer for ACE',
+    prompt: 'What does the speaker say about the age of volunteers?',
+    options: [
+      { id: 'A', label: 'A', text: 'The age of volunteers is less important than other factors.' },
+      { id: 'B', label: 'B', text: 'Young volunteers are less reliable than older ones.' },
+      { id: 'C', label: 'C', text: 'Most volunteers are about 60 years old.' },
+    ],
+    correctAnswer: 'A',
+    explanation: 'Commitment and reliability matter far more than how old you are.',
+  },
+  {
+    id: 'q13',
+    number: 13,
+    sectionNumber: 2,
+    type: 'multiple_choice',
+    groupHeader: 'Questions 11–15: Becoming a Volunteer for ACE',
+    prompt: 'What does the speaker say about training?',
+    options: [
+      { id: 'A', label: 'A', text: 'It is continuous throughout the volunteering period.' },
+      { id: 'B', label: 'B', text: 'It is conducted by a manager in person.' },
+      { id: 'C', label: 'C', text: 'It takes place online before starting work.' },
+    ],
+    correctAnswer: 'A',
+    explanation: 'Training does not stop after induction; there are ongoing workshops.',
+  },
+  {
+    id: 'q14',
+    number: 14,
+    sectionNumber: 2,
+    type: 'multiple_choice',
+    groupHeader: 'Questions 11–15: Becoming a Volunteer for ACE',
+    prompt: 'Which volunteers receive a travel allowance?',
+    options: [
+      { id: 'A', label: 'A', text: 'Those who work more than 10 hours a week.' },
+      { id: 'B', label: 'B', text: 'Those who travel from outside the city boundary.' },
+      { id: 'C', label: 'C', text: 'Those who help with evening community events.' },
+    ],
+    correctAnswer: 'B',
+    explanation: 'Reimbursement is offered to volunteers commuting from outside the city zone.',
+  },
+  {
+    id: 'q15',
+    number: 15,
+    sectionNumber: 2,
+    type: 'multiple_choice',
+    groupHeader: 'Questions 11–15: Becoming a Volunteer for ACE',
+    prompt: 'What is the main focus of the charity this year?',
+    options: [
+      { id: 'A', label: 'A', text: 'Supporting isolated elderly residents.' },
+      { id: 'B', label: 'B', text: 'Organising youth sports tournaments.' },
+      { id: 'C', label: 'C', text: 'Creating green spaces in urban neighbourhoods.' },
+    ],
+    correctAnswer: 'C',
+    explanation: 'This year the primary initiative is urban community gardening.',
+  },
+  {
+    id: 'q16',
+    number: 16,
+    sectionNumber: 2,
+    type: 'sentence_completion',
+    groupHeader: 'Questions 16–20: Volunteer Roles & Schedule',
+    groupInstruction: 'Complete the sentences below. Write ONE WORD ONLY for each answer.',
+    prompt: 'Volunteers helping with the library van must hold a clean driving ___.',
+    correctAnswer: 'licence',
+    acceptableAnswers: ['license'],
+    explanation: 'A valid, clean driving licence is mandatory for mobile library drivers.',
+  },
+  {
+    id: 'q17',
+    number: 17,
+    sectionNumber: 2,
+    type: 'sentence_completion',
+    groupHeader: 'Questions 16–20: Volunteer Roles & Schedule',
+    prompt: 'The digital skills team teaches seniors how to spot online ___.',
+    correctAnswer: 'scams',
+    acceptableAnswers: ['fraud'],
+    explanation: 'The course emphasizes internet safety and avoiding email scams.',
+  },
+  {
+    id: 'q18',
+    number: 18,
+    sectionNumber: 2,
+    type: 'sentence_completion',
+    groupHeader: 'Questions 16–20: Volunteer Roles & Schedule',
+    prompt: 'All equipment for the park clean-up is stored in the wooden ___ near the gate.',
+    correctAnswer: 'shed',
+    explanation: 'Gloves and litter pickers are kept inside the locked shed.',
+  },
+  {
+    id: 'q19',
+    number: 19,
+    sectionNumber: 2,
+    type: 'sentence_completion',
+    groupHeader: 'Questions 16–20: Volunteer Roles & Schedule',
+    prompt: 'The fundraising dinner will take place at the Grand ___ Hotel.',
+    correctAnswer: 'Bridge',
+    acceptableAnswers: ['bridge'],
+    explanation: 'Hosted at the Grand Bridge Hotel overlooking the river.',
+  },
+  {
+    id: 'q20',
+    number: 20,
+    sectionNumber: 2,
+    type: 'sentence_completion',
+    groupHeader: 'Questions 16–20: Volunteer Roles & Schedule',
+    prompt: 'Application forms must be returned to the reception desk by ___ at the latest.',
+    correctAnswer: 'Friday',
+    acceptableAnswers: ['friday'],
+    explanation: 'Forms need to be processed before the weekend.',
+  },
+];
+
+const matchingOptions = [
+  { id: 'A', label: 'A', text: 'It requires specialist equipment.' },
+  { id: 'B', label: 'B', text: 'Local communities must be actively involved.' },
+  { id: 'C', label: 'C', text: 'Previous studies had a sample size that was too small.' },
+  { id: 'D', label: 'D', text: 'Long-term funding is the decisive factor.' },
+  { id: 'E', label: 'E', text: 'Small-scale interventions can be highly effective.' },
+];
+
+const cam18Section3Questions: ListeningQuestion[] = [
+  {
+    id: 'q21',
+    number: 21,
+    sectionNumber: 3,
+    type: 'multiple_choice',
+    groupHeader: 'Questions 21–26: Academic Discussion on Urban Biodiversity',
+    groupInstruction: 'Choose the correct letter, A, B or C.',
+    prompt: 'Sam and Priya agree that their biggest challenge is',
+    options: [
+      { id: 'A', label: 'A', text: 'collecting field data in busy urban areas.' },
+      { id: 'B', label: 'B', text: 'finding relevant peer-reviewed academic sources.' },
+      { id: 'C', label: 'C', text: 'analysing the statistical results accurately.' },
+    ],
+    correctAnswer: 'B',
+    explanation: 'Both students mention that most literature focuses on rural rather than urban habitats.',
+  },
+  {
+    id: 'q22',
+    number: 22,
+    sectionNumber: 3,
+    type: 'multiple_choice',
+    groupHeader: 'Questions 21–26: Academic Discussion on Urban Biodiversity',
+    prompt: 'Priya thinks urban parks are particularly important because they',
+    options: [
+      { id: 'A', label: 'A', text: 'provide shelter for rare migratory birds.' },
+      { id: 'B', label: 'B', text: 'significantly reduce noise pollution for residents.' },
+      { id: 'C', label: 'C', text: 'support diverse pollinator and insect populations.' },
+    ],
+    correctAnswer: 'C',
+    explanation: 'She highlights the critical role of city parks in sustaining wild bees and beetles.',
+  },
+  {
+    id: 'q23',
+    number: 23,
+    sectionNumber: 3,
+    type: 'multiple_choice',
+    groupHeader: 'Questions 21–26: Academic Discussion on Urban Biodiversity',
+    prompt: 'Sam suggests they should include data from',
+    options: [
+      { id: 'A', label: 'A', text: 'local municipal council surveys.' },
+      { id: 'B', label: 'B', text: 'citizen science wildlife projects.' },
+      { id: 'C', label: 'C', text: 'international forestry databases.' },
+    ],
+    correctAnswer: 'B',
+    explanation: 'Sam points out that thousands of residents log sightings on citizen science apps.',
+  },
+  {
+    id: 'q24',
+    number: 24,
+    sectionNumber: 3,
+    type: 'multiple_choice',
+    groupHeader: 'Questions 21–26: Academic Discussion on Urban Biodiversity',
+    prompt: 'What does Priya say about green roofs?',
+    options: [
+      { id: 'A', label: 'A', text: 'They are too costly for older commercial buildings.' },
+      { id: 'B', label: 'B', text: 'They can support a surprisingly wide range of plant species.' },
+      { id: 'C', label: 'C', text: 'They are only effective in temperate climates.' },
+    ],
+    correctAnswer: 'B',
+    explanation: 'Even shallow rooftop substrates can host dozens of drought-tolerant flora.',
+  },
+  {
+    id: 'q25',
+    number: 25,
+    sectionNumber: 3,
+    type: 'multiple_choice',
+    groupHeader: 'Questions 21–26: Academic Discussion on Urban Biodiversity',
+    prompt: 'The students decide to present their findings using',
+    options: [
+      { id: 'A', label: 'A', text: 'a written report and an infographic poster.' },
+      { id: 'B', label: 'B', text: 'an interactive digital slide deck only.' },
+      { id: 'C', label: 'C', text: 'a short documentary video and summary sheet.' },
+    ],
+    correctAnswer: 'A',
+    explanation: 'Their tutor recommended pairing the written report with a visual poster.',
+  },
+  {
+    id: 'q26',
+    number: 26,
+    sectionNumber: 3,
+    type: 'multiple_choice',
+    groupHeader: 'Questions 21–26: Academic Discussion on Urban Biodiversity',
+    prompt: 'Sam believes the most important factor for urban wildlife survival is',
+    options: [
+      { id: 'A', label: 'A', text: 'the total area of individual green spaces.' },
+      { id: 'B', label: 'B', text: 'banning chemical pesticides in public gardens.' },
+      { id: 'C', label: 'C', text: 'ecological corridors connecting different habitats.' },
+    ],
+    correctAnswer: 'C',
+    explanation: 'Isolated parks are less effective unless linked by green corridors.',
+  },
+  {
+    id: 'q27',
+    number: 27,
+    sectionNumber: 3,
+    type: 'matching',
+    groupHeader: 'Questions 27–30: Researchers’ Conclusions',
+    groupInstruction: 'What conclusion did each researcher reach? Choose FOUR answers from the box (A–E).',
+    prompt: 'Dr Collins (2021 study on pocket parks)',
+    options: matchingOptions,
+    correctAnswer: 'E',
+    explanation: 'Dr Collins demonstrated that even tiny roadside planters boost insect numbers.',
+  },
+  {
+    id: 'q28',
+    number: 28,
+    sectionNumber: 3,
+    type: 'matching',
+    groupHeader: 'Questions 27–30: Researchers’ Conclusions',
+    prompt: 'Professor Malik (urban wetland project)',
+    options: matchingOptions,
+    correctAnswer: 'B',
+    explanation: 'Malik concluded projects fail unless neighbourhood residents help maintain them.',
+  },
+  {
+    id: 'q29',
+    number: 29,
+    sectionNumber: 3,
+    type: 'matching',
+    groupHeader: 'Questions 27–30: Researchers’ Conclusions',
+    prompt: 'Dr Huang (acoustic monitoring of bats)',
+    options: matchingOptions,
+    correctAnswer: 'A',
+    explanation: 'Ultrasonic detectors were essential to track nocturnal bat activity.',
+  },
+  {
+    id: 'q30',
+    number: 30,
+    sectionNumber: 3,
+    type: 'matching',
+    groupHeader: 'Questions 27–30: Researchers’ Conclusions',
+    prompt: 'Ms Peterson (municipal tree-planting review)',
+    options: matchingOptions,
+    correctAnswer: 'D',
+    explanation: 'Many newly planted trees died after grants expired after two years.',
+  },
+];
+
+const cam18Section4Questions: ListeningQuestion[] = [
+  {
+    id: 'q31',
+    number: 31,
+    sectionNumber: 4,
+    type: 'note_completion',
+    groupHeader: 'Questions 31–40: History and Role of Botanical Gardens',
+    groupInstruction: 'Complete the notes below. Write ONE WORD ONLY for each answer.',
+    prompt: 'The earliest university botanical gardens were founded in 16th-century ___',
+    correctAnswer: 'Italy',
+    acceptableAnswers: ['italy'],
+    explanation: 'Pisa and Padua in Italy established the first academic physic gardens.',
+  },
+  {
+    id: 'q32',
+    number: 32,
+    sectionNumber: 4,
+    type: 'note_completion',
+    groupHeader: 'Questions 31–40: History and Role of Botanical Gardens',
+    prompt: 'Their original purpose was to cultivate ___ plants for training doctors',
+    correctAnswer: 'medicinal',
+    acceptableAnswers: ['medical'],
+    explanation: 'Medical students learned to identify herbs used in remedies.',
+  },
+  {
+    id: 'q33',
+    number: 33,
+    sectionNumber: 4,
+    type: 'note_completion',
+    groupHeader: 'Questions 31–40: History and Role of Botanical Gardens',
+    prompt: 'In the 18th century, new glasshouses allowed the survival of ___ species',
+    correctAnswer: 'tropical',
+    explanation: 'Heated glasshouses replicated warm, humid tropical climates.',
+  },
+  {
+    id: 'q34',
+    number: 34,
+    sectionNumber: 4,
+    type: 'note_completion',
+    groupHeader: 'Questions 31–40: History and Role of Botanical Gardens',
+    prompt: 'Botanists used pressed specimens stored in a ___ for classification',
+    correctAnswer: 'herbarium',
+    explanation: 'Dried plant collections in a herbarium enabled global taxonomy.',
+  },
+  {
+    id: 'q35',
+    number: 35,
+    sectionNumber: 4,
+    type: 'note_completion',
+    groupHeader: 'Questions 31–40: History and Role of Botanical Gardens',
+    prompt: 'Colonial gardens played a major role in the global trade of ___ and spices',
+    correctAnswer: 'rubber',
+    acceptableAnswers: ['tea', 'coffee'],
+    explanation: 'Seedlings of rubber and tea were transported between continents.',
+  },
+  {
+    id: 'q36',
+    number: 36,
+    sectionNumber: 4,
+    type: 'note_completion',
+    groupHeader: 'Questions 31–40: History and Role of Botanical Gardens',
+    prompt: 'Modern gardens focus heavily on the ___ of endangered flora',
+    correctAnswer: 'conservation',
+    acceptableAnswers: ['preservation'],
+    explanation: 'Protecting threatened species from extinction is now the core mission.',
+  },
+  {
+    id: 'q37',
+    number: 37,
+    sectionNumber: 4,
+    type: 'note_completion',
+    groupHeader: 'Questions 31–40: History and Role of Botanical Gardens',
+    prompt: 'Wild seeds are dried and frozen at minus 20 degrees in a seed ___',
+    correctAnswer: 'bank',
+    acceptableAnswers: ['vault'],
+    explanation: 'The Millennium Seed Bank preserves billions of viable seeds.',
+  },
+  {
+    id: 'q38',
+    number: 38,
+    sectionNumber: 4,
+    type: 'note_completion',
+    groupHeader: 'Questions 31–40: History and Role of Botanical Gardens',
+    prompt: 'Researchers study how plants adapt to prolonged ___ and rising temperatures',
+    correctAnswer: 'drought',
+    acceptableAnswers: ['droughts'],
+    explanation: 'Drought tolerance is critical for future food security.',
+  },
+  {
+    id: 'q39',
+    number: 39,
+    sectionNumber: 4,
+    type: 'note_completion',
+    groupHeader: 'Questions 31–40: History and Role of Botanical Gardens',
+    prompt: 'Gardens also run ___ programmes for local schools and visitors',
+    correctAnswer: 'education',
+    acceptableAnswers: ['educational'],
+    explanation: 'Public education raises awareness of ecological threats.',
+  },
+  {
+    id: 'q40',
+    number: 40,
+    sectionNumber: 4,
+    type: 'note_completion',
+    groupHeader: 'Questions 31–40: History and Role of Botanical Gardens',
+    prompt: 'Digital mapping via ___ helps track deforestation in remote regions',
+    correctAnswer: 'satellite',
+    acceptableAnswers: ['satellites'],
+    explanation: 'High-resolution satellite imagery monitors habitat loss in real time.',
+  },
+];
+
+const defaultTranscript: TranscriptLine[] = [
+  {
+    id: 'tr-1',
+    start: 0,
+    end: 14,
+    speaker: 'Interviewer',
+    text: 'Excuse me, do you have a few minutes to take part in a short survey about public transport in the town?',
+  },
+  {
+    id: 'tr-2',
+    start: 15,
+    end: 32,
+    speaker: 'Sadie',
+    text: 'Yes, sure. Actually, my neighbour mentioned she did this survey at the community centre yesterday.',
+    answerForQuestion: 1,
+    explanation: 'Sadie heard about the survey from her neighbour (Q1).',
+  },
+  {
+    id: 'tr-3',
+    start: 33,
+    end: 52,
+    speaker: 'Interviewer',
+    text: 'Great! First, may I ask what your occupation is? Do you work locally?',
+  },
+  {
+    id: 'tr-4',
+    start: 53,
+    end: 74,
+    speaker: 'Sadie',
+    text: 'I work as a dentist in a clinic right in the city centre, though today is my day off.',
+    answerForQuestion: 2,
+    explanation: 'She works as a dentist (Q2).',
+  },
+  {
+    id: 'tr-5',
+    start: 75,
+    end: 98,
+    speaker: 'Sadie',
+    text: 'I only came into town this morning because I had an appointment at the hairdresser.',
+    answerForQuestion: 3,
+    explanation: 'Reason for visiting town today: hairdresser (Q3).',
+  },
+  {
+    id: 'tr-6',
+    start: 99,
+    end: 125,
+    speaker: 'Sadie',
+    text: 'I usually catch the 712 bus from Station Road — the stop right opposite the bakery. My monthly pass now costs £65.',
+    answerForQuestion: 4,
+    explanation: 'Bus stop is opposite the bakery (Q4) and monthly pass costs £65 (Q5).',
+  },
+  {
+    id: 'tr-7',
+    start: 126,
+    end: 155,
+    speaker: 'Sadie',
+    text: 'The morning buses are fine, but they are frequently late in the evening when I finish work.',
+    answerForQuestion: 6,
+    explanation: 'Buses are frequently late in the evening (Q6).',
+  },
+  {
+    id: 'tr-8',
+    start: 156,
+    end: 188,
+    speaker: 'Sadie',
+    text: 'I used to cycle, but I stopped because of the heavy traffic on the main road. And I no longer drive because parking charges are far too high.',
+    answerForQuestion: 7,
+    explanation: 'Stopped cycling due to heavy traffic (Q7) and stopped driving due to parking charges (Q8).',
+  },
+  {
+    id: 'tr-9',
+    start: 189,
+    end: 225,
+    speaker: 'Sadie',
+    text: 'If the council wants to improve things, they should build a covered shelter at the Station Road stop. Oh, and my surname is Henderson — H-E-N-D-E-R-S-O-N.',
+    answerForQuestion: 9,
+    explanation: 'Suggested adding a shelter (Q9); surname Henderson (Q10).',
+  },
+];
+
+function buildSections(audioFiles: [string, string, string, string], testTag: string): ListeningSection[] {
+  return [
+    {
+      id: `${testTag}-s1`,
+      sectionNumber: 1,
+      title: 'Part 1: Everyday Social Conversation',
+      context: 'A conversation between two speakers about local services and arrangements',
+      instructions: 'Complete the notes below. Write ONE WORD AND/OR A NUMBER for each answer.',
+      audioFile: audioFiles[0],
+      questions: cam18Section1Questions.map((q) => ({ ...q, id: `${testTag}-${q.id}` })),
+    },
+    {
+      id: `${testTag}-s2`,
+      sectionNumber: 2,
+      title: 'Part 2: Public Information Talk',
+      context: 'A monologue by a coordinator giving information to community members',
+      instructions: 'Questions 11–15: Choose A, B or C. Questions 16–20: Write ONE WORD ONLY.',
+      audioFile: audioFiles[1],
+      questions: cam18Section2Questions.map((q) => ({ ...q, id: `${testTag}-${q.id}` })),
+    },
+    {
+      id: `${testTag}-s3`,
+      sectionNumber: 3,
+      title: 'Part 3: Academic Research Discussion',
+      context: 'Two university students discussing an assignment and research findings',
+      instructions: 'Questions 21–26: Choose A, B or C. Questions 27–30: Choose FOUR answers from A–E.',
+      audioFile: audioFiles[2],
+      questions: cam18Section3Questions.map((q) => ({ ...q, id: `${testTag}-${q.id}` })),
+    },
+    {
+      id: `${testTag}-s4`,
+      sectionNumber: 4,
+      title: 'Part 4: University Academic Lecture',
+      context: 'A university lecture on scientific history and environmental conservation',
+      instructions: 'Complete the lecture notes below. Write ONE WORD ONLY for each answer.',
+      audioFile: audioFiles[3],
+      questions: cam18Section4Questions.map((q) => ({ ...q, id: `${testTag}-${q.id}` })),
+    },
+  ];
+}
 
 export const mockListeningFullTests: ListeningFullTest[] = [
-  {
-    id: 'c13-t1',
-    source: 'Cambridge IELTS 13 Test 1',
-    book: 'Cambridge 13',
-    testNumber: 1,
-    totalSections: 4,
+  // Cambridge 20 (Tests 1-4)
+  ...([1, 2, 3, 4] as const).map((t) => ({
+    id: `c20-t${t}`,
+    source: `Cambridge IELTS 20 Test ${t}`,
+    book: 'Cambridge 20',
+    testNumber: t,
+    totalSections: 4 as const,
     estimatedMinutes: 30,
-    sections: [
-      {
-        id: 'c13-t1-s1',
-        sectionNumber: 1,
-        title: 'Tourist Information',
-        context: 'A phone call to a tourist information centre',
-        instructions: 'Write ONE WORD AND/OR A NUMBER for each answer.',
-        audioFile: 'IELTS13-Tests1-4CD1Track_01.mp3',
-        questions: [
-          ...generateQuestions(1, 10, 1, 'form_completion')
-        ]
-      },
-      {
-        id: 'c13-t1-s2',
-        sectionNumber: 2,
-        title: 'Working at a summer camp',
-        context: 'A talk by a manager of a summer camp',
-        instructions: 'Choose the correct letter, A, B or C.',
-        audioFile: 'IELTS13-Tests1-4CD1Track_02.mp3',
-        questions: [
-          ...generateQuestions(11, 20, 2, 'multiple_choice')
-        ]
-      },
-      {
-        id: 'c13-t1-s3',
-        sectionNumber: 3,
-        title: 'University discussion',
-        context: 'Two students discussing their presentation',
-        instructions: 'Choose the correct letter.',
-        audioFile: 'IELTS13-Tests1-4CD1Track_03.mp3',
-        questions: [
-          ...generateQuestions(21, 30, 3, 'multiple_choice')
-        ]
-      },
-      {
-        id: 'c13-t1-s4',
-        sectionNumber: 4,
-        title: 'History of weather forecasting',
-        context: 'A university lecture',
-        instructions: 'Complete the notes below.',
-        audioFile: 'IELTS13-Tests1-4CD1Track_04.mp3',
-        questions: [
-          ...generateQuestions(31, 40, 4, 'note_completion')
-        ]
-      }
-    ],
-    transcript: [
-      {
-        id: 't1',
-        start: 0,
-        end: 5,
-        speaker: 'A',
-        text: 'Hello, Tourist Information.',
-        answerForQuestion: 1,
-        explanation: 'Here is the answer to question 1.'
-      }
-    ]
-  },
-  {
-    id: 'c14-t4',
-    source: 'Cambridge IELTS 14 Test 4',
-    book: 'Cambridge 14',
-    testNumber: 4,
-    totalSections: 4,
+    sections: buildSections(
+      [`20-T${t}S1.m4a`, `20-T${t}S2.m4a`, `20-T${t}S3.m4a`, `20-T${t}S4.m4a`],
+      `c20-t${t}`
+    ),
+    transcript: defaultTranscript,
+  })),
+
+  // Cambridge 19 (Tests 1-4)
+  ...([1, 2, 3, 4] as const).map((t) => ({
+    id: `c19-t${t}`,
+    source: `Cambridge IELTS 19 Test ${t}`,
+    book: 'Cambridge 19',
+    testNumber: t,
+    totalSections: 4 as const,
     estimatedMinutes: 30,
-    sections: [
-      {
-        id: 'c14-t4-s1',
-        sectionNumber: 1,
-        title: 'Section 1',
-        context: 'Context 1',
-        instructions: 'Instructions 1',
-        audioFile: 'C14T4S1.mp3',
-        questions: generateQuestions(1, 10, 1, 'form_completion')
-      },
-      {
-        id: 'c14-t4-s2',
-        sectionNumber: 2,
-        title: 'Section 2',
-        context: 'Context 2',
-        instructions: 'Instructions 2',
-        audioFile: 'C14T4S2.mp3',
-        questions: generateQuestions(11, 20, 2, 'multiple_choice')
-      },
-      {
-        id: 'c14-t4-s3',
-        sectionNumber: 3,
-        title: 'Section 3',
-        context: 'Context 3',
-        instructions: 'Instructions 3',
-        audioFile: 'C14T4S3.mp3',
-        questions: generateQuestions(21, 30, 3, 'matching')
-      },
-      {
-        id: 'c14-t4-s4',
-        sectionNumber: 4,
-        title: 'Section 4',
-        context: 'Context 4',
-        instructions: 'Instructions 4',
-        audioFile: 'C14T4S4.mp3',
-        questions: generateQuestions(31, 40, 4, 'note_completion')
-      }
-    ],
-    transcript: []
-  },
-  {
-    id: 'c15-t1',
-    source: 'Cambridge IELTS 15 Test 1',
-    book: 'Cambridge 15',
-    testNumber: 1,
-    totalSections: 4,
-    estimatedMinutes: 30,
-    sections: [
-      {
-        id: 'c15-t1-s1',
-        sectionNumber: 1,
-        title: 'Section 1',
-        context: 'Context 1',
-        instructions: 'Instructions 1',
-        audioFile: 'ielts15_test1_audio1.m4a',
-        questions: generateQuestions(1, 10, 1, 'form_completion')
-      },
-      {
-        id: 'c15-t1-s2',
-        sectionNumber: 2,
-        title: 'Section 2',
-        context: 'Context 2',
-        instructions: 'Instructions 2',
-        audioFile: 'ielts15_test1_audio2.m4a',
-        questions: generateQuestions(11, 20, 2, 'multiple_choice')
-      },
-      {
-        id: 'c15-t1-s3',
-        sectionNumber: 3,
-        title: 'Section 3',
-        context: 'Context 3',
-        instructions: 'Instructions 3',
-        audioFile: 'ielts15_test1_audio3.m4a',
-        questions: generateQuestions(21, 30, 3, 'matching')
-      },
-      {
-        id: 'c15-t1-s4',
-        sectionNumber: 4,
-        title: 'Section 4',
-        context: 'Context 4',
-        instructions: 'Instructions 4',
-        audioFile: 'ielts15_test1_audio4.m4a',
-        questions: generateQuestions(31, 40, 4, 'note_completion')
-      }
-    ],
-    transcript: []
-  },
-  {
-    id: 'c16-t1',
-    source: 'Cambridge IELTS 16 Test 1',
-    book: 'Cambridge 16',
-    testNumber: 1,
-    totalSections: 4,
-    estimatedMinutes: 30,
-    sections: [
-      {
-        id: 'c16-t1-s1',
-        sectionNumber: 1,
-        title: 'Section 1',
-        context: 'Context 1',
-        instructions: 'Instructions 1',
-        audioFile: '16-Test 1 Part 1.mp3',
-        questions: generateQuestions(1, 10, 1, 'form_completion')
-      },
-      {
-        id: 'c16-t1-s2',
-        sectionNumber: 2,
-        title: 'Section 2',
-        context: 'Context 2',
-        instructions: 'Instructions 2',
-        audioFile: '16-Test 1 Part 2.mp3',
-        questions: generateQuestions(11, 20, 2, 'multiple_choice')
-      },
-      {
-        id: 'c16-t1-s3',
-        sectionNumber: 3,
-        title: 'Section 3',
-        context: 'Context 3',
-        instructions: 'Instructions 3',
-        audioFile: '16-Test 1 Part 3.mp3',
-        questions: generateQuestions(21, 30, 3, 'matching')
-      },
-      {
-        id: 'c16-t1-s4',
-        sectionNumber: 4,
-        title: 'Section 4',
-        context: 'Context 4',
-        instructions: 'Instructions 4',
-        audioFile: '16-Test 1 Part 4.mp3',
-        questions: generateQuestions(31, 40, 4, 'note_completion')
-      }
-    ],
-    transcript: []
-  },
+    sections: buildSections(
+      [
+        `19-Test${t} Part1.mp3`,
+        `19-Test${t} Part2.mp3`,
+        `19-Test${t} Part3.mp3`,
+        `19-Test${t} Part4.mp3`,
+      ],
+      `c19-t${t}`
+    ),
+    transcript: defaultTranscript,
+  })),
+
+  // Cambridge 18 (Tests 1-4)
   {
     id: 'c18-t1',
     source: 'Cambridge IELTS 18 Test 1',
@@ -227,146 +667,198 @@ export const mockListeningFullTests: ListeningFullTest[] = [
     testNumber: 1,
     totalSections: 4,
     estimatedMinutes: 30,
-    sections: [
-      {
-        id: 'c18-t1-s1',
-        sectionNumber: 1,
-        title: 'Section 1',
-        context: 'Context 1',
-        instructions: 'Instructions 1',
-        audioFile: '剑18 section1-part1.mp3',
-        questions: generateQuestions(1, 10, 1, 'form_completion')
-      },
-      {
-        id: 'c18-t1-s2',
-        sectionNumber: 2,
-        title: 'Section 2',
-        context: 'Context 2',
-        instructions: 'Instructions 2',
-        audioFile: '剑18 section2-part1.mp3',
-        questions: generateQuestions(11, 20, 2, 'multiple_choice')
-      },
-      {
-        id: 'c18-t1-s3',
-        sectionNumber: 3,
-        title: 'Section 3',
-        context: 'Context 3',
-        instructions: 'Instructions 3',
-        audioFile: '剑18 section3 part1.mp3',
-        questions: generateQuestions(21, 30, 3, 'matching')
-      },
-      {
-        id: 'c18-t1-s4',
-        sectionNumber: 4,
-        title: 'Section 4',
-        context: 'Context 4',
-        instructions: 'Instructions 4',
-        audioFile: '剑18 section4 part1.mp3',
-        questions: generateQuestions(31, 40, 4, 'note_completion')
-      }
-    ],
-    transcript: [
-      {
-        id: 't1',
-        start: 0,
-        end: 5,
-        speaker: 'A',
-        text: 'This is the transcript for Cambridge 18.'
-      }
-    ]
+    sections: buildSections(
+      [
+        '剑18 section1-part1.mp3',
+        '剑18 section1-part2.mp3',
+        '剑18 section1-part3.mp3',
+        '剑18 section1-part4.mp3',
+      ],
+      'c18-t1'
+    ),
+    transcript: defaultTranscript,
   },
   {
-    id: 'c19-t1',
-    source: 'Cambridge IELTS 19 Test 1',
-    book: 'Cambridge 19',
+    id: 'c18-t2',
+    source: 'Cambridge IELTS 18 Test 2',
+    book: 'Cambridge 18',
+    testNumber: 2,
+    totalSections: 4,
+    estimatedMinutes: 30,
+    sections: buildSections(
+      [
+        '剑18 section2-part1.mp3',
+        '剑18 section2-part2.mp3',
+        '剑18 section2- part3.mp3',
+        '剑18 section2- part4.mp3',
+      ],
+      'c18-t2'
+    ),
+    transcript: defaultTranscript,
+  },
+  {
+    id: 'c18-t3',
+    source: 'Cambridge IELTS 18 Test 3',
+    book: 'Cambridge 18',
+    testNumber: 3,
+    totalSections: 4,
+    estimatedMinutes: 30,
+    sections: buildSections(
+      [
+        '剑18 section3 part1.mp3',
+        '剑18 section3 part2.mp3',
+        '剑18 section3 part3.mp3',
+        '剑18 section3 part4.mp3',
+      ],
+      'c18-t3'
+    ),
+    transcript: defaultTranscript,
+  },
+  {
+    id: 'c18-t4',
+    source: 'Cambridge IELTS 18 Test 4',
+    book: 'Cambridge 18',
+    testNumber: 4,
+    totalSections: 4,
+    estimatedMinutes: 30,
+    sections: buildSections(
+      [
+        '剑18 section4 part1.mp3',
+        '剑18 section4 part2.mp3',
+        '剑18 section4 part3.mp3',
+        '剑18 section4 part4.mp3',
+      ],
+      'c18-t4'
+    ),
+    transcript: defaultTranscript,
+  },
+
+  // Cambridge 16 (Tests 1-4)
+  ...([1, 2, 3, 4] as const).map((t) => ({
+    id: `c16-t${t}`,
+    source: `Cambridge IELTS 16 Test ${t}`,
+    book: 'Cambridge 16',
+    testNumber: t,
+    totalSections: 4 as const,
+    estimatedMinutes: 30,
+    sections: buildSections(
+      [
+        `16-Test ${t} Part 1.mp3`,
+        `16-Test ${t} Part 2.mp3`,
+        `16-Test ${t} Part 3.mp3`,
+        `16-Test ${t} Part 4.mp3`,
+      ],
+      `c16-t${t}`
+    ),
+    transcript: defaultTranscript,
+  })),
+
+  // Cambridge 15 (Tests 1-4)
+  ...([1, 2, 3, 4] as const).map((t) => ({
+    id: `c15-t${t}`,
+    source: `Cambridge IELTS 15 Test ${t}`,
+    book: 'Cambridge 15',
+    testNumber: t,
+    totalSections: 4 as const,
+    estimatedMinutes: 30,
+    sections: buildSections(
+      [
+        `ielts15_test${t}_audio1.m4a`,
+        `ielts15_test${t}_audio2.m4a`,
+        `ielts15_test${t}_audio3.m4a`,
+        `ielts15_test${t}_audio4.m4a`,
+      ],
+      `c15-t${t}`
+    ),
+    transcript: defaultTranscript,
+  })),
+
+  // Cambridge 14 (Test 4)
+  {
+    id: 'c14-t4',
+    source: 'Cambridge IELTS 14 Test 4',
+    book: 'Cambridge 14',
+    testNumber: 4,
+    totalSections: 4,
+    estimatedMinutes: 30,
+    sections: buildSections(
+      ['C14T4S1.mp3', 'C14T4S2.mp3', 'C14T4S3.mp3', 'C14T4S4.mp3'],
+      'c14-t4'
+    ),
+    transcript: defaultTranscript,
+  },
+
+  // Cambridge 13 (Tests 1-4)
+  {
+    id: 'c13-t1',
+    source: 'Cambridge IELTS 13 Test 1',
+    book: 'Cambridge 13',
     testNumber: 1,
     totalSections: 4,
     estimatedMinutes: 30,
-    sections: [
-      {
-        id: 'c19-t1-s1',
-        sectionNumber: 1,
-        title: 'Section 1',
-        context: 'Context 1',
-        instructions: 'Instructions 1',
-        audioFile: '19-Test1 Part1.mp3',
-        questions: generateQuestions(1, 10, 1, 'form_completion')
-      },
-      {
-        id: 'c19-t1-s2',
-        sectionNumber: 2,
-        title: 'Section 2',
-        context: 'Context 2',
-        instructions: 'Instructions 2',
-        audioFile: '19-Test1 Part2.mp3',
-        questions: generateQuestions(11, 20, 2, 'multiple_choice')
-      },
-      {
-        id: 'c19-t1-s3',
-        sectionNumber: 3,
-        title: 'Section 3',
-        context: 'Context 3',
-        instructions: 'Instructions 3',
-        audioFile: '19-Test1 Part3.mp3',
-        questions: generateQuestions(21, 30, 3, 'matching')
-      },
-      {
-        id: 'c19-t1-s4',
-        sectionNumber: 4,
-        title: 'Section 4',
-        context: 'Context 4',
-        instructions: 'Instructions 4',
-        audioFile: '19-Test1 Part4.mp3',
-        questions: generateQuestions(31, 40, 4, 'note_completion')
-      }
-    ],
-    transcript: []
+    sections: buildSections(
+      [
+        'IELTS13-Tests1-4CD1Track_01.mp3',
+        'IELTS13-Tests1-4CD1Track_02.mp3',
+        'IELTS13-Tests1-4CD1Track_03.mp3',
+        'IELTS13-Tests1-4CD1Track_04.mp3',
+      ],
+      'c13-t1'
+    ),
+    transcript: defaultTranscript,
   },
   {
-    id: 'c20-t1',
-    source: 'Cambridge IELTS 20 Test 1',
-    book: 'Cambridge 20',
-    testNumber: 1,
+    id: 'c13-t2',
+    source: 'Cambridge IELTS 13 Test 2',
+    book: 'Cambridge 13',
+    testNumber: 2,
     totalSections: 4,
     estimatedMinutes: 30,
-    sections: [
-      {
-        id: 'c20-t1-s1',
-        sectionNumber: 1,
-        title: 'Section 1',
-        context: 'Context 1',
-        instructions: 'Instructions 1',
-        audioFile: '20-T1S1.m4a',
-        questions: generateQuestions(1, 10, 1, 'form_completion')
-      },
-      {
-        id: 'c20-t1-s2',
-        sectionNumber: 2,
-        title: 'Section 2',
-        context: 'Context 2',
-        instructions: 'Instructions 2',
-        audioFile: '20-T1S2.m4a',
-        questions: generateQuestions(11, 20, 2, 'multiple_choice')
-      },
-      {
-        id: 'c20-t1-s3',
-        sectionNumber: 3,
-        title: 'Section 3',
-        context: 'Context 3',
-        instructions: 'Instructions 3',
-        audioFile: '20-T1S3.m4a',
-        questions: generateQuestions(21, 30, 3, 'matching')
-      },
-      {
-        id: 'c20-t1-s4',
-        sectionNumber: 4,
-        title: 'Section 4',
-        context: 'Context 4',
-        instructions: 'Instructions 4',
-        audioFile: '20-T1S4.m4a',
-        questions: generateQuestions(31, 40, 4, 'note_completion')
-      }
-    ],
-    transcript: []
-  }
+    sections: buildSections(
+      [
+        'IELTS13-Tests1-4CD1Track_05.mp3',
+        'IELTS13-Tests1-4CD1Track_06.mp3',
+        'IELTS13-Tests1-4CD1Track_07.mp3',
+        'IELTS13-Tests1-4CD1Track_08.mp3',
+      ],
+      'c13-t2'
+    ),
+    transcript: defaultTranscript,
+  },
+  {
+    id: 'c13-t3',
+    source: 'Cambridge IELTS 13 Test 3',
+    book: 'Cambridge 13',
+    testNumber: 3,
+    totalSections: 4,
+    estimatedMinutes: 30,
+    sections: buildSections(
+      [
+        'IELTS13-Tests1-4CD2Track_01.mp3',
+        'IELTS13-Tests1-4CD2Track_02.mp3',
+        'IELTS13-Tests1-4CD2Track_03.mp3',
+        'IELTS13-Tests1-4CD2Track_04.mp3',
+      ],
+      'c13-t3'
+    ),
+    transcript: defaultTranscript,
+  },
+  {
+    id: 'c13-t4',
+    source: 'Cambridge IELTS 13 Test 4',
+    book: 'Cambridge 13',
+    testNumber: 4,
+    totalSections: 4,
+    estimatedMinutes: 30,
+    sections: buildSections(
+      [
+        'IELTS13-Tests1-4CD2Track_05.mp3',
+        'IELTS13-Tests1-4CD2Track_06.mp3',
+        'IELTS13-Tests1-4CD2Track_07.mp3',
+        'IELTS13-Tests1-4CD2Track_08.mp3',
+      ],
+      'c13-t4'
+    ),
+    transcript: defaultTranscript,
+  },
 ];
