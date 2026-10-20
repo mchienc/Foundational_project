@@ -9,6 +9,7 @@ const fs = require('fs');
 
 const authRoutes = require('./routes/api/authRoutes');
 const cambridgeRoutes = require('./routes/api/cambridgeRoutes');
+const adminRoutes = require('./routes/api/adminRoutes');
 
 const app = express();
 
@@ -51,6 +52,7 @@ if (fs.existsSync(frontendDist)) {
 // ----- RESTful API -----
 app.use('/api/auth', authRoutes);
 app.use('/api/cambridge', cambridgeRoutes);
+app.use('/api/admin', adminRoutes);
 
 // ----- SPA Fallback cho React Frontend -----
 if (fs.existsSync(frontendDist)) {
