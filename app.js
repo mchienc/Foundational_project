@@ -39,9 +39,8 @@ app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public'))); // phục vụ file css/js/ảnh tĩnh
 // Phục vụ file âm thanh: Tự động redirect sang CDN nếu có cấu hình R2_PUBLIC_URL
 app.use('/audio', (req, res, next) => {
-  if (process.env.R2_PUBLIC_URL) {
-    return res.redirect(`${process.env.R2_PUBLIC_URL.replace(/\/$/, '')}${req.url}`);
-  }
+  const cdnBase = process.env.R2_PUBLIC_URL || 'https://pub-4dafa50b652e4874b46d808673d49f67.r2.dev';
+  return res.redirect(`${cdnBase.replace(/\/$/, '')}${req.url}`);
   next();
 }, express.static(path.join(__dirname, 'audio')));
 app.use(methodOverride('_method')); // cho phép dùng PUT/DELETE trong form HTML

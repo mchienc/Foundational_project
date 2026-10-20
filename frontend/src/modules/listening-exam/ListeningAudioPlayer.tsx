@@ -12,7 +12,7 @@ interface ListeningAudioPlayerProps {
   sectionTitle: string;
 }
 
-const AUDIO_BASE_URL = (import.meta as any).env?.VITE_AUDIO_URL || ((import.meta as any).env?.DEV ? 'http://localhost:3000/audio/' : '/audio/');
+const AUDIO_BASE_URL = (import.meta as any).env?.VITE_AUDIO_URL || 'https://pub-4dafa50b652e4874b46d808673d49f67.r2.dev/';
 
 export const ListeningAudioPlayer: React.FC<ListeningAudioPlayerProps> = ({
   audioFile,
@@ -91,7 +91,7 @@ export const ListeningAudioPlayer: React.FC<ListeningAudioPlayerProps> = ({
     <div className="bg-white border border-stone-200 rounded-2xl p-4 flex items-center gap-6 shadow-sm font-sans w-full max-w-5xl mx-auto">
       <audio
         ref={audioRef}
-        src={`${AUDIO_BASE_URL}${audioFile}`}
+        src={`${AUDIO_BASE_URL.replace(/\/$/, "")}/${encodeURIComponent(audioFile)}`}
         onEnded={onEnded}
         onTimeUpdate={handleTimeUpdate}
         onLoadedMetadata={handleLoadedMetadata}
