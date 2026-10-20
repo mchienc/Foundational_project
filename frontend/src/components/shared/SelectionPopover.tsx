@@ -1,5 +1,5 @@
-import React, { useState, useRef } from 'react';
-import { Bookmark, Check, X, Sparkles } from 'lucide-react';
+import React, { useState, useRef, useEffect } from 'react';
+import { Bookmark, Check, X, Sparkles, Loader2, BookOpen } from 'lucide-react';
 import { AudioPlayButton } from './AudioPlayButton';
 import { useAnki } from '../../context/AnkiContext';
 import gsap from 'gsap';
@@ -14,6 +14,13 @@ interface SelectionPopoverProps {
   onNotify?: (message: string, type?: 'success' | 'info' | 'error') => void;
 }
 
+interface LookupResult {
+  ipa: string;
+  pos: string;
+  definitionEn: string;
+  definitionVi: string;
+}
+
 export const SelectionPopover: React.FC<SelectionPopoverProps> = ({
   selectedText,
   contextSentence,
@@ -23,37 +30,111 @@ export const SelectionPopover: React.FC<SelectionPopoverProps> = ({
   onNotify,
 }) => {
   const { addCardToPersonalDeck, isWordSavedInAnki } = useAnki();
-  const [isSaved, setIsSaved] = useState<boolean>(() => isWordSavedInAnki(selectedText));
+  const cleanWord = selectedText
+    .trim()
+    .replace(/^[.,/#!$%^&*;:{}=\-_`~()?"'“”]+|[.,/#!$%^&*;:{}=\-_`~()?"'“”]+$/g, '');
+
+  const [isSaved, setIsSaved] = useState<boolean>(() => isWordSavedInAnki(cleanWord));
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [lookup, setLookup] = useState<LookupResult>({
+    ipa: '',
+    pos: 'academic',
+    definitionEn: '',
+    definitionVi: '',
+  });
+
   const popoverRef = useRef<HTMLDivElement>(null);
 
-  // Hiệu ứng mở popover đàn hồi mượt mà bằng GSAP
   useGSAP(
     () => {
       if (popoverRef.current) {
         gsap.fromTo(
           popoverRef.current,
-          { scale: 0.9, autoAlpha: 0, y: 8 },
-          { scale: 1, autoAlpha: 1, y: 0, duration: 0.25, ease: 'back.out(1.5)', force3D: true }
+          { scale: 0.92, autoAlpha: 0, y: 8 },
+          { scale: 1, autoAlpha: 1, y: 0, duration: 0.22, ease: 'back.out(1.5)', force3D: true }
         );
       }
     },
     { scope: popoverRef }
   );
 
-  const cleanWord = selectedText.trim().replace(/^[.,/#!$%^&*;:{}=\-_`~()?"'“”]+|[.,/#!$%^&*;:{}=\-_`~()?"'“”]+$/g, '');
+  // Live Dictionary Lookup (Free Dictionary API + Vietnamese Translation API)
+  useEffect(() => {
+    let isMounted = true;
+    if (!cleanWord) return;
+
+    setIsLoading(true);
+    setIsSaved(isWordSavedInAnki(cleanWord));
+
+    const singleWord = cleanWord.split(/\s+/)[0].toLowerCase();
+
+    const fetchDict = fetch(
+      `https://api.dictionaryapi.dev/api/v2/entries/en/${encodeURIComponent(singleWord)}`
+    )
+      .then((r) => (r.ok ? r.json() : null))
+      .catch(() => null);
+
+    const fetchVi = fetch(
+      `https://api.mymemory.translated.net/get?q=${encodeURIComponent(cleanWord)}&langpair=en|vi`
+    )
+      .then((r) => (r.ok ? r.json() : null))
+      .catch(() => null);
+
+    Promise.all([fetchDict, fetchVi]).then(([dictData, viData]) => {
+      if (!isMounted) return;
+
+      let ipa = '';
+      let pos = 'vocab';
+      let definitionEn = '';
+      let definitionVi = '';
+
+      if (Array.isArray(dictData) && dictData[0]) {
+        const entry = dictData[0];
+        ipa =
+          entry.phonetic ||
+          entry.phonetics?.find((p: any) => p.text)?.text ||
+          '';
+        const firstMeaning = entry.meanings?.[0];
+        if (firstMeaning) {
+          pos = firstMeaning.partOfSpeech || 'vocab';
+          definitionEn = firstMeaning.definitions?.[0]?.definition || '';
+        }
+      }
+
+      if (viData?.responseData?.translatedText) {
+        definitionVi = viData.responseData.translatedText;
+      }
+
+      setLookup({
+        ipa: ipa || `/${singleWord}/`,
+        pos,
+        definitionEn:
+          definitionEn || `Academic term encountered in ${source}.`,
+        definitionVi:
+          definitionVi || `Từ vựng học thuật trong ${source}`,
+      });
+      setIsLoading(false);
+    });
+
+    return () => {
+      isMounted = false;
+    };
+  }, [cleanWord, source, isWordSavedInAnki]);
 
   const handleSaveToAnki = () => {
     const success = addCardToPersonalDeck({
       word: cleanWord,
-      definitionVi: `Từ vựng học thuật tra cứu trong ${source}`,
-      definitionEn: cleanWord,
+      ipa: lookup.ipa,
+      pos: lookup.pos,
+      definitionVi: lookup.definitionVi || `Từ vựng học thuật tra cứu trong ${source}`,
+      definitionEn: lookup.definitionEn || cleanWord,
       contextSentence: contextSentence || `... ${cleanWord} ...`,
       source,
     });
 
     if (success) {
       setIsSaved(true);
-      onNotify?.(`Đã lưu "${cleanWord}" vào Deck Cá Nhân trong Anki Flashcard!`, 'success');
+      onNotify?.(`Đã lưu "${cleanWord}" (${lookup.definitionVi}) vào Deck Anki!`, 'success');
     } else {
       setIsSaved(true);
       onNotify?.(`"${cleanWord}" đã có sẵn trong Deck của bạn.`, 'info');
@@ -65,17 +146,17 @@ export const SelectionPopover: React.FC<SelectionPopoverProps> = ({
       ref={popoverRef}
       style={{
         position: 'fixed',
-        left: `${Math.min(Math.max(position.x - 140, 16), window.innerWidth - 320)}px`,
-        top: `${Math.max(position.y - 120, 70)}px`,
+        left: `${Math.min(Math.max(position.x - 160, 16), window.innerWidth - 340)}px`,
+        top: `${Math.max(position.y - 190, 70)}px`,
         zIndex: 50,
       }}
-      className="w-72 bg-white rounded-2xl shadow-xl border border-stone-300 p-3.5 space-y-2.5 text-stone-900 will-change-transform"
+      className="w-80 bg-white rounded-2xl shadow-2xl border border-stone-300 p-4 space-y-3 text-stone-900 will-change-transform"
     >
       {/* Header */}
       <div className="flex items-center justify-between border-b border-stone-200 pb-2">
-        <div className="flex items-center gap-1.5 text-xs text-amber-800 font-mono font-bold uppercase">
-          <Sparkles size={13} className="text-amber-600" />
-          <span>Tra Cứu Nhanh</span>
+        <div className="flex items-center gap-1.5 text-xs text-[#064E3B] font-mono font-bold uppercase">
+          <BookOpen size={13} className="text-amber-600" />
+          <span>Từ Điển Học Thuật Anh–Việt</span>
         </div>
         <button
           onClick={onClose}
@@ -85,19 +166,48 @@ export const SelectionPopover: React.FC<SelectionPopoverProps> = ({
         </button>
       </div>
 
-      {/* Word & Pronounce */}
-      <div className="flex items-center justify-between gap-2">
-        <div>
-          <h4 className="text-base font-bold font-sans text-[#064E3B] leading-tight">
-            {cleanWord}
-          </h4>
-          <span className="text-[11px] font-mono text-stone-500">
-            Học thuật Cambridge
-          </span>
+      {/* Word, IPA, POS & Pronounce */}
+      <div className="flex items-start justify-between gap-2">
+        <div className="min-w-0">
+          <div className="flex items-center gap-2 flex-wrap">
+            <h4 className="text-base font-bold font-serif text-[#064E3B] leading-tight">
+              {cleanWord}
+            </h4>
+            {lookup.pos && (
+              <span className="px-1.5 py-0.5 rounded bg-amber-100 text-amber-900 text-[10px] font-mono font-bold">
+                {lookup.pos}
+              </span>
+            )}
+          </div>
+          {lookup.ipa && (
+            <span className="text-xs font-mono text-stone-500 block mt-0.5">
+              {lookup.ipa}
+            </span>
+          )}
         </div>
 
         <AudioPlayButton text={cleanWord} variant="icon" />
       </div>
+
+      {/* Meaning Section */}
+      {isLoading ? (
+        <div className="flex items-center gap-2 py-2 text-xs text-stone-500 font-sans">
+          <Loader2 size={14} className="animate-spin text-[#064E3B]" />
+          <span>Đang tra nghĩa tiếng Việt &amp; phiên âm...</span>
+        </div>
+      ) : (
+        <div className="space-y-1.5 bg-[#FAFAF9] p-2.5 rounded-xl border border-stone-200/80">
+          <div className="text-xs font-sans font-bold text-emerald-900 flex items-start gap-1.5">
+            <Sparkles size={13} className="text-amber-600 shrink-0 mt-0.5" />
+            <span>{lookup.definitionVi}</span>
+          </div>
+          {lookup.definitionEn && (
+            <p className="text-[11px] font-sans text-stone-600 leading-relaxed line-clamp-2">
+              {lookup.definitionEn}
+            </p>
+          )}
+        </div>
+      )}
 
       {/* Context Sentence Preview */}
       {contextSentence && (
@@ -124,11 +234,10 @@ export const SelectionPopover: React.FC<SelectionPopoverProps> = ({
         ) : (
           <>
             <Bookmark size={14} className="text-amber-400" />
-            <span>Lưu vào Deck Anki</span>
+            <span>Lưu từ này vào Anki SRS</span>
           </>
         )}
       </button>
     </div>
   );
 };
-

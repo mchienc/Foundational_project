@@ -120,8 +120,13 @@ export const ReadingTestRoom: React.FC<ReadingTestRoomProps> = ({
     return passage.targetWords;
   }, [isFullTest, allPassages, passage]);
 
-  // Mode: 'exam' (real test mode with final submission) vs 'practice' (instant feedback)
-  const [testMode, setTestMode] = useState<'exam' | 'practice'>('exam');
+  // Mode: 'exam' (real test mode with final submission) vs 'practice' (instant feedback & untimed dictionary)
+  const [testMode, setTestMode] = useState<'exam' | 'practice'>(
+    sessionConfig?.practiceMode || 'practice'
+  );
+  const [isUntimed, setIsUntimed] = useState<boolean>(
+    sessionConfig?.untimed ?? (sessionConfig?.practiceMode !== 'exam')
+  );
 
   // Right column active tab
   const [activeTab, setActiveTab] = useState<'questions' | 'vocabulary'>('questions');
@@ -248,12 +253,12 @@ export const ReadingTestRoom: React.FC<ReadingTestRoomProps> = ({
 
   // Timer effect
   useEffect(() => {
-    if (!isTimerRunning || isSubmitted) return;
+    if (!isTimerRunning || isSubmitted || isUntimed) return;
     const interval = setInterval(() => {
       setSecondsRemaining((prev) => (prev > 0 ? prev - 1 : 0));
     }, 1000);
     return () => clearInterval(interval);
-  }, [isTimerRunning, isSubmitted]);
+  }, [isTimerRunning, isSubmitted, isUntimed]);
 
   const formatTimer = (secs: number) => {
     const m = Math.floor(secs / 60);
@@ -502,37 +507,104 @@ export const ReadingTestRoom: React.FC<ReadingTestRoomProps> = ({
             {/* Mode Switcher */}
             <div className="hidden sm:inline-flex items-center rounded-xl border border-stone-300 bg-stone-100 p-0.5 text-xs font-sans font-bold">
               <button
-                onClick={() => setTestMode('exam')}
-                className={`px-3 py-1 rounded-lg transition-colors cursor-pointer ${
-                  testMode === 'exam'
-                    ? 'bg-[#064E3B] text-amber-300 shadow-xs'
-                    : 'text-stone-600 hover:text-stone-900'
-                }`}
-              >
-                Thi Thử (Exam)
-              </button>
-              <button
-                onClick={() => setTestMode('practice')}
+                onClick={() => {
+                  setTestMode('practice');
+                  setIsUntimed(true);
+                }}
                 className={`px-3 py-1 rounded-lg transition-colors cursor-pointer ${
                   testMode === 'practice'
                     ? 'bg-[#064E3B] text-amber-300 shadow-xs'
                     : 'text-stone-600 hover:text-stone-900'
                 }`}
               >
-                Luyện Tập
+                Luyện Tập &amp; Tra Từ
+              </button>
+              <button
+                onClick={() => {
+                  setTestMode('exam');
+                  setIsUntimed(false);
+                  setIsTimerRunning(true);
+                }}
+                className={`px-3 py-1 rounded-lg transition-colors cursor-pointer ${
+                  testMode === 'exam'
+                    ? 'bg-[#064E3B] text-amber-300 shadow-xs'
+                    : 'text-stone-600 hover:text-stone-900'
+                }`}
+              >
+                Tính Giờ (Timed)
               </button>
             </div>
 
-            {/* Timer */}
-            <button
-              onClick={() => setIsTimerRunning((prev) => !prev)}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-stone-100 hover:bg-stone-200 border border-stone-300 text-xs font-mono font-bold text-stone-800 cursor-pointer transition-colors"
-              title={isTimerRunning ? 'Bấm để tạm dừng đếm giờ' : 'Bấm để tiếp tục đếm giờ'}
-            >
-              <Clock size={14} className={secondsRemaining < 300 ? 'text-red-600 animate-pulse' : 'text-amber-700'} />
-              <span>{formatTimer(secondsRemaining)}</span>
-              <span className="text-[9px] text-stone-400 font-sans">{isTimerRunning ? 'Chạy' : 'Dừng'}</span>
-            </button>
+            {/* Check All Answers Button in Practice Mode */}
+            {testMode === 'practice' && (
+              <button
+                onClick={() => {
+                  const currentQs = currentPassage.questions || [];
+                  const allChecked = currentQs.every((q) => checkedQuestions[q.id]);
+                  if (allChecked) {
+                    setCheckedQuestions({});
+                  } else {
+                    const next: Record<string, boolean> = { ...checkedQuestions };
+                    currentQs.forEach((q) => {
+                      next[q.id] = true;
+                    });
+                    setCheckedQuestions(next);
+                  }
+                }}
+                className="hidden md:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-[#064E3B] border border-emerald-300 text-xs font-sans font-bold cursor-pointer transition-colors"
+                title="Hiện hoặc ẩn toàn bộ đáp án & giải thích của Passage này"
+              >
+                <Sparkles size={13} className="text-amber-600" />
+                <span>
+                  {(currentPassage.questions || []).every((q) => checkedQuestions[q.id])
+                    ? 'Ẩn Đáp Án'
+                    : 'Hiện Đáp Án Ngay'}
+                </span>
+              </button>
+            )}
+
+            {/* Timer / Untimed Toggle */}
+            {isUntimed ? (
+              <button
+                onClick={() => {
+                  setIsUntimed(false);
+                  setIsTimerRunning(true);
+                }}
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-50 hover:bg-amber-100 border border-amber-300 text-xs font-mono font-bold text-amber-900 cursor-pointer transition-colors"
+                title="Đang ở chế độ Không giới hạn thời gian. Bấm để bật đồng hồ bấm giờ."
+              >
+                <Clock size={14} className="text-amber-700" />
+                <span>∞ Không giới hạn</span>
+              </button>
+            ) : (
+              <div className="inline-flex items-center gap-1">
+                <button
+                  onClick={() => setIsTimerRunning((prev) => !prev)}
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-stone-100 hover:bg-stone-200 border border-stone-300 text-xs font-mono font-bold text-stone-800 cursor-pointer transition-colors"
+                  title={isTimerRunning ? 'Bấm để tạm dừng đếm giờ' : 'Bấm để tiếp tục đếm giờ'}
+                >
+                  <Clock
+                    size={14}
+                    className={
+                      secondsRemaining < 300 ? 'text-red-600 animate-pulse' : 'text-amber-700'
+                    }
+                  />
+                  <span>{formatTimer(secondsRemaining)}</span>
+                  <span className="text-[9px] text-stone-400 font-sans">
+                    {isTimerRunning ? 'Chạy' : 'Dừng'}
+                  </span>
+                </button>
+                {testMode === 'practice' && (
+                  <button
+                    onClick={() => setIsUntimed(true)}
+                    className="px-2 py-1.5 rounded-xl bg-stone-100 hover:bg-stone-200 border border-stone-300 text-[10px] font-mono text-stone-600 cursor-pointer"
+                    title="Tắt giới hạn thời gian"
+                  >
+                    Tắt giờ
+                  </button>
+                )}
+              </div>
+            )}
 
             {/* Font Size Selector */}
             <div className="hidden sm:inline-flex items-center rounded-xl border border-stone-300 bg-white p-0.5 text-xs font-mono">
@@ -641,12 +713,16 @@ export const ReadingTestRoom: React.FC<ReadingTestRoomProps> = ({
                 {currentPassage.subtitle}
               </p>
             )}
-            <div className="flex items-center gap-2 pt-1 text-[11px] font-mono text-stone-500">
-              <span>{currentPassage.wordCount} từ</span>
-              <span>•</span>
-              <span className="text-amber-800 font-semibold">
-                Mẹo: Bôi đen từ/cụm từ bất kỳ để tra cứu và lưu nhanh vào Anki
+            <div className="flex flex-wrap items-center gap-2 pt-2">
+              <span className="px-2.5 py-1 rounded-lg bg-stone-100 border border-stone-200 text-[11px] font-mono text-stone-700">
+                {currentPassage.wordCount} từ
               </span>
+              <div className="flex items-center gap-1.5 px-3 py-1 rounded-lg bg-amber-50 border border-amber-300/80 text-amber-950 text-xs font-sans font-semibold">
+                <Sparkles size={13} className="text-amber-600 shrink-0" />
+                <span>
+                  Hỗ trợ Tra Từ: Quét chọn bất kỳ từ mới nào trong bài đọc để xem nghĩa tiếng Việt, phiên âm IPA &amp; lưu vào Anki
+                </span>
+              </div>
             </div>
           </div>
 

@@ -225,6 +225,8 @@ export interface ReadingSessionConfig {
   passageIds?: string[];
   testTitle: string;
   passageNumber?: 1 | 2 | 3;
+  practiceMode?: 'exam' | 'practice';
+  untimed?: boolean;
 }
 
 // ================= IELTS on Computer & Mistake Vault Types ================= //
