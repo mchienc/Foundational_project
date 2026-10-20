@@ -23,7 +23,6 @@ import { AnkiFlashcardPlayer } from './modules/anki/AnkiFlashcardPlayer';
 import { WritingTask1Studio } from './modules/writing/WritingTask1Studio';
 import { SpeakingMockRoom } from './modules/speaking/SpeakingMockRoom';
 import { AcademicLandingPage } from './components/marketing/AcademicLandingPage';
-import { englishApi } from './services/englishApi';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { VocabularyVaultProvider } from './context/VocabularyVaultContext';
 import { AnkiProvider } from './context/AnkiContext';
@@ -168,31 +167,6 @@ const AppContent: React.FC = () => {
       addToast(cleanMsg, 'success');
     }
   };
-
-  // Sync user learning stats from MySQL Database
-  useEffect(() => {
-    if (!user) return;
-
-    let isMounted = true;
-    const userId = 3; // Minh Chiến Đặng
-    englishApi
-      .getUserStats(userId)
-      .then((dbStats) => {
-        if (isMounted && dbStats) {
-          if (dbStats.streak_days) {
-            setStats((prev) => ({
-              ...prev,
-              streakDays: dbStats.streak_days,
-            }));
-          }
-        }
-      })
-      .catch((err) => console.warn('Could not sync user stats from MySQL:', err));
-
-    return () => {
-      isMounted = false;
-    };
-  }, [user]);
 
   // Protected screens requiring authentication
   const protectedScreens: Screen[] = [

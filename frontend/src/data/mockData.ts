@@ -1,4 +1,4 @@
-import { Course, UserStats, QnAComment, LessonNote } from '../types';
+import { Course, UserStats } from '../types';
 
 export const initialUserStats: UserStats = {
   streakDays: 14,
@@ -177,38 +177,3 @@ export const sampleCourses: Course[] = [
     modules: [],
   },
 ];
-
-export const sampleQnAComments: QnAComment[] = [
-  {
-    id: 'qna-1',
-    author: 'Trần Minh Hoàng',
-    role: 'student',
-    avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&auto=format&fit=crop&q=80',
-    content: 'Thầy cho em hỏi khi phát âm từ "resilient", trọng âm rơi vào âm tiết thứ hai có đúng không ạ?',
-    createdAt: '2 giờ trước',
-    likes: 4,
-  },
-  {
-    id: 'qna-2',
-    author: 'Dr. Sarah Jenkins',
-    role: 'instructor',
-    avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80',
-    content: 'Chính xác em nhé! Trọng âm chính rơi vào âm tiết thứ hai: /rɪˈzɪl.jənt/. Em hãy chú ý âm /z/ rung mạnh trong cổ họng nhé!',
-    createdAt: '1 giờ trước',
-    likes: 7,
-  },
-];
-
-export const sampleNotes: LessonNote[] = [
-  {
-    id: 'note-1',
-    lessonId: 'les-ielts-1',
-    timestamp: '03:45',
-    content: 'Collocation quan trọng: "remain resilient in the face of adversity" (giữ vững kiên cường trước nghịch cảnh).',
-    createdAt: 'Hôm nay lúc 09:30',
-  },
-];
-
-export const sampleLessonNotes = sampleNotes;
-export const sampleQnA = sampleQnAComments;
-

@@ -1,24 +1,18 @@
 // app.js
-// File khởi động server: cấu hình middleware, view engine, và gắn các routes.
+// Khởi động Express Server: cung cấp RESTful API và phục vụ React SPA (Production Build)
 
 require('dotenv').config();
 const express = require('express');
 const session = require('express-session');
-const methodOverride = require('method-override');
 const path = require('path');
 const fs = require('fs');
 
-const authRoutes = require('./routes/authRoutes');
-const adminRoutes = require('./routes/adminRoutes');
-const studentRoutes = require('./routes/studentRoutes');
-const quizRoutes = require('./routes/quizRoutes');
-const englishRoutes = require('./routes/api/englishRoutes');
+const authRoutes = require('./routes/api/authRoutes');
 const cambridgeRoutes = require('./routes/api/cambridgeRoutes');
-const { checkAuth, checkAdmin } = require('./middlewares/auth');
 
 const app = express();
 
-// ----- Cấu hình CORS cho Frontend React (http://localhost:5173) -----
+// ----- Cấu hình CORS cho Frontend React -----
 app.use((req, res, next) => {
   res.header('Access-Control-Allow-Origin', '*');
   res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
@@ -29,35 +23,24 @@ app.use((req, res, next) => {
   next();
 });
 
-// ----- Cấu hình view engine (EJS) -----
-app.set('view engine', 'ejs');
-app.set('views', path.join(__dirname, 'views'));
-
 // ----- Middleware -----
-app.use(express.urlencoded({ extended: true })); // đọc dữ liệu từ form (req.body)
+app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
-app.use(express.static(path.join(__dirname, 'public'))); // phục vụ file css/js/ảnh tĩnh
-// Phục vụ file âm thanh: Tự động redirect sang CDN nếu có cấu hình R2_PUBLIC_URL
-app.use('/audio', (req, res, next) => {
+
+// Phục vụ file âm thanh: Tự động redirect sang Cloudflare R2 CDN
+app.use('/audio', (req, res) => {
   const cdnBase = process.env.R2_PUBLIC_URL || 'https://pub-4dafa50b652e4874b46d808673d49f67.r2.dev';
   return res.redirect(`${cdnBase.replace(/\/$/, '')}${req.url}`);
-  next();
-}, express.static(path.join(__dirname, 'audio')));
-app.use(methodOverride('_method')); // cho phép dùng PUT/DELETE trong form HTML
-
-app.use(session({
-  secret: process.env.SESSION_SECRET,
-  resave: false,
-  saveUninitialized: false,
-  cookie: { maxAge: 1000 * 60 * 60 * 2 } // session sống 2 tiếng
-}));
-
-// Biến này giúp mọi view (EJS) đều truy cập được thông tin user đang đăng nhập
-// mà không cần truyền tay ở từng route (ví dụ để hiển thị tên trên header).
-app.use((req, res, next) => {
-  res.locals.currentUser = req.session.user || null;
-  next();
 });
+
+app.use(
+  session({
+    secret: process.env.SESSION_SECRET || 'eduflow-academic-secret-key',
+    resave: false,
+    saveUninitialized: false,
+    cookie: { maxAge: 1000 * 60 * 60 * 2 },
+  })
+);
 
 // ----- Phục vụ Frontend React (Production SPA Build) -----
 const frontendDist = path.join(__dirname, 'frontend', 'dist');
@@ -65,33 +48,19 @@ if (fs.existsSync(frontendDist)) {
   app.use(express.static(frontendDist));
 }
 
-// ----- RESTful API cho Hệ thống Học Tiếng Anh (React Frontend) -----
-app.use('/api/auth', require('./routes/api/authRoutes'));
-app.use('/api/english', englishRoutes);
+// ----- RESTful API -----
+app.use('/api/auth', authRoutes);
 app.use('/api/cambridge', cambridgeRoutes);
 
-app.use('/', authRoutes); // /login, /register, /logout
-
-// Toàn bộ trang phía học viên (xem khóa học, đăng ký, học bài) nằm trong studentRoutes
-app.use('/', checkAuth, studentRoutes);
-
-// Toàn bộ trang làm bài kiểm tra, xem kết quả, lịch sử
-app.use('/', checkAuth, quizRoutes);
-
-// Toàn bộ route quản lý khóa học/bài học nằm dưới /admin/*
-// và đều yêu cầu đã đăng nhập (checkAuth) + phải là admin (checkAdmin)
-app.use('/admin', checkAuth, checkAdmin, adminRoutes);
- 
 // ----- SPA Fallback cho React Frontend -----
 if (fs.existsSync(frontendDist)) {
   app.get('*', (req, res, next) => {
-    if (req.path.startsWith('/api') || req.path.startsWith('/audio') || req.path.startsWith('/admin')) {
+    if (req.path.startsWith('/api') || req.path.startsWith('/audio')) {
       return next();
     }
     res.sendFile(path.join(frontendDist, 'index.html'));
   });
 } else {
-  // Ở môi trường dev khi chưa build dist, chuyển hướng sang http://localhost:5173
   app.get('/', (req, res) => res.redirect('http://localhost:5173'));
 }
 

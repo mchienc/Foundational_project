@@ -66,55 +66,6 @@ export interface UserStats {
   averageScore: number;
 }
 
-export interface QnAComment {
-  id: string;
-  author: string;
-  role: 'student' | 'instructor';
-  avatar: string;
-  content: string;
-  createdAt: string;
-  likes: number;
-}
-
-export interface LessonNote {
-  id: string;
-  lessonId: string;
-  timestamp: string;
-  content: string;
-  createdAt: string;
-}
-
-export interface QuizOption {
-  id: string;
-  text: string;
-  isCorrect: boolean;
-}
-
-export interface QuizQuestion {
-  id: string;
-  questionText: string;
-  options: QuizOption[];
-  explanation?: string;
-}
-
-export interface Quiz {
-  id: string;
-  courseId: string;
-  lessonId: string;
-  title: string;
-  durationMinutes: number;
-  questions: QuizQuestion[];
-}
-
-export interface QuizResult {
-  score: number; // out of 10
-  correctCount: number;
-  totalQuestions: number;
-  passed: boolean;
-  userAnswers: Record<string, string>; // questionId -> optionId
-  takenAt: string;
-}
-
 export type Screen =
   | 'landing'
   | 'reading'
@@ -126,193 +77,15 @@ export type Screen =
   | 'listening-exam'
   | 'listening-review'
   | 'anki'
-  | 'library'
-  | 'reader'
-  | 'vault'
-  | 'dashboard'
   | 'profile'
   | 'admin'
-  | 'leaderboard'
-  | 'vocab-srs'
   | 'speaking'
-  | 'sentence-builder'
   | 'writing';
 
 export interface ToastMessage {
   id: string;
   type: 'success' | 'error' | 'info';
   message: string;
-}
-
-// ================= English Learning Specialized Types ================= //
-
-export type SrsRating = 'again' | 'hard' | 'good' | 'easy';
-
-export interface Flashcard {
-  id: string;
-  word: string;
-  partOfSpeech: string;
-  ipaUk: string;
-  ipaUs: string;
-  image: string;
-  meaningEn: string;
-  meaningVi: string;
-  examples: { en: string; vi: string }[];
-  collocations: string[];
-  srsStage: 'new' | 'learning' | 'review' | 'mastered';
-  streak: number;
-}
-
-export interface PhonemeBreakdown {
-  phoneme: string;
-  score: number; // 0 - 100
-}
-
-export interface WordPronunciation {
-  word: string;
-  ipa: string;
-  score: number; // 0 - 100
-  phonemes?: PhonemeBreakdown[];
-}
-
-export interface SpeakingLesson {
-  id: string;
-  title: string;
-  category: string;
-  targetSentence: string;
-  ipaFull: string;
-  translationVi: string;
-  difficulty: 'Easy' | 'Medium' | 'Hard';
-  words: WordPronunciation[];
-  tipsVi: string;
-  audioDurationSeconds: number;
-}
-
-export interface DictationBlank {
-  wordIndex: number;
-  correctWord: string;
-  hint?: string;
-}
-
-export interface TranscriptSegment {
-  id: string;
-  startMs: number;
-  endMs: number;
-  speaker: string;
-  textEn: string;
-  textVi: string;
-  dictationBlanks?: DictationBlank[];
-}
-
-export interface ListeningLesson {
-  id: string;
-  title: string;
-  topic: string;
-  speakerName: string;
-  speakerRole: string;
-  level: string;
-  audioDurationMs: number;
-  segments: TranscriptSegment[];
-}
-
-export interface SentenceBuilderWord {
-  id: string;
-  text: string;
-}
-
-export interface SentenceBuilderItem {
-  id: string;
-  targetSentenceVi: string;
-  targetSentenceEn: string;
-  correctWords: string[];
-  shuffledWords: SentenceBuilderWord[];
-  explanationVi: string;
-  grammarTopic: string;
-  points: number;
-}
-
-export interface LeaderboardItem {
-  rank: number;
-  id: string;
-  name: string;
-  avatar: string;
-  streakDays: number;
-  xpThisWeek: number;
-  league: 'Kim Cương' | 'Bạch Kim' | 'Vàng' | 'Bạc';
-  isCurrentUser?: boolean;
-}
-
-export interface QuickWordLookup {
-  word: string;
-  pos: string;
-  ipa: string;
-  meaningVi: string;
-  meaningEn: string;
-}
-
-export interface WritingPromptIdea {
-  perspective: string;
-  points: string[];
-}
-
-export interface WritingPrompt {
-  id: number;
-  title: string;
-  taskType: 'task_1' | 'task_2' | 'academic_essay';
-  category: string;
-  promptText: string;
-  chartImageUrl?: string | null;
-  targetBand: string;
-  minWords: number;
-  suggestedIdeas: WritingPromptIdea[];
-  sampleBand8Essay?: string;
-}
-
-export interface CollocationSuggestion {
-  matched: string;
-  suggestion: string;
-  reason: string;
-}
-
-export interface WritingEvaluationDetails {
-  wordCount: number;
-  paragraphCount: number;
-  sentenceCount: number;
-  awlWordsUsed: string[];
-  awlRatio: number;
-  cohesiveDevicesFound: string[];
-  collocationSuggestions: CollocationSuggestion[];
-  strengths: string[];
-  improvements: string[];
-}
-
-export interface WritingEvaluationResult {
-  submissionId: number;
-  bandOverall: number;
-  bandTR: number;
-  bandCC: number;
-  bandLR: number;
-  bandGRA: number;
-  cefrLevel: string;
-  xpGained: number;
-  evaluationDetails: WritingEvaluationDetails;
-  sampleBand8Essay?: string;
-}
-
-export interface WritingSubmissionHistory {
-  id: number;
-  promptId: number;
-  promptTitle: string;
-  taskType: string;
-  wordCount: number;
-  timeSpentSeconds: number;
-  bandOverall: number;
-  bandTR: number;
-  bandCC: number;
-  bandLR: number;
-  bandGRA: number;
-  cefrLevel: string;
-  createdAt: string;
 }
 
 // ================= Academic Reading & Vocabulary Vault Types ================= //
@@ -327,44 +100,6 @@ export interface TargetWord {
   collocations: string[];
   contextSentence: string;
   explanation: string;
-}
-
-export interface ReadingQuestion {
-  id: string;
-  question: string;
-  options: string[];
-  correctAnswer: number; // 0, 1, 2, 3
-  explanation: string;
-}
-
-export interface DictationSentence {
-  id: string;
-  sentence: string;
-  translationVi: string;
-  focusWord: string;
-  audioUrl?: string;
-}
-
-export interface Article {
-  id: string;
-  title: string;
-  slug: string;
-  topic: 'Khoa Học' | 'Xã Hội' | 'Kinh Tế';
-  topicColor: string;
-  level: 'B1' | 'B2' | 'C1' | 'C2';
-  levelBadgeColor: string;
-  author: string;
-  authorRole: string;
-  journal: string;
-  publishedDate: string;
-  readTimeMinutes: number;
-  wordCount: number;
-  thumbnail: string;
-  summary: string;
-  contentParagraphs: string[];
-  targetWords: TargetWord[];
-  dictationSentences: DictationSentence[];
-  comprehensionQuestions: ReadingQuestion[];
 }
 
 export interface VocabItem {
@@ -384,9 +119,6 @@ export interface VocabItem {
   reviewCount?: number;
 }
 
-// Backward compatibility alias
-export type SavedWordItem = VocabItem;
-
 // ================= Cambridge IELTS & Anki Platform Types ================= //
 
 export type AnkiRating = 'again' | 'hard' | 'good' | 'easy';
@@ -396,16 +128,16 @@ export interface AnkiCard {
   deckId: string;
   word: string;
   ipa: string;
-  pos: string; // noun, verb, adj, adv, idiom, phrase
+  pos: string;
   definitionEn: string;
   definitionVi: string;
-  clozeSentence: string; // Sentence with "[ ... ]" masking the target word
+  clozeSentence: string;
   fullSentence: string;
-  source: string; // e.g. "Cambridge 18 Test 2"
+  source: string;
   repetitions: number;
-  interval: number; // in days
-  easeFactor: number; // default 2.5
-  nextReviewDate: string; // ISO date string
+  interval: number;
+  easeFactor: number;
+  nextReviewDate: string;
   status: 'new' | 'learning' | 'review' | 'mastered';
   lastReviewedDate?: string;
   createdDate: string;
@@ -426,7 +158,7 @@ export interface AnkiDeck {
 
 export interface CambridgeQuestionOption {
   id: string;
-  label: string; // "A", "B", "C", "D" or "TRUE", "FALSE", "NOT GIVEN"
+  label: string;
   text: string;
 }
 
@@ -434,19 +166,19 @@ export interface CambridgeReadingQuestion {
   id: string;
   number: number;
   type: 'tfng' | 'multiple_choice' | 'summary_completion' | 'matching_info';
-  groupHeader?: string; // e.g. "Questions 1–6"
-  groupInstruction?: string; // e.g. "Do the following statements agree with the information given in Reading Passage 2? In boxes 1–6, choose TRUE, FALSE, or NOT GIVEN."
+  groupHeader?: string;
+  groupInstruction?: string;
   question: string;
   options?: CambridgeQuestionOption[];
   correctAnswer: string;
-  acceptableAnswers?: string[]; // for summary completion / fill-in-blank
+  acceptableAnswers?: string[];
   explanation: string;
-  referenceParagraph: string; // e.g. "Đoạn B"
+  referenceParagraph: string;
 }
 
 export interface CambridgeReadingPassage {
   id: string;
-  source: string; // e.g. "Cambridge 18 Test 2" or "Recent Actual Tests Vol 5"
+  source: string;
   sourceType: 'cambridge' | 'actual_test';
   passageNumber: 1 | 2 | 3;
   title: string;
@@ -467,7 +199,7 @@ export interface ListeningSlice {
   vietnameseMeaning: string;
   hint: string;
   keyVocab: string[];
-  phoneticNotes: string; // e.g. "Linking sound: /t/ in 'part of' -> /pɑːrt əv/"
+  phoneticNotes: string;
   audioStartSeconds?: number;
   audioEndSeconds?: number;
 }
@@ -475,14 +207,14 @@ export interface ListeningSlice {
 export interface CambridgeListeningTest {
   id: string;
   title: string;
-  source: string; // e.g. "Cambridge IELTS 18 Test 4"
+  source: string;
   part: 1 | 2 | 3 | 4;
-  partLabel: string; // e.g. "Part 4: Độc thoại học thuật"
+  partLabel: string;
   topic: string;
   speaker: string;
-  wpm: number; // Words Per Minute
+  wpm: number;
   accent: 'British' | 'American' | 'Australian';
-  phoneticFocus: string; // e.g. "Nối âm /r/, âm đuôi /t, d/, từ vựng C1"
+  phoneticFocus: string;
   totalSentences: number;
   sentences: ListeningSlice[];
 }
@@ -509,7 +241,7 @@ export type MistakeQuestionType =
 export interface MistakeRecord {
   id: string;
   testId: string;
-  source: string; // e.g., "Cambridge 18 - Test 1"
+  source: string;
   passage: 1 | 2 | 3;
   questionNumber: number;
   questionType: MistakeQuestionType;
@@ -518,7 +250,7 @@ export interface MistakeRecord {
   userAnswer: string;
   correctAnswer: string;
   acceptableAnswers?: string[];
-  evidenceSnippet: string; // Trích đoạn đoạn văn chứa bằng chứng
+  evidenceSnippet: string;
   explanation: string;
   status: 'NEEDS_PRACTICE' | 'RESOLVED';
   attemptsCount: number;

@@ -122,9 +122,8 @@ export const Navbar: React.FC<NavbarProps> = ({
           {navLinks.map((link) => {
             const isActive =
               currentScreen === link.id ||
-              (link.id === 'reading' && (currentScreen === 'reading-test' || currentScreen === 'library' || currentScreen === 'reader')) ||
-              (link.id === 'listening' && (currentScreen === 'listening-test' || currentScreen === 'listening-exam' || currentScreen === 'listening-review')) ||
-              (link.id === 'anki' && currentScreen === 'vault');
+              (link.id === 'reading' && currentScreen === 'reading-test') ||
+              (link.id === 'listening' && (currentScreen === 'listening-test' || currentScreen === 'listening-exam' || currentScreen === 'listening-review'));
 
             return (
               <button
@@ -210,7 +209,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                       </button>
                       <button
                         onClick={() => {
-                          onSelectScreen('vault');
+                          onSelectScreen('anki');
                           setShowUserMenu(false);
                         }}
                         className="w-full px-4 py-2 flex items-center gap-2.5 text-stone-700 hover:bg-stone-100 hover:text-forest-950 transition-colors cursor-pointer"

@@ -1,37 +1,28 @@
 {
   "name": "online-learning-website",
   "version": "1.0.0",
-  "description": "Website học trực tuyến hỗ trợ quản lý khóa học và bài kiểm tra",
+  "description": "EduFlow — Nền tảng luyện thi Cambridge IELTS & Anki SRS",
   "main": "app.js",
   "scripts": {
     "start": "node app.js",
     "dev": "concurrently -n \"BACKEND,FRONTEND\" -c \"blue,green\" \"nodemon app.js\" \"npm --prefix frontend run dev\"",
     "client": "npm --prefix frontend run dev",
     "server": "nodemon app.js",
-    "client:dev": "npm --prefix frontend run dev",
     "build": "npm install && (npm --prefix frontend install && npm --prefix frontend run build || echo 'Frontend build skipped, using prebuilt dist')",
     "client:build": "npm --prefix frontend run build",
     "client:preview": "npm --prefix frontend run preview",
     "db:seed:cambridge": "node scripts/seedCambridgeData.js",
-    "db:seed:cam13": "node scripts/seedCambridge13All.js"
+    "db:seed:all": "node scripts/seedAllCambridge.js"
   },
   "dependencies": {
     "bcryptjs": "^3.0.3",
     "dotenv": "^16.4.5",
-    "ejs": "^3.1.10",
     "express": "^4.19.2",
     "express-session": "^1.18.0",
-    "jszip": "^3.10.2",
-    "lucide-react": "^1.44.0",
-    "method-override": "^3.0.0",
-    "mysql2": "^3.10.0",
-    "react-resizable-panels": "^4.12.4",
-    "recharts": "^3.10.1",
-    "sql.js": "^1.14.2",
-    "zustand": "^5.0.15"
+    "mysql2": "^3.10.0"
   },
   "devDependencies": {
-    "@aws-sdk/client-s3": "^3.1153.0",
+    "@aws-sdk/client-s3": "^3.1029.0",
     "concurrently": "^10.0.5",
     "nodemon": "^3.1.4"
   }
