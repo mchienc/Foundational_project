@@ -26,6 +26,9 @@ interface AnkiContextType {
     definitionVi: string;
     contextSentence: string;
     source: string;
+    backExtra?: string;
+    tags?: string;
+    customCloze?: string;
   }) => boolean;
   rateCard: (cardId: string, rating: AnkiRating) => void;
   getDueCardsForDeck: (deckId?: string) => AnkiCard[];
@@ -57,6 +60,9 @@ export const AnkiProvider: React.FC<{ children: React.ReactNode }> = ({ children
     definitionVi: string;
     contextSentence: string;
     source: string;
+    backExtra?: string;
+    tags?: string;
+    customCloze?: string;
   }): boolean => {
     const cleanWord = data.word.trim();
     if (!cleanWord) return false;
@@ -89,8 +95,10 @@ export const AnkiProvider: React.FC<{ children: React.ReactNode }> = ({ children
       pos: data.pos || 'vocabulary',
       definitionEn: data.definitionEn || cleanWord,
       definitionVi: data.definitionVi,
-      clozeSentence,
+      clozeSentence: data.customCloze || clozeSentence,
       fullSentence: data.contextSentence,
+      backExtra: data.backExtra,
+      tags: data.tags,
       source: data.source,
       repetitions: 0,
       interval: 0,

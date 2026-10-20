@@ -14,38 +14,45 @@ export const AnkiExportPanel: React.FC = () => {
     const header = 'Front\tBack\tTags\n';
     
     const rows = savedWords.map((item) => {
-      // Field 1: Front
-      const word = item.word;
-      const sentence = item.contextSentence || '';
-      const wordRegex = new RegExp('\\b' + word + '\\b', 'gi');
-      
-      let front = '';
-      if (wordRegex.test(sentence)) {
-        // Reset lastIndex since we used .test()
-        wordRegex.lastIndex = 0;
-        front = sentence.replace(wordRegex, `{{c1::${word}}}`);
-      } else {
-        front = `{{c1::${word}}} — ${sentence}`;
+      // Field 1: Front (Ưu tiên dùng clozeText từ Gemini 9.0)
+      let front = item.clozeText || '';
+      if (!front) {
+        const word = item.word;
+        const sentence = item.contextSentence || '';
+        const wordRegex = new RegExp('\\b' + word + '\\b', 'gi');
+        
+        if (wordRegex.test(sentence)) {
+          wordRegex.lastIndex = 0;
+          front = sentence.replace(wordRegex, `{{c1::${word}}}`);
+        } else {
+          front = `{{c1::${word}}} — ${sentence}`;
+        }
       }
 
-      // Field 2: Back
-      const ipa = item.ipa ? `[${item.ipa}]` : '';
-      const pos = item.pos || '';
-      const meaning = item.contextMeaning || '';
-      const collocations = item.collocations?.length 
-        ? ` | Collocations: ${item.collocations.join(', ')}` 
-        : '';
-      
-      const backComponents = [ipa, pos, meaning].filter(Boolean);
-      const back = `${backComponents.join(' • ')}${collocations}`;
+      // Field 2: Back Extra (Ưu tiên dùng [BACK EXTRA] từ Gemini 9.0)
+      let back = '';
+      if (item.backExtra) {
+        back = item.backExtra.replace(/\n/g, '<br>');
+      } else {
+        const ipa = item.ipa ? `[${item.ipa}]` : '';
+        const pos = item.pos || '';
+        const meaning = item.contextMeaning || '';
+        const collocations = item.collocations?.length 
+          ? ` | Collocations: ${item.collocations.join(', ')}` 
+          : '';
+        const backComponents = [ipa, pos, meaning].filter(Boolean);
+        back = `${backComponents.join(' • ')}${collocations}`;
+      }
 
       // Field 3: Tags
       const articleTitleTag = (item.sourceArticleTitle || 'EduFlow_Vocab').replace(/\s+/g, '_');
-      const tags = `EduFlow Cambridge IELTS_Band_7 ${articleTitleTag}`;
+      const tags = item.tags 
+        ? `${item.tags} ${articleTitleTag}`.trim()
+        : `EduFlow Cambridge IELTS_Band_7 ${articleTitleTag}`;
 
-      // Escape tabs and newlines in fields just in case
+      // Escape tabs in fields (newlines in Cloze are HTML <br> or spaces)
       const cleanFront = front.replace(/\t/g, ' ').replace(/\n/g, ' ');
-      const cleanBack = back.replace(/\t/g, ' ').replace(/\n/g, ' ');
+      const cleanBack = back.replace(/\t/g, ' ');
       const cleanTags = tags.replace(/\t/g, ' ').replace(/\n/g, ' ');
 
       return `${cleanFront}\t${cleanBack}\t${cleanTags}`;

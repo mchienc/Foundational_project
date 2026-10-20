@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Bookmark, Check, X, Sparkles, Loader2, BookOpen } from 'lucide-react';
 import { AudioPlayButton } from './AudioPlayButton';
 import { useAnki } from '../../context/AnkiContext';
+import { useVocabularyVault } from '../../context/VocabularyVaultContext';
 import gsap from 'gsap';
 import { useGSAP } from '@gsap/react';
 
@@ -42,6 +43,10 @@ export const SelectionPopover: React.FC<SelectionPopoverProps> = ({
     definitionEn: '',
     definitionVi: '',
   });
+
+  const { saveAiGeneratedWord } = useVocabularyVault();
+  const [isGeneratingAi, setIsGeneratingAi] = useState<boolean>(false);
+  const [aiGeneratedSuccess, setAiGeneratedSuccess] = useState<boolean>(false);
 
   const popoverRef = useRef<HTMLDivElement>(null);
 
@@ -120,6 +125,57 @@ export const SelectionPopover: React.FC<SelectionPopoverProps> = ({
       isMounted = false;
     };
   }, [cleanWord, source, isWordSavedInAnki]);
+
+  const handleGenerateAiCloze = async () => {
+    setIsGeneratingAi(true);
+    try {
+      const res = await fetch('/api/anki/generate-cloze', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          word: cleanWord,
+          sentence: contextSentence,
+        }),
+      });
+      const data = await res.json();
+      if (res.ok && data?.success && data?.data) {
+        saveAiGeneratedWord({
+          word: cleanWord,
+          clozeText: data.data.text,
+          backExtra: data.data.backExtra,
+          tags: data.data.tags,
+          contextSentence,
+          sourceArticleTitle: source,
+          ipa: lookup.ipa,
+          pos: lookup.pos,
+          contextMeaning: lookup.definitionVi,
+        });
+
+        addCardToPersonalDeck({
+          word: cleanWord,
+          ipa: lookup.ipa,
+          pos: lookup.pos,
+          definitionVi: lookup.definitionVi,
+          definitionEn: lookup.definitionEn,
+          contextSentence,
+          source,
+          customCloze: data.data.text,
+          backExtra: data.data.backExtra,
+          tags: data.data.tags,
+        });
+
+        setIsSaved(true);
+        setAiGeneratedSuccess(true);
+        onNotify?.(`✨ Đã tạo thẻ Anki Cloze 9.0 cho "${cleanWord}" bằng Gemini AI!`, 'success');
+      } else {
+        handleSaveToAnki();
+      }
+    } catch {
+      handleSaveToAnki();
+    } finally {
+      setIsGeneratingAi(false);
+    }
+  };
 
   const handleSaveToAnki = () => {
     const success = addCardToPersonalDeck({
@@ -216,28 +272,46 @@ export const SelectionPopover: React.FC<SelectionPopoverProps> = ({
         </p>
       )}
 
-      {/* Action Button: Save to Anki */}
-      <button
-        onClick={handleSaveToAnki}
-        disabled={isSaved}
-        className={`w-full py-2 px-3 rounded-xl text-xs font-bold font-sans flex items-center justify-center gap-2 transition-all cursor-pointer shadow-xs ${
-          isSaved
-            ? 'bg-emerald-100 text-emerald-800 border border-emerald-300 cursor-default'
-            : 'bg-[#064E3B] hover:bg-[#022C22] text-amber-300 hover:text-white border border-emerald-800 active:scale-95'
-        }`}
-      >
-        {isSaved ? (
-          <>
-            <Check size={14} className="text-emerald-700" />
-            <span>Đã lưu vào Deck Anki</span>
-          </>
-        ) : (
-          <>
-            <Bookmark size={14} className="text-amber-400" />
-            <span>Lưu từ này vào Anki SRS</span>
-          </>
+      {/* Action Buttons: AI 9.0 Cloze & Fast Save */}
+      <div className="space-y-1.5 pt-1">
+        <button
+          onClick={handleGenerateAiCloze}
+          disabled={isSaved || isGeneratingAi}
+          className={`w-full py-2 px-3 rounded-xl text-xs font-bold font-sans flex items-center justify-center gap-2 transition-all cursor-pointer shadow-xs ${
+            aiGeneratedSuccess
+              ? 'bg-emerald-100 text-emerald-800 border border-emerald-300 cursor-default'
+              : 'bg-[#064E3B] hover:bg-[#022C22] text-amber-300 hover:text-white border border-emerald-800 active:scale-95'
+          }`}
+        >
+          {isGeneratingAi ? (
+            <>
+              <Loader2 size={14} className="animate-spin text-amber-300" />
+              <span>Gemini Đang Tạo Thẻ 9.0...</span>
+            </>
+          ) : aiGeneratedSuccess ? (
+            <>
+              <Check size={14} className="text-emerald-700" />
+              <span>Đã Tạo Thẻ Cloze AI 9.0</span>
+            </>
+          ) : (
+            <>
+              <Sparkles size={14} className="text-amber-300" />
+              <span>✨ Tạo Thẻ Anki Cloze AI 9.0</span>
+            </>
+          )}
+        </button>
+
+        {!aiGeneratedSuccess && (
+          <button
+            onClick={handleSaveToAnki}
+            disabled={isSaved}
+            className="w-full py-1.5 px-3 rounded-xl text-[11px] font-semibold text-stone-600 hover:text-stone-900 hover:bg-stone-100 border border-stone-200 transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
+          >
+            <Bookmark size={12} className="text-stone-400" />
+            <span>{isSaved ? 'Đã lưu trong Deck' : 'Lưu nhanh cơ bản'}</span>
+          </button>
         )}
-      </button>
+      </div>
     </div>
   );
 };

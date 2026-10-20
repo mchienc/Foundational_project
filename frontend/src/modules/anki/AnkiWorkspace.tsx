@@ -14,6 +14,8 @@ import {
 import { useAnki } from '../../context/AnkiContext';
 import { AudioPlayButton } from '../../components/shared/AudioPlayButton';
 import { AnkiExportPanel } from './AnkiExportPanel';
+import { GeminiAnkiCardGenerator } from './GeminiAnkiCardGenerator';
+import { Sparkles } from 'lucide-react';
 
 interface AnkiWorkspaceProps {
   onStartStudy: (deckId?: string) => void;
@@ -30,6 +32,7 @@ export const AnkiWorkspace: React.FC<AnkiWorkspaceProps> = ({
   const [selectedDeckForPreview, setSelectedDeckForPreview] = useState<string>('deck-personal');
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [showExport, setShowExport] = useState<boolean>(false);
+  const [showAiGenerator, setShowAiGenerator] = useState<boolean>(true);
 
   const totalLearningCount = cards.filter((c) => c.status === 'learning' || c.status === 'new').length;
   const totalMasteredCount = cards.filter((c) => c.status === 'mastered').length;
@@ -76,6 +79,17 @@ export const AnkiWorkspace: React.FC<AnkiWorkspaceProps> = ({
         {/* Actions: Study All & Export Anki */}
         <div className="flex flex-wrap items-center gap-3 shrink-0">
           <button
+            onClick={() => setShowAiGenerator(!showAiGenerator)}
+            className={`inline-flex items-center gap-2 px-5 py-3.5 rounded-2xl text-xs sm:text-sm font-bold uppercase tracking-normal transition-all cursor-pointer border ${
+              showAiGenerator
+                ? 'bg-[#064E3B] text-amber-300 border-[#064E3B] shadow-xs'
+                : 'bg-white hover:bg-stone-100 border-stone-200 text-stone-700 shadow-xs'
+            }`}
+          >
+            <Sparkles size={16} className={showAiGenerator ? 'text-amber-300' : 'text-amber-600'} />
+            <span>{showAiGenerator ? 'Ẩn Trình Tạo AI' : '✨ Tạo Thẻ Gemini 9.0'}</span>
+          </button>
+          <button
             onClick={() => setShowExport(!showExport)}
             className={`inline-flex items-center gap-2 px-5 py-3.5 rounded-2xl text-xs sm:text-sm font-bold uppercase tracking-normal transition-all cursor-pointer border ${
               showExport 
@@ -106,6 +120,13 @@ export const AnkiWorkspace: React.FC<AnkiWorkspaceProps> = ({
           )}
         </div>
       </div>
+
+            {/* Gemini Anki Cloze Generator (Conditional) */}
+      {showAiGenerator && (
+        <div className="animate-in fade-in slide-in-from-top-4 duration-300">
+          <GeminiAnkiCardGenerator />
+        </div>
+      )}
 
       {/* Anki Export Panel (Conditional) */}
       {showExport && (

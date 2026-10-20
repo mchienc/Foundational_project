@@ -114,6 +114,9 @@ export interface VocabItem {
   articleId?: string;
   savedAt?: string;
   reviewCount?: number;
+  clozeText?: string;
+  backExtra?: string;
+  tags?: string;
 }
 
 // ================= Cambridge IELTS & Anki Platform Types ================= //
@@ -138,6 +141,8 @@ export interface AnkiCard {
   status: 'new' | 'learning' | 'review' | 'mastered';
   lastReviewedDate?: string;
   createdDate: string;
+  backExtra?: string;
+  tags?: string;
 }
 
 export interface AnkiDeck {

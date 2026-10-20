@@ -10,6 +10,7 @@ const fs = require('fs');
 const authRoutes = require('./routes/api/authRoutes');
 const cambridgeRoutes = require('./routes/api/cambridgeRoutes');
 const adminRoutes = require('./routes/api/adminRoutes');
+const ankiRoutes = require('./routes/api/ankiRoutes');
 
 const app = express();
 
@@ -53,6 +54,7 @@ if (fs.existsSync(frontendDist)) {
 app.use('/api/auth', authRoutes);
 app.use('/api/cambridge', cambridgeRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api/anki', ankiRoutes);
 
 // ----- SPA Fallback cho React Frontend -----
 if (fs.existsSync(frontendDist)) {

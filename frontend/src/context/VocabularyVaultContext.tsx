@@ -4,6 +4,17 @@ import { VocabItem, TargetWord } from '../types';
 interface VocabularyVaultContextType {
   savedWords: VocabItem[];
   saveWord: (word: TargetWord, articleId: string, articleTitle: string) => boolean;
+  saveAiGeneratedWord: (data: {
+    word: string;
+    clozeText: string;
+    backExtra: string;
+    tags: string;
+    contextSentence?: string;
+    sourceArticleTitle?: string;
+    ipa?: string;
+    pos?: string;
+    contextMeaning?: string;
+  }) => boolean;
   removeWord: (id: string) => void;
   updateMastery: (id: string, isCorrect: boolean) => void;
   isWordSaved: (word: string) => boolean;
@@ -154,6 +165,62 @@ export const VocabularyVaultProvider: React.FC<{ children: React.ReactNode }> = 
     return true;
   };
 
+  const saveAiGeneratedWord = (data: {
+    word: string;
+    clozeText: string;
+    backExtra: string;
+    tags: string;
+    contextSentence?: string;
+    sourceArticleTitle?: string;
+    ipa?: string;
+    pos?: string;
+    contextMeaning?: string;
+  }): boolean => {
+    const cleanWord = data.word.trim();
+    if (!cleanWord) return false;
+
+    const existingIndex = savedWords.findIndex(
+      (item) => item.word.toLowerCase().trim() === cleanWord.toLowerCase()
+    );
+
+    if (existingIndex !== -1) {
+      setSavedWords((prev) =>
+        prev.map((item, idx) =>
+          idx === existingIndex
+            ? {
+                ...item,
+                clozeText: data.clozeText,
+                backExtra: data.backExtra,
+                tags: data.tags,
+                contextSentence: data.contextSentence || item.contextSentence,
+              }
+            : item
+        )
+      );
+      return true;
+    }
+
+    const newItem: VocabItem = {
+      id: `ai-vocab-${Date.now()}-${cleanWord.toLowerCase().replace(/\s+/g, '-')}`,
+      word: cleanWord,
+      pos: data.pos || 'academic phrase',
+      ipa: data.ipa || '',
+      contextMeaning: data.contextMeaning || (data.backExtra.split('\n')[0] || ''),
+      contextSentence: data.contextSentence || data.clozeText.replace(/\{\{c1::(.*?)(?:::.*?)?\}\}/g, '$1'),
+      sourceArticleTitle: data.sourceArticleTitle || 'Gemini IELTS 9.0 Coach',
+      srsLevel: 1,
+      nextReviewDate: calculateNextReviewDate(1),
+      savedAt: new Date().toISOString(),
+      reviewCount: 0,
+      clozeText: data.clozeText,
+      backExtra: data.backExtra,
+      tags: data.tags,
+    };
+
+    setSavedWords((prev) => [newItem, ...prev]);
+    return true;
+  };
+
   const removeWord = (id: string) => {
     setSavedWords((prev) => prev.filter((item) => item.id !== id));
   };
@@ -187,6 +254,7 @@ export const VocabularyVaultProvider: React.FC<{ children: React.ReactNode }> = 
       value={{
         savedWords,
         saveWord,
+        saveAiGeneratedWord,
         removeWord,
         updateMastery,
         isWordSaved,
