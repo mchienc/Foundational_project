@@ -24,12 +24,12 @@
 ## 📌 Mục Lục
 
 1. [Giới thiệu tổng quan](#-giới-thiệu-tổng-quan)
-2. [Các tính năng chính có trong hệ thống](#-các-tính-năng-chính-có-trong-hệ-thống)
+2. [Các tính năng chính trong hệ thống](#-các-tính-năng-chính-trong-hệ-thống)
    - [1. Luyện Đề Reading (Cambridge 10–20)](#1-luyện-đề-reading-cambridge-1020)
    - [2. Luyện Đề Listening (Cambridge 13–20)](#2-luyện-đề-listening-cambridge-1320)
    - [3. Chép chính tả Video YouTube](#3-chép-chính-tả-video-youtube)
    - [4. Sổ tay từ vựng & Flashcard Anki](#4-sổ-tay-từ-vựng--flashcard-anki)
-   - [5. Trang cá nhân & Sổ tay câu sai](#5-trang-cá-nhân--sổ-tay-câu-sai)
+   - [5. Trang cá nhân & Quản lý tài khoản](#5-trang-cá-nhân--quản-lý-tài-khoản)
    - [6. Cổng Quản trị Admin](#6-cổng-quản-trị-admin)
 3. [Kiến trúc & Công nghệ (Tech Stack)](#-kiến-trúc--công-nghệ-tech-stack)
 4. [Hệ màu sắc & Giao diện (Design Tokens)](#-hệ-màu-sắc--giao-diện-design-tokens)
@@ -42,15 +42,15 @@
 
 ## 🌟 Giới Thiệu Tổng Quan
 
-**EduFlow** là website học tập và luyện thi IELTS trực tuyến được thiết kế theo phong cách tối giản thanh lịch (Academic Minimalism). Nền tảng tập trung giải quyết 3 nhu cầu luyện thi thực tế của học viên:
+**EduFlow** là website học tập và luyện thi IELTS trực tuyến được thiết kế theo phong cách tối giản thanh lịch (Academic Minimalism), tập trung vào các chức năng thực tế phục vụ trực tiếp cho người học:
 
 1. **Luyện đề thi Cambridge chuẩn thực tế:** Trải nghiệm thi thử Reading và Listening trên máy tính với giao diện mô phỏng phòng thi chuẩn IDP/British Council.
-2. **Luyện nghe ngấm sâu:** Tính năng chép chính tả từng câu qua video YouTube bất kỳ, hỗ trợ phụ đề song ngữ và nhận diện lỗi gõ từ theo thời gian thực.
+2. **Luyện nghe chép chính tả (Dictation):** Luyện nghe từng câu qua video YouTube bất kỳ, hỗ trợ phụ đề song ngữ và nhận diện lỗi gõ từ theo thời gian thực.
 3. **Ghi nhớ từ vựng lâu bền:** Ứng dụng phương pháp ôn tập ngắt quãng (Spaced Repetition) với thẻ Flashcard 3D và hỗ trợ xuất file sang phần mềm Anki.
 
 ---
 
-## 🚀 Các Tính Năng Chính Có Trong Hệ Thống
+## 🚀 Các Tính Năng Chính Trong Hệ Thống
 
 ### 1. Luyện Đề Reading (Cambridge 10–20)
 * **Chế độ phòng thi máy tính (IELTS on Computer Simulator):**
@@ -119,9 +119,14 @@
 
 ---
 
-### 5. Trang cá nhân & Sổ tay câu sai
-* Theo dõi số giờ đã học, điểm Band Score cao nhất, số từ vựng đã lưu và chuỗi ngày học liên tục (Streak).
-* **Sổ tay câu sai (Mistake Vault):** Tự động lưu vết các câu hỏi làm sai từ các bài thi Reading và Listening để học viên ôn tập lại riêng biệt.
+### 5. Trang cá nhân & Quản lý tài khoản
+* Xem thông tin cá nhân và cập nhật Họ tên, Email.
+* Đổi mật khẩu tài khoản trực tiếp trong hệ thống.
+* Theo dõi các chỉ số học tập cá nhân:
+  - Số đề đã luyện
+  - Số bài nghe đã hoàn thành
+  - Số từ vựng Anki đã lưu
+  - Chứng nhận đạt được
 
 ---
 
@@ -139,7 +144,7 @@
 - **Framework:** React 18 (`react`, `react-dom`) với TypeScript
 - **Build Tool:** Vite 5 (tốc độ build và hot-reload nhanh)
 - **Styling:** Tailwind CSS 3 (hệ thống design tokens thanh lịch)
-- **State Management:** Zustand (quản lý trạng thái độc lập cho phòng thi, bài nghe và flashcard)
+- **State Management:** Zustand (quản lý trạng thái cho phòng thi, bài nghe và flashcard)
 - **Layout Panels:** `react-resizable-panels` (chia đôi màn hình bài đọc & câu hỏi)
 - **Icons:** `lucide-react`
 - **Hiệu ứng & Cuộn:** Framer Motion, GSAP, Lenis (smooth scroll cho landing page)
@@ -202,6 +207,7 @@ online-learning-website/
         ├── components/
         │   ├── marketing/         # Hero, Navbar, Footer, Features Scrollytelling
         │   ├── admin/             # Bảng điều khiển quản trị Admin
+        │   ├── profile/           # Trang cá nhân & Tài khoản
         │   └── shared/            # Popup tra từ điển, Toast thông báo
         └── services/              # Kết nối HTTP API (cambridgeApi, englishApi)
 ```
