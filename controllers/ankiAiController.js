@@ -119,10 +119,11 @@ exports.generateAnkiCloze = async (req, res) => {
     // Nếu có API Key, thử gọi danh sách các model Gemini thế hệ mới
     if (apiKey) {
       const candidateModels = [
+        'gemini-flash-lite-latest',
+        'gemini-2.5-flash-lite',
+        'gemini-3.5-flash-lite',
         'gemini-3.5-flash',
         'gemini-3.8-flash',
-        'gemini-flash-latest',
-        'gemini-2.5-pro',
       ];
 
       const userPrompt = `Từ vựng / Cụm từ: ${word || 'Trích xuất từ câu dưới'}\n${
@@ -134,7 +135,7 @@ exports.generateAnkiCloze = async (req, res) => {
           const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
 
           const controller = new AbortController();
-          const timeoutId = setTimeout(() => controller.abort(), 12000);
+          const timeoutId = setTimeout(() => controller.abort(), 8000);
 
           const apiResponse = await fetch(geminiUrl, {
             method: 'POST',
@@ -149,7 +150,7 @@ exports.generateAnkiCloze = async (req, res) => {
               ],
               generationConfig: {
                 temperature: 0.2,
-                maxOutputTokens: 1200,
+                maxOutputTokens: 1000,
               },
             }),
           });
@@ -168,6 +169,8 @@ exports.generateAnkiCloze = async (req, res) => {
                 data: parsed,
               });
             }
+          } else {
+            console.warn(`Model ${model} returned HTTP ${apiResponse.status}, trying next...`);
           }
         } catch (mErr) {
           console.warn(`Model ${model} failed, trying next candidate:`, mErr.message);
