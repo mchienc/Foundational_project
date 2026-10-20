@@ -529,10 +529,10 @@ export const YouTubeFocusRoom: React.FC<YouTubeFocusRoomProps> = ({
   return (
     <div
       data-lenis-prevent="true"
-      className="min-h-screen flex flex-col bg-[#FAFAF9] text-stone-900 font-sans selection:bg-amber-300/50"
+      className="min-h-screen flex flex-col text-stone-900 font-sans selection:bg-amber-300/50"
     >
       {/* 1. STUDIO TOPBAR & PROGRESS */}
-      <header className="sticky top-0 z-30 bg-white border-b border-[#E7E5E4] shadow-2xs">
+      <header className="sticky top-0 z-30 bg-white/85 backdrop-blur-md border-b border-[#E7E5E4] shadow-2xs">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-4">
           {/* Left: Back button & Lesson title */}
           <div className="flex items-center gap-3 min-w-0">

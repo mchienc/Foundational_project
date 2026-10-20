@@ -235,9 +235,9 @@ export const DictationStudioPage: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-[#FAFAF9] text-stone-900 font-sans pb-20">
+    <div className="min-h-screen text-stone-900 font-sans pb-20">
       {/* HERO & CUSTOM YOUTUBE IMPORTER BAR (PHẦN 1 & PHẦN 2) */}
-      <section className="relative bg-white border-b border-[#E7E5E4] overflow-hidden">
+      <section className="relative border-b border-[#E7E5E4]/80 overflow-hidden">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-12">
           <div className="max-w-4xl mx-auto text-center space-y-4">
             <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#064E3B] text-amber-300 text-xs font-mono font-bold uppercase tracking-wider shadow-xs">
