@@ -1,56 +1,86 @@
 // controllers/dictationController.js
-// Bộ trích xuất phụ đề YouTube tự động & phân tích câu học thuật cho Xưởng Chép Chính Tả (/dictation)
+// Bộ trích xuất phụ đề YouTube tự động (InnerTube API) & phân tích câu học thuật cho Xưởng Chép Chính Tả (/dictation)
 
 const { getLiveApiKey } = require('./ankiAiController');
 
-// Giải mã các ký tự HTML entities trong phụ đề YouTube
+// Giải mã các ký tự HTML entities trong phụ đề YouTube (hỗ trợ cả double-escaped entities)
 function decodeHtmlEntities(str = '') {
-  return str
-    .replace(/&amp;/g, '&')
-    .replace(/&lt;/g, '<')
-    .replace(/&gt;/g, '>')
-    .replace(/&quot;/g, '"')
-    .replace(/&#39;/g, "'")
-    .replace(/&apos;/g, "'")
-    .replace(/&#(\d+);/g, (_, dec) => String.fromCharCode(dec))
-    .replace(/\s+/g, ' ')
-    .trim();
+  let decoded = str;
+  for (let pass = 0; pass < 2; pass++) {
+    decoded = decoded
+      .replace(/&amp;/g, '&')
+      .replace(/&lt;/g, '<')
+      .replace(/&gt;/g, '>')
+      .replace(/&quot;/g, '"')
+      .replace(/&#39;/g, "'")
+      .replace(/&apos;/g, "'")
+      .replace(/&#(\d+);/g, (_, dec) => String.fromCharCode(Number(dec)));
+  }
+  return decoded.replace(/\s+/g, ' ').trim();
 }
 
-// Gom các mảnh caption rời rạc của YouTube thành từng câu hoàn chỉnh có start, end hợp lý
+// Gom các mảnh caption rời rạc của YouTube thành từng câu hoàn chỉnh có start, end khớp chính xác với giọng đọc
 function mergeCaptionsIntoSentences(rawSegments) {
   if (!Array.isArray(rawSegments) || rawSegments.length === 0) return [];
+
+  // Chuẩn hóa và chặn tràn thời gian (overlap) sang câu kế tiếp
+  const cleanedSegments = [];
+  for (let i = 0; i < rawSegments.length; i++) {
+    const seg = rawSegments[i];
+    const cleanText = decodeHtmlEntities(seg.text || '')
+      .replace(/\[.*?\]/g, '') // Bỏ [Music], [Applause]
+      .replace(/\((?:Laughter|Applause|Music|Cheering|Sighs|inaudible)[^)]*\)/gi, '')
+      .replace(/♪/g, '')
+      .trim();
+
+    if (!cleanText) continue;
+
+    const start = Number(seg.start);
+    const rawEnd = start + Number(seg.dur || 2.5);
+    const nextSeg = rawSegments[i + 1];
+    const clampedEnd =
+      nextSeg && Number(nextSeg.start) > start
+        ? Math.min(rawEnd, Number(nextSeg.start))
+        : rawEnd;
+
+    cleanedSegments.push({
+      start: Number(start.toFixed(2)),
+      end: Number(Math.max(clampedEnd, start + 0.8).toFixed(2)),
+      text: cleanText,
+    });
+  }
 
   const sentences = [];
   let currentText = '';
   let currentStart = null;
   let currentEnd = null;
 
-  for (let i = 0; i < rawSegments.length; i++) {
-    const seg = rawSegments[i];
-    const cleanText = decodeHtmlEntities(seg.text || '')
-      .replace(/\[.*?\]/g, '') // Bỏ [Music], [Applause]
-      .replace(/♪/g, '')
-      .trim();
-
-    if (!cleanText) continue;
+  for (let i = 0; i < cleanedSegments.length; i++) {
+    const seg = cleanedSegments[i];
 
     if (currentStart === null) {
-      currentStart = Number(seg.start.toFixed(1));
+      currentStart = seg.start;
     }
-    currentEnd = Number((seg.start + seg.dur).toFixed(1));
-    currentText = currentText ? `${currentText} ${cleanText}` : cleanText;
+    currentEnd = seg.end;
+    currentText = currentText ? `${currentText} ${seg.text}` : seg.text;
 
     const wordCount = currentText.split(/\s+/).length;
-    const endsWithPunctuation = /[.?!]["']?$/.test(cleanText);
+    const endsWithSentencePunct = /[.?!]["']?$/.test(seg.text);
+    const endsWithClausePunct = /[,;:—–-]["']?$/.test(seg.text);
     const duration = currentEnd - currentStart;
 
-    // Ngắt câu khi gặp dấu chấm câu (và đủ ít nhất 5 từ) hoặc khi câu đã dài (>= 16 từ hoặc >= 8 giây)
-    if ((endsWithPunctuation && wordCount >= 5) || wordCount >= 18 || duration >= 9) {
+    // Ưu tiên ngắt đúng dấu kết câu (. ? !) khi câu đủ độ dài (>= 4 từ),
+    // hoặc ngắt tại dấu phẩy khi câu đã dài (>= 14 từ), hoặc ngắt cưỡng bức khi >= 22 từ
+    if (
+      (endsWithSentencePunct && wordCount >= 4) ||
+      (endsWithClausePunct && wordCount >= 14) ||
+      wordCount >= 22 ||
+      duration >= 12
+    ) {
       sentences.push({
         id: sentences.length + 1,
-        start: currentStart,
-        end: Math.max(currentEnd, Number((currentStart + 2).toFixed(1))),
+        start: Number(currentStart.toFixed(1)),
+        end: Number(Math.max(currentEnd, currentStart + 1.5).toFixed(1)),
         text: currentText.replace(/\s+/g, ' ').trim(),
       });
       currentText = '';
@@ -62,130 +92,147 @@ function mergeCaptionsIntoSentences(rawSegments) {
   if (currentText && currentStart !== null) {
     sentences.push({
       id: sentences.length + 1,
-      start: currentStart,
-      end: Math.max(currentEnd || currentStart + 3, Number((currentStart + 2).toFixed(1))),
+      start: Number(currentStart.toFixed(1)),
+      end: Number(Math.max(currentEnd || currentStart + 2.5, currentStart + 1.5).toFixed(1)),
       text: currentText.replace(/\s+/g, ' ').trim(),
     });
   }
 
-  // Giới hạn tối đa 25 câu đầu tiên để bài luyện tập trung (2-5 phút)
+  // Giới hạn tối đa 25 câu đầu tiên để bài luyện tập trung
   return sentences.slice(0, 25);
 }
 
-// Thử lấy phụ đề tiếng Anh trực tiếp từ trang YouTube Watch HTML
-async function fetchYoutubeCaptions(videoId) {
-  try {
-    const watchUrl = `https://www.youtube.com/watch?v=${videoId}&hl=en`;
-    const response = await fetch(watchUrl, {
-      headers: {
-        'User-Agent':
-          'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36',
-        'Accept-Language': 'en-US,en;q=0.9',
-      },
-    });
+// Bóc tách XML timedtext (Hỗ trợ cả format="3" <p t="ms" d="ms"> và format="1" <text start="s" dur="s">)
+function parseYoutubeCaptionXml(xml = '') {
+  if (!xml || !xml.trim()) return [];
+  const rawSegments = [];
 
-    if (!response.ok) return null;
-    const html = await response.text();
-
-    // Trích xuất khối captionTracks từ ytInitialPlayerResponse bằng bộ đếm ngoặc vuông cân bằng
-    const marker = '"captionTracks":';
-    const markerIdx = html.indexOf(marker);
-    if (markerIdx === -1) return null;
-
-    const startBracket = html.indexOf('[', markerIdx);
-    if (startBracket === -1) return null;
-
-    let depth = 0;
-    let endBracket = -1;
-    let inString = false;
-    let escaped = false;
-
-    for (let i = startBracket; i < html.length; i++) {
-      const ch = html[i];
-      if (escaped) {
-        escaped = false;
-        continue;
-      }
-      if (ch === '\\') {
-        escaped = true;
-        continue;
-      }
-      if (ch === '"') {
-        inString = !inString;
-        continue;
-      }
-      if (!inString) {
-        if (ch === '[') depth++;
-        else if (ch === ']') {
-          depth--;
-          if (depth === 0) {
-            endBracket = i;
-            break;
-          }
-        }
-      }
+  // Format 3: <p t="7315" d="5881">...</p>
+  const pRegex = /<p\s+[^>]*?\bt="(\d+)"[^>]*?\bd="(\d+)"[^>]*>([\s\S]*?)<\/p>/g;
+  let m;
+  while ((m = pRegex.exec(xml)) !== null) {
+    const startSec = Number(m[1]) / 1000;
+    const durSec = Number(m[2]) / 1000;
+    const innerText = m[3].replace(/<[^>]+>/g, '');
+    if (innerText.trim()) {
+      rawSegments.push({
+        start: startSec,
+        dur: durSec,
+        text: innerText,
+      });
     }
-
-    if (endBracket === -1) return null;
-
-    const tracks = JSON.parse(html.slice(startBracket, endBracket + 1));
-    if (!Array.isArray(tracks) || tracks.length === 0) return null;
-
-    // Ưu tiên phụ đề tiếng Anh thủ công (en, en-GB, en-US) rồi mới tới auto-generated
-    const enTrack =
-      tracks.find((t) => t.languageCode?.startsWith('en') && t.kind !== 'asr') ||
-      tracks.find((t) => t.languageCode?.startsWith('en')) ||
-      tracks[0];
-
-    if (!enTrack || !enTrack.baseUrl) return null;
-
-    const captionRes = await fetch(`${enTrack.baseUrl}&fmt=json3`);
-    if (captionRes.ok) {
-      const json3 = await captionRes.json();
-      if (Array.isArray(json3.events)) {
-        const rawSegments = [];
-        for (const ev of json3.events) {
-          if (!ev.segs) continue;
-          const text = ev.segs.map((s) => s.utf8 || '').join('').trim();
-          if (text) {
-            rawSegments.push({
-              start: (ev.tStartMs || 0) / 1000,
-              dur: (ev.dDurationMs || 3000) / 1000,
-              text,
-            });
-          }
-        }
-        const merged = mergeCaptionsIntoSentences(rawSegments);
-        if (merged.length >= 3) return merged;
-      }
-    }
-
-    // Fallback XML format nếu fmt=json3 không trả về events
-    const xmlRes = await fetch(enTrack.baseUrl);
-    if (xmlRes.ok) {
-      const xml = await xmlRes.text();
-      const regex = /<text start="([\d.]+)" dur="([\d.]+)"[^>]*>([\s\S]*?)<\/text>/g;
-      const rawSegments = [];
-      let m;
-      while ((m = regex.exec(xml)) !== null) {
-        rawSegments.push({
-          start: parseFloat(m[1]),
-          dur: parseFloat(m[2]),
-          text: m[3],
-        });
-      }
-      const merged = mergeCaptionsIntoSentences(rawSegments);
-      if (merged.length >= 3) return merged;
-    }
-
-    return null;
-  } catch (err) {
-    console.warn('[Dictation] Direct YouTube caption extraction warning:', err.message);
-    return null;
   }
+
+  if (rawSegments.length > 0) {
+    return rawSegments;
+  }
+
+  // Format 1: <text start="7.315" dur="5.881">...</text>
+  const textRegex = /<text\s+[^>]*?\bstart="([\d.]+)"[^>]*?\bdur="([\d.]+)"[^>]*>([\s\S]*?)<\/text>/g;
+  while ((m = textRegex.exec(xml)) !== null) {
+    const startSec = parseFloat(m[1]);
+    const durSec = parseFloat(m[2]);
+    const innerText = m[3].replace(/<[^>]+>/g, '');
+    if (innerText.trim()) {
+      rawSegments.push({
+        start: startSec,
+        dur: durSec,
+        text: innerText,
+      });
+    }
+  }
+
+  return rawSegments;
 }
 
-// Lấy thông tin Tiêu đề & Kênh từ YouTube oEmbed
+// Lấy phụ đề tiếng Anh & thông tin video trực tiếp qua YouTube InnerTube Player API (ANDROID / IOS client)
+async function fetchYoutubeCaptionsAndDetails(videoId) {
+  const innertubeClients = [
+    {
+      clientName: 'ANDROID',
+      clientVersion: '20.10.38',
+      userAgent: 'com.google.android.youtube/20.10.38 (Linux; U; Android 14) gzip',
+    },
+    {
+      clientName: 'IOS',
+      clientVersion: '20.10.4',
+      userAgent: 'com.google.ios.youtube/20.10.4 (iPhone16,2; U; CPU iOS 17_5_1 like Mac OS X;)',
+    },
+  ];
+
+  let videoDetails = null;
+
+  for (const client of innertubeClients) {
+    try {
+      const playerRes = await fetch('https://www.youtube.com/youtubei/v1/player?prettyPrint=false', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'User-Agent': client.userAgent,
+          'Accept-Language': 'en-US,en;q=0.9',
+        },
+        body: JSON.stringify({
+          context: {
+            client: {
+              clientName: client.clientName,
+              clientVersion: client.clientVersion,
+              hl: 'en',
+              gl: 'US',
+            },
+          },
+          videoId,
+        }),
+      });
+
+      if (!playerRes.ok) continue;
+      const data = await playerRes.json();
+
+      if (data?.videoDetails && !videoDetails) {
+        videoDetails = {
+          title: data.videoDetails.title,
+          channel: data.videoDetails.author,
+          lengthSeconds: Number(data.videoDetails.lengthSeconds || 0),
+        };
+      }
+
+      const tracks = data?.captions?.playerCaptionsTracklistRenderer?.captionTracks;
+      if (!Array.isArray(tracks) || tracks.length === 0) continue;
+
+      // Ưu tiên phụ đề tiếng Anh chuẩn (manual) trước, sau đó tới tiếng Anh tự động (asr)
+      const enTrack =
+        tracks.find((t) => t.languageCode?.startsWith('en') && t.kind !== 'asr') ||
+        tracks.find((t) => t.languageCode?.startsWith('en')) ||
+        tracks[0];
+
+      if (!enTrack || !enTrack.baseUrl) continue;
+
+      const xmlRes = await fetch(enTrack.baseUrl, {
+        headers: {
+          'User-Agent': client.userAgent,
+        },
+      });
+
+      if (xmlRes.ok) {
+        const xml = await xmlRes.text();
+        const rawSegments = parseYoutubeCaptionXml(xml);
+        const merged = mergeCaptionsIntoSentences(rawSegments);
+        if (merged.length >= 2) {
+          return {
+            sentences: merged,
+            videoDetails,
+            trackType: enTrack.kind === 'asr' ? 'youtube_auto_captions' : 'youtube_official_captions',
+          };
+        }
+      }
+    } catch (err) {
+      console.warn(`[Dictation] InnerTube (${client.clientName}) warning:`, err.message);
+    }
+  }
+
+  return { sentences: null, videoDetails, trackType: null };
+}
+
+// Lấy thông tin Tiêu đề & Kênh từ YouTube oEmbed (Fallback)
 async function fetchYoutubeMetadata(videoId) {
   try {
     const oembedUrl = `https://www.youtube.com/oembed?url=https://www.youtube.com/watch?v=${videoId}&format=json`;
@@ -206,7 +253,7 @@ async function fetchYoutubeMetadata(videoId) {
   };
 }
 
-// Tạo bộ câu học thuật thông minh bằng Gemini AI dựa trên chủ đề tiêu đề video nếu video tắt phụ đề
+// Tạo bộ câu học thuật thông minh bằng Gemini AI dựa trên chủ đề tiêu đề video nếu video tắt hoàn toàn phụ đề
 async function generateSmartSentencesWithAi(title, channel) {
   const apiKey = getLiveApiKey();
   if (apiKey) {
@@ -251,101 +298,86 @@ Trả về ĐÚNG MỘT MẢNG JSON (không bọc trong markdown):
         }
       }
     } catch (e) {
-      console.warn('[Dictation] Gemini fallback warning:', e.message);
+      console.warn('[Dictation] AI smart sentence fallback warning:', e.message);
     }
   }
 
-  // Fallback mặc định chuẩn học thuật nếu không có mạng hoặc API
   return [
     {
       id: 1,
-      start: 4,
-      end: 10,
-      text: 'Welcome to today’s academic presentation on this fascinating topic.',
-      translationVi: 'Chào mừng bạn đến với bài thuyết trình học thuật hôm nay về chủ đề thú vị này.',
+      start: 5,
+      end: 12,
+      text: 'Welcome to this academic session, where we explore key concepts and critical perspectives.',
+      translationVi: 'Chào mừng bạn đến với buổi học thuật này, nơi chúng ta khám phá các khái niệm cốt lõi và góc nhìn phản biện.',
     },
     {
       id: 2,
-      start: 11,
-      end: 18,
-      text: 'Researchers have long debated the underlying mechanisms behind this phenomenon.',
-      translationVi: 'Các nhà nghiên cứu từ lâu đã tranh luận về các cơ chế nền tảng đằng sau hiện tượng này.',
+      start: 13,
+      end: 21,
+      text: 'Researchers have long investigated how environmental factors influence human behavior over time.',
+      translationVi: 'Các nhà nghiên cứu từ lâu đã tìm hiểu cách các yếu tố môi trường ảnh hưởng đến hành vi con người theo thời gian.',
     },
     {
       id: 3,
-      start: 19,
-      end: 26,
-      text: 'Recent empirical evidence suggests a strong correlation between these variables.',
-      translationVi: 'Bằng chứng thực nghiệm gần đây cho thấy mối tương quan chặt chẽ giữa các biến số này.',
+      start: 22,
+      end: 30,
+      text: 'By analyzing empirical evidence, scientists can formulate accurate models to predict future trends.',
+      translationVi: 'Bằng cách phân tích bằng chứng thực nghiệm, các nhà khoa học có thể xây dựng mô hình chính xác để dự đoán xu hướng tương lai.',
     },
     {
       id: 4,
-      start: 27,
-      end: 34,
-      text: 'However, implementing effective solutions requires global cooperation and innovation.',
-      translationVi: 'Tuy nhiên, việc triển khai các giải pháp hiệu quả đòi hỏi sự hợp tác và đổi mới toàn cầu.',
+      start: 31,
+      end: 39,
+      text: 'However, implementing sustainable solutions requires collaboration across multiple international institutions.',
+      translationVi: 'Tuy nhiên, việc triển khai các giải pháp bền vững đòi hỏi sự hợp tác giữa nhiều tổ chức quốc tế.',
     },
     {
       id: 5,
-      start: 35,
-      end: 42,
-      text: 'Understanding these core principles helps us make more informed decisions.',
-      translationVi: 'Hiểu rõ những nguyên lý cốt lõi này giúp chúng ta đưa ra các quyết định sáng suốt hơn.',
-    },
-    {
-      id: 6,
-      start: 43,
-      end: 50,
-      text: 'Thank you for watching and remember to review the key vocabulary.',
-      translationVi: 'Cảm ơn bạn đã theo dõi và hãy nhớ ôn tập lại các từ vựng trọng tâm.',
+      start: 40,
+      end: 48,
+      text: 'Ultimately, continuous innovation remains the cornerstone of modern scientific and economic progress.',
+      translationVi: 'Cuối cùng, sự đổi mới liên tục vẫn là nền tảng của tiến bộ khoa học và kinh tế hiện đại.',
     },
   ];
 }
 
+// POST /api/dictation/extract-youtube
 exports.extractYoutubeTranscript = async (req, res) => {
   try {
-    const { videoId = '' } = req.body;
-    const cleanId = (videoId || '').trim();
-
-    if (!cleanId || !/^[a-zA-Z0-9_-]{6,15}$/.test(cleanId)) {
-      return res.status(400).json({
-        success: false,
-        message: 'Mã video YouTube (videoId) không hợp lệ.',
-      });
+    const { videoId } = req.body || {};
+    if (!videoId || typeof videoId !== 'string') {
+      return res.status(400).json({ error: 'Thiếu mã videoId YouTube hợp lệ.' });
     }
 
-    const metadata = await fetchYoutubeMetadata(cleanId);
-    const realCaptions = await fetchYoutubeCaptions(cleanId);
+    const cleanId = videoId.trim();
+    const { sentences: realCaptions, videoDetails, trackType } =
+      await fetchYoutubeCaptionsAndDetails(cleanId);
+
+    const meta = videoDetails?.title
+      ? videoDetails
+      : await fetchYoutubeMetadata(cleanId);
 
     if (realCaptions && realCaptions.length > 0) {
       return res.json({
-        success: true,
-        source: 'YouTube Official Captions',
-        data: {
-          youtubeId: cleanId,
-          title: metadata.title,
-          channel: metadata.channel,
-          sentences: realCaptions,
-        },
+        videoId: cleanId,
+        title: meta.title,
+        channel: meta.channel,
+        sourceType: trackType || 'youtube_captions',
+        sentences: realCaptions,
       });
     }
 
-    const aiSentences = await generateSmartSentencesWithAi(metadata.title, metadata.channel);
+    // Nếu video không có phụ đề công khai, dùng AI tạo kịch bản mẫu
+    const aiSentences = await generateSmartSentencesWithAi(meta.title, meta.channel);
     return res.json({
-      success: true,
-      source: 'AI Smart Transcript Splitter',
-      data: {
-        youtubeId: cleanId,
-        title: metadata.title,
-        channel: metadata.channel,
-        sentences: aiSentences,
-      },
+      videoId: cleanId,
+      title: meta.title,
+      channel: meta.channel,
+      sourceType: 'ai_heuristic',
+      sentences: aiSentences,
     });
-  } catch (error) {
-    console.error('extractYoutubeTranscript error:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Lỗi máy chủ khi trích xuất dữ liệu video YouTube.',
-    });
+  } catch (err) {
+    console.error('[Dictation] extractYoutubeTranscript error:', err);
+    return res.status(500).json({ error: 'Lỗi máy chủ khi trích xuất dữ liệu YouTube.' });
   }
 };

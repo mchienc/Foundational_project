@@ -22,8 +22,8 @@ import { extractYouTubeVideoId } from './diffEngine';
 import { CustomVideoImporterModal } from './CustomVideoImporterModal';
 import { YouTubeFocusRoom } from './YouTubeFocusRoom';
 
-const CUSTOM_LESSONS_STORAGE_KEY = 'eduflow_custom_dictation_lessons_v1';
-const COMPLETED_LESSONS_STORAGE_KEY = 'eduflow_completed_dictation_ids_v1';
+const CUSTOM_LESSONS_STORAGE_KEY = 'eduflow_custom_dictation_lessons_v2';
+const COMPLETED_LESSONS_STORAGE_KEY = 'eduflow_completed_dictation_ids_v2';
 
 const LEVEL_FILTERS: { id: 'ALL' | DictationCefrLevel; label: string; badge?: string }[] = [
   { id: 'ALL', label: 'Tất cả cấp độ' },

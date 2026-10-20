@@ -38,7 +38,6 @@ interface YouTubeFocusRoomProps {
   onProgressUpdate?: (lessonId: string, completedCount: number, totalCount: number) => void;
 }
 
-const TAIL_BUFFER_SECONDS = 0.25; // Đệm 0.25s cuối câu để không bị nuốt âm đuôi (/s/, /t/, /ed/)
 const LOOP_PAUSE_DELAY_MS = 800;  // Nghỉ 0.8s giữa các lần lặp để học viên kịp gõ chữ
 
 export const YouTubeFocusRoom: React.FC<YouTubeFocusRoomProps> = ({
@@ -76,6 +75,11 @@ export const YouTubeFocusRoom: React.FC<YouTubeFocusRoomProps> = ({
   const loopTimeoutRef = useRef<number | null>(null);
 
   const currentSentence = lesson.sentences[currentIdx] || lesson.sentences[0];
+  const currentSentenceRef = useRef(currentSentence);
+  useEffect(() => {
+    currentSentenceRef.current = currentSentence;
+  }, [currentSentence]);
+
   const isCurrentPassed =
     Boolean(completedMap[currentSentence?.id]) ||
     Boolean(revealedMap[currentSentence?.id]) ||
@@ -84,7 +88,7 @@ export const YouTubeFocusRoom: React.FC<YouTubeFocusRoomProps> = ({
   // Khôi phục tiến độ của bài học từ localStorage
   useEffect(() => {
     try {
-      const raw = localStorage.getItem(`eduflow_dictation_prog_${lesson.id}`);
+      const raw = localStorage.getItem(`eduflow_dictation_prog_v2_${lesson.id}`);
       if (raw) {
         const parsed = JSON.parse(raw);
         if (parsed.completedMap) setCompletedMap(parsed.completedMap);
@@ -104,7 +108,7 @@ export const YouTubeFocusRoom: React.FC<YouTubeFocusRoomProps> = ({
     (newCompleted: Record<number, boolean>, newInputs: Record<number, string>) => {
       try {
         localStorage.setItem(
-          `eduflow_dictation_prog_${lesson.id}`,
+          `eduflow_dictation_prog_v2_${lesson.id}`,
           JSON.stringify({
             completedMap: newCompleted,
             savedInputsMap: newInputs,
@@ -145,20 +149,25 @@ export const YouTubeFocusRoom: React.FC<YouTubeFocusRoomProps> = ({
           cc_load_policy: 0, // Tắt phụ đề mặc định trên video để tránh lộ đáp án
           iv_load_policy: 3, // Tắt annotations
           playsinline: 1,
+          start: Math.floor(lesson.sentences[0]?.start || 0),
         },
         events: {
-          onReady: (event: any) => {
+          onReady: () => {
             if (!isMounted) return;
             setIsPlayerReady(true);
-            const firstStart = lesson.sentences[0]?.start || 0;
-            event.target.seekTo(firstStart, true);
-            event.target.pauseVideo();
+            setCurrentTime(lesson.sentences[0]?.start || 0);
           },
           onStateChange: (event: any) => {
             if (!isMounted) return;
             // YT.PlayerState.PLAYING === 1
             if (event.data === 1) {
               setIsPlaying(true);
+              const sent = currentSentenceRef.current;
+              const now = event.target?.getCurrentTime?.() || 0;
+              // Nếu bấm Play trực tiếp trên khung YouTube khi kim thời gian nằm ngoài câu hiện tại, tự động nhảy đúng vào đầu câu hiện tại
+              if (sent && (now < sent.start - 0.35 || now >= sent.end - 0.05)) {
+                event.target.seekTo(sent.start, true);
+              }
             } else if (event.data === 2 || event.data === 0) {
               setIsPlaying(false);
             }
@@ -264,27 +273,34 @@ export const YouTubeFocusRoom: React.FC<YouTubeFocusRoomProps> = ({
       setCurrentTime(now);
 
       // Chỉ kiểm tra cắt câu khi video đang phát (state === 1)
-      if (state === 1 && now >= currentSentence.end + TAIL_BUFFER_SECONDS) {
-        playerRef.current.pauseVideo();
-        setIsPlaying(false);
+      if (state === 1) {
+        if (now < currentSentence.start - 0.35) {
+          playerRef.current.seekTo(currentSentence.start, true);
+          return;
+        }
 
-        // Kiểm tra chế độ Auto A-B Loop
-        setCurrentLoopCount((prevCount) => {
-          const usedLoops = prevCount || 1;
-          if (usedLoops < loopLimit) {
-            setIsWaitingNextLoop(true);
-            loopTimeoutRef.current = window.setTimeout(() => {
-              if (playerRef.current) {
-                playerRef.current.seekTo(currentSentence.start, true);
-                playerRef.current.playVideo();
-                setIsPlaying(true);
-                setIsWaitingNextLoop(false);
-              }
-            }, LOOP_PAUSE_DELAY_MS);
-            return usedLoops + 1;
-          }
-          return usedLoops;
-        });
+        if (now >= currentSentence.end - 0.04) {
+          playerRef.current.pauseVideo();
+          setIsPlaying(false);
+
+          // Kiểm tra chế độ Auto A-B Loop
+          setCurrentLoopCount((prevCount) => {
+            const usedLoops = prevCount || 1;
+            if (usedLoops < loopLimit) {
+              setIsWaitingNextLoop(true);
+              loopTimeoutRef.current = window.setTimeout(() => {
+                if (playerRef.current) {
+                  playerRef.current.seekTo(currentSentence.start, true);
+                  playerRef.current.playVideo();
+                  setIsPlaying(true);
+                  setIsWaitingNextLoop(false);
+                }
+              }, LOOP_PAUSE_DELAY_MS);
+              return usedLoops + 1;
+            }
+            return usedLoops;
+          });
+        }
       }
     }, 50);
 
