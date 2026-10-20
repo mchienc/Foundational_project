@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Layers,
   BookOpen,
@@ -10,12 +10,16 @@ import {
   Search,
   ArrowRight,
   Download,
+  Sparkles,
+  Plus,
+  Trash2,
+  Library,
+  X,
 } from 'lucide-react';
 import { useAnki } from '../../context/AnkiContext';
 import { AudioPlayButton } from '../../components/shared/AudioPlayButton';
 import { AnkiExportPanel } from './AnkiExportPanel';
 import { GeminiAnkiCardGenerator } from './GeminiAnkiCardGenerator';
-import { Sparkles } from 'lucide-react';
 
 interface AnkiWorkspaceProps {
   onStartStudy: (deckId?: string) => void;
@@ -28,14 +32,41 @@ export const AnkiWorkspace: React.FC<AnkiWorkspaceProps> = ({
   onNavigateReading,
   onNavigateListening,
 }) => {
-  const { decks, cards, totalDueCount, getCardsForDeck } = useAnki();
+  const {
+    decks,
+    cards,
+    totalDueCount,
+    getCardsForDeck,
+    createDeck,
+    deleteDeck,
+    deleteCard,
+    loadSampleDecks,
+  } = useAnki();
+
   const [selectedDeckForPreview, setSelectedDeckForPreview] = useState<string>('deck-personal');
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [showExport, setShowExport] = useState<boolean>(false);
   const [showAiGenerator, setShowAiGenerator] = useState<boolean>(true);
 
-  const totalLearningCount = cards.filter((c) => c.status === 'learning' || c.status === 'new').length;
+  // Modal tạo bộ bài mới
+  const [showCreateDeckModal, setShowCreateDeckModal] = useState<boolean>(false);
+  const [newDeckTitle, setNewDeckTitle] = useState<string>('');
+  const [newDeckDescription, setNewDeckDescription] = useState<string>('');
+  const [newDeckIcon, setNewDeckIcon] = useState<string>('Bookmark');
+
+  // Đảm bảo selectedDeckForPreview luôn trỏ vào một deck hợp lệ
+  useEffect(() => {
+    if (decks.length > 0 && !decks.some((d) => d.id === selectedDeckForPreview)) {
+      setSelectedDeckForPreview(decks[0].id);
+    }
+  }, [decks, selectedDeckForPreview]);
+
+  const totalLearningCount = cards.filter(
+    (c) => c.status === 'learning' || c.status === 'new'
+  ).length;
   const totalMasteredCount = cards.filter((c) => c.status === 'mastered').length;
+
+  const currentDeck = decks.find((d) => d.id === selectedDeckForPreview) || decks[0];
 
   const previewCards = getCardsForDeck(selectedDeckForPreview).filter((card) => {
     if (!searchQuery.trim()) return true;
@@ -53,9 +84,24 @@ export const AnkiWorkspace: React.FC<AnkiWorkspaceProps> = ({
         return <BookOpen size={22} className="text-amber-300" />;
       case 'Layers':
         return <Layers size={22} className="text-amber-300" />;
+      case 'Sparkles':
+        return <Sparkles size={22} className="text-amber-300" />;
+      case 'Flame':
+        return <Flame size={22} className="text-amber-300" />;
       default:
         return <Bookmark size={22} className="text-amber-300" />;
     }
+  };
+
+  const handleCreateDeckSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newDeckTitle.trim()) return;
+
+    const created = createDeck(newDeckTitle.trim(), newDeckDescription.trim(), newDeckIcon);
+    setSelectedDeckForPreview(created.id);
+    setNewDeckTitle('');
+    setNewDeckDescription('');
+    setShowCreateDeckModal(false);
   };
 
   return (
@@ -92,8 +138,8 @@ export const AnkiWorkspace: React.FC<AnkiWorkspaceProps> = ({
           <button
             onClick={() => setShowExport(!showExport)}
             className={`inline-flex items-center gap-2 px-5 py-3.5 rounded-2xl text-xs sm:text-sm font-bold uppercase tracking-normal transition-all cursor-pointer border ${
-              showExport 
-                ? 'bg-amber-100 border-amber-300 text-amber-900 shadow-xs' 
+              showExport
+                ? 'bg-amber-100 border-amber-300 text-amber-900 shadow-xs'
                 : 'bg-white hover:bg-stone-100 border-stone-200 text-stone-700 shadow-xs'
             }`}
           >
@@ -121,7 +167,7 @@ export const AnkiWorkspace: React.FC<AnkiWorkspaceProps> = ({
         </div>
       </div>
 
-            {/* Gemini Anki Cloze Generator (Conditional) */}
+      {/* Gemini Anki Cloze Generator (Conditional) */}
       {showAiGenerator && (
         <div className="animate-in fade-in slide-in-from-top-4 duration-300">
           <GeminiAnkiCardGenerator />
@@ -196,13 +242,34 @@ export const AnkiWorkspace: React.FC<AnkiWorkspaceProps> = ({
 
       {/* Decks Section */}
       <div className="space-y-4">
-        <div className="flex items-center justify-between">
-          <h2 className="text-xl font-serif font-bold text-[#064E3B]">
-            Danh Mục Bộ Bài Anki (Decks)
-          </h2>
-          <span className="text-xs font-mono text-stone-500">
-            {decks.length} bộ bài chuẩn bị sẵn
-          </span>
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <h2 className="text-xl font-serif font-bold text-[#064E3B]">
+              Danh Mục Bộ Bài Anki (Decks)
+            </h2>
+            <p className="text-xs text-stone-500 mt-0.5">
+              {decks.length} bộ bài trong tài khoản của bạn • Quản lý độc lập theo từng học viên
+            </p>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setShowCreateDeckModal(true)}
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-[#064E3B] hover:bg-[#053d2e] text-white text-xs font-bold transition-all shadow-xs cursor-pointer active:scale-95"
+            >
+              <Plus size={15} className="text-amber-300" />
+              <span>Tạo Bộ Thẻ Mới</span>
+            </button>
+
+            <button
+              onClick={loadSampleDecks}
+              className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-white hover:bg-stone-50 border border-stone-200 text-stone-700 text-xs font-semibold transition-all cursor-pointer"
+              title="Tải thêm bộ từ vựng mẫu Cambridge Core 500 & AWL"
+            >
+              <Library size={14} className="text-stone-500" />
+              <span>Nạp Bộ Thẻ Mẫu</span>
+            </button>
+          </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -220,22 +287,44 @@ export const AnkiWorkspace: React.FC<AnkiWorkspaceProps> = ({
                   <div className="w-11 h-11 rounded-xl bg-[#064E3B] flex items-center justify-center shadow-xs">
                     {getDeckIcon(deck.iconName)}
                   </div>
-                  <span
-                    className={`text-[10px] font-mono px-2 py-0.5 rounded uppercase font-bold ${
-                      deck.isPersonal
-                        ? 'bg-amber-100 text-amber-900 border border-amber-300'
-                        : 'bg-stone-100 text-stone-600'
-                    }`}
-                  >
-                    {deck.category}
-                  </span>
+                  <div className="flex items-center gap-2">
+                    <span
+                      className={`text-[10px] font-mono px-2 py-0.5 rounded uppercase font-bold ${
+                        deck.isPersonal
+                          ? 'bg-amber-100 text-amber-900 border border-amber-300'
+                          : 'bg-stone-100 text-stone-600'
+                      }`}
+                    >
+                      {deck.category}
+                    </span>
+
+                    {/* Cho phép xóa bộ bài tự tạo */}
+                    {deck.id !== 'deck-personal' && (
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          if (
+                            confirm(
+                              `Bạn có chắc chắn muốn xóa bộ bài "${deck.title}" và toàn bộ thẻ bên trong?`
+                            )
+                          ) {
+                            deleteDeck(deck.id);
+                          }
+                        }}
+                        className="p-1 rounded-md text-stone-400 hover:text-rose-600 hover:bg-rose-50 transition-colors cursor-pointer"
+                        title="Xóa bộ bài này"
+                      >
+                        <Trash2 size={13} />
+                      </button>
+                    )}
+                  </div>
                 </div>
 
                 <h3 className="text-lg font-serif font-bold text-[#064E3B] leading-snug">
                   {deck.title}
                 </h3>
 
-                <p className="text-xs text-stone-600 font-sans leading-relaxed">
+                <p className="text-xs text-stone-600 font-sans leading-relaxed line-clamp-2">
                   {deck.description}
                 </p>
               </div>
@@ -260,7 +349,8 @@ export const AnkiWorkspace: React.FC<AnkiWorkspaceProps> = ({
                 <div className="flex items-center gap-2 pt-1">
                   <button
                     onClick={() => onStartStudy(deck.id)}
-                    className="flex-1 py-2.5 px-3 rounded-xl bg-[#064E3B] hover:bg-[#022C22] text-amber-300 hover:text-white font-sans font-bold text-xs uppercase tracking-wide flex items-center justify-center gap-1.5 transition-all shadow-xs cursor-pointer active:scale-95 border border-emerald-800"
+                    disabled={deck.totalCards === 0}
+                    className="flex-1 py-2.5 px-3 rounded-xl bg-[#064E3B] hover:bg-[#022C22] text-amber-300 hover:text-white font-sans font-bold text-xs uppercase tracking-wide flex items-center justify-center gap-1.5 transition-all shadow-xs cursor-pointer active:scale-95 border border-emerald-800 disabled:opacity-40 disabled:cursor-not-allowed"
                   >
                     <Play size={13} className="fill-current" />
                     <span>Học Bộ Bài Này</span>
@@ -275,7 +365,7 @@ export const AnkiWorkspace: React.FC<AnkiWorkspaceProps> = ({
                     }`}
                     title="Xem trước các thẻ"
                   >
-                    Xem thẻ
+                    Xem thẻ ({deck.totalCards})
                   </button>
                 </div>
               </div>
@@ -292,7 +382,7 @@ export const AnkiWorkspace: React.FC<AnkiWorkspaceProps> = ({
               Chi tiết bộ bài:
             </span>
             <h3 className="text-lg font-serif font-bold text-[#064E3B]">
-              {decks.find((d) => d.id === selectedDeckForPreview)?.title} ({previewCards.length} thẻ)
+              {currentDeck?.title || 'Bộ Bài'} ({previewCards.length} thẻ)
             </h3>
           </div>
 
@@ -309,32 +399,45 @@ export const AnkiWorkspace: React.FC<AnkiWorkspaceProps> = ({
         </div>
 
         {previewCards.length === 0 ? (
-          <div className="text-center py-10 space-y-2 text-stone-500">
-            <p className="text-xs font-sans">
-              Chưa có thẻ từ vựng nào trong bộ bài này hoặc không khớp với tìm kiếm.
-            </p>
-            {selectedDeckForPreview === 'deck-personal' && (
-              <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
-                {onNavigateReading && (
-                  <button
-                    onClick={onNavigateReading}
-                    className="inline-flex items-center gap-1.5 text-xs text-amber-800 font-bold hover:underline cursor-pointer"
-                  >
-                    <span>Vào Luyện Đọc Cambridge</span>
-                    <ArrowRight size={13} />
-                  </button>
-                )}
-                {onNavigateListening && (
-                  <button
-                    onClick={onNavigateListening}
-                    className="inline-flex items-center gap-1.5 text-xs text-emerald-800 font-bold hover:underline cursor-pointer"
-                  >
-                    <span>Vào Luyện Nghe Dictation</span>
-                    <ArrowRight size={13} />
-                  </button>
-                )}
-              </div>
-            )}
+          <div className="text-center py-12 px-4 space-y-3 bg-[#FAFAF9] rounded-2xl border border-dashed border-stone-300">
+            <div className="w-12 h-12 mx-auto rounded-2xl bg-amber-50 text-amber-700 flex items-center justify-center">
+              <BookOpen size={22} className="text-amber-600" />
+            </div>
+            <div className="space-y-1">
+              <h4 className="font-serif font-bold text-stone-800 text-base">
+                Bộ bài này hiện chưa có từ vựng nào
+              </h4>
+              <p className="text-xs text-stone-500 max-w-md mx-auto leading-relaxed">
+                Tài khoản mới bắt đầu với bộ thẻ trắng. Bạn có thể tự tạo thẻ bằng công cụ Gemini 9.0 phía trên hoặc bôi đen từ khi luyện đọc bài Cambridge!
+              </p>
+            </div>
+            <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
+              <button
+                onClick={() => setShowAiGenerator(true)}
+                className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#064E3B] text-amber-300 text-xs font-bold hover:bg-[#053d2e] cursor-pointer shadow-xs"
+              >
+                <Sparkles size={14} />
+                <span>Tạo Thẻ Anki Bằng AI</span>
+              </button>
+              {onNavigateReading && (
+                <button
+                  onClick={onNavigateReading}
+                  className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-white border border-stone-200 text-stone-700 text-xs font-semibold hover:bg-stone-50 cursor-pointer"
+                >
+                  <span>Luyện Đọc Cambridge</span>
+                  <ArrowRight size={13} />
+                </button>
+              )}
+              {onNavigateListening && (
+                <button
+                  onClick={onNavigateListening}
+                  className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-white border border-stone-200 text-stone-700 text-xs font-semibold hover:bg-stone-50 cursor-pointer"
+                >
+                  <span>Luyện Nghe Dictation</span>
+                  <ArrowRight size={13} />
+                </button>
+              )}
+            </div>
           </div>
         ) : (
           <div className="space-y-3">
@@ -379,13 +482,115 @@ export const AnkiWorkspace: React.FC<AnkiWorkspaceProps> = ({
                   >
                     {c.status}
                   </span>
+
+                  <button
+                    onClick={() => {
+                      if (confirm(`Bạn có chắc muốn xóa thẻ "${c.word}" khỏi bộ bài?`)) {
+                        deleteCard(c.id);
+                      }
+                    }}
+                    className="p-1.5 rounded-lg text-stone-400 hover:text-rose-600 hover:bg-rose-50 transition-colors cursor-pointer"
+                    title="Xóa thẻ này"
+                  >
+                    <Trash2 size={14} />
+                  </button>
                 </div>
               </div>
             ))}
           </div>
         )}
       </div>
+
+      {/* Modal Tạo Bộ Bài Mới */}
+      {showCreateDeckModal && (
+        <div className="fixed inset-0 z-50 bg-stone-900/40 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-white rounded-3xl border border-stone-200 shadow-2xl w-full max-w-md p-6 space-y-5 animate-in fade-in zoom-in-95 duration-200">
+            <div className="flex items-center justify-between pb-3 border-b border-stone-200">
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 rounded-xl bg-amber-50 text-amber-700 flex items-center justify-center">
+                  <Plus size={16} />
+                </div>
+                <h3 className="text-base font-serif font-bold text-[#064E3B]">
+                  Tạo Bộ Bài Anki Mới
+                </h3>
+              </div>
+              <button
+                onClick={() => setShowCreateDeckModal(false)}
+                className="p-1 rounded-lg text-stone-400 hover:text-stone-600 hover:bg-stone-100 transition-colors cursor-pointer"
+              >
+                <X size={18} />
+              </button>
+            </div>
+
+            <form onSubmit={handleCreateDeckSubmit} className="space-y-4">
+              <div>
+                <label className="block text-xs font-semibold text-stone-700 mb-1">
+                  Tên Bộ Bài <span className="text-rose-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={newDeckTitle}
+                  onChange={(e) => setNewDeckTitle(e.target.value)}
+                  placeholder="Ví dụ: Cambridge 18 Reading, Collocations Writing Task 2..."
+                  className="w-full px-3.5 py-2 text-sm rounded-xl border border-stone-300 focus:outline-none focus:ring-2 focus:ring-[#064E3B]"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-stone-700 mb-1">
+                  Mô Tả Bộ Bài
+                </label>
+                <textarea
+                  rows={2}
+                  value={newDeckDescription}
+                  onChange={(e) => setNewDeckDescription(e.target.value)}
+                  placeholder="Ví dụ: Tổng hợp các cụm từ đắt giá cho đề thi Cambridge và bài viết task 2..."
+                  className="w-full px-3.5 py-2 text-xs rounded-xl border border-stone-300 focus:outline-none focus:ring-2 focus:ring-[#064E3B]"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-stone-700 mb-1">
+                  Biểu Tượng
+                </label>
+                <div className="flex items-center gap-2">
+                  {(['Bookmark', 'BookOpen', 'Layers', 'Sparkles', 'Flame'] as const).map((icon) => (
+                    <button
+                      key={icon}
+                      type="button"
+                      onClick={() => setNewDeckIcon(icon)}
+                      className={`p-2.5 rounded-xl border transition-all cursor-pointer ${
+                        newDeckIcon === icon
+                          ? 'bg-[#064E3B] text-amber-300 border-[#064E3B] shadow-xs'
+                          : 'bg-stone-50 text-stone-600 border-stone-200 hover:bg-stone-100'
+                      }`}
+                    >
+                      {getDeckIcon(icon)}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div className="flex items-center justify-end gap-2 pt-2 border-t border-stone-100">
+                <button
+                  type="button"
+                  onClick={() => setShowCreateDeckModal(false)}
+                  className="px-4 py-2 text-xs font-semibold rounded-xl text-stone-600 hover:bg-stone-100 transition-colors cursor-pointer"
+                >
+                  Hủy Bỏ
+                </button>
+                <button
+                  type="submit"
+                  className="px-5 py-2 text-xs font-bold rounded-xl bg-[#064E3B] hover:bg-[#053d2e] text-white shadow-xs cursor-pointer transition-all"
+                >
+                  Tạo Bộ Bài
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
-

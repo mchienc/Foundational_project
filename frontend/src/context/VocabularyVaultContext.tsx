@@ -1,5 +1,6 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
 import { VocabItem, TargetWord } from '../types';
+import { useAuth } from './AuthContext';
 
 interface VocabularyVaultContextType {
   savedWords: VocabItem[];
@@ -23,8 +24,6 @@ interface VocabularyVaultContextType {
   totalSavedCount: number;
 }
 
-const STORAGE_KEY = 'eduflow_vault_vocab_v2';
-
 // Spaced repetition interval schedule (in days)
 const SRS_INTERVAL_DAYS: Record<number, number> = {
   1: 1,  // Review next day
@@ -41,93 +40,47 @@ const calculateNextReviewDate = (level: number): string => {
   return next.toISOString();
 };
 
-// Seed words for new learners
-const seedInitialVocab = (): VocabItem[] => {
-  return [
-    {
-      id: 'seed-ubiquitous-0',
-      word: 'ubiquitous',
-      pos: 'adjective',
-      ipa: '/juːˈbɪk.wɪ.təs/',
-      contextMeaning: 'Có mặt ở khắp mọi nơi, phổ biến rộng rãi trong đời sống.',
-      contextSentence: 'The ubiquitous deployment of generative artificial intelligence has ignited debate.',
-      articleId: 'sample-ai',
-      sourceArticleTitle: 'Cognitive Architecture of AI',
-      savedAt: new Date().toISOString(),
-      srsLevel: 1,
-      nextReviewDate: calculateNextReviewDate(1),
-      reviewCount: 0,
-collocations: ['ubiquitous deployment', 'become ubiquitous'],
-    },
-    {
-      id: 'seed-stochastic-1',
-      word: 'stochastic',
-      pos: 'adjective',
-      ipa: '/stəˈkæs.tɪk/',
-      contextMeaning: 'Có tính chất ngẫu nhiên, phỏng đoán theo phân phối xác suất.',
-      contextSentence: 'Transformer models operate via stochastic patterns.',
-      articleId: 'sample-ai',
-      sourceArticleTitle: 'Cognitive Architecture of AI',
-      savedAt: new Date().toISOString(),
-      srsLevel: 1,
-      nextReviewDate: calculateNextReviewDate(1),
-      reviewCount: 0,
-collocations: ['stochastic process', 'stochastic gradient descent'],
-    },
-  ];
-};
-
 const VocabularyVaultContext = createContext<VocabularyVaultContextType | undefined>(undefined);
 
 export const VocabularyVaultProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [savedWords, setSavedWords] = useState<VocabItem[]>(() => {
+  const { user } = useAuth();
+  const userKey = user?.id || user?.email ? `user_${user.id || user.email}` : 'guest';
+  const storageKey = `eduflow_vault_vocab_${userKey}`;
+
+  const loadUserVocab = (key: string): VocabItem[] => {
     try {
-      const stored = localStorage.getItem(STORAGE_KEY);
+      const stored = localStorage.getItem(`eduflow_vault_vocab_${key}`);
       if (stored) {
         const parsed = JSON.parse(stored);
-        if (Array.isArray(parsed) && parsed.length > 0) {
+        if (Array.isArray(parsed)) {
           return parsed;
         }
       }
-      // Migrate legacy storage if exists
-      const legacyStored = localStorage.getItem('eduflow_vault_words');
-      if (legacyStored) {
-        const legacyParsed = JSON.parse(legacyStored);
-        if (Array.isArray(legacyParsed) && legacyParsed.length > 0) {
-          return legacyParsed.map((item: any) => ({
-            id: item.id || `legacy-${item.word}`,
-            word: item.word,
-            pos: item.pos || item.partOfSpeech || 'noun',
-            ipa: item.ipa || '',
-            contextMeaning: item.contextMeaning || item.definitionVi || '',
-            contextSentence: item.contextSentence || '',
-            sourceArticleTitle: item.sourceArticleTitle || item.articleTitle || 'Học thuật EduFlow',
-            srsLevel: item.srsLevel || item.masteryLevel || 1,
-            nextReviewDate: item.nextReviewDate || calculateNextReviewDate(item.srsLevel || item.masteryLevel || 1),
-            collocations: item.collocations || [],
-            definitionEn: item.definitionEn || '',
-            articleId: item.articleId || 'ai-cognitive-architecture',
-            savedAt: item.savedAt || new Date().toISOString(),
-            reviewCount: item.reviewCount || 0,
-          }));
-        }
-      }
-      const initial = seedInitialVocab();
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(initial));
-      return initial;
-    } catch {
-      return seedInitialVocab();
+    } catch (e) {
+      console.warn('Failed to load vocabulary vault:', e);
     }
-  });
+    return [];
+  };
+
+  const [savedWords, setSavedWords] = useState<VocabItem[]>(() => loadUserVocab(userKey));
+  const prevUserKeyRef = useRef(userKey);
+
+  // Khi chuyển đổi User, tải đúng kho từ vựng của user đó
+  useEffect(() => {
+    if (prevUserKeyRef.current !== userKey) {
+      prevUserKeyRef.current = userKey;
+      setSavedWords(loadUserVocab(userKey));
+    }
+  }, [userKey]);
 
   // Persist to localStorage on change
   useEffect(() => {
     try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(savedWords));
+      localStorage.setItem(storageKey, JSON.stringify(savedWords));
     } catch (e) {
       console.error('Failed to sync vocabulary vault:', e);
     }
-  }, [savedWords]);
+  }, [savedWords, storageKey]);
 
   const isWordSaved = (word: string): boolean => {
     const clean = word.toLowerCase().trim();

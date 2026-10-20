@@ -1,9 +1,6 @@
 import { AnkiCard, AnkiDeck, AnkiRating } from '../types';
 import { mockAnkiCards, mockAnkiDecks } from '../data/cambridgeMockData';
 
-const ANKI_CARDS_STORAGE_KEY = 'eduflow_anki_cards_v1';
-const ANKI_DECKS_STORAGE_KEY = 'eduflow_anki_decks_v1';
-
 /**
  * SuperMemo-2 (SM-2) Spaced Repetition calculation
  */
@@ -108,41 +105,60 @@ export function isCardDue(card: AnkiCard): boolean {
 }
 
 /**
- * Load cards from LocalStorage, falling back to seed mock data
+ * Default clean initial deck for a user
  */
-export function loadCardsFromStorage(): AnkiCard[] {
+export const getDefaultUserDecks = (): AnkiDeck[] => [
+  {
+    id: 'deck-personal',
+    title: 'Deck Cá Nhân (Từ Vựng Đã Lưu)',
+    description: 'Tập hợp từ vựng học thuật bạn đã lưu từ bài đọc Cambridge và AI Cloze 9.0',
+    category: 'CÁ NHÂN HÓA',
+    isPersonal: true,
+    totalCards: 0,
+    dueTodayCount: 0,
+    learningCount: 0,
+    masteredCount: 0,
+    iconName: 'Bookmark',
+  },
+];
+
+/**
+ * Load cards for a specific user from LocalStorage.
+ * New users start with an empty card set (0 cards).
+ */
+export function loadUserCardsFromStorage(userKey: string = 'guest'): AnkiCard[] {
   try {
-    const raw = localStorage.getItem(ANKI_CARDS_STORAGE_KEY);
+    const raw = localStorage.getItem(`eduflow_anki_cards_${userKey}`);
     if (raw) {
       const parsed = JSON.parse(raw);
-      if (Array.isArray(parsed) && parsed.length > 0) {
+      if (Array.isArray(parsed)) {
         return parsed;
       }
     }
   } catch (err) {
-    console.warn('Failed to load Anki cards from LocalStorage:', err);
+    console.warn(`Failed to load Anki cards for user ${userKey}:`, err);
   }
-  return mockAnkiCards;
+  return [];
 }
 
 /**
- * Save cards to LocalStorage
+ * Save cards for a specific user to LocalStorage
  */
-export function saveCardsToStorage(cards: AnkiCard[]): void {
+export function saveUserCardsToStorage(userKey: string = 'guest', cards: AnkiCard[]): void {
   try {
-    localStorage.setItem(ANKI_CARDS_STORAGE_KEY, JSON.stringify(cards));
+    localStorage.setItem(`eduflow_anki_cards_${userKey}`, JSON.stringify(cards));
   } catch (err) {
-    console.error('Failed to save Anki cards to LocalStorage:', err);
+    console.error(`Failed to save Anki cards for user ${userKey}:`, err);
   }
 }
 
 /**
- * Load decks from LocalStorage, syncing counts with cards
+ * Load decks for a specific user, syncing counts with current cards
  */
-export function loadDecksFromStorage(cards: AnkiCard[]): AnkiDeck[] {
-  let baseDecks: AnkiDeck[] = mockAnkiDecks;
+export function loadUserDecksFromStorage(userKey: string = 'guest', cards: AnkiCard[]): AnkiDeck[] {
+  let baseDecks: AnkiDeck[] = getDefaultUserDecks();
   try {
-    const raw = localStorage.getItem(ANKI_DECKS_STORAGE_KEY);
+    const raw = localStorage.getItem(`eduflow_anki_decks_${userKey}`);
     if (raw) {
       const parsed = JSON.parse(raw);
       if (Array.isArray(parsed) && parsed.length > 0) {
@@ -150,7 +166,7 @@ export function loadDecksFromStorage(cards: AnkiCard[]): AnkiDeck[] {
       }
     }
   } catch (err) {
-    console.warn('Failed to load Anki decks from LocalStorage:', err);
+    console.warn(`Failed to load Anki decks for user ${userKey}:`, err);
   }
 
   // Update counts dynamically based on cards in store
@@ -171,13 +187,31 @@ export function loadDecksFromStorage(cards: AnkiCard[]): AnkiDeck[] {
 }
 
 /**
- * Save decks to LocalStorage
+ * Save decks for a specific user to LocalStorage
  */
-export function saveDecksToStorage(decks: AnkiDeck[]): void {
+export function saveUserDecksToStorage(userKey: string = 'guest', decks: AnkiDeck[]): void {
   try {
-    localStorage.setItem(ANKI_DECKS_STORAGE_KEY, JSON.stringify(decks));
+    localStorage.setItem(`eduflow_anki_decks_${userKey}`, JSON.stringify(decks));
   } catch (err) {
-    console.error('Failed to save Anki decks to LocalStorage:', err);
+    console.error(`Failed to save Anki decks for user ${userKey}:`, err);
   }
 }
 
+// Backward compatible aliases
+export function loadCardsFromStorage(): AnkiCard[] {
+  return loadUserCardsFromStorage('guest');
+}
+
+export function saveCardsToStorage(cards: AnkiCard[]): void {
+  saveUserCardsToStorage('guest', cards);
+}
+
+export function loadDecksFromStorage(cards: AnkiCard[]): AnkiDeck[] {
+  return loadUserDecksFromStorage('guest', cards);
+}
+
+export function saveDecksToStorage(decks: AnkiDeck[]): void {
+  saveUserDecksToStorage('guest', decks);
+}
+
+export { mockAnkiCards, mockAnkiDecks };

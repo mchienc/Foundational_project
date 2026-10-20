@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Sparkles,
   Copy,
@@ -10,6 +10,7 @@ import {
   AlertCircle,
 } from 'lucide-react';
 import { useVocabularyVault } from '../../context/VocabularyVaultContext';
+import { useAnki } from '../../context/AnkiContext';
 
 interface GeminiAnkiCardGeneratorProps {
   initialWord?: string;
@@ -30,15 +31,24 @@ export const GeminiAnkiCardGenerator: React.FC<GeminiAnkiCardGeneratorProps> = (
   onSavedSuccess,
 }) => {
   const { saveAiGeneratedWord } = useVocabularyVault();
+  const { decks, addCardToPersonalDeck } = useAnki();
 
   const [inputWord, setInputWord] = useState(initialWord);
   const [inputSentence, setInputSentence] = useState(initialSentence);
+  const [targetDeckId, setTargetDeckId] = useState<string>('deck-personal');
   const [isGenerating, setIsGenerating] = useState(false);
   const [cardResult, setCardResult] = useState<GeneratedCardData | null>(null);
   const [generationSource, setGenerationSource] = useState<string>('');
   const [copiedSection, setCopiedSection] = useState<string | null>(null);
   const [isSaved, setIsSaved] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
+  // Cập nhật targetDeckId mặc định theo danh sách decks có sẵn
+  useEffect(() => {
+    if (decks.length > 0 && !decks.some((d) => d.id === targetDeckId)) {
+      setTargetDeckId(decks[0].id);
+    }
+  }, [decks, targetDeckId]);
 
   const handleGenerate = async () => {
     if (!inputWord.trim() && !inputSentence.trim()) {
@@ -77,8 +87,24 @@ export const GeminiAnkiCardGenerator: React.FC<GeminiAnkiCardGeneratorProps> = (
   const handleSaveToVault = () => {
     if (!cardResult) return;
 
-    const saved = saveAiGeneratedWord({
-      word: inputWord.trim() || cardResult.text.replace(/\{\{c1::(.*?)(?:::.*?)?\}\}/g, '$1').slice(0, 30),
+    const cleanWord = inputWord.trim() || cardResult.text.replace(/\{\{c1::(.*?)(?:::.*?)?\}\}/g, '$1').slice(0, 30);
+    const selectedDeck = decks.find((d) => d.id === targetDeckId) || decks[0];
+
+    // 1. Lưu vào AnkiContext để xuất hiện trực tiếp trong bộ bài bên dưới
+    addCardToPersonalDeck({
+      word: cleanWord,
+      definitionVi: cardResult.backExtra.split('\n')[0] || cleanWord,
+      contextSentence: inputSentence.trim() || cardResult.text.replace(/\{\{c1::(.*?)(?:::.*?)?\}\}/g, '$1'),
+      source: 'Gemini IELTS 9.0 Coach',
+      backExtra: cardResult.backExtra,
+      tags: cardResult.tags,
+      customCloze: cardResult.text,
+      deckId: targetDeckId,
+    });
+
+    // 2. Đồng bộ vào VocabularyVaultContext
+    saveAiGeneratedWord({
+      word: cleanWord,
       clozeText: cardResult.text,
       backExtra: cardResult.backExtra,
       tags: cardResult.tags,
@@ -86,10 +112,9 @@ export const GeminiAnkiCardGenerator: React.FC<GeminiAnkiCardGeneratorProps> = (
       sourceArticleTitle: 'Gemini IELTS 9.0 Coach',
     });
 
-    if (saved) {
-      setIsSaved(true);
-      onSavedSuccess?.(`Đã lưu thẻ Anki Cloze "${inputWord || 'từ mới'}" vào kho từ vựng thành công!`);
-    }
+    setIsSaved(true);
+    const deckName = selectedDeck ? selectedDeck.title : 'bộ bài của bạn';
+    onSavedSuccess?.(`Đã lưu thẻ Anki Cloze "${cleanWord}" vào ${deckName} thành công!`);
   };
 
   const copyToClipboard = (content: string, sectionName: string) => {
@@ -234,14 +259,31 @@ export const GeminiAnkiCardGenerator: React.FC<GeminiAnkiCardGeneratorProps> = (
               <BookOpen size={14} /> Thẻ Anki Cloze Hoàn Chỉnh (3 Mục Chuẩn)
             </span>
 
-            <div className="flex items-center gap-2">
+            <div className="flex flex-wrap items-center gap-2">
               <button
                 onClick={() => copyToClipboard(cardResult.raw, 'all')}
-                className="inline-flex items-center gap-1 px-3 py-1 text-xs font-semibold rounded-lg bg-white border border-stone-200 text-stone-700 hover:bg-stone-100 transition-colors cursor-pointer"
+                className="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-semibold rounded-lg bg-white border border-stone-200 text-stone-700 hover:bg-stone-100 transition-colors cursor-pointer"
               >
                 {copiedSection === 'all' ? <Check size={12} className="text-emerald-600" /> : <Copy size={12} />}
                 {copiedSection === 'all' ? 'Đã sao chép!' : 'Sao Chép Tất Cả'}
               </button>
+
+              {decks.length > 0 && (
+                <div className="flex items-center gap-1.5 bg-white px-2.5 py-1 rounded-xl border border-stone-200 text-xs">
+                  <span className="text-[11px] text-stone-500 font-medium">Lưu vào:</span>
+                  <select
+                    value={targetDeckId}
+                    onChange={(e) => setTargetDeckId(e.target.value)}
+                    className="bg-transparent font-semibold text-stone-800 text-xs focus:outline-none cursor-pointer"
+                  >
+                    {decks.map((d) => (
+                      <option key={d.id} value={d.id}>
+                        {d.title}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              )}
 
               <button
                 onClick={handleSaveToVault}
@@ -253,7 +295,7 @@ export const GeminiAnkiCardGenerator: React.FC<GeminiAnkiCardGeneratorProps> = (
                 }`}
               >
                 {isSaved ? <Check size={13} /> : <BookmarkPlus size={13} />}
-                {isSaved ? 'Đã Lưu Vào Kho Từ Vựng' : 'Lưu Thẻ Vào Bộ Ôn Tập'}
+                {isSaved ? 'Đã Lưu Vào Bộ Thẻ' : 'Lưu Thẻ Vào Bộ Ôn Tập'}
               </button>
             </div>
           </div>
