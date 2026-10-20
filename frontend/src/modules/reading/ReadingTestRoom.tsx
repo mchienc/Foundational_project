@@ -52,10 +52,13 @@ export const ReadingTestRoom: React.FC<ReadingTestRoomProps> = ({
   const isFullTest = sessionConfig?.mode === 'full' && (sessionConfig.passageIds?.length || 0) > 1;
 
   const initialPassage =
-    mockReadingPassages.find((p) => p.id === passageId) || mockReadingPassages[0];
+    mockReadingPassages.find((p) => p.id === passageId && p.paragraphs && p.paragraphs.length > 0) || mockReadingPassages[0];
   const [passage, setPassage] = useState<CambridgeReadingPassage>(initialPassage);
   const [allPassages, setAllPassages] = useState<CambridgeReadingPassage[]>([]);
   const [activePassageIndex, setActivePassageIndex] = useState<number>(0);
+  const [isLoading, setIsLoading] = useState<boolean>(
+    !mockReadingPassages.some((p) => p.id === passageId && p.paragraphs && p.paragraphs.length > 0)
+  );
 
   // Timer: 60 minutes for Full Test, 20 minutes for single passage
   const [secondsRemaining, setSecondsRemaining] = useState<number>(
@@ -65,6 +68,7 @@ export const ReadingTestRoom: React.FC<ReadingTestRoomProps> = ({
 
   useEffect(() => {
     if (isFullTest && sessionConfig?.passageIds) {
+      setIsLoading(true);
       Promise.all(sessionConfig.passageIds.map((id) => getReadingPassageById(id)))
         .then((loaded) => {
           setAllPassages(loaded);
@@ -72,18 +76,31 @@ export const ReadingTestRoom: React.FC<ReadingTestRoomProps> = ({
             setPassage(loaded[0]);
           }
           setSecondsRemaining(60 * 60);
+          setIsLoading(false);
         })
         .catch((err) => {
           console.error('Lỗi tải Full Test passages:', err);
+          setIsLoading(false);
         });
     } else {
-      getReadingPassageById(passageId).then((data) => {
-        if (data) {
-          setPassage(data);
-          setAllPassages([data]);
-          setSecondsRemaining((data.estimatedMinutes || 20) * 60);
-        }
-      });
+      if (passage.id === passageId && passage.paragraphs && passage.paragraphs.length > 0) {
+        setIsLoading(false);
+      } else {
+        setIsLoading(true);
+        getReadingPassageById(passageId)
+          .then((data) => {
+            if (data) {
+              setPassage(data);
+              setAllPassages([data]);
+              setSecondsRemaining((data.estimatedMinutes || 20) * 60);
+            }
+            setIsLoading(false);
+          })
+          .catch((err) => {
+            console.error('Lỗi nạp bài đọc:', err);
+            setIsLoading(false);
+          });
+      }
     }
   }, [passageId, sessionConfig, isFullTest]);
 
@@ -430,6 +447,22 @@ export const ReadingTestRoom: React.FC<ReadingTestRoomProps> = ({
     base: 'text-sm sm:text-base leading-relaxed sm:leading-8',
     lg: 'text-base sm:text-lg leading-relaxed sm:leading-9',
   };
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center bg-[#FAFAF9] text-stone-900">
+        <div className="flex flex-col items-center gap-4 text-center">
+          <div className="w-14 h-14 rounded-2xl bg-emerald-50 border border-emerald-200 flex items-center justify-center shadow-sm">
+            <BookOpen className="w-7 h-7 text-[#064E3B] animate-pulse" />
+          </div>
+          <div>
+            <h3 className="font-serif text-lg font-bold text-stone-800">Đang nạp đề thi từ hệ thống...</h3>
+            <p className="text-xs text-stone-500 mt-1">Đồng bộ đoạn văn và toàn bộ câu hỏi khảo thí Cambridge</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex flex-col bg-[#FAFAF9] text-stone-900 selection:bg-amber-400/40">

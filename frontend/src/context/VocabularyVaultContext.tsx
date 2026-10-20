@@ -1,6 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { VocabItem, TargetWord } from '../types';
-import { mockArticles } from '../data/mockArticles';
 
 interface VocabularyVaultContextType {
   savedWords: VocabItem[];
@@ -31,27 +30,40 @@ const calculateNextReviewDate = (level: number): string => {
   return next.toISOString();
 };
 
-// Seed words for new learners from Article 1
+// Seed words for new learners
 const seedInitialVocab = (): VocabItem[] => {
-  const firstArticle = mockArticles[0];
-  if (!firstArticle) return [];
-
-  return firstArticle.targetWords.slice(0, 3).map((tw, idx) => ({
-    id: `seed-${tw.word}-${idx}`,
-    word: tw.word,
-    pos: tw.partOfSpeech,
-    ipa: tw.ipa,
-    contextMeaning: tw.definitionVi,
-    contextSentence: tw.contextSentence,
-    sourceArticleTitle: firstArticle.title,
-    srsLevel: 2 + (idx % 2),
-    nextReviewDate: new Date(Date.now() + (idx === 0 ? -3600000 : 3600 * 1000 * 24 * (idx + 1))).toISOString(),
-    collocations: tw.collocations,
-    definitionEn: tw.definitionEn,
-    articleId: firstArticle.id,
-    savedAt: new Date(Date.now() - (idx + 1) * 3600 * 1000 * 24).toISOString(),
-    reviewCount: idx + 1,
-  }));
+  return [
+    {
+      id: 'seed-ubiquitous-0',
+      word: 'ubiquitous',
+      pos: 'adjective',
+      ipa: '/juːˈbɪk.wɪ.təs/',
+      contextMeaning: 'Có mặt ở khắp mọi nơi, phổ biến rộng rãi trong đời sống.',
+      contextSentence: 'The ubiquitous deployment of generative artificial intelligence has ignited debate.',
+      articleId: 'sample-ai',
+      sourceArticleTitle: 'Cognitive Architecture of AI',
+      savedAt: new Date().toISOString(),
+      srsLevel: 1,
+      nextReviewDate: calculateNextReviewDate(1),
+      reviewCount: 0,
+collocations: ['ubiquitous deployment', 'become ubiquitous'],
+    },
+    {
+      id: 'seed-stochastic-1',
+      word: 'stochastic',
+      pos: 'adjective',
+      ipa: '/stəˈkæs.tɪk/',
+      contextMeaning: 'Có tính chất ngẫu nhiên, phỏng đoán theo phân phối xác suất.',
+      contextSentence: 'Transformer models operate via stochastic patterns.',
+      articleId: 'sample-ai',
+      sourceArticleTitle: 'Cognitive Architecture of AI',
+      savedAt: new Date().toISOString(),
+      srsLevel: 1,
+      nextReviewDate: calculateNextReviewDate(1),
+      reviewCount: 0,
+collocations: ['stochastic process', 'stochastic gradient descent'],
+    },
+  ];
 };
 
 const VocabularyVaultContext = createContext<VocabularyVaultContextType | undefined>(undefined);
