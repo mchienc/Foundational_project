@@ -14,6 +14,7 @@ import {
   Clock,
   Layers,
   Wand2,
+  AlertCircle,
 } from 'lucide-react';
 import {
   DictationCefrLevel,
@@ -58,6 +59,7 @@ export const CustomVideoImporterModal: React.FC<CustomVideoImporterModalProps> =
   const [isExtracting, setIsExtracting] = useState<boolean>(true);
   const [extractSourceLabel, setExtractSourceLabel] = useState<string>('');
   const [autoSentences, setAutoSentences] = useState<DictationSentence[]>([]);
+  const [aiWarningMessage, setAiWarningMessage] = useState<string | null>(null);
 
   const [manualText, setManualText] = useState<string>(SAMPLE_TIMESTAMP_TEXT);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -66,11 +68,25 @@ export const CustomVideoImporterModal: React.FC<CustomVideoImporterModalProps> =
   useEffect(() => {
     let isMounted = true;
     setIsExtracting(true);
+    setAiWarningMessage(null);
 
+    // 1. ƯU TIÊN TUYỆT ĐỐI: Kiểm tra videoId trong kho bài học thuật đã tuyển chọn & kiểm duyệt
     const matchedCurated = mockDictationLessons.find(
       (l) => l.youtubeId.toLowerCase() === videoId.toLowerCase()
     );
 
+    if (matchedCurated && Array.isArray(matchedCurated.sentences) && matchedCurated.sentences.length > 0) {
+      setTitle(matchedCurated.title);
+      setChannel(matchedCurated.channel);
+      setLevel(matchedCurated.level);
+      setTopic(matchedCurated.topic);
+      setAutoSentences(matchedCurated.sentences);
+      setExtractSourceLabel('YouTube Official Captions (Tuyển chọn)');
+      setIsExtracting(false);
+      return;
+    }
+
+    // 2. Nếu là video tùy chỉnh mới, gọi Backend trích xuất phụ đề thật từ YouTube
     fetch('/api/dictation/extract-youtube', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -80,28 +96,28 @@ export const CustomVideoImporterModal: React.FC<CustomVideoImporterModalProps> =
       .then((json) => {
         if (!isMounted) return;
         const payload = json?.data || json;
-        if (matchedCurated && (!payload?.sentences || payload.sentences.length < 10)) {
-          setTitle(matchedCurated.title);
-          setChannel(matchedCurated.channel);
-          setAutoSentences(matchedCurated.sentences);
-          setExtractSourceLabel('YouTube Official Captions');
-        } else if (payload && Array.isArray(payload.sentences) && payload.sentences.length > 0) {
+
+        if (payload && Array.isArray(payload.sentences) && payload.sentences.length > 0) {
           if (payload.title) setTitle(payload.title);
           if (payload.channel) setChannel(payload.channel);
+          if (payload.level) setLevel(payload.level);
+          if (payload.topic) setTopic(payload.topic);
           setAutoSentences(payload.sentences);
-          setExtractSourceLabel(
-            json?.source ||
-              (payload.sourceType === 'youtube_official_captions'
-                ? 'YouTube Official Captions'
-                : payload.sourceType === 'youtube_auto_captions'
-                ? 'YouTube Auto Captions'
-                : 'YouTube Captions')
-          );
-        } else if (matchedCurated) {
-          setTitle(matchedCurated.title);
-          setChannel(matchedCurated.channel);
-          setAutoSentences(matchedCurated.sentences);
-          setExtractSourceLabel('YouTube Official Captions');
+
+          if (payload.sourceType === 'ai_heuristic' || payload.isAiGenerated) {
+            setExtractSourceLabel('AI Gợi Ý Theo Chủ Đề');
+            setAiWarningMessage(
+              payload.warning ||
+                'YouTube không cung cấp phụ đề tiếng Anh cho video này. Kịch bản dưới đây do AI tạo theo chủ đề video và sẽ KHÔNG khớp từng từ với clip phát. Khuyên dùng: Dán phụ đề thật qua tab "Cách 2".'
+            );
+          } else {
+            setExtractSourceLabel(
+              json?.source ||
+                (payload.sourceType === 'youtube_official_captions'
+                  ? 'YouTube Official Captions'
+                  : 'YouTube Auto Captions')
+            );
+          }
         } else {
           setAutoSentences(parseCustomTranscriptInput(SAMPLE_TIMESTAMP_TEXT));
           setExtractSourceLabel('Bộ phân đoạn mẫu');
@@ -109,15 +125,8 @@ export const CustomVideoImporterModal: React.FC<CustomVideoImporterModalProps> =
       })
       .catch(() => {
         if (!isMounted) return;
-        if (matchedCurated) {
-          setTitle(matchedCurated.title);
-          setChannel(matchedCurated.channel);
-          setAutoSentences(matchedCurated.sentences);
-          setExtractSourceLabel('YouTube Official Captions');
-        } else {
-          setAutoSentences(parseCustomTranscriptInput(SAMPLE_TIMESTAMP_TEXT));
-          setExtractSourceLabel('Bộ phân đoạn mẫu (Offline)');
-        }
+        setAutoSentences(parseCustomTranscriptInput(SAMPLE_TIMESTAMP_TEXT));
+        setExtractSourceLabel('Bộ phân đoạn mẫu (Offline)');
       })
       .finally(() => {
         if (isMounted) setIsExtracting(false);
@@ -391,6 +400,24 @@ export const CustomVideoImporterModal: React.FC<CustomVideoImporterModalProps> =
                   </span>
                 )}
               </div>
+
+              {aiWarningMessage && (
+                <div className="p-3 rounded-xl bg-amber-50 border border-amber-300 text-amber-900 text-xs flex items-start gap-2.5 leading-relaxed">
+                  <AlertCircle size={18} className="text-amber-600 shrink-0 mt-0.5" />
+                  <div className="space-y-1">
+                    <span className="font-bold block text-amber-950">Lưu ý về độ khớp phụ đề:</span>
+                    <p>{aiWarningMessage}</p>
+                    <button
+                      type="button"
+                      onClick={() => setSourceMode('manual')}
+                      className="mt-1 inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-[#D97706] text-white font-bold text-[11px] hover:bg-amber-700 transition-colors cursor-pointer"
+                    >
+                      <FileText size={12} />
+                      Chuyển sang "Cách 2: Nạp kịch bản thủ công"
+                    </button>
+                  </div>
+                </div>
+              )}
 
               {isExtracting ? (
                 <div className="py-8 flex flex-col items-center justify-center gap-2 text-stone-500">

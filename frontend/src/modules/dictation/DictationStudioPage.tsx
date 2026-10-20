@@ -42,16 +42,16 @@ const TOPIC_FILTERS: { id: 'ALL' | DictationTopic; label: string }[] = [
 
 const QUICK_SAMPLE_LINKS = [
   {
-    label: 'TED-Ed: How stress affects your brain',
+    label: 'TED (Judson Brewer): A Simple Way to Break a Bad Habit',
+    url: 'https://www.youtube.com/watch?v=-moW9jvvMr4',
+  },
+  {
+    label: 'TED-Ed: Inside the mind of a master procrastinator',
     url: 'https://www.youtube.com/watch?v=WuyPuH9ojCE',
   },
   {
-    label: 'TED-Ed: Why do we dream?',
-    url: 'https://www.youtube.com/watch?v=2W85Dwxx218',
-  },
-  {
-    label: 'BBC: How to speak with confidence',
-    url: 'https://youtu.be/eIho2S0ZahI',
+    label: 'TED: How great leaders inspire action (Simon Sinek)',
+    url: 'https://www.youtube.com/watch?v=arj7oStGLkU',
   },
 ];
 
@@ -60,7 +60,29 @@ export const DictationStudioPage: React.FC = () => {
   const [customLessons, setCustomLessons] = useState<DictationLesson[]>(() => {
     try {
       const raw = localStorage.getItem(CUSTOM_LESSONS_STORAGE_KEY);
-      return raw ? JSON.parse(raw) : [];
+      if (!raw) return [];
+      const parsed: DictationLesson[] = JSON.parse(raw);
+      // Tự động dọn dẹp các bản lưu tùy chỉnh cũ bị lỗi câu AI hoặc trùng videoId với kho tuyển chọn
+      const cleaned = parsed.filter((item) => {
+        const hasAiJunk = item.sentences?.some(
+          (s) =>
+            s.text.toLowerCase().includes('cognitive psychology') ||
+            s.text.toLowerCase().includes('welcome to today')
+        );
+        if (hasAiJunk) return false;
+
+        const isCurated = mockDictationLessons.some(
+          (c) => c.youtubeId.toLowerCase() === item.youtubeId.toLowerCase()
+        );
+        if (isCurated) return false;
+
+        return true;
+      });
+
+      if (cleaned.length !== parsed.length) {
+        localStorage.setItem(CUSTOM_LESSONS_STORAGE_KEY, JSON.stringify(cleaned));
+      }
+      return cleaned;
     } catch {
       return [];
     }
@@ -75,11 +97,16 @@ export const DictationStudioPage: React.FC = () => {
     }
   });
 
-  // Combined vault lessons
-  const allLessons = useMemo(
-    () => [...customLessons, ...mockDictationLessons],
-    [customLessons]
-  );
+  // Combined vault lessons: Kho tuyển chọn (Curated Vault) luôn đứng đầu và ưu tiên cao nhất
+  const allLessons = useMemo(() => {
+    const validCustom = customLessons.filter(
+      (c) =>
+        !mockDictationLessons.some(
+          (m) => m.youtubeId.toLowerCase() === c.youtubeId.toLowerCase()
+        )
+    );
+    return [...mockDictationLessons, ...validCustom];
+  }, [customLessons]);
 
   // Active Lesson ID for `/dictation/[id]` Full-screen Focus Room
   const [activeLessonId, setActiveLessonId] = useState<string | null>(() => {
@@ -219,7 +246,14 @@ export const DictationStudioPage: React.FC = () => {
   // Check if a lesson is active -> Render `/dictation/[id]` Full-screen Focus Room
   const activeLesson = useMemo(() => {
     if (!activeLessonId) return null;
-    return allLessons.find((l) => l.id === activeLessonId) || null;
+    const target = activeLessonId.trim().toLowerCase();
+    return (
+      allLessons.find(
+        (l) =>
+          l.id.toLowerCase() === target ||
+          l.youtubeId.toLowerCase() === target
+      ) || null
+    );
   }, [activeLessonId, allLessons]);
 
   if (activeLesson) {

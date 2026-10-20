@@ -9,6 +9,13 @@ try {
   console.warn('[Dictation] youtube-transcript package not available, using InnerTube fallback.');
 }
 
+let curatedVault = {};
+try {
+  curatedVault = require('./curatedDictationVault');
+} catch (e) {
+  console.warn('[Dictation] curatedDictationVault not loaded:', e.message);
+}
+
 // Giải mã các ký tự HTML entities trong phụ đề YouTube (hỗ trợ cả double-escaped entities)
 function decodeHtmlEntities(str = '') {
   let decoded = str;
@@ -465,15 +472,54 @@ exports.extractYoutubeTranscript = async (req, res) => {
     const cleanId = videoId.trim();
     let meta = await fetchYoutubeMetadata(cleanId);
 
+    // 0. Kiểm tra kho bài học thuật đã tuyển chọn & kiểm duyệt (Curated Vault)
+    const cachedCurated = curatedVault[cleanId.toLowerCase()];
+    if (cachedCurated && Array.isArray(cachedCurated.sentences) && cachedCurated.sentences.length > 0) {
+      const payload = {
+        videoId: cleanId,
+        title: cachedCurated.title || meta.title,
+        channel: cachedCurated.channel || meta.channel,
+        level: cachedCurated.level || 'B2',
+        topic: cachedCurated.topic || 'Khoa học',
+        sourceType: 'youtube_official_captions',
+        sentences: cachedCurated.sentences,
+      };
+      return res.json({
+        success: true,
+        source: 'YouTube Official Captions (Curated Vault)',
+        ...payload,
+        data: payload,
+      });
+    }
+
     // 1. Thử lấy phụ đề chuẩn qua YoutubeTranscript library (Hỗ trợ tốt cả trên môi trường Cloud/Render)
     if (YoutubeTranscriptModule) {
       try {
         let items = null;
-        try {
-          items = await YoutubeTranscriptModule.fetchTranscript(cleanId, { lang: 'en' });
-        } catch {
-          // Thử lấy phụ đề mặc định bất kể ngôn ngữ nếu lang=en thất bại
-          items = await YoutubeTranscriptModule.fetchTranscript(cleanId);
+        const targetLangs = ['en', 'en-US', 'en-GB', 'en-CA'];
+        for (const lang of targetLangs) {
+          try {
+            items = await YoutubeTranscriptModule.fetchTranscript(cleanId, { lang });
+            if (Array.isArray(items) && items.length > 0) break;
+          } catch {
+            // thử tiếp ngôn ngữ tiếng Anh khác
+          }
+        }
+
+        // Nếu chỉ định ngôn ngữ thất bại, thử lấy mặc định nhưng kiểm tra xem có phải tiếng Anh không
+        if (!items) {
+          try {
+            const rawItems = await YoutubeTranscriptModule.fetchTranscript(cleanId);
+            if (Array.isArray(rawItems) && rawItems.length > 0) {
+              const langCode = rawItems[0]?.lang || '';
+              // Chỉ chấp nhận nếu là tiếng Anh hoặc không có nhãn
+              if (!langCode || langCode.startsWith('en')) {
+                items = rawItems;
+              }
+            }
+          } catch {
+            // bỏ qua
+          }
         }
 
         if (Array.isArray(items) && items.length > 0) {
@@ -532,18 +578,21 @@ exports.extractYoutubeTranscript = async (req, res) => {
       });
     }
 
-    // 3. Nếu video không có phụ đề công khai, dùng AI tạo kịch bản 20 câu học thuật
+    // 3. Nếu video không có phụ đề công khai, dùng AI tạo kịch bản gợi ý và đánh dấu cảnh báo rõ ràng
     const aiSentences = await generateSmartSentencesWithAi(meta.title, meta.channel);
     const fallbackPayload = {
       videoId: cleanId,
       title: meta.title,
       channel: meta.channel,
       sourceType: 'ai_heuristic',
+      isAiGenerated: true,
+      warning:
+        'Video này không có phụ đề tiếng Anh trên YouTube. Kịch bản dưới đây do AI tạo theo chủ đề video và sẽ không khớp từng từ với clip phát.',
       sentences: aiSentences,
     };
     return res.json({
       success: true,
-      source: 'AI Academic Generator',
+      source: 'AI Academic Fallback (Không khớp 100% audio)',
       ...fallbackPayload,
       data: fallbackPayload,
     });
