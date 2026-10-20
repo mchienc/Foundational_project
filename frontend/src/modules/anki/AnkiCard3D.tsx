@@ -1,12 +1,12 @@
 // frontend/src/modules/anki/AnkiCard3D.tsx
-// Component Thẻ Anki Flashcard 3D với GSAP: Lật 180 độ 3D, SRS Rating Swipe, 60FPS GPU Accelerated
+// Component Thẻ Anki Flashcard 3D với GSAP: Lật 180 độ 3D, SRS Rating Swipe, Chuẩn Cloze Deletion & Back Extra
 
 import React, { useRef, useEffect } from 'react';
 import gsap from 'gsap';
 import { useGSAP } from '@gsap/react';
 import { AnkiCard, AnkiRating } from '../../types';
 import { AudioPlayButton } from '../../components/shared/AudioPlayButton';
-import { Sparkles } from 'lucide-react';
+import { Sparkles, Tag } from 'lucide-react';
 
 export interface AnkiCard3DProps {
   card: AnkiCard;
@@ -15,6 +15,103 @@ export interface AnkiCard3DProps {
   ratingAction?: { rating: AnkiRating; timestamp: number } | null;
   onActionComplete?: () => void;
 }
+
+// 1. Phân tích & Render mặt trước (Ẩn cụm từ cần học, hiển thị chỗ trống kèm gợi ý tiếng Việt)
+const renderFrontCloze = (rawText: string) => {
+  if (!rawText) return null;
+
+  const regex = /\{\{c\d+::(.*?)(?:::([^}]*))?\}\}/g;
+  if (!regex.test(rawText)) {
+    if (rawText.includes('[ ________ ]')) {
+      const parts = rawText.split('[ ________ ]');
+      return (
+        <span>
+          {parts.map((p, i) => (
+            <React.Fragment key={i}>
+              {p}
+              {i < parts.length - 1 && (
+                <span className="inline-block px-3 py-1 mx-1.5 rounded-xl bg-amber-100 text-amber-950 font-sans font-bold border-2 border-dashed border-amber-400 shadow-2xs">
+                  [ . . . ]
+                </span>
+              )}
+            </React.Fragment>
+          ))}
+        </span>
+      );
+    }
+    return rawText;
+  }
+
+  regex.lastIndex = 0;
+  const parts: React.ReactNode[] = [];
+  let lastIdx = 0;
+  let match: RegExpExecArray | null;
+
+  while ((match = regex.exec(rawText)) !== null) {
+    if (match.index > lastIdx) {
+      parts.push(rawText.substring(lastIdx, match.index));
+    }
+    const hint = match[2];
+    parts.push(
+      <span
+        key={match.index}
+        className="inline-flex items-baseline px-3 py-1 rounded-xl bg-amber-100 text-amber-950 font-sans font-bold border-2 border-dashed border-amber-400 mx-1.5 shadow-xs transition-all hover:bg-amber-200"
+      >
+        <span>[ ... ]</span>
+        {hint && (
+          <span className="ml-1.5 text-xs font-normal text-amber-900 italic">
+            ({hint})
+          </span>
+        )}
+      </span>
+    );
+    lastIdx = regex.lastIndex;
+  }
+
+  if (lastIdx < rawText.length) {
+    parts.push(rawText.substring(lastIdx));
+  }
+
+  return parts;
+};
+
+// 2. Phân tích & Render mặt sau (Làm nổi bật cụm từ đáp án hoàn chỉnh)
+const renderBackRevealedSentence = (rawText: string, fullSentenceFallback: string) => {
+  const textToParse = rawText || fullSentenceFallback;
+  if (!textToParse) return null;
+
+  const regex = /\{\{c\d+::(.*?)(?:::([^}]*))?\}\}/g;
+  if (!regex.test(textToParse)) {
+    return textToParse;
+  }
+
+  regex.lastIndex = 0;
+  const parts: React.ReactNode[] = [];
+  let lastIdx = 0;
+  let match: RegExpExecArray | null;
+
+  while ((match = regex.exec(textToParse)) !== null) {
+    if (match.index > lastIdx) {
+      parts.push(textToParse.substring(lastIdx, match.index));
+    }
+    const answer = match[1];
+    parts.push(
+      <span
+        key={match.index}
+        className="inline-flex items-baseline px-2.5 py-0.5 rounded-lg bg-emerald-100 text-emerald-950 font-bold border border-emerald-300 underline decoration-emerald-600 decoration-2 underline-offset-2 mx-1 shadow-2xs"
+      >
+        {answer}
+      </span>
+    );
+    lastIdx = regex.lastIndex;
+  }
+
+  if (lastIdx < textToParse.length) {
+    parts.push(textToParse.substring(lastIdx));
+  }
+
+  return parts;
+};
 
 export const AnkiCard3D: React.FC<AnkiCard3DProps> = ({
   card,
@@ -27,12 +124,16 @@ export const AnkiCard3D: React.FC<AnkiCard3DProps> = ({
   const flipperRef = useRef<HTMLDivElement>(null);
   const isInitialMount = useRef<boolean>(true);
 
+  // Câu đọc tự nhiên sạch sẽ để phát âm (loại bỏ cú pháp cloze)
+  const cleanSpokenSentence = (card.clozeSentence || card.fullSentence)
+    .replace(/\{\{c\d+::(.*?)(?:::.*?)?\}\}/g, '$1')
+    .replace(/\[ ________ \]/g, card.word);
+
   // 1. Quản lý xoay lật True 3D Flip bằng useGSAP
   useGSAP(
     () => {
       if (!flipperRef.current) return;
 
-      // Không animate lật trong lần mount đầu tiên nếu thẻ chưa lật
       if (isInitialMount.current) {
         isInitialMount.current = false;
         gsap.set(flipperRef.current, {
@@ -62,7 +163,6 @@ export const AnkiCard3D: React.FC<AnkiCard3DProps> = ({
     const cardEl = flipperRef.current;
 
     if (rating === 'easy' || rating === 'good') {
-      // Swipe phải và bay nhẹ lên trên
       gsap.to(cardEl, {
         x: 120,
         y: -25,
@@ -76,7 +176,6 @@ export const AnkiCard3D: React.FC<AnkiCard3DProps> = ({
         },
       });
     } else if (rating === 'again') {
-      // Rung lắc ngang phản hồi lỗi rồi trượt xuống đáy
       const tl = gsap.timeline({
         onComplete: () => {
           onActionComplete?.();
@@ -98,7 +197,6 @@ export const AnkiCard3D: React.FC<AnkiCard3DProps> = ({
         force3D: true,
       });
     } else if (rating === 'hard') {
-      // Trượt nhẹ sang trái
       gsap.to(cardEl, {
         x: -100,
         y: 15,
@@ -112,7 +210,7 @@ export const AnkiCard3D: React.FC<AnkiCard3DProps> = ({
         },
       });
     }
-  }, [ratingAction]);
+  }, [ratingAction, onActionComplete]);
 
   // 3. Hiệu ứng trượt vào trung tâm khi đổi thẻ bài mới
   useEffect(() => {
@@ -136,12 +234,12 @@ export const AnkiCard3D: React.FC<AnkiCard3DProps> = ({
         force3D: true,
       }
     );
-  }, [card.id]);
+  }, [card.id, isFlipped]);
 
   return (
     <div
       ref={containerRef}
-      className="w-full relative min-h-[420px]"
+      className="w-full relative min-h-[440px]"
       style={{ perspective: 1000 }}
     >
       <div
@@ -152,9 +250,9 @@ export const AnkiCard3D: React.FC<AnkiCard3DProps> = ({
           transformOrigin: 'center center',
         }}
       >
-        {/* ================== MẶT TRƯỚC (FRONT FACE): CÂU ĐỤC LỖ ================== */}
+        {/* ================== MẶT TRƯỚC (FRONT FACE): CÂU ĐỤC LỖ CLOZE ================== */}
         <div
-          className="w-full h-full bg-white rounded-3xl border border-stone-300 shadow-md p-6 sm:p-10 flex flex-col justify-between space-y-6 min-h-[420px]"
+          className="w-full h-full bg-white rounded-3xl border border-stone-300 shadow-md p-6 sm:p-10 flex flex-col justify-between space-y-6 min-h-[440px]"
           style={{
             backfaceVisibility: 'hidden',
             WebkitBackfaceVisibility: 'hidden',
@@ -179,19 +277,19 @@ export const AnkiCard3D: React.FC<AnkiCard3DProps> = ({
             </span>
           </div>
 
-          {/* Cloze Sentence Content */}
+          {/* Cloze Sentence Content (Chuẩn Anki Cloze) */}
           <div className="space-y-4 text-center my-auto">
             <span className="text-xs font-sans font-bold text-amber-800 tracking-normal block">
-              — Điền từ còn thiếu vào chỗ trống —
+              — Điền cụm từ học thuật còn thiếu vào chỗ trống —
             </span>
 
-            <p className="text-lg sm:text-2xl font-serif text-stone-900 leading-relaxed max-w-xl mx-auto">
-              "{card.clozeSentence}"
-            </p>
+            <div className="text-lg sm:text-2xl font-serif text-stone-900 leading-relaxed max-w-2xl mx-auto">
+              "{renderFrontCloze(card.clozeSentence || card.fullSentence)}"
+            </div>
 
             <div className="pt-2">
               <AudioPlayButton
-                text={card.fullSentence}
+                text={cleanSpokenSentence}
                 variant="pill"
                 label="Nghe câu mẫu"
                 className="mx-auto"
@@ -215,9 +313,9 @@ export const AnkiCard3D: React.FC<AnkiCard3DProps> = ({
           </div>
         </div>
 
-        {/* ================== MẶT SAU (BACK FACE): ĐÁP ÁN & ĐỊNH NGHĨA ================== */}
+        {/* ================== MẶT SAU (BACK FACE): ĐÁP ÁN & BACK EXTRA 9.0 ================== */}
         <div
-          className="w-full h-full bg-white rounded-3xl border-2 border-emerald-700/30 shadow-lg p-6 sm:p-10 flex flex-col justify-between space-y-6 absolute inset-0 min-h-[420px]"
+          className="w-full h-full bg-white rounded-3xl border-2 border-emerald-700/30 shadow-lg p-6 sm:p-10 flex flex-col justify-between space-y-5 absolute inset-0 min-h-[440px]"
           style={{
             backfaceVisibility: 'hidden',
             WebkitBackfaceVisibility: 'hidden',
@@ -227,7 +325,7 @@ export const AnkiCard3D: React.FC<AnkiCard3DProps> = ({
           {/* Top Metadata */}
           <div className="flex items-center justify-between border-b border-stone-200 pb-3">
             <span className="text-[10px] font-mono text-emerald-800 uppercase font-bold tracking-normal">
-              Đáp Án Chuẩn Xác • Cambridge IELTS
+              Đáp Án Chuẩn Xác • Anki Cloze Band 9.0
             </span>
             <span className="text-[10px] font-mono text-stone-400 font-bold uppercase">
               {card.source}
@@ -236,35 +334,70 @@ export const AnkiCard3D: React.FC<AnkiCard3DProps> = ({
 
           {/* Word, IPA & Audio */}
           <div className="space-y-4 my-auto">
-            <div className="text-center space-y-2">
+            <div className="text-center space-y-1.5">
               <div className="flex items-center justify-center gap-3">
-                <h2 className="text-3xl sm:text-4xl font-serif font-bold text-[#064E3B] tracking-tight">
+                <h2 className="text-2xl sm:text-3xl font-serif font-bold text-[#064E3B] tracking-tight">
                   {card.word}
                 </h2>
-                <span className="text-xs font-mono px-2 py-0.5 rounded-md bg-stone-100 text-stone-700 font-semibold border border-stone-200">
-                  {card.pos}
-                </span>
+                {card.pos && (
+                  <span className="text-xs font-mono px-2 py-0.5 rounded-md bg-stone-100 text-stone-700 font-semibold border border-stone-200">
+                    {card.pos}
+                  </span>
+                )}
                 <AudioPlayButton text={card.word} variant="icon" />
               </div>
-              <span className="text-sm font-mono text-stone-500 font-ipa block">
-                {card.ipa}
-              </span>
+              {card.ipa && (
+                <span className="text-sm font-mono text-stone-500 font-ipa block">
+                  {card.ipa}
+                </span>
+              )}
             </div>
 
-            {/* Definitions */}
-            <div className="p-4 rounded-2xl bg-amber-50/80 border border-amber-200/80 text-xs sm:text-sm space-y-2 max-w-lg mx-auto">
-              <p className="font-sans font-bold text-amber-950 leading-snug">
-                {card.definitionVi}
-              </p>
-              <p className="font-sans text-stone-600 italic leading-relaxed">
-                {card.definitionEn}
-              </p>
+            {/* Back Extra Phân Tích Súc Tích Band 9.0 (hoặc Definition Vi/En nếu là thẻ cũ) */}
+            {card.backExtra ? (
+              <div className="p-4 rounded-2xl bg-emerald-50/70 border border-emerald-200/80 text-xs sm:text-sm space-y-1.5 max-w-xl mx-auto text-left shadow-2xs">
+                <span className="text-[10px] font-mono font-bold text-emerald-800 uppercase tracking-wider block">
+                  [Back Extra • Phân Tích Học Thuật IELTS 9.0]
+                </span>
+                <div className="font-sans text-stone-800 whitespace-pre-line leading-relaxed font-medium">
+                  {card.backExtra}
+                </div>
+              </div>
+            ) : (
+              <div className="p-4 rounded-2xl bg-amber-50/80 border border-amber-200/80 text-xs sm:text-sm space-y-1.5 max-w-lg mx-auto">
+                <p className="font-sans font-bold text-amber-950 leading-snug">
+                  {card.definitionVi}
+                </p>
+                {card.definitionEn && (
+                  <p className="font-sans text-stone-600 italic leading-relaxed">
+                    {card.definitionEn}
+                  </p>
+                )}
+              </div>
+            )}
+
+            {/* Context Sentence with Answer Highlighted */}
+            <div className="text-center text-xs sm:text-sm font-serif text-stone-800 leading-relaxed max-w-xl mx-auto bg-stone-50 p-3.5 rounded-xl border border-stone-200/70 shadow-2xs">
+              "{renderBackRevealedSentence(card.clozeSentence, card.fullSentence)}"
             </div>
 
-            {/* Context Sentence with Highlighted Word */}
-            <p className="text-center text-xs sm:text-sm font-serif text-stone-700 italic max-w-lg mx-auto bg-stone-50 p-2.5 rounded-xl border border-stone-200/60">
-              "{card.fullSentence}"
-            </p>
+            {/* Tags nếu có */}
+            {card.tags && (
+              <div className="flex flex-wrap items-center justify-center gap-1.5 pt-1">
+                <Tag size={12} className="text-stone-400" />
+                {card.tags
+                  .split(/\s+/)
+                  .filter(Boolean)
+                  .map((t, idx) => (
+                    <span
+                      key={idx}
+                      className="text-[10px] font-mono px-2 py-0.5 rounded-md bg-stone-100 text-stone-600 border border-stone-200"
+                    >
+                      #{t}
+                    </span>
+                  ))}
+              </div>
+            )}
           </div>
 
           {/* Prompt at bottom of back face */}

@@ -463,8 +463,8 @@ export const AnkiWorkspace: React.FC<AnkiWorkspaceProps> = ({
                     <strong>Nghĩa:</strong> {c.definitionVi}
                   </p>
 
-                  <p className="text-stone-600 font-serif italic line-clamp-1 border-l-2 border-amber-500 pl-2">
-                    "{c.fullSentence}"
+                  <p className="text-stone-600 font-serif italic line-clamp-2 border-l-2 border-amber-500 pl-2">
+                    "{(c.clozeSentence || c.fullSentence).replace(/\{\{c\d+::(.*?)(?:::.*?)?\}\}/g, '$1')}"
                   </p>
                 </div>
 
