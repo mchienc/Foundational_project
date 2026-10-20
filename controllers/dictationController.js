@@ -2,6 +2,12 @@
 // Bộ trích xuất phụ đề YouTube tự động (InnerTube API) & phân tích câu học thuật cho Xưởng Chép Chính Tả (/dictation)
 
 const { getLiveApiKey } = require('./ankiAiController');
+let YoutubeTranscriptModule = null;
+try {
+  YoutubeTranscriptModule = require('youtube-transcript').YoutubeTranscript;
+} catch (e) {
+  console.warn('[Dictation] youtube-transcript package not available, using InnerTube fallback.');
+}
 
 // Giải mã các ký tự HTML entities trong phụ đề YouTube (hỗ trợ cả double-escaped entities)
 function decodeHtmlEntities(str = '') {
@@ -457,12 +463,55 @@ exports.extractYoutubeTranscript = async (req, res) => {
     }
 
     const cleanId = videoId.trim();
+    let meta = await fetchYoutubeMetadata(cleanId);
+
+    // 1. Thử lấy phụ đề chuẩn qua YoutubeTranscript library (Hỗ trợ tốt cả trên môi trường Cloud/Render)
+    if (YoutubeTranscriptModule) {
+      try {
+        let items = null;
+        try {
+          items = await YoutubeTranscriptModule.fetchTranscript(cleanId, { lang: 'en' });
+        } catch {
+          // Thử lấy phụ đề mặc định bất kể ngôn ngữ nếu lang=en thất bại
+          items = await YoutubeTranscriptModule.fetchTranscript(cleanId);
+        }
+
+        if (Array.isArray(items) && items.length > 0) {
+          const rawSegments = items.map((it) => ({
+            start: (it.offset || 0) / 1000,
+            dur: (it.duration || 2500) / 1000,
+            text: it.text || '',
+          }));
+
+          const merged = mergeCaptionsIntoSentences(rawSegments);
+          if (merged.length >= 2) {
+            const payload = {
+              videoId: cleanId,
+              title: meta.title,
+              channel: meta.channel,
+              sourceType: 'youtube_official_captions',
+              sentences: merged,
+            };
+            return res.json({
+              success: true,
+              source: 'YouTube Official Captions',
+              ...payload,
+              data: payload,
+            });
+          }
+        }
+      } catch (ytErr) {
+        console.warn('[Dictation] YoutubeTranscript module warning:', ytErr.message);
+      }
+    }
+
+    // 2. Fallback qua InnerTube Player API
     const { sentences: realCaptions, videoDetails, trackType } =
       await fetchYoutubeCaptionsAndDetails(cleanId);
 
-    const meta = videoDetails?.title
-      ? videoDetails
-      : await fetchYoutubeMetadata(cleanId);
+    if (videoDetails?.title) {
+      meta = videoDetails;
+    }
 
     if (realCaptions && realCaptions.length > 0) {
       const payload = {
@@ -483,7 +532,7 @@ exports.extractYoutubeTranscript = async (req, res) => {
       });
     }
 
-    // Nếu video không có phụ đề công khai, dùng AI tạo kịch bản mẫu
+    // 3. Nếu video không có phụ đề công khai, dùng AI tạo kịch bản 20 câu học thuật
     const aiSentences = await generateSmartSentencesWithAi(meta.title, meta.channel);
     const fallbackPayload = {
       videoId: cleanId,
