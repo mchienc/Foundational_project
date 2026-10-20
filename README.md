@@ -153,7 +153,7 @@
 - **Runtime:** Node.js (phiên bản `>= 18.x`)
 - **Web Framework:** Express.js 4 (REST API, session cookies)
 - **Database:** MySQL 8.0 (kết nối qua `mysql2/promise` pool)
-- **Authentication:** `bcryptjs` (băm mật khẩu bảo mật) và `express-session`
+- **Authentication & Security:** `bcryptjs` (băm mật khẩu bảo mật), `express-session`, đăng nhập nhanh qua Google (OAuth), và khôi phục mật khẩu qua mã OTP 6 số
 - **YouTube Subtitle Extractor:** `youtube-transcript` kết hợp `https-proxy-agent`
 
 ---
