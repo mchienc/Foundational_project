@@ -16,6 +16,48 @@ try {
   console.warn('[Dictation] curatedDictationVault not loaded:', e.message);
 }
 
+// Hỗ trợ cấu hình Residential Proxy qua biến môi trường YOUTUBE_PROXY (cho môi trường Render/Cloud)
+let UndiciProxyAgent = null;
+let undiciFetchFn = null;
+try {
+  const undici = require('undici');
+  UndiciProxyAgent = undici.ProxyAgent;
+  undiciFetchFn = undici.fetch;
+} catch (e) {
+  console.warn('[Dictation] undici package not available for proxy agent.');
+}
+
+function getYoutubeProxyUrl() {
+  const raw = process.env.YOUTUBE_PROXY || process.env.HTTPS_PROXY || process.env.HTTP_PROXY;
+  if (!raw || typeof raw !== 'string') return null;
+  // Tự động gỡ bỏ dấu nháy đơn hoặc nháy kép nếu người dùng nhập '...' hoặc "..." trên Render
+  const clean = raw.replace(/^['"]|['"]$/g, '').trim().replace(/\/$/, '');
+  return clean || null;
+}
+
+function getProxyDispatcher() {
+  const proxyUrl = getYoutubeProxyUrl();
+  if (!proxyUrl || !UndiciProxyAgent) return null;
+  try {
+    return new UndiciProxyAgent(proxyUrl);
+  } catch (err) {
+    console.warn('[Dictation] Error creating ProxyAgent:', err.message);
+    return null;
+  }
+}
+
+async function proxyFetch(url, options = {}) {
+  const dispatcher = getProxyDispatcher();
+  if (dispatcher && undiciFetchFn) {
+    try {
+      return await undiciFetchFn(url, { ...options, dispatcher });
+    } catch (err) {
+      console.warn('[Dictation] Proxy request failed, falling back to direct fetch:', err.message);
+    }
+  }
+  return fetch(url, options);
+}
+
 // Giải mã các ký tự HTML entities trong phụ đề YouTube (hỗ trợ cả double-escaped entities)
 function decodeHtmlEntities(str = '') {
   let decoded = str;
@@ -184,7 +226,7 @@ async function fetchYoutubeCaptionsAndDetails(videoId) {
 
   for (const client of innertubeClients) {
     try {
-      const playerRes = await fetch('https://www.youtube.com/youtubei/v1/player?prettyPrint=false', {
+      const playerRes = await proxyFetch('https://www.youtube.com/youtubei/v1/player?prettyPrint=false', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -226,7 +268,7 @@ async function fetchYoutubeCaptionsAndDetails(videoId) {
 
       if (!enTrack || !enTrack.baseUrl) continue;
 
-      const xmlRes = await fetch(enTrack.baseUrl, {
+      const xmlRes = await proxyFetch(enTrack.baseUrl, {
         headers: {
           'User-Agent': client.userAgent,
         },
@@ -256,7 +298,7 @@ async function fetchYoutubeCaptionsAndDetails(videoId) {
 async function fetchYoutubeMetadata(videoId) {
   try {
     const oembedUrl = `https://www.youtube.com/oembed?url=https://www.youtube.com/watch?v=${videoId}&format=json`;
-    const res = await fetch(oembedUrl);
+    const res = await proxyFetch(oembedUrl);
     if (res.ok) {
       const data = await res.json();
       return {
@@ -506,7 +548,10 @@ exports.extractYoutubeTranscript = async (req, res) => {
         const targetLangs = ['en', 'en-US', 'en-GB', 'en-CA'];
         for (const lang of targetLangs) {
           try {
-            items = await YoutubeTranscriptModule.fetchTranscript(cleanId, { lang });
+            items = await YoutubeTranscriptModule.fetchTranscript(cleanId, {
+              lang,
+              fetch: proxyFetch,
+            });
             if (Array.isArray(items) && items.length > 0) break;
           } catch {
             // thử tiếp ngôn ngữ tiếng Anh khác
@@ -516,7 +561,9 @@ exports.extractYoutubeTranscript = async (req, res) => {
         // Nếu chỉ định ngôn ngữ thất bại, thử lấy mặc định nhưng kiểm tra xem có phải tiếng Anh không
         if (!items) {
           try {
-            const rawItems = await YoutubeTranscriptModule.fetchTranscript(cleanId);
+            const rawItems = await YoutubeTranscriptModule.fetchTranscript(cleanId, {
+              fetch: proxyFetch,
+            });
             if (Array.isArray(rawItems) && rawItems.length > 0) {
               const langCode = rawItems[0]?.lang || '';
               // Chỉ chấp nhận nếu là tiếng Anh hoặc không có nhãn
