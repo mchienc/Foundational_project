@@ -284,7 +284,7 @@ export const CustomVideoImporterModal: React.FC<CustomVideoImporterModalProps> =
 
                 <div>
                   <label className="block text-[10px] font-mono font-bold uppercase text-stone-500 mb-1">
-                    Chủ đề học thuật
+                    Chủ đề
                   </label>
                   <select
                     value={topic}
@@ -348,14 +348,14 @@ export const CustomVideoImporterModal: React.FC<CustomVideoImporterModalProps> =
                 <div>
                   <div className="flex items-center gap-1.5">
                     <span className="text-xs font-bold text-[#064E3B]">
-                      Cách 1: Tự Động Trích Xuất Phụ Đề Gốc
+                      Cách 1: Tự động lấy phụ đề từ YouTube
                     </span>
                     <span className="px-1.5 py-0.2 rounded bg-amber-100 text-amber-900 text-[9px] font-mono font-bold">
                       Khuyên dùng
                     </span>
                   </div>
                   <p className="text-[11px] text-stone-600 mt-0.5 leading-relaxed">
-                    Hút trực tiếp phụ đề chuẩn từ YouTube InnerTube API &amp; gộp thành các câu dài tự nhiên.
+                    Lấy phụ đề chuẩn trực tiếp từ YouTube và chia thành các câu ngắn vừa nghe.
                   </p>
                 </div>
               </button>
@@ -374,10 +374,10 @@ export const CustomVideoImporterModal: React.FC<CustomVideoImporterModalProps> =
                 </div>
                 <div>
                   <span className="text-xs font-bold text-stone-900 block">
-                    Cách 2: Nạp File JSON / WebVTT / Dán Text
+                    Cách 2: Dán phụ đề hoặc tải file (.srt, .vtt)
                   </span>
                   <p className="text-[11px] text-stone-600 mt-0.5 leading-relaxed">
-                    Tải lên file phụ đề (.vtt, .srt, .json) hoặc dán văn bản có mốc `00:12 - 00:18: Câu...`
+                    Tải file phụ đề (.srt, .vtt) hoặc dán văn bản có mốc thời gian để chia câu.
                   </p>
                 </div>
               </button>
@@ -523,7 +523,7 @@ export const CustomVideoImporterModal: React.FC<CustomVideoImporterModalProps> =
               onClick={onClose}
               className="px-4 py-2.5 rounded-xl border border-stone-300 text-stone-700 hover:bg-stone-100 text-xs font-bold font-sans cursor-pointer transition-colors"
             >
-              Hủy Bỏ
+              Hủy
             </button>
             <button
               type="button"
@@ -532,7 +532,7 @@ export const CustomVideoImporterModal: React.FC<CustomVideoImporterModalProps> =
               className="px-5 py-2.5 rounded-xl bg-[#064E3B] hover:bg-[#043327] text-white text-xs font-bold font-sans flex items-center gap-2 shadow-md cursor-pointer transition-all disabled:opacity-50"
             >
               <Play size={14} className="fill-amber-300 text-amber-300" />
-              <span>Vào Phòng Chép Chính Tả ({activeSentences.length} đoạn)</span>
+              <span>Bắt đầu chép ({activeSentences.length} câu)</span>
             </button>
           </div>
         </div>

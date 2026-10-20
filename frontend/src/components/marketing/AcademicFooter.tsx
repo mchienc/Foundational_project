@@ -30,49 +30,49 @@ export const AcademicFooter: React.FC<AcademicFooterProps> = ({ onRequireAuth, o
                 EduFlow
               </span>
               <span className="text-[10px] font-sans text-amber-300 tracking-wide mt-1 block">
-                Cambridge IELTS • YouTube Dictation • Anki SRS
+                Cambridge IELTS • Chép chính tả YouTube • Flashcard Anki
               </span>
             </div>
           </div>
 
           <p className="text-xs text-stone-400 leading-relaxed font-sans">
-            Hệ thống học thuật Cambridge IELTS toàn diện: 28 Đề thi Cam 10–20, Xưởng chép chính tả YouTube Dictation cắt lát câu thời gian thực, và Thẻ 3D Anki tích hợp Gemini AI 9.0.
+            Luyện thi IELTS thực chiến: 28 Đề thi Cam 10–20, chép chính tả video YouTube và học từ vựng Flashcard Anki.
           </p>
 
           <div className="flex items-center gap-2 text-xs text-amber-300 font-sans">
             <ShieldCheck className="w-4 h-4 text-amber-400 shrink-0" />
-            <span>28 Đề Cambridge • 84 Passages • 7 Listening Tests</span>
+            <span>28 Đề Cambridge • 84 Bài Đọc • 7 Đề Nghe Full Test</span>
           </div>
         </div>
 
-        {/* Col 2: 4 Core Pillars */}
+        {/* Col 2: Core Practice Modules */}
         <div className="space-y-3 text-xs">
           <h4 className="font-sans font-bold text-white uppercase tracking-normal text-sm border-b border-forest-800 pb-1.5">
-            Phân Hệ Nổi Bật
+            Phần Luyện Tập
           </h4>
           <ul className="space-y-2 font-sans text-stone-400">
             <li>
               <button
-                onClick={() => handleNav('reading', 'Luyện Đọc Cambridge IELTS 10 - 20')}
+                onClick={() => handleNav('reading', 'Luyện Đọc Reading Cam 10 - 20')}
                 className="hover:text-amber-300 transition-colors text-left cursor-pointer"
               >
-                Luyện Đọc Cambridge (Cam 10 - 20)
+                Luyện Đọc Reading (Cam 10–20)
               </button>
             </li>
             <li>
               <button
-                onClick={() => handleNav('listening-exam', 'Luyện Nghe IELTS Full Test 13 - 20')}
+                onClick={() => handleNav('listening-exam', 'Luyện Nghe Listening Cam 13 - 20')}
                 className="hover:text-amber-300 transition-colors text-left cursor-pointer"
               >
-                Luyện Nghe Full Test (Cam 13 - 20)
+                Luyện Nghe Listening (Cam 13–20)
               </button>
             </li>
             <li>
               <button
-                onClick={() => handleNav('dictation', 'Xưởng Chép Chính Tả Video YouTube')}
+                onClick={() => handleNav('dictation', 'Chép chính tả video YouTube')}
                 className="hover:text-amber-300 transition-colors text-left cursor-pointer flex items-center gap-1.5"
               >
-                <span>Xưởng YouTube Dictation Studio</span>
+                <span>Chép chính tả YouTube</span>
                 <span className="px-1.5 py-0.2 rounded bg-amber-400 text-amber-950 font-mono text-[9px] font-bold">
                   MỚI
                 </span>
@@ -80,10 +80,10 @@ export const AcademicFooter: React.FC<AcademicFooterProps> = ({ onRequireAuth, o
             </li>
             <li>
               <button
-                onClick={() => handleNav('anki', 'Thẻ 3D Anki Flashcard & AI')}
+                onClick={() => handleNav('anki', 'Học từ vựng Flashcard Anki')}
                 className="hover:text-amber-300 transition-colors text-left cursor-pointer"
               >
-                Thẻ 3D Anki &amp; Gemini AI 9.0
+                Học từ vựng Flashcard Anki
               </button>
             </li>
           </ul>
@@ -100,7 +100,7 @@ export const AcademicFooter: React.FC<AcademicFooterProps> = ({ onRequireAuth, o
                 onClick={() => handleNav('reading', 'Cambridge IELTS 18 - 20')}
                 className="hover:text-amber-300 transition-colors text-left cursor-pointer"
               >
-                Cambridge IELTS 18 - 20 (Mới Nhất)
+                Cambridge IELTS 18–20 (Mới Nhất)
               </button>
             </li>
             <li>
@@ -108,7 +108,7 @@ export const AcademicFooter: React.FC<AcademicFooterProps> = ({ onRequireAuth, o
                 onClick={() => handleNav('reading', 'Cambridge IELTS 15 - 17')}
                 className="hover:text-amber-300 transition-colors text-left cursor-pointer"
               >
-                Cambridge IELTS 15 - 17
+                Cambridge IELTS 15–17
               </button>
             </li>
             <li>
@@ -116,7 +116,7 @@ export const AcademicFooter: React.FC<AcademicFooterProps> = ({ onRequireAuth, o
                 onClick={() => handleNav('reading', 'Cambridge IELTS 13 - 14')}
                 className="hover:text-amber-300 transition-colors text-left cursor-pointer"
               >
-                Cambridge IELTS 13 - 14
+                Cambridge IELTS 13–14
               </button>
             </li>
             <li>
@@ -124,7 +124,7 @@ export const AcademicFooter: React.FC<AcademicFooterProps> = ({ onRequireAuth, o
                 onClick={() => handleNav('reading', 'Cambridge IELTS 10 - 12')}
                 className="hover:text-amber-300 transition-colors text-left cursor-pointer"
               >
-                Cambridge IELTS 10 - 12
+                Cambridge IELTS 10–12
               </button>
             </li>
           </ul>
@@ -152,9 +152,9 @@ export const AcademicFooter: React.FC<AcademicFooterProps> = ({ onRequireAuth, o
         </div>
       </div>
 
-      {/* Bottom Legal & Citation */}
+      {/* Bottom */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-12 pt-6 border-t border-forest-900 flex flex-col sm:flex-row items-center justify-between text-[11px] text-stone-400 font-sans gap-3">
-        <p>© 2026 EduFlow. Nền Tảng Luyện Thi Cambridge IELTS &amp; Học Từ Vựng Anki SRS.</p>
+        <p>© 2026 EduFlow. Nền tảng luyện thi IELTS &amp; Học từ vựng Flashcard.</p>
         <div className="flex items-center gap-4">
           <span>Học trực tuyến miễn phí</span>
           <span>•</span>

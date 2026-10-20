@@ -279,7 +279,7 @@ export const AnkiCard3D: React.FC<AnkiCard3DProps> = ({
           {/* Cloze Sentence Content (Chuẩn Anki Cloze) */}
           <div className="space-y-4 text-center my-auto py-2">
             <span className="text-xs font-sans font-bold text-amber-800 tracking-normal block">
-              — Điền cụm từ học thuật còn thiếu vào chỗ trống —
+              — Điền từ còn thiếu vào chỗ trống —
             </span>
 
             <div className="text-lg sm:text-2xl font-serif text-stone-900 leading-relaxed max-w-2xl mx-auto">
@@ -307,12 +307,12 @@ export const AnkiCard3D: React.FC<AnkiCard3DProps> = ({
               <span>Hiện Đáp Án (Space)</span>
             </button>
             <span className="text-[11px] font-mono text-stone-400">
-              Nhấn phím cách (Space) để lật thẻ 3D
+              Nhấn phím Space để lật thẻ
             </span>
           </div>
         </div>
 
-        {/* ================== MẶT SAU (BACK FACE): ĐÁP ÁN & BACK EXTRA 9.0 ================== */}
+        {/* ================== MẶT SAU (BACK FACE) ================== */}
         <div
           className="col-start-1 row-start-1 w-full bg-white rounded-3xl border-2 border-emerald-700/30 shadow-lg p-6 sm:p-7 flex flex-col justify-between space-y-4 min-h-[420px]"
           style={{
@@ -324,7 +324,7 @@ export const AnkiCard3D: React.FC<AnkiCard3DProps> = ({
           {/* Top Metadata */}
           <div className="flex items-center justify-between border-b border-stone-200 pb-2.5">
             <span className="text-[10px] font-mono text-emerald-800 uppercase font-bold tracking-normal">
-              Đáp Án Chuẩn Xác • Anki Cloze Band 9.0
+              Đáp Án &amp; Giải Nghĩa
             </span>
             <span className="text-[10px] font-mono text-stone-400 font-bold uppercase">
               {card.source}
@@ -356,7 +356,7 @@ export const AnkiCard3D: React.FC<AnkiCard3DProps> = ({
             {card.backExtra ? (
               <div className="p-3.5 sm:p-4 rounded-2xl bg-emerald-50/70 border border-emerald-200/80 text-xs sm:text-[13px] space-y-1 max-w-xl mx-auto text-left shadow-2xs">
                 <span className="text-[10px] font-mono font-bold text-emerald-800 uppercase tracking-wider block mb-1">
-                  [Back Extra • Phân Tích Học Thuật IELTS 9.0]
+                  [Giải nghĩa chi tiết &amp; Cụm từ đi kèm]
                 </span>
                 <div className="font-sans text-stone-800 whitespace-pre-line leading-relaxed font-medium">
                   {card.backExtra}

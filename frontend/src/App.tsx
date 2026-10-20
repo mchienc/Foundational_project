@@ -219,12 +219,14 @@ const AppContent: React.FC = () => {
     if (!isAuthenticated && protectedScreens.includes(screen)) {
       requireAuth(
         screen === 'reading' || screen === 'reading-test' || screen === 'computer-exam'
-          ? 'Phòng Thi Máy Tính & Luyện Đọc Cambridge'
+          ? 'Luyện Đọc Reading Cambridge'
           : screen === 'listening' || screen === 'listening-test' || screen === 'listening-exam'
-          ? 'Phòng Thi & Luyện Nghe IELTS'
+          ? 'Luyện Nghe IELTS'
           : screen === 'anki'
-          ? 'Anki Flashcard Spaced Repetition'
-          : 'Phân Hệ Nghiên Cứu'
+          ? 'Học từ vựng Flashcard (Anki)'
+          : screen === 'profile'
+          ? 'Trang cá nhân'
+          : 'Bài học'
       );
       return;
     }
@@ -630,13 +632,13 @@ const AppContent: React.FC = () => {
             <div className="flex items-center gap-3 font-sans">
               <span className="font-bold text-forest-950">EduFlow</span>
               <span>•</span>
-              <span className="font-sans">Hệ Thống Luyện Thi Cambridge IELTS &amp; Anki Spaced Repetition</span>
+              <span className="font-sans">Luyện thi Cambridge IELTS &amp; Học từ vựng Flashcard</span>
             </div>
 
             <div className="flex items-center gap-4 font-mono text-[11px]">
               <span className="inline-flex items-center gap-1.5 text-forest-800 font-medium">
                 <span className="w-2 h-2 rounded-full bg-emerald-600 inline-block animate-ping" />
-                Academic Forest &amp; Warm Gold Engine Active
+                Hệ thống học tập trực tuyến
               </span>
             </div>
           </div>

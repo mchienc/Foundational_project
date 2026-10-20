@@ -505,7 +505,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNotify }) => {
 
         <Card className="p-5 flex items-center justify-between border-stone-200 bg-white">
           <div className="space-y-1">
-            <span className="text-xs text-stone-500 font-medium">Học Viên Khảo Thí</span>
+            <span className="text-xs text-stone-500 font-medium">Học Viên Đã Thi</span>
             <div className="text-2xl font-bold font-mono text-[#D97706]">{studentCount} Bạn</div>
             <div className="text-[11px] text-stone-400">Quyền thi & luyện tập</div>
           </div>
@@ -573,7 +573,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNotify }) => {
             }`}
           >
             <Award size={14} />
-            Bảng Điểm Khảo Thí Toàn Sàn ({examResults.length})
+            Bảng Điểm Thi Thử ({examResults.length})
           </button>
         </div>
 
@@ -815,12 +815,12 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNotify }) => {
           </div>
         )}
 
-        {/* ================= TAB 3: BẢNG ĐIỂM KHẢO THÍ TOÀN SÀN ================= */}
+        {/* ================= TAB 3: BẢNG ĐIỂM THI THỬ ================= */}
         {adminTab === 'results' && (
           <div className="space-y-4">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white p-4 rounded-2xl border border-stone-200">
               <div className="text-xs text-stone-600">
-                Hiển thị kết quả khảo thí gần đây của tất cả học viên trong hệ thống.
+                Hiển thị kết quả thi thử gần đây của tất cả học viên trong hệ thống.
               </div>
               <div className="flex items-center gap-2">
                 <span className="text-xs text-stone-500 font-medium">Lọc kỹ năng:</span>
@@ -930,7 +930,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNotify }) => {
             <div className="flex items-center justify-between px-6 py-4 border-b border-stone-200 bg-stone-50">
               <div>
                 <span className="text-[10px] font-mono text-emerald-800 uppercase tracking-wider font-bold">
-                  Quản Trị Khảo Thí • Chỉnh Sửa Bộ Đề & Đáp Án
+                  Quản Trị Đề Thi • Chỉnh Sửa Bộ Đề & Đáp Án
                 </span>
                 <h3 className="text-lg font-bold text-stone-900 font-serif">
                   {editingTest.book} - Test {editingTest.testNumber}

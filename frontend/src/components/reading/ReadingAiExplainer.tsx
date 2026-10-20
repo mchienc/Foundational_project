@@ -80,7 +80,7 @@ export const ReadingAiExplainer: React.FC<ReadingAiExplainerProps> = ({
 
       if (res.success && res.data) {
         setAiData(res.data);
-        setSourceTag(res.source || 'Gemini 9.0');
+        setSourceTag(res.source || 'AI Giải Thích');
         if (res.data.keyVocabulary?.collocation) {
           setIsSavedAnki(isWordSavedInAnki(res.data.keyVocabulary.collocation));
         }
@@ -120,10 +120,10 @@ export const ReadingAiExplainer: React.FC<ReadingAiExplainerProps> = ({
 
     if (success) {
       setIsSavedAnki(true);
-      onNotify?.(`Đã lưu "${collocation}" vào bộ thẻ cá nhân Anki 3D!`, 'success');
+      onNotify?.(`Đã lưu "${collocation}" vào Flashcard!`, 'success');
     } else {
       setIsSavedAnki(true);
-      onNotify?.(`"${collocation}" đã có trong danh sách Anki.`, 'info');
+      onNotify?.(`"${collocation}" đã có trong danh sách Flashcard.`, 'info');
     }
   };
 
@@ -149,11 +149,11 @@ export const ReadingAiExplainer: React.FC<ReadingAiExplainerProps> = ({
                 AI Giải Thích &amp; Định Vị Dẫn Chứng
               </span>
               <span className="px-1.5 py-0.5 rounded text-[10px] font-mono font-bold bg-amber-200/80 text-amber-900 border border-amber-300">
-                Gemini 9.0
+                AI
               </span>
             </div>
             <p className="text-[11px] text-stone-500 font-sans">
-              Bóc tách bẫy đề Paraphrase, trích xuất dẫn chứng &amp; liên kết Anki
+              Giải thích chi tiết câu hỏi &amp; định vị dẫn chứng trong bài đọc
             </p>
           </div>
         </div>

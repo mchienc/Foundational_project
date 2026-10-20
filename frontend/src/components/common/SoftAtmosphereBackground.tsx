@@ -641,26 +641,26 @@ export const SoftAtmosphereBackground: React.FC = () => {
                   {[
                     {
                       id: 'golden-stardust' as AnimationMode,
-                      label: 'Bụi Vàng Tri Thức',
-                      desc: 'Hạt kết nối mạng lưới',
+                      label: 'Bụi Vàng',
+                      desc: 'Hạt ánh sáng nhẹ',
                       icon: <Sparkles className="w-3.5 h-3.5 text-amber-600" />,
                     },
                     {
                       id: 'forest-aurora' as AnimationMode,
-                      label: 'Cực Quang Rừng Già',
+                      label: 'Cực Quang',
                       desc: 'Mây Gradient chuyển sắc',
                       icon: <Flame className="w-3.5 h-3.5 text-emerald-600" />,
                     },
                     {
                       id: 'acoustic-waves' as AnimationMode,
-                      label: 'Sóng Âm Ngôn Ngữ',
-                      desc: 'Đường phổ âm vị học',
+                      label: 'Sóng Âm',
+                      desc: 'Hiệu ứng sóng âm',
                       icon: <Activity className="w-3.5 h-3.5 text-blue-600" />,
                     },
                     {
                       id: 'fireflies' as AnimationMode,
-                      label: 'Đom Đóm Tinh Vân',
-                      desc: 'Đốm sáng Bokeh thở nhẹ',
+                      label: 'Đom Đóm',
+                      desc: 'Đốm sáng nhẹ nhàng',
                       icon: <Radio className="w-3.5 h-3.5 text-amber-500" />,
                     },
                   ].map((mode) => {

@@ -1,5 +1,5 @@
 // frontend/src/modules/dictation/types.ts
-// Hệ thống kiểu dữ liệu độc lập cho Xưởng Luyện Nghe Chép Chính Tả Video YouTube (/dictation)
+// Hệ thống kiểu dữ liệu độc lập cho Luyện Nghe Chép Chính Tả Video YouTube (/dictation)
 
 export type DictationCefrLevel = 'B1' | 'B2' | 'C1';
 

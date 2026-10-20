@@ -21,10 +21,10 @@ export const AcademicNavbar: React.FC<AcademicNavbarProps> = ({
   const [mobileMenuOpen, setMobileMenuOpen] = useState<boolean>(false);
 
   const navLinks: { label: string; href?: string; screen?: Screen; badge?: string }[] = [
-    { label: 'Luyện Đọc Cam 10-20', screen: 'reading' },
-    { label: 'Luyện Nghe Cam 13-20', screen: 'listening-exam' },
-    { label: 'YouTube Dictation', screen: 'dictation', badge: 'MỚI' },
-    { label: 'Thẻ 3D Anki & AI', screen: 'anki' },
+    { label: 'Luyện Reading', screen: 'reading' },
+    { label: 'Luyện Listening', screen: 'listening-exam' },
+    { label: 'Chép chính tả', screen: 'dictation', badge: 'MỚI' },
+    { label: 'Flashcard', screen: 'anki' },
   ];
 
   const handleNavClick = (e: React.MouseEvent, item: typeof navLinks[0]) => {
@@ -43,7 +43,7 @@ export const AcademicNavbar: React.FC<AcademicNavbarProps> = ({
   return (
     <header className="sticky top-0 z-40 bg-[#064E3B] border-b border-emerald-800/80 shadow-md transition-colors">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
-        {/* Academic Brand Mark - 100% Unified with Inside Navbar */}
+        {/* Brand Logo - 100% Unified with Inside Navbar */}
         <div
           onClick={() => onNavigateScreen('landing')}
           className="flex items-center gap-2.5 cursor-pointer group select-none text-left"
@@ -61,11 +61,11 @@ export const AcademicNavbar: React.FC<AcademicNavbarProps> = ({
                 EduFlow
               </span>
               <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[9px] sm:text-[10px] font-semibold bg-[#032B20]/90 text-amber-300 border border-amber-400/30 whitespace-nowrap leading-none tracking-wide shadow-xs">
-                Cambridge &amp; Anki
+                Cambridge &amp; Flashcard
               </span>
             </div>
             <span className="text-[10px] sm:text-[11px] text-emerald-200/80 font-sans tracking-normal leading-tight whitespace-nowrap mt-0.5 hidden sm:block">
-              Luyện thi Cambridge IELTS &amp; Học từ vựng Anki
+              Luyện thi Cambridge IELTS &amp; Học từ vựng Flashcard
             </span>
           </div>
         </div>
@@ -105,7 +105,7 @@ export const AcademicNavbar: React.FC<AcademicNavbarProps> = ({
                   className="w-full h-full object-cover"
                 />
               </div>
-              <span>Vào Học Ngay ({currentUser.full_name})</span>
+              <span>Xin chào, {currentUser.full_name}</span>
               <ArrowRight className="w-3.5 h-3.5 text-amber-400 group-hover:translate-x-0.5 transition-transform" />
             </button>
           ) : (
@@ -122,7 +122,7 @@ export const AcademicNavbar: React.FC<AcademicNavbarProps> = ({
                 className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#D97706] hover:bg-[#B45309] text-white text-xs font-bold uppercase tracking-wider shadow-md hover:shadow-lg active:scale-95 transition-all cursor-pointer"
               >
                 <Compass className="w-3.5 h-3.5 text-white" />
-                <span>Luyện Đề Miễn Phí</span>
+                <span>Bắt Đầu Học Ngay</span>
               </button>
             </div>
           )}
@@ -168,7 +168,7 @@ export const AcademicNavbar: React.FC<AcademicNavbarProps> = ({
                 }}
                 className="w-full py-2.5 rounded-xl bg-forest-950 text-gold-300 text-xs font-bold flex items-center justify-center gap-2"
               >
-                <span>Vào Học Ngay ({currentUser.full_name})</span>
+                <span>Xin chào, {currentUser.full_name}</span>
                 <ArrowRight size={14} />
               </button>
             ) : (

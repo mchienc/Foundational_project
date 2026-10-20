@@ -111,14 +111,13 @@ export const AnkiWorkspace: React.FC<AnkiWorkspaceProps> = ({
         <div className="space-y-3">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#064E3B] text-amber-300 text-xs font-mono font-bold tracking-normal uppercase shadow-xs">
             <Layers size={13} className="text-amber-300" />
-            <span>Thuật Toán Giãn Cách Spaced Repetition (Anki SM-2)</span>
+            <span>Học Từ Vựng Flashcard (Anki)</span>
           </div>
           <h1 className="text-3xl sm:text-4xl lg:text-5xl font-serif font-bold text-[#064E3B] tracking-tight leading-tight">
-            Sổ Tay Từ Vựng &amp; Flashcard Anki
+            Sổ Tay Từ Vựng &amp; Thẻ Flashcard
           </h1>
           <p className="text-sm text-stone-600 font-sans max-w-2xl leading-relaxed">
-            Chống lại đường cong lãng quên tự nhiên của não bộ. Mọi từ vựng được lưu trữ nguyên vẹn kèm câu văn trích từ đề thi Cambridge,
-            tự động lập lịch ôn tập theo 4 cấp độ SM-2 (Again, Hard, Good, Easy) kích hoạt vùng ghi nhớ ngữ cảnh sâu.
+            Lưu trữ từ vựng kèm câu ví dụ thực tế từ bài đọc và bài nghe, tự động nhắc ôn tập đúng thời điểm giúp bạn ghi nhớ nhanh và lâu hơn.
           </p>
         </div>
 
@@ -133,7 +132,7 @@ export const AnkiWorkspace: React.FC<AnkiWorkspaceProps> = ({
             }`}
           >
             <Sparkles size={16} className={showAiGenerator ? 'text-amber-300' : 'text-amber-600'} />
-            <span>{showAiGenerator ? 'Ẩn Trình Tạo AI' : '✨ Tạo Thẻ Gemini 9.0'}</span>
+            <span>{showAiGenerator ? 'Ẩn Trình Tạo AI' : '✨ Tạo Thẻ Bằng AI'}</span>
           </button>
           <button
             onClick={() => setShowExport(!showExport)}
@@ -144,7 +143,7 @@ export const AnkiWorkspace: React.FC<AnkiWorkspaceProps> = ({
             }`}
           >
             <Download size={16} className={showExport ? 'text-amber-800' : 'text-stone-500'} />
-            <span>{showExport ? 'Ẩn Xuất Dữ Liệu' : 'Xuất Thẻ Anki'}</span>
+            <span>{showExport ? 'Ẩn Xuất File' : 'Xuất File Anki'}</span>
           </button>
 
           {totalDueCount > 0 ? (
@@ -153,7 +152,7 @@ export const AnkiWorkspace: React.FC<AnkiWorkspaceProps> = ({
               className="inline-flex items-center gap-2.5 px-6 py-3.5 rounded-2xl bg-[#D97706] hover:bg-[#B45309] text-white text-xs sm:text-sm font-bold uppercase tracking-normal shadow-md shadow-amber-600/20 active:scale-95 transition-all cursor-pointer"
             >
               <Play size={16} className="fill-white" />
-              <span>Ôn Tập Tất Cả Thẻ Đến Hạn ({totalDueCount})</span>
+              <span>Cần Ôn Tập Hôm Nay ({totalDueCount})</span>
             </button>
           ) : (
             <button
@@ -189,7 +188,7 @@ export const AnkiWorkspace: React.FC<AnkiWorkspaceProps> = ({
           </div>
           <div>
             <span className="text-[11px] font-mono text-stone-500 uppercase font-bold block">
-              Cần ôn hôm nay
+              Cần ôn tập hôm nay
             </span>
             <span className="text-2xl sm:text-3xl font-serif font-bold text-amber-700">
               {totalDueCount}
@@ -203,7 +202,7 @@ export const AnkiWorkspace: React.FC<AnkiWorkspaceProps> = ({
           </div>
           <div>
             <span className="text-[11px] font-mono text-stone-500 uppercase font-bold block">
-              Đang củng cố
+              Từ mới nạp
             </span>
             <span className="text-2xl sm:text-3xl font-serif font-bold text-stone-800">
               {totalLearningCount}
@@ -217,7 +216,7 @@ export const AnkiWorkspace: React.FC<AnkiWorkspaceProps> = ({
           </div>
           <div>
             <span className="text-[11px] font-mono text-stone-500 uppercase font-bold block">
-              Đã làm chủ (Mastered)
+              Đã nhớ kỹ
             </span>
             <span className="text-2xl sm:text-3xl font-serif font-bold text-[#064E3B]">
               {totalMasteredCount}
@@ -408,7 +407,7 @@ export const AnkiWorkspace: React.FC<AnkiWorkspaceProps> = ({
                 Bộ bài này hiện chưa có từ vựng nào
               </h4>
               <p className="text-xs text-stone-500 max-w-md mx-auto leading-relaxed">
-                Tài khoản mới bắt đầu với bộ thẻ trắng. Bạn có thể tự tạo thẻ bằng công cụ Gemini 9.0 phía trên hoặc bôi đen từ khi luyện đọc bài Cambridge!
+                Bộ thẻ này chưa có từ nào. Bạn có thể tự tạo thẻ bằng nút AI phía trên hoặc tra từ khi làm bài đọc Cambridge!
               </p>
             </div>
             <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
@@ -417,7 +416,7 @@ export const AnkiWorkspace: React.FC<AnkiWorkspaceProps> = ({
                 className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#064E3B] text-amber-300 text-xs font-bold hover:bg-[#053d2e] cursor-pointer shadow-xs"
               >
                 <Sparkles size={14} />
-                <span>Tạo Thẻ Anki Bằng AI</span>
+                <span>Tạo Thẻ Bằng AI</span>
               </button>
               {onNavigateReading && (
                 <button

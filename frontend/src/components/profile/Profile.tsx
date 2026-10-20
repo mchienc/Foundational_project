@@ -68,7 +68,7 @@ export const Profile: React.FC<ProfileProps> = ({
           Tài khoản người dùng
         </span>
         <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
-          Hồ Sơ & Thiết Lập Bảo Mật
+          Trang Cá Nhân &amp; Tài Khoản
         </h1>
       </div>
 

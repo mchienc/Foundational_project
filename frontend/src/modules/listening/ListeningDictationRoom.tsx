@@ -531,7 +531,7 @@ export const ListeningDictationRoom: React.FC<ListeningDictationRoomProps> = ({
             {/* Phonetic Insight */}
             <div className="p-3 rounded-xl bg-white border border-amber-200/80 text-xs text-stone-700 space-y-1">
               <span className="font-bold text-amber-900 block font-mono text-[10px] uppercase">
-                Phân tích hiện tượng ngữ âm thính giác:
+                Mẹo phát âm &amp; nối âm:
               </span>
               <p className="font-sans leading-relaxed">{currentSlice.phoneticNotes}</p>
             </div>
@@ -539,7 +539,7 @@ export const ListeningDictationRoom: React.FC<ListeningDictationRoomProps> = ({
             {/* Key Vocab to save in Anki */}
             <div className="space-y-2 pt-1">
               <span className="text-[10px] font-mono uppercase font-bold text-stone-500">
-                Từ vựng then chốt trong câu (Bấm để nạp vào Anki Flashcard):
+                Từ vựng nổi bật (Bấm để lưu vào Flashcard):
               </span>
               <div className="flex flex-wrap items-center gap-2">
                 {currentSlice.keyVocab.map((kv, idx) => (

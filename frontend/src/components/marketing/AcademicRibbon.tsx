@@ -12,17 +12,17 @@ export const AcademicRibbon: React.FC<AcademicRibbonProps> = ({ onOpenAuth, onNa
   if (!isVisible) return null;
 
   return (
-    <aside aria-label="Bản tin nghiên cứu học thuật" className="relative z-50 bg-[#022018] text-stone-200 border-b border-emerald-900/60 px-4 py-2 text-xs transition-all">
+    <aside aria-label="Thông báo mới" className="relative z-50 bg-[#022018] text-stone-200 border-b border-emerald-900/60 px-4 py-2 text-xs transition-all">
       <div className="max-w-7xl mx-auto flex items-center justify-between gap-3">
-        {/* Center editorial bulletin */}
+        {/* Center bulletin */}
         <div className="flex-1 flex items-center justify-center gap-2.5 text-center flex-wrap">
           <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-amber-500/20 border border-amber-400/40 text-amber-300 text-[10px] font-sans uppercase font-bold tracking-wider">
             <BookOpen className="w-3 h-3 text-amber-300" />
-            Ấn Bản Cambridge 2026
+            Mới Cập Nhật
           </span>
 
           <span className="font-sans text-stone-200 hidden sm:inline">
-            "Hệ Thống Luyện Đề Cambridge IELTS 10–20 • Xưởng YouTube Dictation Studio • Thẻ 3D Anki &amp; Gemini AI 9.0"
+            "Luyện đề Cambridge IELTS 10–20 • Chép chính tả YouTube • Học từ vựng Flashcard Anki"
           </span>
 
           <span className="text-stone-400 hidden md:inline">•</span>
@@ -32,12 +32,12 @@ export const AcademicRibbon: React.FC<AcademicRibbonProps> = ({ onOpenAuth, onNa
               if (onNavigateScreen) {
                 onNavigateScreen('dictation');
               } else {
-                onOpenAuth('register', 'Trải nghiệm xưởng YouTube Dictation');
+                onOpenAuth('register', 'Trải nghiệm chép chính tả YouTube');
               }
             }}
             className="inline-flex items-center gap-1 text-amber-300 hover:text-amber-200 font-bold underline underline-offset-4 decoration-amber-500/50 hover:decoration-amber-400 transition-colors cursor-pointer"
           >
-            <span>Trải Nghiệm YouTube Dictation Miễn Phí</span>
+            <span>Trải nghiệm chép chính tả YouTube miễn phí</span>
             <ArrowRight className="w-3 h-3" />
           </button>
         </div>

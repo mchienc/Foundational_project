@@ -170,15 +170,14 @@ export const GeminiAnkiCardGenerator: React.FC<GeminiAnkiCardGeneratorProps> = (
           <div>
             <div className="flex items-center gap-2">
               <h3 className="text-lg sm:text-xl font-bold font-serif text-[#064E3B]">
-                Gemini IELTS 9.0 • AI Cloze Card Generator
+                Tạo Thẻ Flashcard Bằng AI
               </h3>
               <span className="px-2 py-0.5 rounded-full text-[10px] font-mono font-bold bg-[#064E3B] text-amber-300">
-                Band 8.0+ Collocation
+                Gợi ý cụm từ hay
               </span>
             </div>
             <p className="text-xs text-stone-500 mt-1 max-w-2xl leading-relaxed">
-              Tự động phân tích từ vựng, bắt trọn cụm Collocation tự nhiên, sinh 3 dòng Back Extra súc tích
-              (phiên âm, từ đồng nghĩa, bẫy danh từ hóa) và định dạng chuẩn Note Type <strong>Cloze</strong> của Anki.
+              Tự động phân tích từ vựng, trích xuất cụm từ hay, tạo câu ví dụ và phiên âm để bạn thêm ngay vào bộ thẻ Flashcard.
             </p>
           </div>
         </div>
@@ -245,7 +244,7 @@ export const GeminiAnkiCardGenerator: React.FC<GeminiAnkiCardGeneratorProps> = (
           ) : (
             <>
               <Sparkles size={16} className="text-amber-300" />
-              <span>Tạo Thẻ Anki Chuẩn 9.0</span>
+              <span>Tạo Thẻ Flashcard</span>
             </>
           )}
         </button>

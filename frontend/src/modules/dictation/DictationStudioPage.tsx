@@ -276,17 +276,15 @@ export const DictationStudioPage: React.FC = () => {
           <div className="max-w-4xl mx-auto text-center space-y-4">
             <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#064E3B] text-amber-300 text-xs font-mono font-bold uppercase tracking-wider shadow-xs">
               <Headphones size={13} className="text-amber-300" />
-              <span>Standalone YouTube Dictation Studio • /dictation</span>
+              <span>Luyện Nghe Chép Chính Tả Video YouTube</span>
             </div>
 
             <h1 className="text-3xl sm:text-4xl lg:text-5xl font-serif font-bold text-[#064E3B] tracking-tight leading-tight">
-              Xưởng Luyện Nghe Chép Chính Tả YouTube &amp; Kho Bài Học Thuật
+              Luyện Nghe Chép Chính Tả Video YouTube
             </h1>
 
             <p className="text-sm sm:text-base text-stone-600 max-w-2xl mx-auto leading-relaxed">
-              Rèn luyện kỹ năng nghe sâu (Deep Active Listening) qua phương pháp cắt lát câu thời gian thực
-              <strong> Sentence-Slicing Audio</strong> và thuật toán so khớp từ vựng thông minh
-              <strong> LCS + Levenshtein Diff Engine</strong>.
+              Dán link YouTube bất kỳ hoặc chọn bài có sẵn bên dưới để bắt đầu luyện nghe từng câu.
             </p>
           </div>
 
@@ -382,16 +380,16 @@ export const DictationStudioPage: React.FC = () => {
         </div>
       </section>
 
-      {/* CURATED ACADEMIC VAULT (PHẦN 3: KHO VIDEO CHỌN LỌC SẴN) */}
+      {/* KHO VIDEO CHỌN LỌC SẴN */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-10 space-y-6">
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
           <div>
             <div className="flex items-center gap-2 text-xs font-mono uppercase tracking-wider font-bold text-[#D97706]">
               <BookOpen size={14} />
-              <span>Curated Academic Vault</span>
+              <span>Kho Video Chọn Lọc</span>
             </div>
             <h2 className="text-2xl sm:text-3xl font-serif font-bold text-[#064E3B] mt-1">
-              Kho Video Học Thuật Chọn Lọc ({filteredLessons.length} bài)
+              Kho Video Luyện Nghe ({filteredLessons.length} bài)
             </h2>
           </div>
 
@@ -443,7 +441,7 @@ export const DictationStudioPage: React.FC = () => {
           </div>
 
           <div className="pt-2 border-t border-stone-100 flex flex-wrap items-center gap-2">
-            <span className="text-xs font-bold text-stone-500 mr-2">Chủ đề học thuật:</span>
+            <span className="text-xs font-bold text-stone-500 mr-2">Chủ đề:</span>
             {TOPIC_FILTERS.map((topic) => {
               const active = selectedTopic === topic.id;
               return (
@@ -605,7 +603,7 @@ export const DictationStudioPage: React.FC = () => {
                         className="w-full py-3 px-4 rounded-2xl bg-[#064E3B] hover:bg-[#043327] text-white text-xs font-bold flex items-center justify-center gap-2 shadow-xs transition-colors cursor-pointer"
                       >
                         <Headphones size={15} className="text-amber-300" />
-                        <span>Vào phòng chép chính tả</span>
+                        <span>Bắt đầu chép</span>
                         <ArrowRight size={14} />
                       </button>
                     </div>

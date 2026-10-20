@@ -566,8 +566,8 @@ export const ReadingTestRoom: React.FC<ReadingTestRoomProps> = ({
             <BookOpen className="w-7 h-7 text-[#064E3B] animate-pulse" />
           </div>
           <div>
-            <h3 className="font-serif text-lg font-bold text-stone-800">Đang nạp đề thi từ hệ thống...</h3>
-            <p className="text-xs text-stone-500 mt-1">Đồng bộ đoạn văn và toàn bộ câu hỏi khảo thí Cambridge</p>
+            <h3 className="font-serif text-lg font-bold text-stone-800">Đang tải đề thi...</h3>
+            <p className="text-xs text-stone-500 mt-1">Đồng bộ đoạn văn và toàn bộ câu hỏi đề thi Cambridge</p>
           </div>
         </div>
       </div>
@@ -1261,7 +1261,7 @@ export const ReadingTestRoom: React.FC<ReadingTestRoomProps> = ({
                               <p className="leading-relaxed font-sans">{q.explanation}</p>
                             </div>
 
-                            {/* Gemini 9.0 AI Evidence & Trap Explainer */}
+                            {/* AI Evidence & Trap Explainer */}
                             <ReadingAiExplainer
                               passageTitle={currentPassage.title}
                               paragraphLetter={q.referenceParagraph || 'A'}

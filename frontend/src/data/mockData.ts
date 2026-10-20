@@ -13,8 +13,8 @@ export const sampleCourses: Course[] = [
   {
     id: 'course-ielts-vocab',
     title: 'IELTS Academic Vocabulary & Collocations Band 7.5+',
-    headline: 'Làm chủ 300+ từ vựng Cambridge cốt lõi, collocations và ngữ cảnh thực tế qua Spaced Repetition.',
-    description: 'Chương trình phát triển vốn từ vựng bám sát đề thi Cambridge. Tích hợp Spaced Repetition (SRS) giúp ghi nhớ bền vững gấp 3 lần phương pháp truyền thống.',
+    headline: 'Làm chủ 300+ từ vựng Cambridge cốt lõi, collocations và ngữ cảnh thực tế qua Flashcard Anki.',
+    description: 'Chương trình phát triển vốn từ vựng bám sát đề thi Cambridge. Tích hợp Flashcard Anki giúp ghi nhớ bền vững gấp 3 lần phương pháp truyền thống.',
     category: 'Ngoại ngữ',
     level: 'Nâng cao',
     duration: '24 giờ học',
@@ -37,12 +37,12 @@ export const sampleCourses: Course[] = [
       'Làm chủ 300+ từ vựng cốt lõi thường xuất hiện trong IELTS Reading & Writing Task 2.',
       'Phát âm chuẩn xác phiên âm quốc tế IPA, nắm vững trọng âm từ và trọng âm câu.',
       'Sử dụng các cụm từ cố định (Collocations) tự nhiên như người bản xứ.',
-      'Ứng dụng Spaced Repetition để ôn tập từ vựng đúng thời điểm ngắt quãng tối ưu.',
+      'Ôn tập ngắt quãng khoa học để ghi nhớ từ vựng lâu bền.',
     ],
     features: [
-      'Thẻ Flashcard 3D lật mượt mà với âm thanh UK/US bản xứ',
+      'Thẻ Flashcard lật mượt mà với âm thanh UK/US chuẩn',
       'Tra từ điển nhanh Popup trên mọi ví dụ song ngữ',
-      'Thuật toán Spaced Repetition tự động tính lịch ôn tập',
+      'Tự động tính lịch nhắc ôn tập từ vựng đúng lúc',
       'Cấp Chứng chỉ Hoàn thành khóa học',
     ],
     modules: [

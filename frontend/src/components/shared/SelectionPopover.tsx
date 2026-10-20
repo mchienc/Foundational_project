@@ -95,7 +95,7 @@ export const SelectionPopover: React.FC<SelectionPopoverProps> = ({
     setIsLoadingDict(true);
 
     try {
-      // 1. Gọi Backend API Gemini AI 9.0 để phân tích sâu nghĩa học thuật, IPA, POS
+      // 1. Gọi Backend API AI để phân tích nghĩa từ, IPA, POS
       const res = await fetch('/api/anki/lookup-word', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -230,7 +230,7 @@ export const SelectionPopover: React.FC<SelectionPopoverProps> = ({
 
         setIsSaved(true);
         setAiGeneratedSuccess(true);
-        onNotify?.(`✨ Đã tạo thẻ Anki Cloze 9.0 cho "${cleanWord}" bằng Gemini AI!`, 'success');
+        onNotify?.(`✨ Đã lưu từ "${cleanWord}" vào Flashcard!`, 'success');
       } else {
         handleDirectSaveToAnki();
       }
@@ -321,7 +321,7 @@ export const SelectionPopover: React.FC<SelectionPopoverProps> = ({
             type="button"
             onClick={handleOpenDictionary}
             className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-400 text-emerald-950 hover:bg-amber-300 text-xs font-bold transition-all cursor-pointer shadow-xs"
-            title="Mở từ điển học thuật tra cứu IPA và nghĩa tiếng Việt"
+            title="Tra cứu phiên âm IPA và nghĩa tiếng Việt"
           >
             <BookOpen size={13} />
             <span>Tra nghĩa</span>
@@ -449,7 +449,7 @@ export const SelectionPopover: React.FC<SelectionPopoverProps> = ({
             <div className="space-y-1.5 bg-[#FAFAF9] p-2.5 rounded-xl border border-stone-200/80">
               <div className="text-xs font-sans font-bold text-emerald-900 flex items-start gap-1.5">
                 <Sparkles size={13} className="text-amber-600 shrink-0 mt-0.5" />
-                <span>{lookup.definitionVi || `Từ vựng học thuật trong ${source}`}</span>
+                <span>{lookup.definitionVi || `Từ vựng trong ${source}`}</span>
               </div>
               {lookup.definitionEn && (
                 <p className="text-[11px] font-sans text-stone-600 leading-relaxed line-clamp-2">
@@ -466,7 +466,7 @@ export const SelectionPopover: React.FC<SelectionPopoverProps> = ({
             </p>
           )}
 
-          {/* Action Buttons: AI 9.0 Cloze & Fast Save */}
+          {/* Action Buttons: AI Cloze & Fast Save */}
           <div className="space-y-1.5 pt-1">
             <button
               type="button"
@@ -481,17 +481,17 @@ export const SelectionPopover: React.FC<SelectionPopoverProps> = ({
               {isGeneratingAi ? (
                 <>
                   <Loader2 size={14} className="animate-spin text-amber-300" />
-                  <span>Gemini Đang Tạo Thẻ 9.0...</span>
+                  <span>Đang tạo thẻ với AI...</span>
                 </>
               ) : aiGeneratedSuccess ? (
                 <>
                   <CheckCircle2 size={14} className="text-emerald-700" />
-                  <span>Đã Tạo Thẻ Cloze AI 9.0</span>
+                  <span>Đã lưu vào Flashcard</span>
                 </>
               ) : (
                 <>
                   <Sparkles size={14} className="text-amber-300" />
-                  <span>✨ Tạo Thẻ Anki Cloze AI 9.0</span>
+                  <span>✨ Tạo thẻ Flashcard với AI</span>
                 </>
               )}
             </button>

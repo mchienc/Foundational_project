@@ -111,7 +111,7 @@ export const getDefaultUserDecks = (): AnkiDeck[] => [
   {
     id: 'deck-personal',
     title: 'Deck Cá Nhân (Từ Vựng Đã Lưu)',
-    description: 'Tập hợp từ vựng học thuật bạn đã lưu từ bài đọc Cambridge và AI Cloze 9.0',
+    description: 'Tập hợp từ vựng bạn đã lưu từ bài đọc Cambridge và bài tập chép chính tả',
     category: 'CÁ NHÂN HÓA',
     isPersonal: true,
     totalCards: 0,

@@ -96,13 +96,13 @@ export const ListeningLibrary: React.FC<ListeningLibraryProps> = ({
         <div className="space-y-3">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#064E3B] text-amber-300 text-xs font-mono font-bold tracking-normal uppercase shadow-xs">
             <Headphones size={13} className="text-amber-300" />
-            <span>Thư Viện Nghe Cambridge IELTS (Cloudflare R2 CDN)</span>
+            <span>Luyện Nghe Cambridge IELTS</span>
           </div>
           <h1 className="text-3xl sm:text-4xl lg:text-5xl font-serif font-bold text-[#064E3B] tracking-tight leading-tight">
             Luyện Nghe IELTS
           </h1>
           <p className="text-sm text-stone-600 font-sans max-w-2xl leading-relaxed">
-            Mỗi bộ đề hỗ trợ <strong>2 nhánh làm bài</strong>: <strong>Phòng Thi Thật (IDP Simulation)</strong> khoá dừng/tua băng kèm 2 phút rà bài cuối giờ, hoặc <strong>Phòng Luyện Tập (Practice Studio)</strong> cho phép dừng, tua ±5 giây, lặp đoạn A–B và tăng/giảm tốc độ <code>0.75x – 1.5x</code>.
+            Luyện nghe với 2 chế độ: <strong>Thi Thật</strong> (không tua/dừng) hoặc <strong>Luyện Tập</strong> (tua lại, lặp đoạn A–B và chỉnh tốc độ).
           </p>
         </div>
         {onNavigateAnki && (
@@ -111,7 +111,7 @@ export const ListeningLibrary: React.FC<ListeningLibraryProps> = ({
             className="inline-flex items-center gap-2.5 px-5 py-3 rounded-2xl bg-amber-50 hover:bg-amber-100 border border-amber-300/80 text-amber-900 text-xs font-sans font-bold shadow-xs hover:shadow-sm active:scale-95 transition-all cursor-pointer shrink-0"
           >
             <FileCheck size={16} className="text-amber-700" />
-            <span>Mở Anki Flashcard SRS</span>
+            <span>Mở Thẻ Flashcard</span>
             <ArrowRight size={14} className="text-amber-700" />
           </button>
         )}
@@ -140,7 +140,7 @@ export const ListeningLibrary: React.FC<ListeningLibraryProps> = ({
             }`}
           >
             <Headphones size={14} />
-            Dictation Studio (Chép chính tả từng câu)
+            Chép chính tả từng câu
           </button>
         </div>
 

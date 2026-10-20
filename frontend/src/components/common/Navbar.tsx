@@ -39,26 +39,26 @@ export const Navbar: React.FC<NavbarProps> = ({
   const [showUserMenu, setShowUserMenu] = useState<boolean>(false);
   const [showMobileNav, setShowMobileNav] = useState<boolean>(false);
 
-  // Core Routes for Cambridge IELTS & Anki Platform
+  // Core Routes for Cambridge IELTS & Flashcard Platform
   const navLinks: { id: Screen; label: string; icon: React.ReactNode; adminOnly?: boolean }[] = [
     {
       id: 'reading',
-      label: 'Luyện Đọc Cambridge',
+      label: 'Luyện Reading',
       icon: <BookOpen size={15} />,
     },
     {
       id: 'listening',
-      label: 'Luyện Nghe IELTS',
+      label: 'Luyện Listening',
       icon: <Headphones size={15} />,
     },
     {
       id: 'dictation',
-      label: 'YouTube Dictation',
+      label: 'Chép chính tả',
       icon: <Youtube size={15} />,
     },
     {
       id: 'anki',
-      label: 'Anki Flashcard (SRS)',
+      label: 'Flashcard',
       icon: <Layers size={15} />,
     },
     ...(currentUser?.role === 'admin'
@@ -95,11 +95,11 @@ export const Navbar: React.FC<NavbarProps> = ({
                   EduFlow
                 </span>
                 <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[9px] sm:text-[10px] font-semibold bg-[#032B20]/90 text-amber-300 border border-amber-400/30 whitespace-nowrap leading-none tracking-wide shadow-xs">
-                  Cambridge &amp; Anki
+                  Cambridge &amp; Flashcard
                 </span>
               </div>
               <span className="text-[10px] sm:text-[11px] text-emerald-200/80 font-sans tracking-normal leading-tight whitespace-nowrap mt-0.5 hidden sm:block">
-                Luyện thi Cambridge IELTS &amp; Học từ vựng Anki
+                Luyện thi Cambridge IELTS &amp; Học từ vựng Flashcard
               </span>
             </div>
           </button>
@@ -183,7 +183,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                         className="w-full px-4 py-2 flex items-center gap-2.5 text-stone-700 hover:bg-stone-100 hover:text-forest-950 transition-colors cursor-pointer"
                       >
                         <Globe size={14} />
-                        Trang Giới Thiệu (Landing)
+                        Trang Giới Thiệu
                       </button>
                       <button
                         onClick={() => {
@@ -193,7 +193,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                         className="w-full px-4 py-2 flex items-center gap-2.5 text-stone-700 hover:bg-stone-100 hover:text-forest-950 transition-colors cursor-pointer"
                       >
                         <UserIcon size={14} />
-                        Hồ Sơ &amp; Thành Tích
+                        Trang cá nhân
                       </button>
                       <button
                         onClick={() => {
@@ -203,7 +203,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                         className="w-full px-4 py-2 flex items-center gap-2.5 text-stone-700 hover:bg-stone-100 hover:text-forest-950 transition-colors cursor-pointer"
                       >
                         <Bookmark size={14} />
-                        Sổ Tay Từ Vựng (SRS)
+                        Từ vựng của tôi
                       </button>
                       {currentUser.role === 'admin' && (
                         <button
@@ -236,23 +236,24 @@ export const Navbar: React.FC<NavbarProps> = ({
               </AnimatePresence>
             </div>
           ) : (
-            <div className="flex items-center gap-2 pl-2 border-l border-slate-200">
+            <div className="flex items-center gap-2 sm:gap-3">
               <Button
-                variant="outline"
+                variant="ghost"
                 size="sm"
-                icon={<LogIn size={13} />}
                 onClick={() => onOpenAuth('login')}
+                className="text-stone-100 hover:text-amber-300 hover:bg-emerald-900/60"
               >
-                Đăng Nhập
+                <LogIn size={14} />
+                <span>Đăng Nhập</span>
               </Button>
               <Button
                 variant="primary"
                 size="sm"
-                icon={<UserPlus size={13} />}
                 onClick={() => onOpenAuth('register')}
-                className="hidden sm:inline-flex"
+                className="bg-[#D97706] hover:bg-[#B45309] text-white border-none shadow-sm"
               >
-                Đăng Ký
+                <UserPlus size={14} />
+                <span>Bắt Đầu Học Ngay</span>
               </Button>
             </div>
           )}
@@ -301,7 +302,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-amber-300 hover:bg-forest-900/60 border-t border-emerald-900/80 pt-2 cursor-pointer transition-colors"
             >
               <Globe size={14} />
-              Trang Giới Thiệu (Landing)
+              Trang Giới Thiệu
             </button>
           </motion.div>
         )}

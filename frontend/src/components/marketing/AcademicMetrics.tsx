@@ -19,10 +19,10 @@ export const AcademicMetrics: React.FC = () => {
         { ref: val1Ref, target: 28, suffix: ' đề' },
         { ref: val2Ref, target: 100, suffix: '%' },
         { ref: val3Ref, target: 84, suffix: ' bài' },
-        { ref: val4Ref, target: 4, suffix: ' chu kỳ' },
+        { ref: val4Ref, target: 4, suffix: ' mức' },
       ];
 
-      // Smooth entrance of metric cells without ever hiding them on initial load
+      // Smooth entrance of metric cells
       gsap.from('.metric-column-cell', {
         y: 15,
         opacity: 0,
@@ -69,7 +69,7 @@ export const AcademicMetrics: React.FC = () => {
               Đề Thi Cambridge
             </p>
             <p className="text-[11px] text-stone-500 font-sans">
-              Trọn bộ đề thi thật từ Cambridge 10 đến 20 (Đọc &amp; Nghe)
+              Trọn bộ đề thi thật từ Cambridge 10 đến 20 (Reading &amp; Listening)
             </p>
           </div>
 
@@ -82,10 +82,10 @@ export const AcademicMetrics: React.FC = () => {
               <span ref={val2Ref}>100%</span>
             </div>
             <p className="text-xs font-bold text-[#064E3B] uppercase tracking-normal">
-              Khớp Lời YouTube
+              Chép Chính Tả Video
             </p>
             <p className="text-[11px] text-stone-500 font-sans">
-              Cắt lát câu theo timestamp video &amp; so khớp sai số Levenshtein
+              Nghe chép theo từng câu ngắn có phụ đề chuẩn và sửa lỗi tức thì
             </p>
           </div>
 
@@ -98,10 +98,10 @@ export const AcademicMetrics: React.FC = () => {
               <span ref={val3Ref}>84 bài</span>
             </div>
             <p className="text-xs font-bold text-[#064E3B] uppercase tracking-normal">
-              Passages Đọc Hiểu
+              Bài Đọc Reading
             </p>
             <p className="text-[11px] text-stone-500 font-sans">
-              Chuẩn giao diện thi máy tính kèm tra từ Popover 1 chạm
+              Làm bài như thi thật trên máy tính kèm tra từ điển nhanh 1 chạm
             </p>
           </div>
 
@@ -111,13 +111,13 @@ export const AcademicMetrics: React.FC = () => {
               <Layers className="w-5 h-5 text-amber-800" />
             </div>
             <div className="font-sans font-bold text-3xl sm:text-4xl text-[#064E3B] tracking-tight font-mono">
-              <span ref={val4Ref}>4 chu kỳ</span>
+              <span ref={val4Ref}>4 mức</span>
             </div>
             <p className="text-xs font-bold text-[#064E3B] uppercase tracking-normal">
-              Thuật Toán Anki SM-2
+              Ghi Nhớ Flashcard
             </p>
             <p className="text-[11px] text-stone-500 font-sans">
-              Spaced Repetition tối ưu ghi nhớ &amp; xuất file Anki .apkg
+              Nhắc ôn tập ngắt quãng khoa học giúp nhớ từ lâu và xuất file Anki dễ dàng
             </p>
           </div>
         </div>

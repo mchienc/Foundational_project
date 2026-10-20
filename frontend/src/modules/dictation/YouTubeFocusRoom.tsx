@@ -1010,7 +1010,7 @@ export const YouTubeFocusRoom: React.FC<YouTubeFocusRoomProps> = ({
                   <div className="p-4 rounded-2xl bg-emerald-950 text-white space-y-1.5 shadow-sm">
                     <div className="flex items-center justify-between">
                       <span className="text-[10px] font-mono uppercase tracking-wider text-amber-300 font-bold flex items-center gap-1">
-                        <Award size={12} /> Câu Nguyên Bản Chuẩn Học Thuật
+                        <Award size={12} /> Câu nói chuẩn gốc
                       </span>
                     </div>
                     <p className="font-serif text-base font-bold text-white leading-relaxed">
@@ -1018,7 +1018,7 @@ export const YouTubeFocusRoom: React.FC<YouTubeFocusRoomProps> = ({
                     </p>
                     {currentSentence.translationVi && (
                       <p className="text-xs text-emerald-200 italic pt-0.5">
-                        Nghĩa: {currentSentence.translationVi}
+                        Dịch nghĩa: {currentSentence.translationVi}
                       </p>
                     )}
                   </div>
@@ -1027,13 +1027,13 @@ export const YouTubeFocusRoom: React.FC<YouTubeFocusRoomProps> = ({
             )}
           </div>
 
-          {/* 4. FULL TRANSCRIPT DRAWER (Unlocked sentences or full review) */}
+          {/* 4. FULL TRANSCRIPT DRAWER */}
           {showFullTranscript && (
             <div className="bg-white rounded-3xl border border-[#E7E5E4] p-6 shadow-xs space-y-4 animate-in fade-in duration-150">
               <div className="flex items-center justify-between border-b border-stone-200 pb-3">
                 <div>
                   <h3 className="font-serif font-bold text-base text-[#064E3B]">
-                    Toàn Văn Kịch Bản Video (Transcript)
+                    Phụ đề toàn bộ video
                   </h3>
                   <p className="text-xs text-stone-500">
                     Các câu đã hoàn thành ({completedCount}/{activeSentences.length}) hoặc đã mở khóa sẽ hiển thị đầy đủ

@@ -138,7 +138,7 @@ export const AnkiFlashcardPlayer: React.FC<AnkiFlashcardPlayerProps> = ({
             Không có thẻ nào cần ôn tập lúc này!
           </h2>
           <p className="text-xs sm:text-sm text-stone-600 font-sans max-w-md mx-auto leading-relaxed">
-            Tuyệt vời! Bạn đã hoàn thành toàn bộ mục tiêu Spaced Repetition hôm nay.
+            Tuyệt vời! Bạn đã hoàn thành toàn bộ thẻ cần ôn tập hôm nay.
             Hãy tiếp tục luyện đọc và luyện nghe đề Cambridge để tích lũy thêm từ vựng mới.
           </p>
         </div>
@@ -146,7 +146,7 @@ export const AnkiFlashcardPlayer: React.FC<AnkiFlashcardPlayerProps> = ({
           onClick={onBackToWorkspace}
           className="px-6 py-3 rounded-2xl bg-[#064E3B] text-amber-300 font-sans font-bold text-xs uppercase tracking-wide cursor-pointer hover:bg-[#022C22] transition-colors"
         >
-          Trở về Bộ Bài Anki
+          Về Danh Sách Thẻ
         </button>
       </div>
     );
