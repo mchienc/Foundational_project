@@ -945,7 +945,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNotify }) => {
             </div>
 
             {/* Modal Body */}
-            <div className="p-6 overflow-y-auto space-y-6">
+            <div data-lenis-prevent="true" className="p-6 overflow-y-auto space-y-6">
               {/* Cấu hình chung */}
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 p-4 rounded-2xl bg-stone-50 border border-stone-200">
                 <div>

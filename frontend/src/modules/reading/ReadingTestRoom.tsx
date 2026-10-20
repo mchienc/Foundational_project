@@ -25,6 +25,7 @@ import {
   submitReadingExamToDatabase,
 } from '../../services/cambridgeApi';
 import { ReadingAiExplainer } from '../../components/reading/ReadingAiExplainer';
+import { useSmoothScroll } from '../../context/SmoothScrollProvider';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { useGSAP } from '@gsap/react';
@@ -49,6 +50,16 @@ export const ReadingTestRoom: React.FC<ReadingTestRoomProps> = ({
   onNotify,
 }) => {
   const { addCardToPersonalDeck, isWordSavedInAnki } = useAnki();
+  const { stop: stopLenis, start: startLenis } = useSmoothScroll();
+
+  // Tạm dừng Lenis trên window toàn cục khi ở trong phòng thi Reading
+  // để 2 cột bài đọc và câu hỏi cuộn mượt mà chuẩn native 100% không bị chặn
+  useEffect(() => {
+    stopLenis();
+    return () => {
+      startLenis();
+    };
+  }, [stopLenis, startLenis]);
 
   const isFullTest = sessionConfig?.mode === 'full' && (sessionConfig.passageIds?.length || 0) > 1;
 
@@ -172,14 +183,13 @@ export const ReadingTestRoom: React.FC<ReadingTestRoomProps> = ({
   const passageContainerRef = useRef<HTMLDivElement>(null);
   const readingProgressRef = useRef<HTMLDivElement>(null);
 
-  // Đồng bộ thanh tiến độ đọc vàng hổ phách & hiệu ứng làm nổi bật đoạn văn (Paragraph Reveal)
+  // Đồng bộ thanh tiến độ đọc vàng hổ phách (Reading Scroll Progress)
   useGSAP(
     () => {
       const container = passageContainerRef.current;
       const bar = readingProgressRef.current;
       if (!container || !bar) return;
 
-      // 1. Thanh tiến độ đọc vàng cát (Reading Scroll Progress)
       const updateReadingProgress = () => {
         const isScrollable = container.scrollHeight > container.clientHeight;
         let progress = 0;
@@ -200,59 +210,9 @@ export const ReadingTestRoom: React.FC<ReadingTestRoomProps> = ({
       container.addEventListener('scroll', updateReadingProgress, { passive: true });
       window.addEventListener('scroll', updateReadingProgress, { passive: true });
 
-      // 2. Xuất hiện từng đoạn văn (Paragraph Reveal với ScrollTrigger.batch)
-      // Khi cuộn tới đoạn văn nào, đoạn văn đó sáng rõ 100% để tập trung đọc
-      const batchTriggers = ScrollTrigger.batch('.reading-paragraph', {
-        scroller: container.scrollHeight > container.clientHeight ? container : undefined,
-        interval: 0.08,
-        batchMax: 3,
-        onEnter: (batch) => {
-          gsap.to(batch, {
-            opacity: 1,
-            duration: 0.35,
-            stagger: 0.05,
-            ease: 'power2.out',
-            force3D: true,
-            overwrite: 'auto',
-          });
-        },
-        onLeave: (batch) => {
-          gsap.to(batch, {
-            opacity: 0.45,
-            duration: 0.3,
-            ease: 'power1.out',
-            overwrite: 'auto',
-          });
-        },
-        onEnterBack: (batch) => {
-          gsap.to(batch, {
-            opacity: 1,
-            duration: 0.35,
-            ease: 'power2.out',
-            force3D: true,
-            overwrite: 'auto',
-          });
-        },
-        onLeaveBack: (batch) => {
-          gsap.to(batch, {
-            opacity: 0.45,
-            duration: 0.3,
-            ease: 'power1.out',
-            overwrite: 'auto',
-          });
-        },
-      });
-
-      // Đoạn văn đầu tiên luôn sáng rõ 100% ban đầu
-      const firstParagraph = container.querySelector('.reading-paragraph');
-      if (firstParagraph) {
-        gsap.set(firstParagraph, { opacity: 1 });
-      }
-
       return () => {
         container.removeEventListener('scroll', updateReadingProgress);
         window.removeEventListener('scroll', updateReadingProgress);
-        batchTriggers.forEach((t) => t.kill());
       };
     },
     { scope: passageContainerRef, dependencies: [currentPassage.id, activePassageIndex] }
@@ -723,12 +683,13 @@ export const ReadingTestRoom: React.FC<ReadingTestRoomProps> = ({
       </header>
 
       {/* Main Split-Screen Workspace */}
-      <main className="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+      <main data-lenis-prevent="true" className="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
         {/* LEFT COLUMN: Passage Reading (55% / 7 Cols) */}
         <section
           ref={passageContainerRef}
+          data-lenis-prevent="true"
           onMouseUp={handleMouseUp}
-          className="lg:col-span-7 bg-white rounded-3xl border border-stone-300 p-6 sm:p-8 shadow-xs space-y-6 lg:max-h-[calc(100vh-130px)] lg:overflow-y-auto"
+          className="lg:col-span-7 bg-white rounded-3xl border border-stone-300 p-6 sm:p-8 shadow-xs space-y-6 lg:max-h-[calc(100vh-130px)] lg:overflow-y-auto overscroll-contain"
         >
           {/* Full Test Passage Switcher Bar */}
           {isFullTest && allPassages.length > 1 && (
@@ -795,17 +756,16 @@ export const ReadingTestRoom: React.FC<ReadingTestRoomProps> = ({
           </div>
 
           {/* Paragraphs with Section Letters */}
-          {/* Paragraphs with Section Letters (Paragraph Focus Reveal) */}
           <div className={`space-y-6 text-stone-800 font-serif ${fontClasses[fontSize]}`}>
-            {currentPassage.paragraphs.map((p, idx) => {
+            {currentPassage.paragraphs.map((p) => {
               const isTargetPara = highlightedEvidence?.letter === p.letter;
               return (
                 <div
                   key={p.letter}
                   id={`para-${p.letter}`}
                   className={`reading-paragraph relative flex items-start gap-3 sm:gap-4 transition-all duration-300 will-change-transform rounded-2xl ${
-                    idx === 0 ? 'opacity-100' : 'opacity-40'
-                  } ${isTargetPara ? '!opacity-100 ring-2 ring-amber-400 bg-amber-50/60 p-2.5 -mx-2.5' : ''}`}
+                    isTargetPara ? 'ring-2 ring-amber-400 bg-amber-50/60 p-2.5 -mx-2.5' : ''
+                  }`}
                 >
                   <span
                     className={`sticky top-2 shrink-0 w-7 h-7 rounded-lg border font-sans font-bold text-xs flex items-center justify-center select-none shadow-2xs transition-colors ${
@@ -816,7 +776,7 @@ export const ReadingTestRoom: React.FC<ReadingTestRoomProps> = ({
                   >
                     {p.letter}
                   </span>
-                  <p className="flex-1 leading-relaxed text-justify sm:text-left">
+                  <p className="flex-1 leading-relaxed text-justify sm:text-left text-stone-900">
                     {renderParagraphWithHighlight(
                       p.text,
                       isTargetPara ? highlightedEvidence?.quote : undefined
@@ -829,7 +789,7 @@ export const ReadingTestRoom: React.FC<ReadingTestRoomProps> = ({
         </section>
 
         {/* RIGHT COLUMN: Tooling Pane (45% / 5 Cols) */}
-        <aside className="lg:col-span-5 bg-white rounded-3xl border border-stone-300 shadow-xs flex flex-col lg:max-h-[calc(100vh-130px)] overflow-hidden">
+        <aside data-lenis-prevent="true" className="lg:col-span-5 bg-white rounded-3xl border border-stone-300 shadow-xs flex flex-col lg:max-h-[calc(100vh-130px)] overflow-hidden">
           {/* Tab Selector */}
           <div className="flex items-center border-b border-stone-200 bg-stone-50/80 p-1.5 rounded-t-3xl">
             <button
@@ -906,7 +866,7 @@ export const ReadingTestRoom: React.FC<ReadingTestRoomProps> = ({
           )}
 
           {/* Tab Content Body */}
-          <div className="flex-1 p-5 sm:p-6 overflow-y-auto space-y-6">
+          <div data-lenis-prevent="true" className="flex-1 p-5 sm:p-6 overflow-y-auto space-y-6 overscroll-contain">
             {/* TAB 1: QUESTIONS */}
             {activeTab === 'questions' && (
               <div className="space-y-6">

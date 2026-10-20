@@ -110,7 +110,7 @@ export const ListeningReviewRoom: React.FC<ListeningReviewRoomProps> = ({
           </div>
         </header>
         
-        <div className="flex-1 overflow-y-auto p-6 space-y-8" data-lenis-prevent="true">
+        <div className="flex-1 overflow-y-auto overscroll-contain p-6 space-y-8" data-lenis-prevent="true">
           {/* Score Card */}
           <div className="bg-gray-50 rounded-2xl p-6 border border-gray-200 flex items-center justify-between shadow-sm">
             <div>
@@ -227,7 +227,7 @@ export const ListeningReviewRoom: React.FC<ListeningReviewRoomProps> = ({
           />
         </div>
 
-        <div className="flex-1 overflow-y-auto p-6 space-y-4" data-lenis-prevent="true">
+        <div className="flex-1 overflow-y-auto overscroll-contain p-6 space-y-4" data-lenis-prevent="true">
           {transcriptLines.map((line, idx) => {
             const isActive = idx === activeLineIndex;
             return (

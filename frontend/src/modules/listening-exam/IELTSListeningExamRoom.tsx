@@ -466,7 +466,7 @@ export const IELTSListeningExamRoom: React.FC<IELTSListeningExamRoomProps> = ({
       <div className="flex-1 flex min-h-0 overflow-hidden" data-lenis-prevent="true">
         {/* Left / Center: Active Part Questions */}
         <div
-          className={`flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 ${
+          className={`flex-1 overflow-y-auto overscroll-contain p-4 sm:p-6 lg:p-8 ${
             showPracticeTranscript ? 'border-r border-stone-200' : ''
           }`}
           data-lenis-prevent="true"

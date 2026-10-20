@@ -52,6 +52,36 @@ export const SmoothScrollProvider: React.FC<SmoothScrollProviderProps> = ({
       touchMultiplier: 1.2,
       infinite: false,
       autoResize: true,
+      allowNestedScroll: true,
+      prevent: (node: any) => {
+        if (!node || !(node instanceof HTMLElement)) return false;
+        // 1. Bỏ qua các phần tử hoặc cha có data-lenis-prevent
+        if (node.hasAttribute('data-lenis-prevent') || Boolean(node.closest?.('[data-lenis-prevent]'))) {
+          return true;
+        }
+        // 2. Bỏ qua mọi container có scroll tự nhiên (overflow auto/scroll)
+        if (Boolean(node.closest?.('.overflow-y-auto, .overflow-x-auto, .overflow-auto, .overflow-y-scroll, .overflow-x-scroll, [data-scrollable="true"]'))) {
+          return true;
+        }
+        // 3. Bỏ qua các modal, dialog, dropdown popovers
+        if (Boolean(node.closest?.('[role="dialog"], .modal, [data-modal="true"]'))) {
+          return true;
+        }
+        // 4. Kiểm tra computed overflow style nếu container có thể cuộn
+        let curr: HTMLElement | null = node;
+        while (curr && curr !== document.body && curr !== document.documentElement) {
+          if (curr.scrollHeight > curr.clientHeight || curr.scrollWidth > curr.clientWidth) {
+            const style = window.getComputedStyle(curr);
+            const oy = style.overflowY;
+            const ox = style.overflowX;
+            if (oy === 'auto' || oy === 'scroll' || ox === 'auto' || ox === 'scroll') {
+              return true;
+            }
+          }
+          curr = curr.parentElement;
+        }
+        return false;
+      },
     });
 
     lenisRef.current = lenis;

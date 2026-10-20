@@ -421,7 +421,7 @@ export const ReadingLibrary: React.FC<ReadingLibraryProps> = ({
             </div>
 
             {/* Modal Content */}
-            <div className="p-6 overflow-y-auto space-y-6">
+            <div data-lenis-prevent="true" className="p-6 overflow-y-auto space-y-6 overscroll-contain">
               {/* 2-Branch Comparison Cards */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {/* Branch 1: Real Exam Simulation */}
