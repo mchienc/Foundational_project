@@ -114,49 +114,64 @@ exports.generateAnkiCloze = async (req, res) => {
       });
     }
 
-    const apiKey = customApiKey || process.env.GEMINI_API_KEY;
+    const apiKey = (customApiKey || process.env.GEMINI_API_KEY || '').replace(/["']/g, '').trim();
 
-    // Nếu có API Key, ưu tiên gọi Gemini API
+    // Nếu có API Key, thử gọi danh sách các model Gemini thế hệ mới
     if (apiKey) {
-      try {
-        const userPrompt = `Từ vựng / Cụm từ: ${word || 'Trích xuất từ câu dưới'}\n${
-          sentence ? `Câu văn ngữ cảnh: ${sentence}` : ''
-        }`;
+      const candidateModels = [
+        'gemini-3.5-flash',
+        'gemini-3.8-flash',
+        'gemini-flash-latest',
+        'gemini-2.5-pro',
+      ];
 
-        const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+      const userPrompt = `Từ vựng / Cụm từ: ${word || 'Trích xuất từ câu dưới'}\n${
+        sentence ? `Câu văn ngữ cảnh: ${sentence}` : ''
+      }`;
 
-        const apiResponse = await fetch(geminiUrl, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            contents: [
-              {
-                role: 'user',
-                parts: [{ text: `${SYSTEM_PROMPT}\n\n${userPrompt}` }],
+      for (const model of candidateModels) {
+        try {
+          const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
+
+          const controller = new AbortController();
+          const timeoutId = setTimeout(() => controller.abort(), 12000);
+
+          const apiResponse = await fetch(geminiUrl, {
+            method: 'POST',
+            signal: controller.signal,
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              contents: [
+                {
+                  role: 'user',
+                  parts: [{ text: `${SYSTEM_PROMPT}\n\n${userPrompt}` }],
+                },
+              ],
+              generationConfig: {
+                temperature: 0.2,
+                maxOutputTokens: 1200,
               },
-            ],
-            generationConfig: {
-              temperature: 0.2,
-              maxOutputTokens: 600,
-            },
-          }),
-        });
+            }),
+          });
 
-        if (apiResponse.ok) {
-          const apiData = await apiResponse.json();
-          const candidate = apiData?.candidates?.[0]?.content?.parts?.[0]?.text;
+          clearTimeout(timeoutId);
 
-          if (candidate) {
-            const parsed = parseAnkiResponse(candidate);
-            return res.json({
-              success: true,
-              source: 'gemini-1.5-flash',
-              data: parsed,
-            });
+          if (apiResponse.ok) {
+            const apiData = await apiResponse.json();
+            const candidate = apiData?.candidates?.[0]?.content?.parts?.[0]?.text;
+
+            if (candidate) {
+              const parsed = parseAnkiResponse(candidate);
+              return res.json({
+                success: true,
+                source: `Gemini AI (${model})`,
+                data: parsed,
+              });
+            }
           }
+        } catch (mErr) {
+          console.warn(`Model ${model} failed, trying next candidate:`, mErr.message);
         }
-      } catch (geminiError) {
-        console.warn('Gemini API call failed, falling back to smart engine:', geminiError.message);
       }
     }
 
