@@ -69,13 +69,13 @@ function mergeCaptionsIntoSentences(rawSegments) {
     const endsWithClausePunct = /[,;:—–-]["']?$/.test(seg.text);
     const duration = currentEnd - currentStart;
 
-    // Ưu tiên ngắt đúng dấu kết câu (. ? !) khi câu đủ độ dài (>= 4 từ),
-    // hoặc ngắt tại dấu phẩy khi câu đã dài (>= 14 từ), hoặc ngắt cưỡng bức khi >= 22 từ
+    // Ưu tiên ngắt đúng dấu kết câu (. ? !) khi câu đủ dài (>= 12 từ và >= 5.5 giây),
+    // hoặc ngắt tại dấu phẩy khi câu đã dài (>= 22 từ), hoặc ngắt cưỡng bức khi >= 28 từ / 15 giây
     if (
-      (endsWithSentencePunct && wordCount >= 4) ||
-      (endsWithClausePunct && wordCount >= 14) ||
-      wordCount >= 22 ||
-      duration >= 12
+      (endsWithSentencePunct && wordCount >= 12 && duration >= 5.5) ||
+      (endsWithClausePunct && wordCount >= 22) ||
+      wordCount >= 28 ||
+      duration >= 15
     ) {
       sentences.push({
         id: sentences.length + 1,
@@ -98,8 +98,8 @@ function mergeCaptionsIntoSentences(rawSegments) {
     });
   }
 
-  // Giới hạn tối đa 25 câu đầu tiên để bài luyện tập trung
-  return sentences.slice(0, 25);
+  // Hỗ trợ tối đa 40 đoạn câu dài cho mỗi bài luyện (bao phủ trọn vẹn video 4-6 phút)
+  return sentences.slice(0, 40);
 }
 
 // Bóc tách XML timedtext (Hỗ trợ cả format="3" <p t="ms" d="ms"> và format="1" <text start="s" dur="s">)

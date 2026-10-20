@@ -22,7 +22,7 @@ import {
   Check,
   AlertCircle,
 } from 'lucide-react';
-import { DictationLesson, DiffCheckResult } from './types';
+import { DictationLesson, DictationSentence, DiffCheckResult } from './types';
 import { evaluateDictationDiff, cleanSingleWord } from './diffEngine';
 
 declare global {
@@ -55,6 +55,29 @@ export const YouTubeFocusRoom: React.FC<YouTubeFocusRoomProps> = ({
   // Chế độ luyện: 'full' (Chép trắng cả câu) | 'cloze' (Gợi ý khung câu, chỉ ẩn từ khóa học thuật)
   const [practiceMode, setPracticeMode] = useState<'full' | 'cloze'>('full');
 
+  // Độ dài đoạn chép: 1 (Mặc định ~8-12s/câu) | 2 (Gộp 2 câu ~16-24s/đoạn) | 3 (Gộp 3 câu ~25-35s/đoạn)
+  const [chunkSize, setChunkSize] = useState<1 | 2 | 3>(1);
+
+  const activeSentences = React.useMemo<DictationSentence[]>(() => {
+    if (chunkSize === 1) return lesson.sentences;
+    const grouped: DictationSentence[] = [];
+    for (let i = 0; i < lesson.sentences.length; i += chunkSize) {
+      const slice = lesson.sentences.slice(i, i + chunkSize);
+      if (slice.length === 0) continue;
+      grouped.push({
+        id: grouped.length + 1,
+        start: slice[0].start,
+        end: slice[slice.length - 1].end,
+        text: slice.map((s) => s.text).join(' '),
+        translationVi: slice
+          .map((s) => s.translationVi)
+          .filter(Boolean)
+          .join(' '),
+      });
+    }
+    return grouped;
+  }, [lesson.sentences, chunkSize]);
+
   // Trạng thái trình phát YouTube
   const [isPlayerReady, setIsPlayerReady] = useState<boolean>(false);
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
@@ -74,7 +97,7 @@ export const YouTubeFocusRoom: React.FC<YouTubeFocusRoomProps> = ({
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const loopTimeoutRef = useRef<number | null>(null);
 
-  const currentSentence = lesson.sentences[currentIdx] || lesson.sentences[0];
+  const currentSentence = activeSentences[currentIdx] || activeSentences[0];
   const currentSentenceRef = useRef(currentSentence);
   useEffect(() => {
     currentSentenceRef.current = currentSentence;
@@ -116,12 +139,12 @@ export const YouTubeFocusRoom: React.FC<YouTubeFocusRoomProps> = ({
           })
         );
         const doneCount = Object.values(newCompleted).filter(Boolean).length;
-        onProgressUpdate?.(lesson.id, doneCount, lesson.sentences.length);
+        onProgressUpdate?.(lesson.id, doneCount, activeSentences.length);
       } catch {
         // Ignore
       }
     },
-    [lesson.id, lesson.sentences.length, onProgressUpdate]
+    [lesson.id, activeSentences.length, onProgressUpdate]
   );
 
   // Khởi tạo YouTube IFrame Player API
@@ -318,14 +341,14 @@ export const YouTubeFocusRoom: React.FC<YouTubeFocusRoomProps> = ({
   // Chuyển sang câu khác theo index
   const goToSentenceIndex = useCallback(
     (targetIdx: number, autoPlay = true) => {
-      if (targetIdx < 0 || targetIdx >= lesson.sentences.length) return;
+      if (targetIdx < 0 || targetIdx >= activeSentences.length) return;
       if (loopTimeoutRef.current) {
         window.clearTimeout(loopTimeoutRef.current);
         loopTimeoutRef.current = null;
       }
       setIsWaitingNextLoop(false);
 
-      const nextSentence = lesson.sentences[targetIdx];
+      const nextSentence = activeSentences[targetIdx];
       setCurrentIdx(targetIdx);
 
       const savedText = savedInputsMap[nextSentence.id] || '';
@@ -347,7 +370,7 @@ export const YouTubeFocusRoom: React.FC<YouTubeFocusRoomProps> = ({
         }
       }, 60);
     },
-    [lesson.sentences, savedInputsMap, isPlayerReady]
+    [activeSentences, savedInputsMap, isPlayerReady]
   );
 
   // Kiểm tra đáp án câu hiện tại
@@ -432,7 +455,7 @@ export const YouTubeFocusRoom: React.FC<YouTubeFocusRoomProps> = ({
     // 4. Alt + ArrowRight / Alt + ArrowLeft: Chuyển câu
     if (e.altKey && e.key === 'ArrowRight') {
       e.preventDefault();
-      if (currentIdx < lesson.sentences.length - 1) {
+      if (currentIdx < activeSentences.length - 1) {
         goToSentenceIndex(currentIdx + 1, true);
       }
       return;
@@ -448,7 +471,7 @@ export const YouTubeFocusRoom: React.FC<YouTubeFocusRoomProps> = ({
     // 5. Enter: Kiểm tra đáp án (hoặc chuyển sang câu tiếp theo nếu đã đạt >= 90%)
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
-      if (isCurrentPassed && currentIdx < lesson.sentences.length - 1) {
+      if (isCurrentPassed && currentIdx < activeSentences.length - 1) {
         goToSentenceIndex(currentIdx + 1, true);
       } else {
         handleCheckAnswer();
@@ -539,7 +562,7 @@ export const YouTubeFocusRoom: React.FC<YouTubeFocusRoomProps> = ({
 
           {/* Center: Sentence Progress Dots */}
           <div className="flex items-center gap-1.5 overflow-x-auto py-1 max-w-xs sm:max-w-md">
-            {lesson.sentences.map((s, idx) => {
+            {activeSentences.map((s, idx) => {
               const isCurrent = idx === currentIdx;
               const isDone = Boolean(completedMap[s.id]);
               const isRevealed = Boolean(revealedMap[s.id]);
@@ -726,42 +749,75 @@ export const YouTubeFocusRoom: React.FC<YouTubeFocusRoomProps> = ({
           <div className="bg-white rounded-3xl border border-[#E7E5E4] p-6 sm:p-8 shadow-xs space-y-5">
             {/* Sentence Header & Mode Switcher */}
             <div className="flex flex-wrap items-center justify-between gap-3 border-b border-stone-200 pb-4">
-              <div className="flex items-center gap-2.5">
+              <div className="flex flex-wrap items-center gap-2.5">
                 <span className="px-3 py-1 rounded-xl bg-[#064E3B] text-amber-300 font-mono text-xs font-bold">
-                  Câu {currentIdx + 1} / {lesson.sentences.length}
+                  Đoạn {currentIdx + 1} / {activeSentences.length}
                 </span>
                 <span className="text-xs text-stone-500 font-mono">
-                  Tổng số từ cần nghe:{' '}
+                  Độ dài:{' '}
                   <strong className="text-stone-800">
-                    {currentSentence.text.trim().split(/\s+/).length} từ
+                    {currentSentence.text.trim().split(/\s+/).length} từ (~
+                    {Math.round(currentSentence.end - currentSentence.start)}s)
                   </strong>
                 </span>
               </div>
 
-              {/* Switch Full Dictation vs Keyword Cloze */}
-              <div className="inline-flex items-center bg-stone-100 p-1 rounded-xl border border-stone-200 text-xs">
-                <button
-                  type="button"
-                  onClick={() => setPracticeMode('full')}
-                  className={`px-2.5 py-1 rounded-lg font-bold transition-colors cursor-pointer ${
-                    practiceMode === 'full'
-                      ? 'bg-white text-[#064E3B] shadow-2xs'
-                      : 'text-stone-600 hover:text-stone-900'
-                  }`}
+              <div className="flex flex-wrap items-center gap-2">
+                {/* Chunk Size Selector: 1x / 2x / 3x */}
+                <div
+                  className="inline-flex items-center bg-[#FAFAF9] p-1 rounded-xl border border-stone-200 text-xs"
+                  title="Tùy chỉnh độ dài mỗi đoạn nghe chép"
                 >
-                  Chép Toàn Câu
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setPracticeMode('cloze')}
-                  className={`px-2.5 py-1 rounded-lg font-bold transition-colors cursor-pointer ${
-                    practiceMode === 'cloze'
-                      ? 'bg-white text-[#064E3B] shadow-2xs'
-                      : 'text-stone-600 hover:text-stone-900'
-                  }`}
-                >
-                  Gợi Ý Khung Cloze
-                </button>
+                  {([
+                    { size: 1 as const, label: 'Chuẩn (1 câu)' },
+                    { size: 2 as const, label: 'Dài (Gộp 2)' },
+                    { size: 3 as const, label: 'Đoạn văn (Gộp 3)' },
+                  ]).map((opt) => (
+                    <button
+                      key={opt.size}
+                      type="button"
+                      onClick={() => {
+                        setChunkSize(opt.size);
+                        setCurrentIdx(0);
+                        setUserInput('');
+                        setDiffResult(null);
+                      }}
+                      className={`px-2.5 py-1 rounded-lg font-bold transition-colors cursor-pointer ${
+                        chunkSize === opt.size
+                          ? 'bg-[#D97706] text-white shadow-2xs'
+                          : 'text-stone-600 hover:text-stone-900'
+                      }`}
+                    >
+                      {opt.label}
+                    </button>
+                  ))}
+                </div>
+
+                {/* Switch Full Dictation vs Keyword Cloze */}
+                <div className="inline-flex items-center bg-stone-100 p-1 rounded-xl border border-stone-200 text-xs">
+                  <button
+                    type="button"
+                    onClick={() => setPracticeMode('full')}
+                    className={`px-2.5 py-1 rounded-lg font-bold transition-colors cursor-pointer ${
+                      practiceMode === 'full'
+                        ? 'bg-white text-[#064E3B] shadow-2xs'
+                        : 'text-stone-600 hover:text-stone-900'
+                    }`}
+                  >
+                    Chép Toàn Câu
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setPracticeMode('cloze')}
+                    className={`px-2.5 py-1 rounded-lg font-bold transition-colors cursor-pointer ${
+                      practiceMode === 'cloze'
+                        ? 'bg-white text-[#064E3B] shadow-2xs'
+                        : 'text-stone-600 hover:text-stone-900'
+                    }`}
+                  >
+                    Gợi Ý Khung Cloze
+                  </button>
+                </div>
               </div>
             </div>
 
@@ -788,7 +844,7 @@ export const YouTubeFocusRoom: React.FC<YouTubeFocusRoomProps> = ({
               <textarea
                 ref={textareaRef}
                 autoFocus
-                rows={3}
+                rows={chunkSize > 1 ? 5 : 3}
                 value={userInput}
                 onChange={(e) => setUserInput(e.target.value)}
                 onKeyDown={handleKeyDown}
@@ -833,10 +889,10 @@ export const YouTubeFocusRoom: React.FC<YouTubeFocusRoomProps> = ({
 
                 <button
                   type="button"
-                  disabled={!isCurrentPassed || currentIdx >= lesson.sentences.length - 1}
+                  disabled={!isCurrentPassed || currentIdx >= activeSentences.length - 1}
                   onClick={() => goToSentenceIndex(currentIdx + 1, true)}
                   className={`px-4 py-2.5 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer ${
-                    isCurrentPassed && currentIdx < lesson.sentences.length - 1
+                    isCurrentPassed && currentIdx < activeSentences.length - 1
                       ? 'bg-[#D97706] hover:bg-amber-700 text-white shadow-sm'
                       : 'bg-stone-200 text-stone-400 cursor-not-allowed'
                   }`}
@@ -980,17 +1036,17 @@ export const YouTubeFocusRoom: React.FC<YouTubeFocusRoomProps> = ({
                     Toàn Văn Kịch Bản Video (Transcript)
                   </h3>
                   <p className="text-xs text-stone-500">
-                    Các câu đã hoàn thành ({completedCount}/{lesson.sentences.length}) hoặc đã mở khóa sẽ hiển thị đầy đủ
+                    Các câu đã hoàn thành ({completedCount}/{activeSentences.length}) hoặc đã mở khóa sẽ hiển thị đầy đủ
                   </p>
                 </div>
               </div>
 
               <div className="space-y-2.5 max-h-80 overflow-y-auto pr-1">
-                {lesson.sentences.map((s, idx) => {
+                {activeSentences.map((s, idx) => {
                   const isUnlocked =
                     Boolean(completedMap[s.id]) ||
                     Boolean(revealedMap[s.id]) ||
-                    completedCount === lesson.sentences.length;
+                    completedCount === activeSentences.length;
 
                   return (
                     <div
