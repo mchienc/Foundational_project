@@ -5,25 +5,38 @@ const fs = require('fs');
 const path = require('path');
 
 function getLiveApiKey() {
+  // Thử các đường dẫn có thể có của file .env
+  const candidatePaths = [
+    path.resolve(__dirname, '../.env'),
+    path.resolve(process.cwd(), '.env'),
+    path.resolve(process.cwd(), 'online-learning-website/.env'),
+  ];
+
+  for (const envPath of candidatePaths) {
+    try {
+      if (fs.existsSync(envPath)) {
+        const content = fs.readFileSync(envPath, 'utf8');
+        const lines = content.split(/\r?\n/);
+        for (const line of lines) {
+          const trimmed = line.trim();
+          if (trimmed.startsWith('GEMINI_API_KEY=')) {
+            const rawVal = trimmed.slice('GEMINI_API_KEY='.length).trim();
+            const cleanVal = rawVal.replace(/^["']|["']$/g, '').trim();
+            if (cleanVal) {
+              process.env.GEMINI_API_KEY = cleanVal;
+              return cleanVal;
+            }
+          }
+        }
+      }
+    } catch (err) {
+      console.warn('Cannot read .env dynamically from', envPath, err.message);
+    }
+  }
+
   let key = process.env.GEMINI_API_KEY;
   if (key && key.trim()) {
     return key.replace(/["']/g, '').trim();
-  }
-
-  // Đọc trực tiếp từ file .env nếu server Node chưa được restart
-  try {
-    const envPath = path.resolve(__dirname, '../.env');
-    if (fs.existsSync(envPath)) {
-      const content = fs.readFileSync(envPath, 'utf8');
-      const match = content.match(/GEMINI_API_KEY=["']?([^"'\r\n]+)/);
-      if (match && match[1]) {
-        const found = match[1].trim();
-        process.env.GEMINI_API_KEY = found;
-        return found;
-      }
-    }
-  } catch (err) {
-    console.warn('Cannot read .env dynamically:', err.message);
   }
 
   return '';
@@ -120,12 +133,12 @@ function generateSmartFallback(word, sentence) {
       `{{c1::${collocation}::nghĩa học thuật ngữ cảnh (Collocation Band 8.0+)}}`
     );
   } else {
-    clozeSentence = `Scholars argue that rigorous policies fail to {{c1::${cleanWord}::hạn chế/tác động (V + Collocation)}}, necessitating broader civic interventions.`;
+    clozeSentence = `The academic literature underscores the need to examine {{c1::${cleanWord}::nghĩa học thuật}} within contemporary analytical frameworks.`;
   }
 
   const text = clozeSentence;
-  const backExtra = `/${cleanWord}/ • academic term • Thuật ngữ trọng tâm IELTS Academic\n• Paraphrase: curb, impede, mitigate the severity of\n• [Nominalization / Bẫy từ]: Chuyển danh từ hóa đi kèm giới từ: ${cleanWord} -> exercise significant ${cleanWord} on`;
-  const tags = `ielts_writing academic_lexicon band8 c1 nominalization`;
+  const backExtra = `/${cleanWord}/ • [Chế độ ngoại tuyến]\n• Lưu ý: Cần kết nối Gemini AI để phân tích Collocation & Paraphrase chính xác cho từ này.\n• [Cấu hình]: Đảm bảo GEMINI_API_KEY hợp lệ trong file .env.`;
+  const tags = `ielts_vocabulary academic c1`;
 
   return { text, backExtra, tags, raw: `[TEXT]\n${text}\n\n[BACK EXTRA]\n${backExtra}\n\n[TAGS]\n${tags}` };
 }
@@ -145,13 +158,14 @@ exports.generateAnkiCloze = async (req, res) => {
     const apiKey = (customApiKey || getLiveApiKey()).replace(/["']/g, '').trim();
 
     // Nếu có API Key, thử gọi danh sách các model Gemini thế hệ mới
+    let lastErrorDetails = '';
     if (apiKey) {
       const candidateModels = [
         'gemini-flash-lite-latest',
         'gemini-2.5-flash-lite',
+        'gemini-2.5-flash',
         'gemini-3.5-flash-lite',
         'gemini-3.5-flash',
-        'gemini-3.8-flash',
       ];
 
       const userPrompt = `Từ vựng / Cụm từ: ${word || 'Trích xuất từ câu dưới'}\n${
@@ -163,7 +177,7 @@ exports.generateAnkiCloze = async (req, res) => {
           const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
 
           const controller = new AbortController();
-          const timeoutId = setTimeout(() => controller.abort(), 8000);
+          const timeoutId = setTimeout(() => controller.abort(), 9000);
 
           const apiResponse = await fetch(geminiUrl, {
             method: 'POST',
@@ -198,15 +212,24 @@ exports.generateAnkiCloze = async (req, res) => {
               });
             }
           } else {
-            console.warn(`Model ${model} returned HTTP ${apiResponse.status}, trying next...`);
+            const errText = await apiResponse.text().catch(() => '');
+            lastErrorDetails = `Model ${model} HTTP ${apiResponse.status}: ${errText.slice(0, 100)}`;
+            console.warn(`[Gemini API] ${lastErrorDetails}`);
           }
         } catch (mErr) {
-          console.warn(`Model ${model} failed, trying next candidate:`, mErr.message);
+          lastErrorDetails = `Model ${model} Error: ${mErr.message}`;
+          console.warn(`[Gemini API] ${lastErrorDetails}`);
         }
       }
+
+      // Nếu đã có API key nhưng các model Gemini đều lỗi, trả về lỗi chi tiết thay vì giả mạo kết quả
+      return res.status(502).json({
+        success: false,
+        message: `Không thể kết nối Gemini AI (${lastErrorDetails || 'Mô hình không phản hồi'}). Vui lòng kiểm tra lại kết nối mạng hoặc API Key.`,
+      });
     }
 
-    // Cơ chế Fallback an toàn (Smart Academic Fallback Engine)
+    // Cơ chế Fallback an toàn (Smart Academic Fallback Engine) - CHỈ KHI HOÀN TOÀN KHÔNG CÓ API KEY
     const fallbackResult = generateSmartFallback(word, sentence);
     res.json({
       success: true,
