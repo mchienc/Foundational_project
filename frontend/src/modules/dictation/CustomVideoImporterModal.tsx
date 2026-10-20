@@ -469,11 +469,26 @@ export const CustomVideoImporterModal: React.FC<CustomVideoImporterModalProps> =
                 </div>
               </div>
 
+              {/* Hướng dẫn sao chép siêu tốc từ YouTube */}
+              <div className="p-3 rounded-2xl bg-amber-50/80 border border-amber-300/80 text-[11px] text-amber-950 space-y-1 leading-relaxed">
+                <span className="font-bold text-xs text-[#064E3B] flex items-center gap-1.5">
+                  <Sparkles size={14} className="text-[#D97706]" />
+                  Mẹo lấy phụ đề YouTube chuẩn 100% trong 5 giây (Bỏ qua giới hạn Cloud Render):
+                </span>
+                <p className="text-stone-700">
+                  1. Mở video trên YouTube &rarr; Bấm <strong>...</strong> (dưới tiêu đề) &rarr; Chọn <strong>"Hiện bản chép lời" (Show transcript)</strong>.
+                  <br />
+                  2. Nhấn <strong>Ctrl + A</strong> (hoặc bôi đen) &rarr; <strong>Ctrl + C</strong> (sao chép).
+                  <br />
+                  3. Dán (<strong>Ctrl + V</strong>) vào ô bên dưới &rarr; Hệ thống tự động nhận diện toàn bộ mốc thời gian và chia câu hoàn chỉnh!
+                </p>
+              </div>
+
               <textarea
-                rows={5}
+                rows={6}
                 value={manualText}
                 onChange={(e) => setManualText(e.target.value)}
-                placeholder="Ví dụ:&#10;00:12 - 00:18: Sentence one text here.&#10;00:19 - 00:25: Sentence two text here."
+                placeholder="Dán phụ đề sao chép từ YouTube hoặc file phụ đề tại đây...&#10;Hệ thống tự động hỗ trợ cả 3 định dạng:&#10;1. Dạng sao chép trực tiếp từ YouTube: 0:13\nHave you ever thought...\n0:18\nTomorrow is the day...&#10;2. Dạng mốc thời gian: 00:12 - 00:18: Sentence text&#10;3. File WebVTT (.vtt) hoặc SubRip (.srt)"
                 className="w-full p-3 rounded-xl border border-stone-300 bg-[#FAFAF9] font-mono text-xs text-stone-800 focus:outline-none focus:border-[#064E3B] leading-relaxed"
               />
 
@@ -482,7 +497,7 @@ export const CustomVideoImporterModal: React.FC<CustomVideoImporterModalProps> =
                   <CheckCircle2 size={13} className="text-emerald-600" />
                   Đã nhận diện hợp lệ: <strong>{activeSentences.length} đoạn</strong>
                 </span>
-                <span>Hỗ trợ định dạng: `MM:SS - MM:SS: Nội dung`, WebVTT, SRT, JSON</span>
+                <span>Hỗ trợ: Copy YouTube, `MM:SS - MM:SS`, WebVTT, SRT, JSON</span>
               </div>
             </div>
           )}

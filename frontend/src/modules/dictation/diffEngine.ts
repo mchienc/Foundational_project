@@ -447,6 +447,77 @@ export function parseCustomTranscriptInput(rawInput: string): DictationSentence[
     return timestampedSentences;
   }
 
+  // 3b. Kiểm tra định dạng sao chép trực tiếp từ bảng phụ đề YouTube (Show Transcript):
+  // Dòng 1: Mốc thời gian (0:13)
+  // Dòng 2: Nội dung câu ("Have you ever thought to yourself...")
+  const ytCues: { start: number; text: string }[] = [];
+  const singleTimeRegex = /^\[?(\d{1,2}:\d{2}(?::\d{2})?)\]?$/;
+
+  for (let idx = 0; idx < lines.length; idx++) {
+    const l = lines[idx];
+    const timeMatch = l.match(singleTimeRegex);
+    if (timeMatch && idx + 1 < lines.length) {
+      const nextLine = lines[idx + 1];
+      if (!singleTimeRegex.test(nextLine)) {
+        // Loại bỏ phần tín chỉ dịch giả ở đầu nếu có
+        const cleanContent = nextLine
+          .replace(/(?:Transcriber|Reviewer|Translated by|Subtitles by):?[^\n\r]+/gi, '')
+          .trim();
+
+        if (cleanContent) {
+          ytCues.push({
+            start: parseTimeStringToSeconds(timeMatch[1]),
+            text: cleanContent,
+          });
+        }
+        idx++; // Đã lấy dòng nội dung tương ứng
+      }
+    }
+  }
+
+  if (ytCues.length >= 2) {
+    const mergedYt: DictationSentence[] = [];
+    let curText = '';
+    let curStart: number | null = null;
+    let curEnd = 0;
+
+    for (let i = 0; i < ytCues.length; i++) {
+      const cue = ytCues[i];
+      if (curStart === null) curStart = cue.start;
+      const nextCue = ytCues[i + 1];
+      curEnd = nextCue ? nextCue.start : cue.start + 5;
+      curText = curText ? `${curText} ${cue.text}` : cue.text;
+
+      const wc = curText.split(/\s+/).length;
+      const endsWithPunct = /[.?!]["']?$/.test(cue.text);
+      const dur = curEnd - curStart;
+
+      if ((endsWithPunct && wc >= 12 && dur >= 5.5) || wc >= 24 || dur >= 14) {
+        mergedYt.push({
+          id: mergedYt.length + 1,
+          start: Number(curStart.toFixed(1)),
+          end: Number(Math.max(curEnd, curStart + 1.5).toFixed(1)),
+          text: curText.replace(/\s+/g, ' ').trim(),
+        });
+        curText = '';
+        curStart = null;
+      }
+    }
+
+    if (curText && curStart !== null) {
+      mergedYt.push({
+        id: mergedYt.length + 1,
+        start: Number(curStart.toFixed(1)),
+        end: Number(Math.max(curEnd, curStart + 2).toFixed(1)),
+        text: curText.replace(/\s+/g, ' ').trim(),
+      });
+    }
+
+    if (mergedYt.length > 0) {
+      return mergedYt;
+    }
+  }
+
   // 4. Heuristic / Smart Sentence Splitter cho đoạn văn bản thuần
   const rawSentences = text
     .split(/(?<=[.?!])\s+/)
