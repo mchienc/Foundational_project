@@ -246,3 +246,150 @@ exports.generateAnkiCloze = async (req, res) => {
     });
   }
 };
+
+
+// Parser an toàn cho chuỗi JSON trả về từ LLM
+function cleanAndParseJson(rawText) {
+  if (!rawText) return null;
+  let text = rawText.trim();
+  if (text.startsWith('```')) {
+    text = text.replace(/^```(?:json)?\s*/i, '').replace(/```\s*$/i, '');
+  }
+  try {
+    return JSON.parse(text);
+  } catch (err) {
+    const match = text.match(/\{[\s\S]*\}/);
+    if (match) {
+      try {
+        return JSON.parse(match[0]);
+      } catch (e) {
+        console.warn('Regex JSON parse failed:', e.message);
+      }
+    }
+    return null;
+  }
+}
+
+// Tra cứu từ vựng học thuật Anh - Việt đa nguồn (Google Translate + Gemini AI 9.0)
+exports.lookupWord = async (req, res) => {
+  try {
+    const { word = '', contextSentence = '', source = '' } = req.body;
+    const cleanWord = (word || '').trim();
+
+    if (!cleanWord) {
+      return res.status(400).json({ success: false, message: 'Thiếu từ cần tra cứu.' });
+    }
+
+    // 1. Dùng Google Translate GTX lấy bản dịch nghĩa tiếng Việt siêu tốc (< 150ms)
+    let fastTranslation = '';
+    try {
+      const gtxUrl = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=vi&dt=t&q=${encodeURIComponent(cleanWord)}`;
+      const gtxRes = await fetch(gtxUrl);
+      if (gtxRes.ok) {
+        const gtxData = await gtxRes.json();
+        if (gtxData?.[0]?.[0]?.[0]) {
+          fastTranslation = gtxData[0][0][0].trim();
+        }
+      }
+    } catch (e) {
+      console.warn('GTX translation warning:', e.message);
+    }
+
+    // 2. Dùng Gemini AI để lấy thông tin học thuật chuẩn IELTS 9.0 (IPA, POS, En def, Vi def)
+    const apiKey = getLiveApiKey();
+    if (apiKey) {
+      const prompt = `Bạn là một cựu giám khảo chấm thi IELTS và chuyên gia từ điển học thuật Cambridge/Oxford.
+Nhiệm vụ: Phân tích từ vựng/cụm từ tiếng Anh sau: "${cleanWord}"
+${contextSentence ? `Trong ngữ cảnh câu: "${contextSentence}"` : ''}
+
+Bạn PHẢI trả về ĐÚNG MỘT JSON OBJECT duy nhất (không bọc trong markdown code fence, chỉ chuỗi JSON thuần) có cấu trúc:
+{
+  "ipa": "/phiên âm IPA chuẩn quốc tế/",
+  "pos": "từ loại (noun/verb/adjective/phrase...)",
+  "definitionVi": "Nghĩa tiếng Việt chuẩn xác, tự nhiên, cô đọng nhất (2-6 từ)",
+  "definitionEn": "Định nghĩa tiếng Anh học thuật ngắn gọn (1 câu)"
+}`;
+
+      const candidateModels = [
+        'gemini-flash-lite-latest',
+        'gemini-2.5-flash-lite',
+        'gemini-2.5-flash',
+      ];
+
+      for (const model of candidateModels) {
+        try {
+          const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
+          const controller = new AbortController();
+          const timeoutId = setTimeout(() => controller.abort(), 6000);
+
+          const apiResponse = await fetch(geminiUrl, {
+            method: 'POST',
+            signal: controller.signal,
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              contents: [{ role: 'user', parts: [{ text: prompt }] }],
+              generationConfig: {
+                temperature: 0.1,
+                maxOutputTokens: 500,
+                responseMimeType: 'application/json',
+              },
+            }),
+          });
+          clearTimeout(timeoutId);
+
+          if (apiResponse.ok) {
+            const apiData = await apiResponse.json();
+            const textPart = apiData?.candidates?.[0]?.content?.parts?.[0]?.text;
+            const parsed = cleanAndParseJson(textPart);
+
+            if (parsed && (parsed.definitionVi || parsed.definitionEn)) {
+              return res.json({
+                success: true,
+                source: `Gemini AI (${model})`,
+                data: {
+                  ipa: parsed.ipa || `/${cleanWord}/`,
+                  pos: parsed.pos || 'vocab',
+                  definitionVi: parsed.definitionVi || fastTranslation || cleanWord,
+                  definitionEn: parsed.definitionEn || `Academic term in ${source || 'Cambridge IELTS'}.`,
+                },
+              });
+            }
+          }
+        } catch (mErr) {
+          console.warn(`[Lookup AI] Model ${model} failed:`, mErr.message);
+        }
+      }
+    }
+
+    // 3. Fallback dùng bản dịch siêu tốc Google Translate nếu Gemini bận
+    if (fastTranslation) {
+      return res.json({
+        success: true,
+        source: 'Google Translate Engine',
+        data: {
+          ipa: `/${cleanWord}/`,
+          pos: 'vocab',
+          definitionVi: fastTranslation,
+          definitionEn: `Vocabulary term in ${source || 'Cambridge IELTS'}.`,
+        },
+      });
+    }
+
+    return res.json({
+      success: true,
+      source: 'offline-academic',
+      data: {
+        ipa: `/${cleanWord}/`,
+        pos: 'vocab',
+        definitionVi: cleanWord,
+        definitionEn: `Academic term in ${source || 'Cambridge IELTS'}.`,
+      },
+    });
+  } catch (error) {
+    console.error('lookupWord error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Lỗi máy chủ khi tra cứu từ vựng.',
+    });
+  }
+};

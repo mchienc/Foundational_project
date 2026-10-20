@@ -88,57 +88,67 @@ export const SelectionPopover: React.FC<SelectionPopoverProps> = ({
     { scope: popoverRef, dependencies: [mode] }
   );
 
-  // Lazy dictionary fetch
-  const triggerDictionaryLookup = () => {
+  // Lazy dictionary fetch với Backend Gemini AI + Google Translate GTX dự phòng
+  const triggerDictionaryLookup = async () => {
     if (hasLoadedDict || !cleanWord) return;
 
     setIsLoadingDict(true);
-    const singleWord = cleanWord.split(/\s+/)[0].toLowerCase();
 
-    const fetchDict = fetch(
-      `https://api.dictionaryapi.dev/api/v2/entries/en/${encodeURIComponent(singleWord)}`
-    )
-      .then((r) => (r.ok ? r.json() : null))
-      .catch(() => null);
+    try {
+      // 1. Gọi Backend API Gemini AI 9.0 để phân tích sâu nghĩa học thuật, IPA, POS
+      const res = await fetch('/api/anki/lookup-word', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          word: cleanWord,
+          contextSentence,
+          source,
+        }),
+      });
 
-    const fetchVi = fetch(
-      `https://api.mymemory.translated.net/get?q=${encodeURIComponent(cleanWord)}&langpair=en|vi`
-    )
-      .then((r) => (r.ok ? r.json() : null))
-      .catch(() => null);
-
-    Promise.all([fetchDict, fetchVi]).then(([dictData, viData]) => {
-      let ipa = '';
-      let pos = 'vocab';
-      let definitionEn = '';
-      let definitionVi = '';
-
-      if (Array.isArray(dictData) && dictData[0]) {
-        const entry = dictData[0];
-        ipa =
-          entry.phonetic ||
-          entry.phonetics?.find((p: any) => p.text)?.text ||
-          '';
-        const firstMeaning = entry.meanings?.[0];
-        if (firstMeaning) {
-          pos = firstMeaning.partOfSpeech || 'vocab';
-          definitionEn = firstMeaning.definitions?.[0]?.definition || '';
+      if (res.ok) {
+        const json = await res.json();
+        if (json?.success && json?.data) {
+          setLookup({
+            ipa: json.data.ipa || `/${cleanWord}/`,
+            pos: json.data.pos || 'vocab',
+            definitionVi: json.data.definitionVi || `Từ vựng trong ${source}`,
+            definitionEn: json.data.definitionEn || `Academic term in ${source}.`,
+          });
+          setIsLoadingDict(false);
+          setHasLoadedDict(true);
+          return;
         }
       }
+    } catch (err) {
+      console.warn('Backend lookup failed, using client fallback:', err);
+    }
 
-      if (viData?.responseData?.translatedText) {
-        definitionVi = viData.responseData.translatedText;
+    // 2. Client-side Fallback: Google Translate GTX siêu tốc trực tiếp từ trình duyệt
+    try {
+      const gtxUrl = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=vi&dt=t&q=${encodeURIComponent(cleanWord)}`;
+      const gtxRes = await fetch(gtxUrl);
+      if (gtxRes.ok) {
+        const gtxData = await gtxRes.json();
+        const translated = gtxData?.[0]?.[0]?.[0];
+        if (translated) {
+          setLookup({
+            ipa: `/${cleanWord}/`,
+            pos: 'vocab',
+            definitionVi: translated,
+            definitionEn: `Academic term in ${source}.`,
+          });
+          setIsLoadingDict(false);
+          setHasLoadedDict(true);
+          return;
+        }
       }
+    } catch (e) {
+      console.warn('Client GTX fallback failed:', e);
+    }
 
-      setLookup({
-        ipa: ipa || `/${singleWord}/`,
-        pos,
-        definitionEn: definitionEn || `Academic term encountered in ${source}.`,
-        definitionVi: definitionVi || `Từ vựng học thuật trong ${source}`,
-      });
-      setIsLoadingDict(false);
-      setHasLoadedDict(true);
-    });
+    setIsLoadingDict(false);
+    setHasLoadedDict(true);
   };
 
   const handleOpenDictionary = () => {
