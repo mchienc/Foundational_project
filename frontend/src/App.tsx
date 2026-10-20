@@ -19,6 +19,7 @@ import { IELTSListeningExamRoom } from './modules/listening-exam/IELTSListeningE
 import { ListeningReviewRoom } from './modules/listening-exam/ListeningReviewRoom';
 import { AnkiWorkspace } from './modules/anki/AnkiWorkspace';
 import { AnkiFlashcardPlayer } from './modules/anki/AnkiFlashcardPlayer';
+import { DictationStudioPage } from './modules/dictation';
 import { AcademicLandingPage } from './components/marketing/AcademicLandingPage';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { VocabularyVaultProvider } from './context/VocabularyVaultContext';
@@ -100,11 +101,24 @@ const AppContent: React.FC = () => {
     setNotifyHandler,
   } = useAuth();
 
-  // Navigation Screen State: Guests land on 'landing', authenticated students go to 'reading'
+  // Navigation Screen State: Supports direct URL /dictation or /dictation/:id
   const [currentScreen, setCurrentScreen] = useState<Screen>(() => {
+    if (typeof window !== 'undefined' && window.location.pathname.startsWith('/dictation')) {
+      return 'dictation';
+    }
     const saved = localStorage.getItem('eduflow_current_user');
     return saved ? 'reading' : 'landing';
   });
+
+  useEffect(() => {
+    const handlePopState = () => {
+      if (window.location.pathname.startsWith('/dictation')) {
+        setCurrentScreen('dictation');
+      }
+    };
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, []);
 
   // Active Cambridge Reading Passage ID & Session Config (Single Passage vs Full Test)
   const [selectedPassageId, setSelectedPassageId] = useState<string>('cambridge-18-test-2-p2');
@@ -182,6 +196,19 @@ const AppContent: React.FC = () => {
 
   // Auth Guard Navigation Handler
   const handleScreenNavigate = (screen: Screen) => {
+    if (screen === 'dictation') {
+      if (typeof window !== 'undefined' && !window.location.pathname.startsWith('/dictation')) {
+        window.history.pushState({}, '', '/dictation');
+      }
+      setCurrentScreen('dictation');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      return;
+    }
+
+    if (typeof window !== 'undefined' && window.location.pathname.startsWith('/dictation')) {
+      window.history.pushState({}, '', '/');
+    }
+
     if (screen === 'landing') {
       setCurrentScreen('landing');
       window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -457,6 +484,9 @@ const AppContent: React.FC = () => {
           />
         );
       }
+
+      case 'dictation':
+        return <DictationStudioPage />;
 
       case 'anki':
         if (isStudyingAnki && selectedAnkiDeckId) {

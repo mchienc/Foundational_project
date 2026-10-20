@@ -75,6 +75,7 @@ export type Screen =
   | 'listening-test'
   | 'listening-exam'
   | 'listening-review'
+  | 'dictation'
   | 'anki'
   | 'profile'
   | 'admin';

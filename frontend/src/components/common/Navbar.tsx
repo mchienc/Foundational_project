@@ -14,6 +14,7 @@ import {
   Menu,
   X,
   Globe,
+  Youtube,
 } from 'lucide-react';
 import { Screen, UserStats, User } from '../../types';
 import { Button } from './Button';
@@ -49,6 +50,11 @@ export const Navbar: React.FC<NavbarProps> = ({
       id: 'listening',
       label: 'Luyện Nghe IELTS',
       icon: <Headphones size={15} />,
+    },
+    {
+      id: 'dictation',
+      label: 'YouTube Dictation',
+      icon: <Youtube size={15} />,
     },
     {
       id: 'anki',
