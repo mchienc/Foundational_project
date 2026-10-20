@@ -6,6 +6,7 @@ import {
   Bookmark,
   CheckCircle2,
   XCircle,
+  X,
   Sparkles,
   Check,
   Flag,
@@ -180,6 +181,35 @@ export const ReadingTestRoom: React.FC<ReadingTestRoomProps> = ({
     position: { x: 0, y: 0 },
   });
 
+  // User Highlights and Notes in Reading Passage
+  const [userHighlights, setUserHighlights] = useState<string[]>([]);
+  const [userNotes, setUserNotes] = useState<Array<{ id: string; text: string; note: string }>>([]);
+  const [activeNoteModal, setActiveNoteModal] = useState<{ text: string; note: string } | null>(null);
+
+  const handleToggleHighlight = (text: string) => {
+    const clean = text.trim();
+    if (!clean) return;
+    setUserHighlights((prev) => {
+      const exists = prev.includes(clean);
+      if (exists) {
+        onNotify?.(`Đã xóa highlight cho "${clean}".`, 'info');
+        return prev.filter((h) => h !== clean);
+      } else {
+        onNotify?.(`Đã tô sáng (highlight) "${clean}"!`, 'success');
+        return [...prev, clean];
+      }
+    });
+  };
+
+  const handleAddUserNote = (text: string, noteText: string) => {
+    const clean = text.trim();
+    if (!clean || !noteText.trim()) return;
+    setUserNotes((prev) => [
+      ...prev.filter((n) => n.text !== clean),
+      { id: `note-${Date.now()}`, text: clean, note: noteText.trim() },
+    ]);
+  };
+
   const passageContainerRef = useRef<HTMLDivElement>(null);
   const readingProgressRef = useRef<HTMLDivElement>(null);
 
@@ -325,50 +355,97 @@ export const ReadingTestRoom: React.FC<ReadingTestRoomProps> = ({
     }, 50);
   };
 
-  // Helper tô màu câu dẫn chứng bên trong nội dung đoạn văn
+  // Helper tô màu câu dẫn chứng bên trong nội dung đoạn văn, cùng với highlight và ghi chú của người dùng
   const renderParagraphWithHighlight = (text: string, quote?: string) => {
-    if (!quote || !text) return text;
-    const cleanQuote = quote.trim().replace(/^["']|["']$/g, '');
-    if (!cleanQuote || cleanQuote.length < 5) return text;
+    if (!text) return text;
 
-    const lowerText = text.toLowerCase();
-    const lowerQuote = cleanQuote.toLowerCase();
-    const matchIdx = lowerText.indexOf(lowerQuote);
+    const hasAiQuote = Boolean(quote && quote.trim().length >= 4);
+    const hasHighlights = userHighlights.length > 0;
+    const hasNotes = userNotes.length > 0;
 
-    if (matchIdx !== -1) {
-      const before = text.slice(0, matchIdx);
-      const matched = text.slice(matchIdx, matchIdx + cleanQuote.length);
-      const after = text.slice(matchIdx + cleanQuote.length);
-      return (
-        <>
-          {before}
-          <mark className="bg-amber-300 text-stone-900 font-semibold px-1 rounded shadow-2xs">
-            {matched}
-          </mark>
-          {after}
-        </>
-      );
+    if (!hasAiQuote && !hasHighlights && !hasNotes) {
+      return text;
     }
 
-    // Nếu không khớp toàn bộ (do khác ký tự khoảng trắng), thử so khớp 35 ký tự đầu
-    const subQuote = cleanQuote.slice(0, 35).trim();
-    const subIdx = lowerText.indexOf(subQuote.toLowerCase());
-    if (subIdx !== -1) {
-      const before = text.slice(0, subIdx);
-      const matched = text.slice(subIdx, subIdx + subQuote.length);
-      const after = text.slice(subIdx + subQuote.length);
-      return (
-        <>
-          {before}
-          <mark className="bg-amber-300 text-stone-900 font-semibold px-1 rounded shadow-2xs">
-            {matched}
-          </mark>
-          {after}
-        </>
-      );
+    let modified = text;
+
+    // 1. Đánh dấu AI Evidence
+    if (hasAiQuote) {
+      const cleanQuote = quote!.trim().replace(/^["']|["']$/g, '');
+      const regexQuote = cleanQuote.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&');
+      if (new RegExp(regexQuote, 'i').test(modified)) {
+        modified = modified.replace(new RegExp(`(${regexQuote})`, 'i'), '___AI_EV_START___$1___AI_EV_END___');
+      } else {
+        const subQuote = cleanQuote.slice(0, 35).trim().replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&');
+        if (new RegExp(subQuote, 'i').test(modified)) {
+          modified = modified.replace(new RegExp(`(${subQuote})`, 'i'), '___AI_EV_START___$1___AI_EV_END___');
+        }
+      }
     }
 
-    return text;
+    // 2. Đánh dấu User Highlights
+    userHighlights.forEach((hl) => {
+      const cleanHl = hl.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&');
+      if (cleanHl.length > 1) {
+        modified = modified.replace(new RegExp(`(${cleanHl})`, 'gi'), '___USER_HL_START___$1___USER_HL_END___');
+      }
+    });
+
+    // 3. Đánh dấu User Notes
+    userNotes.forEach((n) => {
+      const cleanN = n.text.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&');
+      if (cleanN.length > 1) {
+        modified = modified.replace(new RegExp(`(${cleanN})`, 'gi'), `___USER_NOTE_START___$1___USER_NOTE_ID___${n.id}___USER_NOTE_END___`);
+      }
+    });
+
+    const tokenRegex = /(___AI_EV_START___.*?___AI_EV_END___|___USER_HL_START___.*?___USER_HL_END___|___USER_NOTE_START___.*?___USER_NOTE_END___)/g;
+    const parts = modified.split(tokenRegex);
+
+    return parts.map((part, idx) => {
+      if (part.startsWith('___AI_EV_START___') && part.endsWith('___AI_EV_END___')) {
+        const content = part.replace('___AI_EV_START___', '').replace('___AI_EV_END___', '');
+        return (
+          <mark key={`ai-${idx}`} className="bg-amber-300 text-stone-900 font-semibold px-1 rounded shadow-2xs">
+            {content}
+          </mark>
+        );
+      }
+      if (part.startsWith('___USER_HL_START___') && part.endsWith('___USER_HL_END___')) {
+        const content = part.replace('___USER_HL_START___', '').replace('___USER_HL_END___', '');
+        return (
+          <mark
+            key={`hl-${idx}`}
+            onClick={() => handleToggleHighlight(content)}
+            className="bg-yellow-200/90 hover:bg-yellow-300 text-stone-950 px-1 py-0.5 rounded cursor-pointer transition-colors shadow-2xs"
+            title="Nhấn để xóa highlight này"
+          >
+            {content}
+          </mark>
+        );
+      }
+      if (part.startsWith('___USER_NOTE_START___') && part.endsWith('___USER_NOTE_END___')) {
+        const match = part.match(/___USER_NOTE_START___(.*?)___USER_NOTE_ID___(.*?)___USER_NOTE_END___/);
+        const content = match ? match[1] : part;
+        const noteId = match ? match[2] : '';
+        const noteItem = userNotes.find((n) => n.id === noteId);
+
+        return (
+          <span key={`note-${idx}`} className="inline-flex items-baseline gap-1">
+            <span className="underline decoration-amber-500 decoration-2 underline-offset-2">{content}</span>
+            <button
+              type="button"
+              onClick={() => setActiveNoteModal({ text: content, note: noteItem?.note || '' })}
+              className="inline-flex items-center gap-0.5 px-1.5 py-0.2 rounded bg-amber-100 hover:bg-amber-200 text-amber-900 border border-amber-300 text-[10px] font-sans font-bold cursor-pointer transition-colors shadow-2xs"
+              title={`Xem ghi chú: "${noteItem?.note}"`}
+            >
+              📝 Note
+            </button>
+          </span>
+        );
+      }
+      return part;
+    });
   };
 
   const checkIsCorrect = (q: CambridgeReadingQuestion, answer: string): boolean => {
@@ -1459,7 +1536,56 @@ export const ReadingTestRoom: React.FC<ReadingTestRoomProps> = ({
           position={popoverState.position}
           onClose={() => setPopoverState((prev) => ({ ...prev, visible: false }))}
           onNotify={onNotify}
+          onHighlight={handleToggleHighlight}
+          onAddNote={handleAddUserNote}
+          isHighlighted={userHighlights.includes(popoverState.selectedText.trim())}
         />
+      )}
+
+      {/* View User Note Modal */}
+      {activeNoteModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-xs">
+          <div className="w-full max-w-sm bg-white rounded-2xl shadow-2xl border border-stone-300 p-5 space-y-3 animate-in fade-in zoom-in-95 duration-150">
+            <div className="flex items-center justify-between border-b border-stone-200 pb-2">
+              <span className="text-xs font-bold font-mono text-[#064E3B] flex items-center gap-1.5">
+                📝 Ghi Chú Cá Nhân
+              </span>
+              <button
+                type="button"
+                onClick={() => setActiveNoteModal(null)}
+                className="p-1 rounded-md text-stone-400 hover:text-stone-700 hover:bg-stone-100 cursor-pointer"
+              >
+                <X size={14} />
+              </button>
+            </div>
+            <p className="text-xs font-serif italic text-stone-600 border-l-2 border-amber-500 pl-2 bg-stone-50 py-1 rounded-r">
+              "{activeNoteModal.text}"
+            </p>
+            <div className="p-3 bg-amber-50/70 rounded-xl border border-amber-200 text-xs font-sans text-stone-800 leading-relaxed whitespace-pre-wrap">
+              {activeNoteModal.note}
+            </div>
+            <div className="flex items-center justify-between pt-1">
+              <button
+                type="button"
+                onClick={() => {
+                  setUserNotes((prev) => prev.filter((n) => n.text !== activeNoteModal.text));
+                  setActiveNoteModal(null);
+                  onNotify?.('Đã xóa ghi chú này.', 'info');
+                }}
+                className="text-xs text-red-600 hover:underline font-semibold cursor-pointer"
+              >
+                Xóa ghi chú
+              </button>
+              <button
+                type="button"
+                onClick={() => setActiveNoteModal(null)}
+                className="px-4 py-1.5 rounded-xl bg-[#064E3B] text-amber-300 font-bold text-xs hover:bg-[#022C22] cursor-pointer"
+              >
+                Đóng
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );
