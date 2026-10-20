@@ -3,9 +3,10 @@ import { ArrowRight, X, BookOpen } from 'lucide-react';
 
 interface AcademicRibbonProps {
   onOpenAuth: (tab: 'login' | 'register', context?: string) => void;
+  onNavigateScreen?: (screen: import('../../types').Screen) => void;
 }
 
-export const AcademicRibbon: React.FC<AcademicRibbonProps> = ({ onOpenAuth }) => {
+export const AcademicRibbon: React.FC<AcademicRibbonProps> = ({ onOpenAuth, onNavigateScreen }) => {
   const [isVisible, setIsVisible] = useState<boolean>(true);
 
   if (!isVisible) return null;
@@ -21,16 +22,22 @@ export const AcademicRibbon: React.FC<AcademicRibbonProps> = ({ onOpenAuth }) =>
           </span>
 
           <span className="font-sans text-stone-200 hidden sm:inline">
-            "Hệ Thống Luyện Đề Cambridge IELTS 10-20 • Nghe Chép Chính Tả • Thẻ 3D Anki SRS"
+            "Hệ Thống Luyện Đề Cambridge IELTS 10–20 • Xưởng YouTube Dictation Studio • Thẻ 3D Anki &amp; Gemini AI 9.0"
           </span>
 
           <span className="text-stone-400 hidden md:inline">•</span>
 
           <button
-            onClick={() => onOpenAuth('register', 'Trải nghiệm luyện đề Cambridge')}
+            onClick={() => {
+              if (onNavigateScreen) {
+                onNavigateScreen('dictation');
+              } else {
+                onOpenAuth('register', 'Trải nghiệm xưởng YouTube Dictation');
+              }
+            }}
             className="inline-flex items-center gap-1 text-amber-300 hover:text-amber-200 font-bold underline underline-offset-4 decoration-amber-500/50 hover:decoration-amber-400 transition-colors cursor-pointer"
           >
-            <span>Luyện Đề Thi Thử Miễn Phí</span>
+            <span>Trải Nghiệm YouTube Dictation Miễn Phí</span>
             <ArrowRight className="w-3 h-3" />
           </button>
         </div>

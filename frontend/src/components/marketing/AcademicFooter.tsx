@@ -1,10 +1,21 @@
+import React from 'react';
 import { ShieldCheck, Phone, Mail, MapPin } from 'lucide-react';
+import { Screen } from '../../types';
 
 interface AcademicFooterProps {
   onRequireAuth: (context: string) => void;
+  onNavigateScreen?: (screen: Screen) => void;
 }
 
-export const AcademicFooter: React.FC<AcademicFooterProps> = ({ onRequireAuth }) => {
+export const AcademicFooter: React.FC<AcademicFooterProps> = ({ onRequireAuth, onNavigateScreen }) => {
+  const handleNav = (screen: Screen, fallbackContext: string) => {
+    if (onNavigateScreen) {
+      onNavigateScreen(screen);
+    } else {
+      onRequireAuth(fallbackContext);
+    }
+  };
+
   return (
     <footer className="bg-[#022018] text-stone-300 py-16 border-t border-emerald-900/60">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 md:grid-cols-4 gap-10 text-left">
@@ -19,31 +30,30 @@ export const AcademicFooter: React.FC<AcademicFooterProps> = ({ onRequireAuth })
                 EduFlow
               </span>
               <span className="text-[10px] font-sans text-amber-300 tracking-wide mt-1 block">
-                Cambridge IELTS &amp; Anki SRS
+                Cambridge IELTS • YouTube Dictation • Anki SRS
               </span>
             </div>
           </div>
 
           <p className="text-xs text-stone-400 leading-relaxed font-sans">
-            Hệ thống tự luyện thi Cambridge IELTS và ghi nhớ từ vựng ngắt quãng Anki 3D.
-            Tích hợp trọn bộ 28 đề thi Cambridge 10 - 20, luyện nghe chép chính tả Dictation và bộ thẻ từ vựng thông minh.
+            Hệ thống học thuật Cambridge IELTS toàn diện: 28 Đề thi Cam 10–20, Xưởng chép chính tả YouTube Dictation cắt lát câu thời gian thực, và Thẻ 3D Anki tích hợp Gemini AI 9.0.
           </p>
 
           <div className="flex items-center gap-2 text-xs text-amber-300 font-sans">
-            <ShieldCheck className="w-4 h-4 text-amber-400" />
-            <span>Trọn bộ 28 đề thi Cambridge IELTS 10 - 20</span>
+            <ShieldCheck className="w-4 h-4 text-amber-400 shrink-0" />
+            <span>28 Đề Cambridge • 84 Passages • 7 Listening Tests</span>
           </div>
         </div>
 
-        {/* Col 2: 3 Core Pillars */}
+        {/* Col 2: 4 Core Pillars */}
         <div className="space-y-3 text-xs">
           <h4 className="font-sans font-bold text-white uppercase tracking-normal text-sm border-b border-forest-800 pb-1.5">
-            Tính Năng Nổi Bật
+            Phân Hệ Nổi Bật
           </h4>
           <ul className="space-y-2 font-sans text-stone-400">
             <li>
               <button
-                onClick={() => onRequireAuth('Luyện Đọc Cambridge IELTS 10 - 20')}
+                onClick={() => handleNav('reading', 'Luyện Đọc Cambridge IELTS 10 - 20')}
                 className="hover:text-amber-300 transition-colors text-left cursor-pointer"
               >
                 Luyện Đọc Cambridge (Cam 10 - 20)
@@ -51,18 +61,29 @@ export const AcademicFooter: React.FC<AcademicFooterProps> = ({ onRequireAuth })
             </li>
             <li>
               <button
-                onClick={() => onRequireAuth('Luyện Nghe Dictation Từng Câu')}
+                onClick={() => handleNav('listening-exam', 'Luyện Nghe IELTS Full Test 13 - 20')}
                 className="hover:text-amber-300 transition-colors text-left cursor-pointer"
               >
-                Luyện Nghe Dictation (Chép Chính Tả)
+                Luyện Nghe Full Test (Cam 13 - 20)
               </button>
             </li>
             <li>
               <button
-                onClick={() => onRequireAuth('Thẻ 3D Anki Flashcard')}
+                onClick={() => handleNav('dictation', 'Xưởng Chép Chính Tả Video YouTube')}
+                className="hover:text-amber-300 transition-colors text-left cursor-pointer flex items-center gap-1.5"
+              >
+                <span>Xưởng YouTube Dictation Studio</span>
+                <span className="px-1.5 py-0.2 rounded bg-amber-400 text-amber-950 font-mono text-[9px] font-bold">
+                  MỚI
+                </span>
+              </button>
+            </li>
+            <li>
+              <button
+                onClick={() => handleNav('anki', 'Thẻ 3D Anki Flashcard & AI')}
                 className="hover:text-amber-300 transition-colors text-left cursor-pointer"
               >
-                Thẻ 3D Anki Flashcard (SRS)
+                Thẻ 3D Anki &amp; Gemini AI 9.0
               </button>
             </li>
           </ul>
@@ -76,7 +97,7 @@ export const AcademicFooter: React.FC<AcademicFooterProps> = ({ onRequireAuth })
           <ul className="space-y-2 font-sans text-stone-400">
             <li>
               <button
-                onClick={() => onRequireAuth('Cambridge IELTS 18 - 20')}
+                onClick={() => handleNav('reading', 'Cambridge IELTS 18 - 20')}
                 className="hover:text-amber-300 transition-colors text-left cursor-pointer"
               >
                 Cambridge IELTS 18 - 20 (Mới Nhất)
@@ -84,7 +105,7 @@ export const AcademicFooter: React.FC<AcademicFooterProps> = ({ onRequireAuth })
             </li>
             <li>
               <button
-                onClick={() => onRequireAuth('Cambridge IELTS 15 - 17')}
+                onClick={() => handleNav('reading', 'Cambridge IELTS 15 - 17')}
                 className="hover:text-amber-300 transition-colors text-left cursor-pointer"
               >
                 Cambridge IELTS 15 - 17
@@ -92,10 +113,18 @@ export const AcademicFooter: React.FC<AcademicFooterProps> = ({ onRequireAuth })
             </li>
             <li>
               <button
-                onClick={() => onRequireAuth('Cambridge IELTS 13 - 14')}
+                onClick={() => handleNav('reading', 'Cambridge IELTS 13 - 14')}
                 className="hover:text-amber-300 transition-colors text-left cursor-pointer"
               >
                 Cambridge IELTS 13 - 14
+              </button>
+            </li>
+            <li>
+              <button
+                onClick={() => handleNav('reading', 'Cambridge IELTS 10 - 12')}
+                className="hover:text-amber-300 transition-colors text-left cursor-pointer"
+              >
+                Cambridge IELTS 10 - 12
               </button>
             </li>
           </ul>

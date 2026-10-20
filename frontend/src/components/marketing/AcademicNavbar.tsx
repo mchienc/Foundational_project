@@ -20,18 +20,23 @@ export const AcademicNavbar: React.FC<AcademicNavbarProps> = ({
 }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState<boolean>(false);
 
-  const navLinks = [
-    { label: 'Luyện Đọc Cambridge', href: '#chapters' },
-    { label: 'Luyện Nghe IELTS', href: '#chapters' },
-    { label: 'Anki Flashcard', href: '#chapters' },
+  const navLinks: { label: string; href?: string; screen?: Screen; badge?: string }[] = [
+    { label: 'Luyện Đọc Cam 10-20', screen: 'reading' },
+    { label: 'Luyện Nghe Cam 13-20', screen: 'listening-exam' },
+    { label: 'YouTube Dictation', screen: 'dictation', badge: 'MỚI' },
+    { label: 'Thẻ 3D Anki & AI', screen: 'anki' },
   ];
 
-  const handleScrollTo = (e: React.MouseEvent, href: string) => {
+  const handleNavClick = (e: React.MouseEvent, item: typeof navLinks[0]) => {
     e.preventDefault();
     setMobileMenuOpen(false);
-    const target = document.querySelector(href);
-    if (target) {
-      target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    if (item.screen) {
+      onNavigateScreen(item.screen);
+    } else if (item.href) {
+      const target = document.querySelector(item.href);
+      if (target) {
+        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
     }
   };
 
@@ -66,16 +71,20 @@ export const AcademicNavbar: React.FC<AcademicNavbarProps> = ({
         </div>
 
         {/* Center Desktop Navigation Links */}
-        <nav className="hidden lg:flex items-center gap-7 text-xs font-bold text-stone-100 font-sans tracking-wide">
+        <nav className="hidden lg:flex items-center gap-6 text-xs font-bold text-stone-100 font-sans tracking-wide">
           {navLinks.map((link, idx) => (
-            <a
+            <button
               key={idx}
-              href={link.href}
-              onClick={(e) => handleScrollTo(e, link.href)}
-              className="hover:text-amber-300 transition-colors py-1 cursor-pointer"
+              onClick={(e) => handleNavClick(e, link)}
+              className="hover:text-amber-300 transition-colors py-1 cursor-pointer flex items-center gap-1.5"
             >
-              {link.label}
-            </a>
+              <span>{link.label}</span>
+              {link.badge && (
+                <span className="px-1.5 py-0.2 rounded bg-amber-400 text-amber-950 font-mono text-[9px] font-extrabold uppercase">
+                  {link.badge}
+                </span>
+              )}
+            </button>
           ))}
         </nav>
 
@@ -135,14 +144,18 @@ export const AcademicNavbar: React.FC<AcademicNavbarProps> = ({
         <div className="lg:hidden border-t border-stone-300 bg-[#FAFAF9] px-4 py-4 space-y-3 shadow-lg">
           <div className="space-y-1">
             {navLinks.map((link, idx) => (
-              <a
+              <button
                 key={idx}
-                href={link.href}
-                onClick={(e) => handleScrollTo(e, link.href)}
-                className="block px-3 py-2 rounded-lg text-xs font-bold text-stone-800 hover:bg-stone-200/60"
+                onClick={(e) => handleNavClick(e, link)}
+                className="w-full flex items-center justify-between px-3 py-2 rounded-lg text-xs font-bold text-stone-800 hover:bg-stone-200/60 text-left"
               >
-                {link.label}
-              </a>
+                <span>{link.label}</span>
+                {link.badge && (
+                  <span className="px-1.5 py-0.5 rounded bg-amber-400 text-amber-950 font-mono text-[9px] font-extrabold uppercase">
+                    {link.badge}
+                  </span>
+                )}
+              </button>
             ))}
           </div>
 

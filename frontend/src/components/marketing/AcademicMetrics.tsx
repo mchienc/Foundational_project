@@ -2,7 +2,7 @@ import React, { useRef } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { useGSAP } from '@gsap/react';
-import { BookOpen, Activity, Headphones, CheckCircle2 } from 'lucide-react';
+import { BookOpen, Youtube, Sparkles, Layers } from 'lucide-react';
 
 gsap.registerPlugin(ScrollTrigger, useGSAP);
 
@@ -17,9 +17,9 @@ export const AcademicMetrics: React.FC = () => {
     () => {
       const counters = [
         { ref: val1Ref, target: 28, suffix: ' đề' },
-        { ref: val2Ref, target: 96, suffix: '%' },
-        { ref: val3Ref, target: 4, suffix: ' mức' },
-        { ref: val4Ref, target: 100, suffix: '%' },
+        { ref: val2Ref, target: 100, suffix: '%' },
+        { ref: val3Ref, target: 84, suffix: ' bài' },
+        { ref: val4Ref, target: 4, suffix: ' chu kỳ' },
       ];
 
       // Smooth entrance of metric cells without ever hiding them on initial load
@@ -69,55 +69,55 @@ export const AcademicMetrics: React.FC = () => {
               Đề Thi Cambridge
             </p>
             <p className="text-[11px] text-stone-500 font-sans">
-              Trọn bộ đề thi thật từ Cambridge 10 đến 20
+              Trọn bộ đề thi thật từ Cambridge 10 đến 20 (Đọc &amp; Nghe)
             </p>
           </div>
 
           {/* Metric 2 */}
           <div className="metric-column-cell p-6 text-center space-y-3 bg-white/85 backdrop-blur-md border border-stone-200/90 rounded-2xl shadow-xs hover:shadow-md hover:border-amber-400/40 transition-all duration-300">
-            <div className="w-10 h-10 rounded-xl bg-amber-50 border border-amber-200/60 text-amber-800 flex items-center justify-center mx-auto shadow-2xs">
-              <Activity className="w-5 h-5 text-amber-800" />
+            <div className="w-10 h-10 rounded-xl bg-amber-50 border border-amber-200/60 text-rose-600 flex items-center justify-center mx-auto shadow-2xs">
+              <Youtube className="w-5 h-5 text-rose-600" />
             </div>
             <div className="font-sans font-bold text-3xl sm:text-4xl text-[#064E3B] tracking-tight font-mono">
-              <span ref={val2Ref}>96%</span>
+              <span ref={val2Ref}>100%</span>
             </div>
             <p className="text-xs font-bold text-[#064E3B] uppercase tracking-normal">
-              Chính Xác Dictation
+              Khớp Lời YouTube
             </p>
             <p className="text-[11px] text-stone-500 font-sans">
-              Nghe chép từng câu, phát hiện từ sai tức thì
+              Cắt lát câu theo timestamp video &amp; so khớp sai số Levenshtein
             </p>
           </div>
 
           {/* Metric 3 */}
           <div className="metric-column-cell p-6 text-center space-y-3 bg-white/85 backdrop-blur-md border border-stone-200/90 rounded-2xl shadow-xs hover:shadow-md hover:border-amber-400/40 transition-all duration-300">
             <div className="w-10 h-10 rounded-xl bg-amber-50 border border-amber-200/60 text-amber-800 flex items-center justify-center mx-auto shadow-2xs">
-              <Headphones className="w-5 h-5 text-amber-800" />
+              <Sparkles className="w-5 h-5 text-amber-800" />
             </div>
             <div className="font-sans font-bold text-3xl sm:text-4xl text-[#064E3B] tracking-tight font-mono">
-              <span ref={val3Ref}>4 mức</span>
+              <span ref={val3Ref}>84 bài</span>
             </div>
             <p className="text-xs font-bold text-[#064E3B] uppercase tracking-normal">
-              Đánh Giá Thẻ Anki
+              Passages Đọc Hiểu
             </p>
             <p className="text-[11px] text-stone-500 font-sans">
-              Again, Hard, Good, Easy theo thuật toán SM-2
+              Chuẩn giao diện thi máy tính kèm tra từ Popover 1 chạm
             </p>
           </div>
 
           {/* Metric 4 */}
           <div className="metric-column-cell p-6 text-center space-y-3 bg-white/85 backdrop-blur-md border border-stone-200/90 rounded-2xl shadow-xs hover:shadow-md hover:border-amber-400/40 transition-all duration-300">
             <div className="w-10 h-10 rounded-xl bg-amber-50 border border-amber-200/60 text-amber-800 flex items-center justify-center mx-auto shadow-2xs">
-              <CheckCircle2 className="w-5 h-5 text-amber-800" />
+              <Layers className="w-5 h-5 text-amber-800" />
             </div>
             <div className="font-sans font-bold text-3xl sm:text-4xl text-[#064E3B] tracking-tight font-mono">
-              <span ref={val4Ref}>100%</span>
+              <span ref={val4Ref}>4 chu kỳ</span>
             </div>
             <p className="text-xs font-bold text-[#064E3B] uppercase tracking-normal">
-              Lời Giải Chi Tiết
+              Thuật Toán Anki SM-2
             </p>
             <p className="text-[11px] text-stone-500 font-sans">
-              Giải thích đáp án học thuật cho từng câu hỏi
+              Spaced Repetition tối ưu ghi nhớ &amp; xuất file Anki .apkg
             </p>
           </div>
         </div>

@@ -30,7 +30,10 @@ export const AcademicLandingPage: React.FC<AcademicLandingPageProps> = ({
   return (
     <div className="min-h-screen flex flex-col bg-transparent text-stone-900 selection:bg-gold-600 selection:text-white font-sans antialiased">
       {/* 1. Academic Research Bulletin Ribbon */}
-      <AcademicRibbon onOpenAuth={onOpenAuth} />
+      <AcademicRibbon
+        onOpenAuth={onOpenAuth}
+        onNavigateScreen={onNavigateScreen}
+      />
 
       {/* 2. Academic Brand Mark Navbar */}
       <AcademicNavbar
@@ -45,17 +48,24 @@ export const AcademicLandingPage: React.FC<AcademicLandingPageProps> = ({
         <AcademicHero
           onOpenAuth={onOpenAuth}
           onExploreChapters={handleExploreChapters}
+          onNavigateScreen={onNavigateScreen}
         />
 
         {/* 4 Scientific Metrics with GSAP Count-up */}
         <AcademicMetrics />
 
         {/* 5 Chapters Scrollytelling with GSAP ScrollTrigger Pinning */}
-        <AcademicChaptersScrolly onRequireAuth={onRequireAuth} />
+        <AcademicChaptersScrolly
+          onRequireAuth={onRequireAuth}
+          onNavigateScreen={onNavigateScreen}
+        />
       </main>
 
       {/* 4. Academic Institution Footer */}
-      <AcademicFooter onRequireAuth={onRequireAuth} />
+      <AcademicFooter
+        onRequireAuth={onRequireAuth}
+        onNavigateScreen={onNavigateScreen}
+      />
     </div>
   );
 };
