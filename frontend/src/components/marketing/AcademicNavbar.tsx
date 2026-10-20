@@ -22,9 +22,8 @@ export const AcademicNavbar: React.FC<AcademicNavbarProps> = ({
 
   const navLinks = [
     { label: 'Luyện Đọc Cambridge', href: '#chapters' },
-    { label: 'Luyện Nghe Dictation', href: '#chapters' },
+    { label: 'Luyện Nghe IELTS', href: '#chapters' },
     { label: 'Anki Flashcard', href: '#chapters' },
-    { label: 'Đánh Giá', href: '#evidence' },
   ];
 
   const handleScrollTo = (e: React.MouseEvent, href: string) => {

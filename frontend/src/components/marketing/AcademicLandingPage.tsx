@@ -4,7 +4,6 @@ import { AcademicNavbar } from './AcademicNavbar';
 import { AcademicHero } from './AcademicHero';
 import { AcademicMetrics } from './AcademicMetrics';
 import { AcademicChaptersScrolly } from './AcademicChaptersScrolly';
-import { AcademicEvidence } from './AcademicEvidence';
 import { AcademicFooter } from './AcademicFooter';
 import { User, Screen } from '../../types';
 
@@ -53,9 +52,6 @@ export const AcademicLandingPage: React.FC<AcademicLandingPageProps> = ({
 
         {/* 5 Chapters Scrollytelling with GSAP ScrollTrigger Pinning */}
         <AcademicChaptersScrolly onRequireAuth={onRequireAuth} />
-
-        {/* Empirical Evidence & Reviews */}
-        <AcademicEvidence />
       </main>
 
       {/* 4. Academic Institution Footer */}
