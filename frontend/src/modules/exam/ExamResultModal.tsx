@@ -1,17 +1,15 @@
-import { Award, CheckCircle2, XCircle, Clock, ArrowRight, BookmarkCheck, RotateCcw } from 'lucide-react';
+import { Award, CheckCircle2, XCircle, Clock, ArrowRight, RotateCcw } from 'lucide-react';
 import { ExamResultData } from '../../store/useExamStore';
 import { useExamStore } from '../../store/useExamStore';
 
 interface ExamResultModalProps {
   result: ExamResultData;
-  onNavigateMistakeVault: () => void;
   onReviewTest: () => void;
   onBackToLibrary: () => void;
 }
 
 export const ExamResultModal = ({
   result,
-  onNavigateMistakeVault,
   onReviewTest,
   onBackToLibrary,
 }: ExamResultModalProps) => {
@@ -155,11 +153,11 @@ export const ExamResultModal = ({
               }`}
             >
               <div className="font-bold flex items-center gap-1">
-                <BookmarkCheck size={14} />
-                <span>Sổ Tay Câu Sai:</span>
+                <CheckCircle2 size={14} />
+                <span>Chế Độ Xem Lại:</span>
               </div>
               <p className="text-[11px] leading-snug">
-                Đã tự động lưu <strong>{mistakesCount} câu sai / bỏ trống</strong> kèm lời giải chi tiết.
+                Còn <strong>{mistakesCount} câu cần xem lại</strong> đáp án và giải thích chi tiết trong bài đọc.
               </p>
             </div>
           </div>
@@ -194,41 +192,30 @@ export const ExamResultModal = ({
         )}
 
         {/* Actions Buttons */}
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-2">
+        <div className="flex flex-col sm:flex-row items-center justify-end gap-3 pt-2">
+          <button
+            type="button"
+            onClick={onBackToLibrary}
+            className="w-full sm:w-auto px-4 py-2.5 rounded-xl border border-stone-300 hover:bg-stone-100 text-xs font-semibold transition-colors cursor-pointer"
+          >
+            Quay về Thư viện đề thi
+          </button>
+
           <button
             type="button"
             onClick={onReviewTest}
-            className="w-full sm:w-auto px-4 py-2.5 rounded-xl border border-stone-300 hover:bg-stone-100 text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
+            className={`w-full sm:w-auto px-5 py-2.5 rounded-xl font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 shadow-sm hover:shadow-md active:scale-95 transition-all cursor-pointer ${
+              isHighContrast
+                ? 'bg-yellow-400 text-black hover:bg-yellow-300'
+                : isInverted
+                ? 'bg-emerald-500 text-white hover:bg-emerald-400'
+                : 'bg-[#064E3B] text-white hover:bg-[#022C22]'
+            }`}
           >
-            <RotateCcw size={14} />
-            <span>Xem lại bài làm</span>
+            <RotateCcw size={15} className="text-amber-400" />
+            <span>Xem Lại Bài Làm &amp; Giải Thích</span>
+            <ArrowRight size={14} className="text-amber-400" />
           </button>
-
-          <div className="flex items-center gap-2 w-full sm:w-auto">
-            <button
-              type="button"
-              onClick={onBackToLibrary}
-              className="w-full sm:w-auto px-4 py-2.5 rounded-xl hover:bg-stone-500/10 text-xs font-semibold transition-colors cursor-pointer"
-            >
-              Thư viện đề thi
-            </button>
-
-            <button
-              type="button"
-              onClick={onNavigateMistakeVault}
-              className={`w-full sm:w-auto px-5 py-2.5 rounded-xl font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 shadow-sm hover:shadow-md active:scale-95 transition-all cursor-pointer ${
-                isHighContrast
-                  ? 'bg-yellow-400 text-black hover:bg-yellow-300'
-                  : isInverted
-                  ? 'bg-emerald-500 text-white hover:bg-emerald-400'
-                  : 'bg-[#064E3B] text-white hover:bg-[#022C22]'
-              }`}
-            >
-              <BookmarkCheck size={16} className="text-amber-400" />
-              <span>Mở Sổ Tay Câu Sai ({mistakesCount})</span>
-              <ArrowRight size={14} className="text-amber-400" />
-            </button>
-          </div>
         </div>
       </div>
     </div>

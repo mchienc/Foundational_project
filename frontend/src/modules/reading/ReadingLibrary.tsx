@@ -17,7 +17,6 @@ import { mockReadingPassages } from '../../data/cambridgeMockData';
 import { getReadingPassages } from '../../services/cambridgeApi';
 import { CambridgeReadingPassage, ReadingSessionConfig } from '../../types';
 import { useCardEntrance } from '../../hooks/useCardEntrance';
-import { useMistakeStore } from '../../store/useMistakeStore';
 import { useSmoothScroll } from '../../context/SmoothScrollProvider';
 
 export interface CambridgeTestGroup {
@@ -37,7 +36,6 @@ interface ReadingLibraryProps {
   onStartSession?: (config: ReadingSessionConfig) => void;
   onNavigateAnki?: () => void;
   onStartComputerExam?: (group: CambridgeTestGroup) => void;
-  onNavigateMistakeVault?: () => void;
 }
 
 export const ReadingLibrary: React.FC<ReadingLibraryProps> = ({
@@ -45,9 +43,7 @@ export const ReadingLibrary: React.FC<ReadingLibraryProps> = ({
   onStartSession,
   onNavigateAnki,
   onStartComputerExam,
-  onNavigateMistakeVault,
 }) => {
-  const { mistakes } = useMistakeStore();
   const [passages, setPassages] = useState<CambridgeReadingPassage[]>(mockReadingPassages);
 
   useEffect(() => {
@@ -218,19 +214,6 @@ export const ReadingLibrary: React.FC<ReadingLibraryProps> = ({
 
         {/* Header Actions */}
         <div className="flex flex-wrap items-center gap-3 shrink-0">
-          {onNavigateMistakeVault && (
-            <button
-              onClick={onNavigateMistakeVault}
-              className="inline-flex items-center gap-2 px-4 py-3 rounded-2xl bg-[#064E3B] hover:bg-[#022C22] text-amber-300 text-xs font-sans font-bold shadow-xs hover:shadow-sm active:scale-95 transition-all cursor-pointer border border-amber-400/30"
-            >
-              <BookmarkCheck size={16} className="text-amber-300" />
-              <span>Sổ Tay Câu Sai</span>
-              <span className="px-2 py-0.5 rounded-full bg-amber-400 text-stone-950 font-mono font-bold text-[10px]">
-                {mistakes.length}
-              </span>
-            </button>
-          )}
-
           {onNavigateAnki && (
             <button
               onClick={onNavigateAnki}

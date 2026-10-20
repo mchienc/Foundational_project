@@ -16,7 +16,6 @@ interface IELTSComputerExamRoomProps {
   testTitle: string;
   customTestId?: string;
   onExit: () => void;
-  onNavigateMistakeVault: () => void;
 }
 
 export const IELTSComputerExamRoom = ({
@@ -24,7 +23,6 @@ export const IELTSComputerExamRoom = ({
   testTitle,
   customTestId,
   onExit,
-  onNavigateMistakeVault,
 }: IELTSComputerExamRoomProps) => {
   const {
     initExam,
@@ -219,13 +217,6 @@ export const IELTSComputerExamRoom = ({
       {showResultModal && examResult && (
         <ExamResultModal
           result={examResult}
-          onNavigateMistakeVault={() => {
-            setShowResultModal(false);
-            if (document.fullscreenElement) {
-              document.exitFullscreen?.().catch(() => {});
-            }
-            onNavigateMistakeVault();
-          }}
           onReviewTest={() => setShowResultModal(false)}
           onBackToLibrary={() => {
             setShowResultModal(false);

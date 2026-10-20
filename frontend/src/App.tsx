@@ -11,7 +11,6 @@ import { AdminDashboard } from './components/admin/AdminDashboard';
 import { ReadingLibrary, CambridgeTestGroup } from './modules/reading/ReadingLibrary';
 import { ReadingTestRoom } from './modules/reading/ReadingTestRoom';
 import { IELTSComputerExamRoom } from './modules/exam/IELTSComputerExamRoom';
-import { MistakeVaultView } from './modules/mistakes/MistakeVaultView';
 import { mockReadingPassages } from './data/cambridgeMockData';
 import { mockListeningFullTests } from './data/mockListeningTests';
 import { ListeningLibrary } from './modules/listening/ListeningLibrary';
@@ -20,8 +19,6 @@ import { IELTSListeningExamRoom } from './modules/listening-exam/IELTSListeningE
 import { ListeningReviewRoom } from './modules/listening-exam/ListeningReviewRoom';
 import { AnkiWorkspace } from './modules/anki/AnkiWorkspace';
 import { AnkiFlashcardPlayer } from './modules/anki/AnkiFlashcardPlayer';
-import { WritingTask1Studio } from './modules/writing/WritingTask1Studio';
-import { SpeakingMockRoom } from './modules/speaking/SpeakingMockRoom';
 import { AcademicLandingPage } from './components/marketing/AcademicLandingPage';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { VocabularyVaultProvider } from './context/VocabularyVaultContext';
@@ -174,9 +171,10 @@ const AppContent: React.FC = () => {
     'reading',
     'reading-test',
     'computer-exam',
-    'mistake-vault',
     'listening',
     'listening-test',
+    'listening-exam',
+    'listening-review',
     'anki',
     'profile',
     'admin',
@@ -195,10 +193,8 @@ const AppContent: React.FC = () => {
       requireAuth(
         screen === 'reading' || screen === 'reading-test' || screen === 'computer-exam'
           ? 'Phòng Thi Máy Tính & Luyện Đọc Cambridge'
-          : screen === 'mistake-vault'
-          ? 'Sổ Tay Câu Sai (Mistake Vault)'
-          : screen === 'listening' || screen === 'listening-test'
-          ? 'Luyện Nghe Dictation Audio Slicing'
+          : screen === 'listening' || screen === 'listening-test' || screen === 'listening-exam'
+          ? 'Phòng Thi & Luyện Nghe IELTS'
           : screen === 'anki'
           ? 'Anki Flashcard Spaced Repetition'
           : 'Phân Hệ Nghiên Cứu'
@@ -334,10 +330,6 @@ const AppContent: React.FC = () => {
               setSelectedComputerExamGroup(group);
               setCurrentScreen('computer-exam');
             }}
-            onNavigateMistakeVault={() => {
-              setCurrentScreen('mistake-vault');
-              window.scrollTo({ top: 0, behavior: 'smooth' });
-            }}
             onNavigateAnki={() => {
               setCurrentScreen('anki');
               setIsStudyingAnki(false);
@@ -362,27 +354,9 @@ const AppContent: React.FC = () => {
               setCurrentScreen('reading');
               window.scrollTo({ top: 0, behavior: 'smooth' });
             }}
-            onNavigateMistakeVault={() => {
-              setCurrentScreen('mistake-vault');
-              window.scrollTo({ top: 0, behavior: 'smooth' });
-            }}
           />
         );
       }
-
-      case 'mistake-vault':
-        return (
-          <MistakeVaultView
-            onBackToLibrary={() => {
-              setCurrentScreen('reading');
-              window.scrollTo({ top: 0, behavior: 'smooth' });
-            }}
-            onNavigateExam={() => {
-              setCurrentScreen('reading');
-              window.scrollTo({ top: 0, behavior: 'smooth' });
-            }}
-          />
-        );
 
       case 'reading-test':
         return (
@@ -483,28 +457,6 @@ const AppContent: React.FC = () => {
           />
         );
       }
-
-      case 'writing':
-        return (
-          <WritingTask1Studio
-            onBack={() => {
-              setCurrentScreen('reading');
-              window.scrollTo({ top: 0, behavior: 'smooth' });
-            }}
-            onNotify={addToast}
-          />
-        );
-
-      case 'speaking':
-        return (
-          <SpeakingMockRoom
-            onBack={() => {
-              setCurrentScreen('reading');
-              window.scrollTo({ top: 0, behavior: 'smooth' });
-            }}
-            onNotify={addToast}
-          />
-        );
 
       case 'anki':
         if (isStudyingAnki && selectedAnkiDeckId) {

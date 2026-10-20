@@ -71,16 +71,13 @@ export type Screen =
   | 'reading'
   | 'reading-test'
   | 'computer-exam'
-  | 'mistake-vault'
   | 'listening'
   | 'listening-test'
   | 'listening-exam'
   | 'listening-review'
   | 'anki'
   | 'profile'
-  | 'admin'
-  | 'speaking'
-  | 'writing';
+  | 'admin';
 
 export interface ToastMessage {
   id: string;
@@ -229,36 +226,9 @@ export interface ReadingSessionConfig {
   untimed?: boolean;
 }
 
-// ================= IELTS on Computer & Mistake Vault Types ================= //
+// ================= IELTS on Computer Types ================= //
 
 export type ContrastMode = 'standard' | 'high-contrast' | 'inverted';
-
-export type MistakeQuestionType =
-  | 'TFNG'
-  | 'MATCHING_HEADINGS'
-  | 'SUMMARY_COMPLETION'
-  | 'MULTIPLE_CHOICE'
-  | 'MATCHING_INFO';
-
-export interface MistakeRecord {
-  id: string;
-  testId: string;
-  source: string;
-  passage: 1 | 2 | 3;
-  questionNumber: number;
-  questionType: MistakeQuestionType;
-  questionText: string;
-  options?: { id: string; label: string; text: string }[];
-  userAnswer: string;
-  correctAnswer: string;
-  acceptableAnswers?: string[];
-  evidenceSnippet: string;
-  explanation: string;
-  status: 'NEEDS_PRACTICE' | 'RESOLVED';
-  attemptsCount: number;
-  createdAt: string;
-  lastPracticedAt?: string;
-}
 
 export interface ExamHighlight {
   id: string;
@@ -348,61 +318,4 @@ export interface ListeningExamResult {
   bandScore: number;
   sectionScores: { section: number; correct: number; total: number }[];
   completedAt: string;
-}
-
-// ================= Writing Task 1 Types ================= //
-
-export type ChartType = 'line' | 'bar' | 'pie' | 'table' | 'process' | 'map' | 'mixed';
-
-export interface WritingTask1Prompt {
-  id: string;
-  source: string;
-  chartType: ChartType;
-  chartImageUrl: string;
-  taskText: string;
-  timeLimit: number;
-  minWords: number;
-  sentenceExamples: {
-    original: string;
-    band65: string;
-    band75: string;
-    band85: string;
-  }[];
-}
-
-// ================= Speaking Mock Test Types ================= //
-
-export type SpeakingState =
-  | 'IDLE'
-  | 'EXAMINER_SPEAKING'
-  | 'CANDIDATE_PREPARING'
-  | 'CANDIDATE_SPEAKING'
-  | 'EVALUATING';
-
-export interface SpeakingQuestion {
-  id: string;
-  part: 1 | 2 | 3;
-  type: 'interview' | 'cue_card' | 'discussion';
-  question: string;
-  cueCardBullets?: string[];
-  prepTimeSeconds?: number;
-  maxAnswerSeconds: number;
-}
-
-export interface SpeakingMockTest {
-  id: string;
-  source: string;
-  topic: string;
-  part1Questions: SpeakingQuestion[];
-  part2CueCard: SpeakingQuestion;
-  part3Questions: SpeakingQuestion[];
-}
-
-export interface SpeakingAnswerRecord {
-  questionId: string;
-  transcript: string;
-  wordCount: number;
-  durationSeconds: number;
-  wpm: number;
-  fillerWords: { word: string; count: number }[];
 }

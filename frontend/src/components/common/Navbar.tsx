@@ -11,12 +11,9 @@ import {
   Headphones,
   Layers,
   Bookmark,
-  BookmarkCheck,
   Menu,
   X,
   Globe,
-  PenLine,
-  Mic,
 } from 'lucide-react';
 import { Screen, UserStats, User } from '../../types';
 import { Button } from './Button';
@@ -49,24 +46,9 @@ export const Navbar: React.FC<NavbarProps> = ({
       icon: <BookOpen size={15} />,
     },
     {
-      id: 'mistake-vault',
-      label: 'Sổ Tay Câu Sai',
-      icon: <BookmarkCheck size={15} className="text-amber-300" />,
-    },
-    {
       id: 'listening',
       label: 'Luyện Nghe IELTS',
       icon: <Headphones size={15} />,
-    },
-    {
-      id: 'writing',
-      label: 'Writing Task 1',
-      icon: <PenLine size={15} />,
-    },
-    {
-      id: 'speaking',
-      label: 'Speaking Mock',
-      icon: <Mic size={15} />,
     },
     {
       id: 'anki',

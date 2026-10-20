@@ -5,10 +5,7 @@ import {
   ContrastMode,
   ExamHighlight,
   ExamNote,
-  MistakeRecord,
-  MistakeQuestionType,
 } from '../types';
-import { useMistakeStore } from './useMistakeStore';
 
 export interface ExamResultData {
   testId: string;
@@ -78,18 +75,6 @@ export const calculateIELTSBandScore = (correctCount: number): number => {
   if (correctCount >= 6) return 3.0;
   if (correctCount >= 4) return 2.5;
   return 2.0;
-};
-
-// Map question type string from data to unified MistakeQuestionType
-const mapQuestionType = (type?: string): MistakeQuestionType => {
-  if (!type) return 'MULTIPLE_CHOICE';
-  const lower = type.toLowerCase();
-  if (lower.includes('tfng') || lower.includes('true') || lower.includes('not given')) return 'TFNG';
-  if (lower.includes('heading')) return 'MATCHING_HEADINGS';
-  if (lower.includes('summary') || lower.includes('completion') || lower.includes('fill'))
-    return 'SUMMARY_COMPLETION';
-  if (lower.includes('matching') || lower.includes('info')) return 'MATCHING_INFO';
-  return 'MULTIPLE_CHOICE';
 };
 
 const normalizeAnswer = (str: string): string => {
@@ -240,7 +225,6 @@ export const useExamStore = create<ExamState>((set, get) => ({
     let correctCount = 0;
     let incorrectCount = 0;
     let unansweredCount = 0;
-    const mistakesToPush: MistakeRecord[] = [];
 
     const passageBreakdowns = passages.map((passage, idx) => {
       const questions = passage.questions || [];
@@ -259,43 +243,6 @@ export const useExamStore = create<ExamState>((set, get) => ({
           } else {
             incorrectCount++;
           }
-
-          // Extract evidence snippet from paragraph if available
-          let evidence = '';
-          if (q.referenceParagraph && passage.paragraphs) {
-            const matchedP = passage.paragraphs.find(
-              (p) =>
-                p.letter.toLowerCase() ===
-                q.referenceParagraph.replace(/[^a-zA-Z]/g, '').toLowerCase()
-            );
-            if (matchedP) {
-              evidence = matchedP.text.slice(0, 220) + '...';
-            }
-          }
-          if (!evidence && passage.paragraphs && passage.paragraphs[0]) {
-            evidence = passage.paragraphs[0].text.slice(0, 220) + '...';
-          }
-
-          const record: MistakeRecord = {
-            id: `mst-${testId}-q${q.number}-${Date.now()}`,
-            testId,
-            source: passage.source || testTitle,
-            passage: (idx + 1) as 1 | 2 | 3,
-            questionNumber: q.number,
-            questionType: mapQuestionType(q.type),
-            questionText: q.question,
-            options: q.options,
-            userAnswer: userAns || '(Chưa trả lời)',
-            correctAnswer: q.correctAnswer,
-            acceptableAnswers: q.acceptableAnswers,
-            evidenceSnippet: evidence,
-            explanation: q.explanation || 'Xem lại đối chiếu từ khóa và đoạn văn chứa manh mối.',
-            status: 'NEEDS_PRACTICE',
-            attemptsCount: 1,
-            createdAt: new Date().toISOString(),
-          };
-
-          mistakesToPush.push(record);
         }
       });
 
@@ -324,11 +271,6 @@ export const useExamStore = create<ExamState>((set, get) => ({
       date: new Date().toISOString(),
       passageBreakdowns,
     };
-
-    // Push mistakes to MistakeStore automatically
-    if (mistakesToPush.length > 0) {
-      useMistakeStore.getState().addMistakes(mistakesToPush);
-    }
 
     set({
       isSubmitted: true,
