@@ -10,6 +10,7 @@ import {
   ShieldCheck,
   CheckCircle2,
   RotateCcw,
+  Clock,
 } from 'lucide-react';
 import { User } from '../../types';
 import { modalScaleVariants } from '../../styles/motion';
@@ -55,12 +56,26 @@ export const AcademicAuthModal: React.FC<AcademicAuthModalProps> = ({
   const [forgotEmail, setForgotEmail] = useState<string>('');
   const [forgotStep, setForgotStep] = useState<1 | 2 | 3>(1);
   const [forgotOtp, setForgotOtp] = useState<string>('');
+  const [otpCountdown, setOtpCountdown] = useState<number>(120);
   const [newPassword, setNewPassword] = useState<string>('');
   const [confirmNewPassword, setConfirmNewPassword] = useState<string>('');
 
   const [error, setError] = useState<string | null>(null);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
+
+  // Đếm ngược 120 giây cho mã OTP
+  useEffect(() => {
+    let timer: any = null;
+    if (tab === 'forgot' && forgotStep === 2 && otpCountdown > 0) {
+      timer = setInterval(() => {
+        setOtpCountdown((prev) => Math.max(0, prev - 1));
+      }, 1000);
+    }
+    return () => {
+      if (timer) clearInterval(timer);
+    };
+  }, [tab, forgotStep, otpCountdown]);
 
   useEffect(() => {
     if (isOpen) {
@@ -278,6 +293,7 @@ export const AcademicAuthModal: React.FC<AcademicAuthModalProps> = ({
       }
 
       setSuccessMsg(data.message || `Mã OTP đã được gửi đến email ${forgotEmail.trim()}! Vui lòng kiểm tra hộp thư.`);
+      setOtpCountdown(120);
       setForgotStep(2);
     } catch (err) {
       setError('Không thể gửi yêu cầu đặt lại mật khẩu.');
@@ -306,6 +322,7 @@ export const AcademicAuthModal: React.FC<AcademicAuthModalProps> = ({
       }
 
       setForgotOtp('');
+      setOtpCountdown(120);
       setSuccessMsg(`Đã tạo mã OTP mới và gửi về ${forgotEmail.trim()}! Vui lòng kiểm tra email.`);
     } catch (err) {
       setError('Lỗi kết nối khi gửi lại mã OTP.');
@@ -765,9 +782,21 @@ export const AcademicAuthModal: React.FC<AcademicAuthModalProps> = ({
                     </div>
 
                     <div className="space-y-1">
-                      <label className="text-xs font-bold text-stone-800 uppercase tracking-wider">
-                        Nhập Mã OTP (6 Chữ Số)
-                      </label>
+                      <div className="flex items-center justify-between">
+                        <label className="text-xs font-bold text-stone-800 uppercase tracking-wider">
+                          Nhập Mã OTP (6 Chữ Số)
+                        </label>
+                        <span className={`text-[11px] font-mono font-bold flex items-center gap-1 px-2 py-0.5 rounded-md border ${
+                          otpCountdown > 30
+                            ? 'text-emerald-800 bg-emerald-50 border-emerald-300'
+                            : 'text-rose-600 bg-rose-50 border-rose-300 animate-pulse'
+                        }`}>
+                          <Clock size={12} />
+                          {otpCountdown > 0
+                            ? `Còn ${Math.floor(otpCountdown / 60)}:${(otpCountdown % 60).toString().padStart(2, '0')}`
+                            : 'Hết hạn (120s)'}
+                        </span>
+                      </div>
                       <input
                         type="text"
                         maxLength={6}
@@ -804,11 +833,17 @@ export const AcademicAuthModal: React.FC<AcademicAuthModalProps> = ({
 
                     <button
                       type="submit"
-                      disabled={loading || forgotOtp.trim().length < 6}
-                      className="w-full py-3 rounded-xl bg-[#064E3B] hover:bg-[#043327] text-amber-300 text-xs font-bold uppercase tracking-wider shadow-md hover:shadow-lg transition-all cursor-pointer flex items-center justify-center gap-2 disabled:opacity-60"
+                      disabled={loading || forgotOtp.trim().length < 6 || otpCountdown === 0}
+                      className="w-full py-3 rounded-xl bg-[#064E3B] hover:bg-[#043327] text-amber-300 text-xs font-bold uppercase tracking-wider shadow-md hover:shadow-lg transition-all cursor-pointer flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       <ShieldCheck size={15} />
-                      <span>{loading ? 'Đang kiểm tra...' : 'Xác Thực Mã OTP'}</span>
+                      <span>
+                        {loading
+                          ? 'Đang kiểm tra...'
+                          : otpCountdown === 0
+                          ? 'Mã đã hết hạn - Hãy gửi lại mã'
+                          : 'Xác Thực Mã OTP'}
+                      </span>
                     </button>
                   </form>
                 )}

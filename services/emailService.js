@@ -52,7 +52,7 @@ async function sendOtpEmail(toEmail, otp) {
             </span>
           </div>
           <p style="color: #78716c; font-size: 12px; line-height: 1.5; margin-bottom: 0;">
-            Mã OTP này có hiệu lực trong vòng <strong>5 phút</strong>. Nếu bạn không gửi yêu cầu này, vui lòng bỏ qua email.
+            Mã OTP này có hiệu lực trong vòng <strong>120 giây (2 phút)</strong>. Nếu bạn không gửi yêu cầu này, vui lòng bỏ qua email.
           </p>
         </div>
         <div style="text-align: center; margin-top: 20px; color: #a8a29e; font-size: 11px;">
