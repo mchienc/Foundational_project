@@ -15,6 +15,14 @@ const dictationRoutes = require('./routes/api/dictationRoutes');
 
 const app = express();
 
+// ----- Request Logger -----
+app.use((req, res, next) => {
+  if (!req.url.startsWith('/assets')) {
+    console.log(`[HTTP ${req.method}] ${req.url} - ${new Date().toLocaleTimeString()}`);
+  }
+  next();
+});
+
 // ----- Cấu hình CORS cho Frontend React -----
 app.use((req, res, next) => {
   res.header('Access-Control-Allow-Origin', '*');

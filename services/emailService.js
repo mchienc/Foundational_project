@@ -4,18 +4,25 @@
 const nodemailer = require('nodemailer');
 
 function createTransporter() {
-  const user = process.env.EMAIL_USER;
-  const pass = process.env.EMAIL_PASS;
+  const rawUser = process.env.EMAIL_USER;
+  const rawPass = process.env.EMAIL_PASS;
 
-  if (!user || !pass) {
+  if (!rawUser || !rawPass) {
     return null;
   }
+
+  // Loại bỏ dấu ngoặc kép hoặc khoảng trắng dư thừa nếu người dùng cấu hình trên Render
+  const user = rawUser.trim().replace(/^["']|["']$/g, '');
+  const pass = rawPass.trim().replace(/^["']|["']$/g, '').replace(/\s+/g, '');
 
   return nodemailer.createTransport({
     service: 'gmail',
     auth: {
-      user: user.trim(),
-      pass: pass.trim().replace(/\s+/g, ''),
+      user: user,
+      pass: pass,
+    },
+    tls: {
+      rejectUnauthorized: false,
     },
   });
 }
@@ -26,12 +33,13 @@ function createTransporter() {
 async function sendOtpEmail(toEmail, otp) {
   const transporter = createTransporter();
   if (!transporter) {
-    console.log(`[Email Service] Chưa cấu hình EMAIL_USER & EMAIL_PASS trong .env. Mã OTP cho ${toEmail} là: ${otp}`);
+    console.log(`[Email Service] Chưa cấu hình EMAIL_USER & EMAIL_PASS trong biến môi trường (Environment Variables). Mã OTP cho ${toEmail} là: ${otp}`);
     return { sent: false, reason: 'NOT_CONFIGURED', otp };
   }
 
+  const senderUser = (process.env.EMAIL_USER || '').trim().replace(/^["']|["']$/g, '');
   const mailOptions = {
-    from: `"EduFlow Platform" <${process.env.EMAIL_USER}>`,
+    from: `"EduFlow Platform" <${senderUser}>`,
     to: toEmail,
     subject: `[EduFlow] Mã xác nhận khôi phục mật khẩu: ${otp}`,
     html: `
