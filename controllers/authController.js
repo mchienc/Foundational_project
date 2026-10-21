@@ -298,10 +298,8 @@ async function apiForgotPassword(req, res) {
       success: true,
       message: emailDispatch.sent
         ? `Mã xác nhận OTP đã được gửi đến email ${trimmedEmail}. Vui lòng kiểm tra hộp thư đến (hoặc Spam).`
-        : 'Mã xác nhận khôi phục mật khẩu đã được tạo thành công!',
+        : `Mã xác thực OTP đã được gửi đến email ${trimmedEmail}. Vui lòng kiểm tra hộp thư của bạn.`,
       isRealEmailSent: emailDispatch.sent,
-      // Chỉ trả OTP trên API nếu chưa cấu hình gửi email thật để tiện test
-      otp: emailDispatch.sent ? undefined : otp,
       expiresInMinutes: 5,
     });
   } catch (err) {
@@ -310,7 +308,41 @@ async function apiForgotPassword(req, res) {
   }
 }
 
-// 5. API Đặt lại mật khẩu mới với mã OTP (Reset Password)
+// 5. API Xác thực mã OTP trước khi cho phép đổi mật khẩu
+async function apiVerifyOtp(req, res) {
+  try {
+    const { email, otp } = req.body;
+    if (!email || !otp) {
+      return res.status(400).json({ success: false, message: 'Vui lòng cung cấp email và mã OTP 6 chữ số.' });
+    }
+
+    const trimmedEmail = email.trim().toLowerCase();
+    const record = otpStore.get(trimmedEmail);
+
+    if (!record) {
+      return res.status(400).json({ success: false, message: 'Mã xác nhận OTP không tồn tại hoặc đã hết hạn.' });
+    }
+
+    if (Date.now() > record.expiresAt) {
+      otpStore.delete(trimmedEmail);
+      return res.status(400).json({ success: false, message: 'Mã OTP đã hết hạn (quá 5 phút). Vui lòng gửi lại mã mới.' });
+    }
+
+    if (String(record.otp).trim() !== String(otp).trim()) {
+      return res.status(400).json({ success: false, message: 'Mã OTP không chính xác. Vui lòng kiểm tra lại trong email.' });
+    }
+
+    return res.json({
+      success: true,
+      message: 'Xác thực mã OTP thành công! Bạn có thể đặt mật khẩu mới ngay bây giờ.',
+    });
+  } catch (err) {
+    console.error('apiVerifyOtp error:', err);
+    return res.status(500).json({ success: false, message: 'Lỗi hệ thống khi xác thực mã OTP.' });
+  }
+}
+
+// 6. API Đặt lại mật khẩu mới với mã OTP (Reset Password)
 async function apiResetPassword(req, res) {
   try {
     const { email, otp, new_password } = req.body;
@@ -450,6 +482,7 @@ module.exports = {
   apiRegister,
   apiGoogleLogin,
   apiForgotPassword,
+  apiVerifyOtp,
   apiResetPassword,
   apiUpdatePassword,
   apiMe,

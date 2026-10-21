@@ -9,6 +9,7 @@ router.post('/login', authController.apiLogin);
 router.post('/register', authController.apiRegister);
 router.post('/google-login', authController.apiGoogleLogin);
 router.post('/forgot-password', authController.apiForgotPassword);
+router.post('/verify-otp', authController.apiVerifyOtp);
 router.post('/reset-password', authController.apiResetPassword);
 router.post('/update-password', authController.apiUpdatePassword);
 router.get('/me', authController.apiMe);

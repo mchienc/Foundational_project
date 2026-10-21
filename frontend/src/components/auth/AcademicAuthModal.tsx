@@ -50,11 +50,10 @@ export const AcademicAuthModal: React.FC<AcademicAuthModalProps> = ({
   const [regPassword, setRegPassword] = useState<string>('');
   const [regConfirmPassword, setRegConfirmPassword] = useState<string>('');
 
-  // Forgot Password state
+  // Forgot Password state (3 bước: 1. Nhập Email -> 2. Nhập & Xác thực OTP -> 3. Đổi Mật Khẩu)
   const [forgotEmail, setForgotEmail] = useState<string>('');
-  const [forgotStep, setForgotStep] = useState<1 | 2>(1);
+  const [forgotStep, setForgotStep] = useState<1 | 2 | 3>(1);
   const [forgotOtp, setForgotOtp] = useState<string>('');
-  const [generatedOtpHint, setGeneratedOtpHint] = useState<string | null>(null);
   const [newPassword, setNewPassword] = useState<string>('');
   const [confirmNewPassword, setConfirmNewPassword] = useState<string>('');
 
@@ -277,13 +276,7 @@ export const AcademicAuthModal: React.FC<AcademicAuthModalProps> = ({
         return;
       }
 
-      if (data.isRealEmailSent) {
-        setGeneratedOtpHint(null);
-        setSuccessMsg(`Mã OTP đã được gửi đến email ${forgotEmail.trim()}! Vui lòng kiểm tra hộp thư.`);
-      } else {
-        setGeneratedOtpHint(data.otp || '123456');
-        setSuccessMsg('Mã OTP đã được tạo! Vui lòng nhập mã xác nhận bên dưới.');
-      }
+      setSuccessMsg(data.message || `Mã OTP đã được gửi đến email ${forgotEmail.trim()}! Vui lòng kiểm tra hộp thư.`);
       setForgotStep(2);
     } catch (err) {
       setError('Không thể gửi yêu cầu đặt lại mật khẩu.');
@@ -292,14 +285,53 @@ export const AcademicAuthModal: React.FC<AcademicAuthModalProps> = ({
     }
   };
 
-  // Quên mật khẩu - Bước 2: Xác minh OTP & Đổi mật khẩu
+  // Quên mật khẩu - Bước 2: Xác minh tính hợp lệ của mã OTP
+  const handleVerifyOtp = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError(null);
+    setSuccessMsg(null);
+
+    const cleanOtp = forgotOtp.trim();
+    if (!cleanOtp || cleanOtp.length < 6) {
+      setError('Vui lòng nhập đủ 6 chữ số mã OTP nhận được qua email.');
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const res = await fetch('/api/auth/verify-otp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: forgotEmail.trim(),
+          otp: cleanOtp,
+        }),
+      });
+
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        setError(data.message || 'Mã OTP không chính xác hoặc đã hết hạn.');
+        setLoading(false);
+        return;
+      }
+
+      setSuccessMsg(data.message || 'Xác thực OTP thành công! Vui lòng thiết lập mật khẩu mới.');
+      setForgotStep(3);
+    } catch (err) {
+      setError('Lỗi khi xác thực mã OTP. Vui lòng thử lại.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Quên mật khẩu - Bước 3: Đổi mật khẩu mới
   const handleResetPassword = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
     setSuccessMsg(null);
 
-    if (!forgotOtp.trim() || !newPassword || !confirmNewPassword) {
-      setError('Vui lòng nhập đầy đủ mã OTP và mật khẩu mới.');
+    if (!newPassword || !confirmNewPassword) {
+      setError('Vui lòng nhập đầy đủ mật khẩu mới và xác nhận mật khẩu.');
       return;
     }
 
@@ -634,10 +666,29 @@ export const AcademicAuthModal: React.FC<AcademicAuthModalProps> = ({
               </form>
             )}
 
-            {/* TAB 3: QUÊN MẬT KHẨU */}
+            {/* TAB 3: QUÊN MẬT KHẨU (3 Bước Rõ Ràng & Bảo Mật) */}
             {tab === 'forgot' && (
-              <div className="space-y-3 text-left">
-                {forgotStep === 1 ? (
+              <div className="space-y-4 text-left">
+                {/* 3-Step Stepper Progress Bar */}
+                <div className="flex items-center justify-between px-2 py-1.5 bg-stone-100/80 rounded-xl border border-stone-200 text-[11px] font-bold">
+                  <div className={`flex items-center gap-1.5 ${forgotStep >= 1 ? 'text-[#064E3B]' : 'text-stone-400'}`}>
+                    <span className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold ${forgotStep >= 1 ? 'bg-[#064E3B] text-white' : 'bg-stone-200 text-stone-500'}`}>1</span>
+                    <span className="hidden sm:inline">Nhập Email</span>
+                  </div>
+                  <div className={`h-0.5 flex-1 mx-2 ${forgotStep >= 2 ? 'bg-[#064E3B]' : 'bg-stone-200'}`} />
+                  <div className={`flex items-center gap-1.5 ${forgotStep >= 2 ? 'text-[#064E3B]' : 'text-stone-400'}`}>
+                    <span className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold ${forgotStep >= 2 ? 'bg-[#064E3B] text-white' : 'bg-stone-200 text-stone-500'}`}>2</span>
+                    <span className="hidden sm:inline">Nhập OTP</span>
+                  </div>
+                  <div className={`h-0.5 flex-1 mx-2 ${forgotStep >= 3 ? 'bg-[#064E3B]' : 'bg-stone-200'}`} />
+                  <div className={`flex items-center gap-1.5 ${forgotStep >= 3 ? 'text-[#064E3B]' : 'text-stone-400'}`}>
+                    <span className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold ${forgotStep === 3 ? 'bg-[#064E3B] text-white' : 'bg-stone-200 text-stone-500'}`}>3</span>
+                    <span className="hidden sm:inline">Đổi Mật Khẩu</span>
+                  </div>
+                </div>
+
+                {/* BƯỚC 1: NHẬP EMAIL */}
+                {forgotStep === 1 && (
                   <form onSubmit={handleRequestOtp} className="space-y-3">
                     <div className="space-y-1">
                       <label className="text-xs font-bold text-stone-800 uppercase tracking-wider">
@@ -652,8 +703,12 @@ export const AcademicAuthModal: React.FC<AcademicAuthModalProps> = ({
                           placeholder="ten@eduflow.vn"
                           className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-stone-300 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-[#D97706] transition-all"
                           required
+                          autoFocus
                         />
                       </div>
+                      <p className="text-[11px] text-stone-500 mt-1">
+                        Hệ thống sẽ gửi mã xác thực 6 chữ số đến địa chỉ email này.
+                      </p>
                     </div>
 
                     <button
@@ -665,30 +720,20 @@ export const AcademicAuthModal: React.FC<AcademicAuthModalProps> = ({
                       <span>{loading ? 'Đang gửi mã...' : 'Nhận Mã Xác Nhận OTP'}</span>
                     </button>
                   </form>
-                ) : (
-                  <form onSubmit={handleResetPassword} className="space-y-3">
-                    {/* OTP Notification Hint (Chỉ hiện khi chưa cấu hình email thật) */}
-                    {generatedOtpHint ? (
-                      <div className="p-3 bg-amber-50 border border-amber-300 rounded-xl text-amber-900 text-xs space-y-1">
-                        <p className="font-bold flex items-center gap-1.5">
-                          <ShieldCheck size={14} className="text-amber-700" />
-                          Mã xác nhận OTP (hết hạn trong 5 phút):
-                        </p>
-                        <p className="font-mono text-base font-extrabold text-[#064E3B] tracking-widest">
-                          {generatedOtpHint}
-                        </p>
-                      </div>
-                    ) : (
-                      <div className="p-3 bg-emerald-50 border border-emerald-300 rounded-xl text-emerald-950 text-xs space-y-1">
-                        <p className="font-bold flex items-center gap-1.5 text-emerald-900">
-                          <Mail size={14} className="text-emerald-700" />
-                          Mã xác thực đã được gửi đến: {forgotEmail}
-                        </p>
-                        <p className="text-[11px] text-emerald-800 leading-relaxed">
-                          Vui lòng mở hộp thư Gmail của bạn (kiểm tra cả hộp thư Spam/Thư rác) và nhập mã 6 số vào ô bên dưới:
-                        </p>
-                      </div>
-                    )}
+                )}
+
+                {/* BƯỚC 2: NHẬP VÀ XÁC THỰC MÃ OTP */}
+                {forgotStep === 2 && (
+                  <form onSubmit={handleVerifyOtp} className="space-y-3">
+                    <div className="p-3 bg-emerald-50 border border-emerald-300 rounded-xl text-emerald-950 text-xs space-y-1">
+                      <p className="font-bold flex items-center gap-1.5 text-emerald-900">
+                        <Mail size={14} className="text-emerald-700 shrink-0" />
+                        Mã OTP đã gửi đến: <span className="font-mono underline">{forgotEmail}</span>
+                      </p>
+                      <p className="text-[11px] text-emerald-800 leading-relaxed">
+                        Vui lòng mở hòm thư Gmail (kiểm tra cả mục <b>Spam / Thư rác</b>) và nhập mã xác thực 6 số vào ô bên dưới:
+                      </p>
+                    </div>
 
                     <div className="space-y-1">
                       <label className="text-xs font-bold text-stone-800 uppercase tracking-wider">
@@ -698,59 +743,88 @@ export const AcademicAuthModal: React.FC<AcademicAuthModalProps> = ({
                         type="text"
                         maxLength={6}
                         value={forgotOtp}
-                        onChange={(e) => setForgotOtp(e.target.value)}
-                        placeholder="Ví dụ: 849201"
-                        className="w-full px-4 py-2 rounded-xl border border-stone-300 bg-white text-sm font-mono tracking-widest focus:outline-none focus:ring-2 focus:ring-[#D97706] transition-all"
+                        onChange={(e) => setForgotOtp(e.target.value.replace(/\D/g, ''))}
+                        placeholder="••••••"
+                        className="w-full px-4 py-2.5 rounded-xl border border-stone-300 bg-white text-center text-xl font-mono font-bold tracking-[0.3em] focus:outline-none focus:ring-2 focus:ring-[#D97706] transition-all"
                         required
+                        autoFocus
                       />
                     </div>
 
-                    <div className="grid grid-cols-2 gap-2">
-                      <div className="space-y-1">
-                        <label className="text-xs font-bold text-stone-800 uppercase tracking-wider">
-                          Mật Khẩu Mới
-                        </label>
+                    <div className="flex gap-2 pt-1">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setForgotStep(1);
+                          setError(null);
+                        }}
+                        className="px-3.5 py-2.5 rounded-xl border border-stone-300 bg-white hover:bg-stone-100 text-stone-700 text-xs font-bold cursor-pointer"
+                      >
+                        Đổi email
+                      </button>
+                      <button
+                        type="submit"
+                        disabled={loading || forgotOtp.trim().length < 6}
+                        className="flex-1 py-2.5 rounded-xl bg-[#064E3B] hover:bg-[#043327] text-amber-300 text-xs font-bold uppercase tracking-wider shadow-md hover:shadow-lg transition-all cursor-pointer flex items-center justify-center gap-2 disabled:opacity-60"
+                      >
+                        <ShieldCheck size={15} />
+                        <span>{loading ? 'Đang kiểm tra...' : 'Xác Thực Mã OTP'}</span>
+                      </button>
+                    </div>
+                  </form>
+                )}
+
+                {/* BƯỚC 3: ĐẶT MẬT KHẨU MỚI (CHỈ MỞ KHI OTP ĐÃ ĐƯỢC XÁC THỰC THÀNH CÔNG) */}
+                {forgotStep === 3 && (
+                  <form onSubmit={handleResetPassword} className="space-y-3">
+                    <div className="p-2.5 bg-emerald-50 border border-emerald-300 rounded-xl text-emerald-900 text-xs flex items-center gap-2">
+                      <CheckCircle2 size={16} className="text-emerald-600 shrink-0" />
+                      <span>Xác thực OTP thành công! Vui lòng thiết lập mật khẩu mới.</span>
+                    </div>
+
+                    <div className="space-y-1">
+                      <label className="text-xs font-bold text-stone-800 uppercase tracking-wider">
+                        Mật Khẩu Mới
+                      </label>
+                      <div className="relative">
+                        <Lock size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-stone-400" />
                         <input
                           type="password"
                           value={newPassword}
                           onChange={(e) => setNewPassword(e.target.value)}
-                          placeholder="Ít nhất 6 ký tự"
-                          className="w-full px-3.5 py-2 rounded-xl border border-stone-300 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-[#D97706] transition-all"
+                          placeholder="Tối thiểu 6 ký tự"
+                          className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-stone-300 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-[#D97706] transition-all"
                           required
+                          autoFocus
                         />
                       </div>
-                      <div className="space-y-1">
-                        <label className="text-xs font-bold text-stone-800 uppercase tracking-wider">
-                          Xác Nhận Mới
-                        </label>
+                    </div>
+
+                    <div className="space-y-1">
+                      <label className="text-xs font-bold text-stone-800 uppercase tracking-wider">
+                        Xác Nhận Mật Khẩu Mới
+                      </label>
+                      <div className="relative">
+                        <Lock size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-stone-400" />
                         <input
                           type="password"
                           value={confirmNewPassword}
                           onChange={(e) => setConfirmNewPassword(e.target.value)}
-                          placeholder="Nhập lại mật khẩu"
-                          className="w-full px-3.5 py-2 rounded-xl border border-stone-300 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-[#D97706] transition-all"
+                          placeholder="Nhập lại mật khẩu mới"
+                          className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-stone-300 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-[#D97706] transition-all"
                           required
                         />
                       </div>
                     </div>
 
-                    <div className="flex gap-2">
-                      <button
-                        type="button"
-                        onClick={() => setForgotStep(1)}
-                        className="px-4 py-2.5 rounded-xl border border-stone-300 bg-white hover:bg-stone-100 text-stone-700 text-xs font-bold cursor-pointer"
-                      >
-                        Gửi lại
-                      </button>
-                      <button
-                        type="submit"
-                        disabled={loading}
-                        className="flex-1 py-2.5 rounded-xl bg-[#064E3B] hover:bg-[#043327] text-amber-300 text-xs font-bold uppercase tracking-wider shadow-md hover:shadow-lg transition-all cursor-pointer flex items-center justify-center gap-2 disabled:opacity-60"
-                      >
-                        <CheckCircle2 size={15} />
-                        <span>{loading ? 'Đang lưu...' : 'Xác Nhận Đổi Mật Khẩu'}</span>
-                      </button>
-                    </div>
+                    <button
+                      type="submit"
+                      disabled={loading}
+                      className="w-full py-3 rounded-xl bg-[#064E3B] hover:bg-[#043327] text-amber-300 text-xs font-bold uppercase tracking-wider shadow-md hover:shadow-lg transition-all cursor-pointer flex items-center justify-center gap-2 disabled:opacity-60"
+                    >
+                      <CheckCircle2 size={15} />
+                      <span>{loading ? 'Đang lưu...' : 'Lưu Mật Khẩu Mới'}</span>
+                    </button>
                   </form>
                 )}
 
@@ -760,6 +834,9 @@ export const AcademicAuthModal: React.FC<AcademicAuthModalProps> = ({
                     onClick={() => {
                       setTab('login');
                       setForgotStep(1);
+                      setForgotOtp('');
+                      setNewPassword('');
+                      setConfirmNewPassword('');
                       setError(null);
                     }}
                     className="text-xs text-stone-600 hover:text-stone-900 font-bold hover:underline cursor-pointer"
