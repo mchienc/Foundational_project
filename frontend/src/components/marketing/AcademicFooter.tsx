@@ -138,7 +138,7 @@ export const AcademicFooter: React.FC<AcademicFooterProps> = ({ onRequireAuth, o
           <ul className="space-y-2.5 font-sans text-stone-400">
             <li className="flex items-center gap-2">
               <Phone className="w-3.5 h-3.5 text-amber-400 shrink-0" />
-              <span>Hotline Hỗ Trợ: 1900 8989 (08:00 - 21:00)</span>
+              <span>Hotline / Zalo: 0976 294 907 (08:00 - 21:00)</span>
             </li>
             <li className="flex items-center gap-2">
               <Mail className="w-3.5 h-3.5 text-amber-400 shrink-0" />

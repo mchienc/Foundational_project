@@ -1,5 +1,4 @@
 import React from 'react';
-import { AcademicRibbon } from './AcademicRibbon';
 import { AcademicNavbar } from './AcademicNavbar';
 import { AcademicHero } from './AcademicHero';
 import { AcademicMetrics } from './AcademicMetrics';
@@ -29,12 +28,6 @@ export const AcademicLandingPage: React.FC<AcademicLandingPageProps> = ({
 
   return (
     <div className="min-h-screen flex flex-col bg-transparent text-stone-900 selection:bg-gold-600 selection:text-white font-sans antialiased">
-      {/* 1. Academic Research Bulletin Ribbon */}
-      <AcademicRibbon
-        onOpenAuth={onOpenAuth}
-        onNavigateScreen={onNavigateScreen}
-      />
-
       {/* 2. Academic Brand Mark Navbar */}
       <AcademicNavbar
         currentUser={currentUser}

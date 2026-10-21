@@ -22,14 +22,19 @@ export const AcademicMetrics: React.FC = () => {
         { ref: val4Ref, target: 4, suffix: ' mức' },
       ];
 
-      // Smooth entrance of metric cells
-      gsap.from('.metric-column-cell', {
-        y: 15,
-        opacity: 0,
-        duration: 0.6,
-        stagger: 0.08,
-        ease: 'power2.out',
-      });
+      // Smooth entrance of metric cells with guaranteed full opacity
+      gsap.fromTo(
+        '.metric-column-cell',
+        { y: 15, opacity: 0 },
+        {
+          y: 0,
+          opacity: 1,
+          duration: 0.6,
+          stagger: 0.08,
+          ease: 'power2.out',
+          clearProps: 'opacity,transform',
+        }
+      );
 
       // Count up numbers
       counters.forEach((item) => {
@@ -58,7 +63,7 @@ export const AcademicMetrics: React.FC = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
           {/* Metric 1 */}
-          <div className="metric-column-cell p-6 text-center space-y-3 bg-white/85 backdrop-blur-md border border-stone-200/90 rounded-2xl shadow-xs hover:shadow-md hover:border-amber-400/40 transition-all duration-300">
+          <div className="metric-column-cell p-6 text-center space-y-3 bg-white border border-stone-200 rounded-2xl shadow-sm hover:shadow-md hover:border-amber-400/60 transition-all duration-300 opacity-100">
             <div className="w-10 h-10 rounded-xl bg-amber-50 border border-amber-200/60 text-amber-800 flex items-center justify-center mx-auto shadow-2xs">
               <BookOpen className="w-5 h-5 text-amber-800" />
             </div>
@@ -68,13 +73,13 @@ export const AcademicMetrics: React.FC = () => {
             <p className="text-xs font-bold text-[#064E3B] uppercase tracking-normal">
               Đề Thi Cambridge
             </p>
-            <p className="text-[11px] text-stone-500 font-sans">
+            <p className="text-[11px] text-stone-600 font-sans leading-relaxed">
               Trọn bộ đề thi thật từ Cambridge 10 đến 20 (Reading &amp; Listening)
             </p>
           </div>
 
           {/* Metric 2 */}
-          <div className="metric-column-cell p-6 text-center space-y-3 bg-white/85 backdrop-blur-md border border-stone-200/90 rounded-2xl shadow-xs hover:shadow-md hover:border-amber-400/40 transition-all duration-300">
+          <div className="metric-column-cell p-6 text-center space-y-3 bg-white border border-stone-200 rounded-2xl shadow-sm hover:shadow-md hover:border-amber-400/60 transition-all duration-300 opacity-100">
             <div className="w-10 h-10 rounded-xl bg-amber-50 border border-amber-200/60 text-rose-600 flex items-center justify-center mx-auto shadow-2xs">
               <Youtube className="w-5 h-5 text-rose-600" />
             </div>
@@ -84,13 +89,13 @@ export const AcademicMetrics: React.FC = () => {
             <p className="text-xs font-bold text-[#064E3B] uppercase tracking-normal">
               Chép Chính Tả Video
             </p>
-            <p className="text-[11px] text-stone-500 font-sans">
+            <p className="text-[11px] text-stone-600 font-sans leading-relaxed">
               Nghe chép theo từng câu ngắn có phụ đề chuẩn và sửa lỗi tức thì
             </p>
           </div>
 
           {/* Metric 3 */}
-          <div className="metric-column-cell p-6 text-center space-y-3 bg-white/85 backdrop-blur-md border border-stone-200/90 rounded-2xl shadow-xs hover:shadow-md hover:border-amber-400/40 transition-all duration-300">
+          <div className="metric-column-cell p-6 text-center space-y-3 bg-white border border-stone-200 rounded-2xl shadow-sm hover:shadow-md hover:border-amber-400/60 transition-all duration-300 opacity-100">
             <div className="w-10 h-10 rounded-xl bg-amber-50 border border-amber-200/60 text-amber-800 flex items-center justify-center mx-auto shadow-2xs">
               <Sparkles className="w-5 h-5 text-amber-800" />
             </div>
@@ -100,13 +105,13 @@ export const AcademicMetrics: React.FC = () => {
             <p className="text-xs font-bold text-[#064E3B] uppercase tracking-normal">
               Bài Đọc Reading
             </p>
-            <p className="text-[11px] text-stone-500 font-sans">
+            <p className="text-[11px] text-stone-600 font-sans leading-relaxed">
               Làm bài như thi thật trên máy tính kèm tra từ điển nhanh 1 chạm
             </p>
           </div>
 
           {/* Metric 4 */}
-          <div className="metric-column-cell p-6 text-center space-y-3 bg-white/85 backdrop-blur-md border border-stone-200/90 rounded-2xl shadow-xs hover:shadow-md hover:border-amber-400/40 transition-all duration-300">
+          <div className="metric-column-cell p-6 text-center space-y-3 bg-white border border-stone-200 rounded-2xl shadow-sm hover:shadow-md hover:border-amber-400/60 transition-all duration-300 opacity-100">
             <div className="w-10 h-10 rounded-xl bg-amber-50 border border-amber-200/60 text-amber-800 flex items-center justify-center mx-auto shadow-2xs">
               <Layers className="w-5 h-5 text-amber-800" />
             </div>
@@ -116,7 +121,7 @@ export const AcademicMetrics: React.FC = () => {
             <p className="text-xs font-bold text-[#064E3B] uppercase tracking-normal">
               Ghi Nhớ Flashcard
             </p>
-            <p className="text-[11px] text-stone-500 font-sans">
+            <p className="text-[11px] text-stone-600 font-sans leading-relaxed">
               Nhắc ôn tập ngắt quãng khoa học giúp nhớ từ lâu và xuất file Anki dễ dàng
             </p>
           </div>
