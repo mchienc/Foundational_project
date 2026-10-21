@@ -9,6 +9,7 @@ import {
   KeyRound,
   ShieldCheck,
   CheckCircle2,
+  RotateCcw,
 } from 'lucide-react';
 import { User } from '../../types';
 import { modalScaleVariants } from '../../styles/motion';
@@ -280,6 +281,34 @@ export const AcademicAuthModal: React.FC<AcademicAuthModalProps> = ({
       setForgotStep(2);
     } catch (err) {
       setError('Không thể gửi yêu cầu đặt lại mật khẩu.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Gửi lại mã OTP mới ngay tại Bước 2
+  const handleResendOtp = async () => {
+    setError(null);
+    setSuccessMsg(null);
+    setLoading(true);
+    try {
+      const res = await fetch('/api/auth/forgot-password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: forgotEmail.trim() }),
+      });
+
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        setError(data.message || 'Không thể gửi lại mã OTP.');
+        setLoading(false);
+        return;
+      }
+
+      setForgotOtp('');
+      setSuccessMsg(`Đã tạo mã OTP mới và gửi về ${forgotEmail.trim()}! Vui lòng kiểm tra email.`);
+    } catch (err) {
+      setError('Lỗi kết nối khi gửi lại mã OTP.');
     } finally {
       setLoading(false);
     }
@@ -751,26 +780,36 @@ export const AcademicAuthModal: React.FC<AcademicAuthModalProps> = ({
                       />
                     </div>
 
-                    <div className="flex gap-2 pt-1">
+                    <div className="flex items-center justify-between text-xs pt-0.5 px-0.5">
                       <button
                         type="button"
                         onClick={() => {
                           setForgotStep(1);
                           setError(null);
                         }}
-                        className="px-3.5 py-2.5 rounded-xl border border-stone-300 bg-white hover:bg-stone-100 text-stone-700 text-xs font-bold cursor-pointer"
+                        className="text-stone-500 hover:text-stone-800 hover:underline cursor-pointer"
                       >
-                        Đổi email
+                        ← Đổi email khác
                       </button>
                       <button
-                        type="submit"
-                        disabled={loading || forgotOtp.trim().length < 6}
-                        className="flex-1 py-2.5 rounded-xl bg-[#064E3B] hover:bg-[#043327] text-amber-300 text-xs font-bold uppercase tracking-wider shadow-md hover:shadow-lg transition-all cursor-pointer flex items-center justify-center gap-2 disabled:opacity-60"
+                        type="button"
+                        disabled={loading}
+                        onClick={handleResendOtp}
+                        className="text-[#D97706] hover:text-[#B45309] font-bold hover:underline cursor-pointer flex items-center gap-1.5"
                       >
-                        <ShieldCheck size={15} />
-                        <span>{loading ? 'Đang kiểm tra...' : 'Xác Thực Mã OTP'}</span>
+                        <RotateCcw size={12} className={loading ? 'animate-spin' : ''} />
+                        <span>Gửi lại mã mới</span>
                       </button>
                     </div>
+
+                    <button
+                      type="submit"
+                      disabled={loading || forgotOtp.trim().length < 6}
+                      className="w-full py-3 rounded-xl bg-[#064E3B] hover:bg-[#043327] text-amber-300 text-xs font-bold uppercase tracking-wider shadow-md hover:shadow-lg transition-all cursor-pointer flex items-center justify-center gap-2 disabled:opacity-60"
+                    >
+                      <ShieldCheck size={15} />
+                      <span>{loading ? 'Đang kiểm tra...' : 'Xác Thực Mã OTP'}</span>
+                    </button>
                   </form>
                 )}
 

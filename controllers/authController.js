@@ -285,7 +285,7 @@ async function apiForgotPassword(req, res) {
 
     // Sinh mã OTP 6 chữ số ngẫu nhiên
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
-    const expiresAt = Date.now() + 5 * 60 * 1000; // Hết hạn sau 5 phút
+    const expiresAt = Date.now() + 15 * 60 * 1000; // Hết hạn sau 15 phút
 
     otpStore.set(trimmedEmail, { otp, expiresAt });
 
@@ -300,7 +300,7 @@ async function apiForgotPassword(req, res) {
         ? `Mã xác nhận OTP đã được gửi đến email ${trimmedEmail}. Vui lòng kiểm tra hộp thư đến (hoặc Spam).`
         : `Mã xác thực OTP đã được gửi đến email ${trimmedEmail}. Vui lòng kiểm tra hộp thư của bạn.`,
       isRealEmailSent: emailDispatch.sent,
-      expiresInMinutes: 5,
+      expiresInMinutes: 15,
     });
   } catch (err) {
     console.error('apiForgotPassword error:', err);
@@ -325,7 +325,7 @@ async function apiVerifyOtp(req, res) {
 
     if (Date.now() > record.expiresAt) {
       otpStore.delete(trimmedEmail);
-      return res.status(400).json({ success: false, message: 'Mã OTP đã hết hạn (quá 5 phút). Vui lòng gửi lại mã mới.' });
+      return res.status(400).json({ success: false, message: 'Mã OTP đã hết hạn (quá 15 phút). Vui lòng gửi lại mã mới.' });
     }
 
     if (String(record.otp).trim() !== String(otp).trim()) {
@@ -363,7 +363,7 @@ async function apiResetPassword(req, res) {
 
     if (Date.now() > record.expiresAt) {
       otpStore.delete(trimmedEmail);
-      return res.status(400).json({ success: false, message: 'Mã xác nhận OTP đã hết hạn (quá 5 phút). Vui lòng gửi lại yêu cầu.' });
+      return res.status(400).json({ success: false, message: 'Mã xác nhận OTP đã hết hạn (quá 15 phút). Vui lòng gửi lại yêu cầu.' });
     }
 
     if (String(record.otp).trim() !== String(otp).trim()) {
