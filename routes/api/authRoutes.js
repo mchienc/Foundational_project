@@ -10,6 +10,7 @@ router.post('/register', authController.apiRegister);
 router.post('/google-login', authController.apiGoogleLogin);
 router.post('/forgot-password', authController.apiForgotPassword);
 router.post('/reset-password', authController.apiResetPassword);
+router.post('/update-password', authController.apiUpdatePassword);
 router.get('/me', authController.apiMe);
 router.post('/logout', authController.apiLogout);
 

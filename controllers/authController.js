@@ -380,12 +380,70 @@ function apiLogout(req, res) {
   });
 }
 
+// 8. API Cập nhật mật khẩu từ Trang Cá Nhân
+async function apiUpdatePassword(req, res) {
+  try {
+    const { email, current_password, new_password, is_google_account } = req.body;
+    if (!email || !new_password) {
+      return res.status(400).json({ success: false, message: 'Vui lòng cung cấp mật khẩu mới.' });
+    }
+
+    if (new_password.length < 6) {
+      return res.status(400).json({ success: false, message: 'Mật khẩu mới phải có tối thiểu 6 ký tự.' });
+    }
+
+    const trimmedEmail = email.trim().toLowerCase();
+
+    // Nếu không phải tài khoản Google, bắt buộc kiểm tra mật khẩu hiện tại
+    if (!is_google_account) {
+      if (!current_password) {
+        return res.status(400).json({ success: false, message: 'Vui lòng nhập mật khẩu hiện tại của bạn.' });
+      }
+
+      try {
+        const [users] = await db.query('SELECT password FROM users WHERE LOWER(email) = ?', [trimmedEmail]);
+        if (users.length > 0) {
+          const isMatch = await bcrypt.compare(current_password, users[0].password);
+          if (!isMatch) {
+            return res.status(400).json({ success: false, message: 'Mật khẩu hiện tại không chính xác.' });
+          }
+        }
+      } catch (dbErr) {
+        console.warn('DB check skipped in updatePassword:', dbErr.message);
+      }
+    }
+
+    // Hash mật khẩu mới và cập nhật
+    const hashedPassword = await bcrypt.hash(new_password, 10);
+    try {
+      await db.query('UPDATE users SET password = ? WHERE LOWER(email) = ?', [hashedPassword, trimmedEmail]);
+    } catch (dbErr) {
+      console.warn('DB update failed, updating in-memory store:', dbErr.message);
+      const memUser = fallbackUsers.find((u) => u.email.toLowerCase() === trimmedEmail);
+      if (memUser) {
+        memUser.passwordHash = hashedPassword;
+      }
+    }
+
+    return res.json({
+      success: true,
+      message: is_google_account
+        ? 'Thiết lập mật khẩu bổ sung thành công! Giờ đây bạn có thể đăng nhập bằng cả Google và Email/Mật khẩu.'
+        : 'Cập nhật mật khẩu thành công!',
+    });
+  } catch (err) {
+    console.error('apiUpdatePassword error:', err);
+    return res.status(500).json({ success: false, message: 'Lỗi hệ thống khi cập nhật mật khẩu.' });
+  }
+}
+
 module.exports = {
   apiLogin,
   apiRegister,
   apiGoogleLogin,
   apiForgotPassword,
   apiResetPassword,
+  apiUpdatePassword,
   apiMe,
   apiLogout,
 };
