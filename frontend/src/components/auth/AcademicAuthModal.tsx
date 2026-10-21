@@ -11,8 +11,7 @@ import {
   CheckCircle2,
   RotateCcw,
   Clock,
-  AlertTriangle,
-} from 'lucide-react';
+  } from 'lucide-react';
 import { User } from '../../types';
 import { modalScaleVariants } from '../../styles/motion';
 
@@ -58,8 +57,7 @@ export const AcademicAuthModal: React.FC<AcademicAuthModalProps> = ({
   const [forgotStep, setForgotStep] = useState<1 | 2 | 3>(1);
   const [forgotOtp, setForgotOtp] = useState<string>('');
   const [otpCountdown, setOtpCountdown] = useState<number>(120);
-  const [renderOtpFallback, setRenderOtpFallback] = useState<string | null>(null);
-  const [newPassword, setNewPassword] = useState<string>('');
+    const [newPassword, setNewPassword] = useState<string>('');
   const [confirmNewPassword, setConfirmNewPassword] = useState<string>('');
 
   const [error, setError] = useState<string | null>(null);
@@ -299,12 +297,6 @@ export const AcademicAuthModal: React.FC<AcademicAuthModalProps> = ({
         return;
       }
 
-      if (data.otp) {
-        setRenderOtpFallback(data.otp);
-      } else {
-        setRenderOtpFallback(null);
-      }
-
       setSuccessMsg(data.message || `Mã OTP đã được gửi đến email ${forgotEmail.trim()}! Vui lòng kiểm tra hộp thư.`);
       setOtpCountdown(120);
       setForgotStep(2);
@@ -342,12 +334,6 @@ export const AcademicAuthModal: React.FC<AcademicAuthModalProps> = ({
         setError(data.message || 'Không thể gửi lại mã OTP.');
         setLoading(false);
         return;
-      }
-
-      if (data.otp) {
-        setRenderOtpFallback(data.otp);
-      } else {
-        setRenderOtpFallback(null);
       }
 
       setForgotOtp('');
@@ -805,27 +791,15 @@ export const AcademicAuthModal: React.FC<AcademicAuthModalProps> = ({
                 {/* BƯỚC 2: NHẬP VÀ XÁC THỰC MÃ OTP */}
                 {forgotStep === 2 && (
                   <form onSubmit={handleVerifyOtp} className="space-y-3">
-                    {renderOtpFallback ? (
-                      <div className="p-3 bg-amber-50 border border-amber-300 rounded-xl text-amber-950 text-xs space-y-1.5">
-                        <p className="font-bold flex items-center gap-1.5 text-amber-900">
-                          <AlertTriangle size={14} className="text-amber-700 shrink-0" />
-                          Lưu ý: Môi trường hosting chặn cổng gửi thư SMTP
-                        </p>
-                        <p className="text-[11px] text-stone-700">
-                          Mã xác thực OTP của bạn là: <span className="font-mono font-extrabold text-base text-[#064E3B] tracking-wider">{renderOtpFallback}</span>
-                        </p>
-                      </div>
-                    ) : (
-                      <div className="p-3 bg-emerald-50 border border-emerald-300 rounded-xl text-emerald-950 text-xs space-y-1">
-                        <p className="font-bold flex items-center gap-1.5 text-emerald-900">
-                          <Mail size={14} className="text-emerald-700 shrink-0" />
-                          Mã OTP đã gửi đến: <span className="font-mono underline">{forgotEmail}</span>
-                        </p>
-                        <p className="text-[11px] text-emerald-800 leading-relaxed">
-                          Vui lòng mở hòm thư Gmail (kiểm tra cả mục <b>Spam / Thư rác</b>) và nhập mã xác thực 6 số vào ô bên dưới:
-                        </p>
-                      </div>
-                    )}
+                    <div className="p-3 bg-emerald-50 border border-emerald-300 rounded-xl text-emerald-950 text-xs space-y-1">
+                      <p className="font-bold flex items-center gap-1.5 text-emerald-900">
+                        <Mail size={14} className="text-emerald-700 shrink-0" />
+                        Mã OTP đã gửi đến: <span className="font-mono underline">{forgotEmail}</span>
+                      </p>
+                      <p className="text-[11px] text-emerald-800 leading-relaxed">
+                        Vui lòng mở hòm thư Gmail (kiểm tra cả mục <b>Spam / Thư rác</b>) và nhập mã xác thực 6 số vào ô bên dưới:
+                      </p>
+                    </div>
 
                     <div className="space-y-1">
                       <div className="flex items-center justify-between">

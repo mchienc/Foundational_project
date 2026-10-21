@@ -291,16 +291,20 @@ async function apiForgotPassword(req, res) {
 
     console.log(`[EduFlow Auth] Mã OTP đặt lại mật khẩu cho ${trimmedEmail}: ${otp}`);
 
-    // Gửi email thật qua Nodemailer (nếu đã cấu hình EMAIL_USER & EMAIL_PASS)
+    // Gửi email thật qua HTTP REST API (cổng 443) hoặc Gmail SMTP
     const emailDispatch = await sendOtpEmail(trimmedEmail, otp);
+
+    if (!emailDispatch.sent) {
+      return res.status(500).json({
+        success: false,
+        message: 'Máy chủ hiện không thể gửi email xác thực. Vui lòng kiểm tra lại cấu hình email (Resend API Key hoặc Gmail SMTP).',
+      });
+    }
 
     return res.json({
       success: true,
-      message: emailDispatch.sent
-        ? `Mã xác nhận OTP đã được gửi đến email ${trimmedEmail}. Vui lòng kiểm tra hộp thư đến (hoặc Spam).`
-        : `Lưu ý: Môi trường Render Free chặn cổng SMTP gửi email. Mã OTP của bạn là: ${otp}`,
-      isRealEmailSent: emailDispatch.sent,
-      otp: emailDispatch.sent ? undefined : otp,
+      message: `Mã xác nhận OTP đã được gửi đến email ${trimmedEmail}. Vui lòng kiểm tra hộp thư đến (hoặc Spam).`,
+      isRealEmailSent: true,
       expiresInSeconds: 120,
     });
   } catch (err) {
