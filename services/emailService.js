@@ -24,6 +24,9 @@ function createTransporter() {
     tls: {
       rejectUnauthorized: false,
     },
+    connectionTimeout: 4000,
+    greetingTimeout: 4000,
+    socketTimeout: 5000,
   });
 }
 
@@ -71,11 +74,16 @@ async function sendOtpEmail(toEmail, otp) {
   };
 
   try {
-    const info = await transporter.sendMail(mailOptions);
+    // Đặt giới hạn tối đa 4.5s để chống treo server khi hosting chặn cổng SMTP (như Render Free)
+    const sendPromise = transporter.sendMail(mailOptions);
+    const timeoutPromise = new Promise((_, reject) =>
+      setTimeout(() => reject(new Error('SMTP_PORT_BLOCKED_OR_TIMEOUT')), 4500)
+    );
+    const info = await Promise.race([sendPromise, timeoutPromise]);
     console.log(`[Email Service] Đã gửi mã OTP thật thành công đến ${toEmail}: ${info.messageId}`);
     return { sent: true, messageId: info.messageId };
   } catch (err) {
-    console.error(`[Email Service Error] Không thể gửi email đến ${toEmail}:`, err.message);
+    console.error(`[Email Service Error] Không thể gửi email đến ${toEmail} (${err.message}). Hosting có thể đang chặn cổng SMTP.`);
     return { sent: false, reason: err.message, otp };
   }
 }

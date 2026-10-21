@@ -298,8 +298,9 @@ async function apiForgotPassword(req, res) {
       success: true,
       message: emailDispatch.sent
         ? `Mã xác nhận OTP đã được gửi đến email ${trimmedEmail}. Vui lòng kiểm tra hộp thư đến (hoặc Spam).`
-        : `Mã xác thực OTP đã được gửi đến email ${trimmedEmail}. Vui lòng kiểm tra hộp thư của bạn.`,
+        : `Lưu ý: Môi trường Render Free chặn cổng SMTP gửi email. Mã OTP của bạn là: ${otp}`,
       isRealEmailSent: emailDispatch.sent,
+      otp: emailDispatch.sent ? undefined : otp,
       expiresInSeconds: 120,
     });
   } catch (err) {
