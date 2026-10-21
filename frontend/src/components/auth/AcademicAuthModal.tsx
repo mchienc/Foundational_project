@@ -277,8 +277,13 @@ export const AcademicAuthModal: React.FC<AcademicAuthModalProps> = ({
         return;
       }
 
-      setGeneratedOtpHint(data.otp || '123456');
-      setSuccessMsg('Mã OTP đã được tạo! Vui lòng nhập mã xác nhận bên dưới.');
+      if (data.isRealEmailSent) {
+        setGeneratedOtpHint(null);
+        setSuccessMsg(`Mã OTP đã được gửi đến email ${forgotEmail.trim()}! Vui lòng kiểm tra hộp thư.`);
+      } else {
+        setGeneratedOtpHint(data.otp || '123456');
+        setSuccessMsg('Mã OTP đã được tạo! Vui lòng nhập mã xác nhận bên dưới.');
+      }
       setForgotStep(2);
     } catch (err) {
       setError('Không thể gửi yêu cầu đặt lại mật khẩu.');
@@ -662,7 +667,8 @@ export const AcademicAuthModal: React.FC<AcademicAuthModalProps> = ({
                   </form>
                 ) : (
                   <form onSubmit={handleResetPassword} className="space-y-3">
-                    {generatedOtpHint && (
+                    {/* OTP Notification Hint (Chỉ hiện khi chưa cấu hình email thật) */}
+                    {generatedOtpHint ? (
                       <div className="p-3 bg-amber-50 border border-amber-300 rounded-xl text-amber-900 text-xs space-y-1">
                         <p className="font-bold flex items-center gap-1.5">
                           <ShieldCheck size={14} className="text-amber-700" />
@@ -670,6 +676,16 @@ export const AcademicAuthModal: React.FC<AcademicAuthModalProps> = ({
                         </p>
                         <p className="font-mono text-base font-extrabold text-[#064E3B] tracking-widest">
                           {generatedOtpHint}
+                        </p>
+                      </div>
+                    ) : (
+                      <div className="p-3 bg-emerald-50 border border-emerald-300 rounded-xl text-emerald-950 text-xs space-y-1">
+                        <p className="font-bold flex items-center gap-1.5 text-emerald-900">
+                          <Mail size={14} className="text-emerald-700" />
+                          Mã xác thực đã được gửi đến: {forgotEmail}
+                        </p>
+                        <p className="text-[11px] text-emerald-800 leading-relaxed">
+                          Vui lòng mở hộp thư Gmail của bạn (kiểm tra cả hộp thư Spam/Thư rác) và nhập mã 6 số vào ô bên dưới:
                         </p>
                       </div>
                     )}

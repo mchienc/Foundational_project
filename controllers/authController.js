@@ -3,6 +3,7 @@
 
 const bcrypt = require('bcryptjs');
 const db = require('../config/db');
+const { sendOtpEmail } = require('../services/emailService');
 
 // In-memory store cho OTP quên mật khẩu: email -> { otp: string, expiresAt: number }
 const otpStore = new Map();
@@ -290,10 +291,17 @@ async function apiForgotPassword(req, res) {
 
     console.log(`[EduFlow Auth] Mã OTP đặt lại mật khẩu cho ${trimmedEmail}: ${otp}`);
 
+    // Gửi email thật qua Nodemailer (nếu đã cấu hình EMAIL_USER & EMAIL_PASS)
+    const emailDispatch = await sendOtpEmail(trimmedEmail, otp);
+
     return res.json({
       success: true,
-      message: 'Mã xác nhận khôi phục mật khẩu đã được tạo thành công!',
-      otp, // Trả kèm OTP trực tiếp để học viên/người chấm đồ án trải nghiệm ngay
+      message: emailDispatch.sent
+        ? `Mã xác nhận OTP đã được gửi đến email ${trimmedEmail}. Vui lòng kiểm tra hộp thư đến (hoặc Spam).`
+        : 'Mã xác nhận khôi phục mật khẩu đã được tạo thành công!',
+      isRealEmailSent: emailDispatch.sent,
+      // Chỉ trả OTP trên API nếu chưa cấu hình gửi email thật để tiện test
+      otp: emailDispatch.sent ? undefined : otp,
       expiresInMinutes: 5,
     });
   } catch (err) {
