@@ -26,6 +26,7 @@ import { VocabularyVaultProvider } from './context/VocabularyVaultContext';
 import { AnkiProvider } from './context/AnkiContext';
 import { SmoothScrollProvider } from './context/SmoothScrollProvider';
 import { SoftAtmosphereBackground } from './components/common/SoftAtmosphereBackground';
+import { AiTutorFloatingChatbot } from './components/chat/AiTutorFloatingChatbot';
 
 // Error Boundary to prevent white screen crashes
 interface ErrorBoundaryProps {
@@ -630,6 +631,9 @@ const AppContent: React.FC = () => {
 
       {/* Global Toast Notifications Container */}
       <ToastContainer toasts={toasts} onDismiss={removeToast} />
+
+      {/* Trợ Lý Học Tập AI (Floating Widget) */}
+      <AiTutorFloatingChatbot currentScreen={currentScreen} onNotify={addToast} />
 
       {/* Student LMS Workspace Footer */}
       {currentScreen !== 'landing' && currentScreen !== 'computer-exam' && currentScreen !== 'listening-exam' && (

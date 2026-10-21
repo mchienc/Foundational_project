@@ -12,6 +12,7 @@ const cambridgeRoutes = require('./routes/api/cambridgeRoutes');
 const adminRoutes = require('./routes/api/adminRoutes');
 const ankiRoutes = require('./routes/api/ankiRoutes');
 const dictationRoutes = require('./routes/api/dictationRoutes');
+const chatRoutes = require('./routes/api/chatRoutes');
 
 const app = express();
 
@@ -65,6 +66,7 @@ app.use('/api/cambridge', cambridgeRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/anki', ankiRoutes);
 app.use('/api/dictation', dictationRoutes);
+app.use('/api/chat', chatRoutes);
 
 // ----- SPA Fallback cho React Frontend -----
 if (fs.existsSync(frontendDist)) {
