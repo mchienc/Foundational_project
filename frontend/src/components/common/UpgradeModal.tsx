@@ -1,5 +1,5 @@
 // frontend/src/components/common/UpgradeModal.tsx
-// Cổng thanh toán VietQR Napas 24/7 (Ngân hàng Quân Đội MB Bank - 0976294907)
+// Cổng thanh toán VietQR Napas 24/7 & Tự Động Nhận Diện Giao Dịch SePay (MB Bank 0976294907)
 
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -14,7 +14,6 @@ import {
   Clock,
   ArrowRight,
   ShieldCheck,
-  CheckCircle2,
   ChevronLeft,
 } from 'lucide-react';
 import { useProStore } from '../../modules/pro/useProStore';
@@ -23,6 +22,7 @@ interface UpgradeModalProps {
   isOpen?: boolean;
   onClose?: () => void;
   onSuccess?: () => void;
+  onNavigateHome?: () => void;
 }
 
 interface PlanOption {
@@ -77,6 +77,7 @@ export const UpgradeModal: React.FC<UpgradeModalProps> = ({
   isOpen: propsIsOpen,
   onClose: propsOnClose,
   onSuccess,
+  onNavigateHome,
 }) => {
   const isStoreOpen = useProStore((state) => state.isUpgradeModalOpen);
   const closeStoreModal = useProStore((state) => state.closeUpgradeModal);
@@ -93,7 +94,6 @@ export const UpgradeModal: React.FC<UpgradeModalProps> = ({
   const [step, setStep] = useState<'select' | 'payment' | 'success'>('select');
   const [selectedPlan, setSelectedPlan] = useState<PlanOption>(PRO_PLANS[1]); // Default 6 months
   const [isLoadingOrder, setIsLoadingOrder] = useState<boolean>(false);
-  const [isConfirming, setIsConfirming] = useState<boolean>(false);
   const [orderData, setOrderData] = useState<any>(null);
 
   // Copy feedback state
@@ -125,6 +125,48 @@ export const UpgradeModal: React.FC<UpgradeModalProps> = ({
     return () => clearInterval(interval);
   }, [step, countdown]);
 
+  // Polling tự động lắng nghe Webhook SePay (kiểm tra tiền vào STK MB Bank)
+  useEffect(() => {
+    let pollInterval: any = null;
+    if (step === 'payment' && orderData?.orderId) {
+      pollInterval = setInterval(async () => {
+        try {
+          const res = await fetch(`/api/payment/check-status/${orderData.orderId}`);
+          const data = await res.json();
+          if (data.success && data.status === 'completed') {
+            clearInterval(pollInterval);
+            const expiry =
+              data.order?.expiryDate || (selectedPlan.id === 'lifetime' ? 'Vĩnh viễn' : '30 ngày');
+
+            activateProPackage({
+              packageId: selectedPlan.id,
+              planName: selectedPlan.name,
+              expiryDate: expiry,
+              orderId: orderData.orderCode,
+            });
+
+            setStep('success');
+            if (onSuccess) onSuccess();
+
+            // Tự động đóng modal và điều hướng về Trang Chủ sau 2 giây!
+            setTimeout(() => {
+              handleClose();
+              if (onNavigateHome) {
+                onNavigateHome();
+              }
+            }, 2200);
+          }
+        } catch (err) {
+          // Bỏ qua lỗi mạng polling tạm thời
+        }
+      }, 2000);
+    }
+
+    return () => {
+      if (pollInterval) clearInterval(pollInterval);
+    };
+  }, [step, orderData, selectedPlan, activateProPackage, onSuccess, handleClose, onNavigateHome]);
+
   if (!isOpen) return null;
 
   const formatPrice = (p: number) => {
@@ -147,7 +189,7 @@ export const UpgradeModal: React.FC<UpgradeModalProps> = ({
     }
   };
 
-  // Step 1 -> Step 2: Create VietQR Order
+  // Step 1 -> Step 2: Tạo đơn hàng VietQR
   const handleProceedToPayment = async () => {
     setIsLoadingOrder(true);
     try {
@@ -172,18 +214,17 @@ export const UpgradeModal: React.FC<UpgradeModalProps> = ({
       }
     } catch (err: any) {
       console.error('Order creation error:', err);
-      // Fallback in-client order creation if backend offline
+      // Fallback cục bộ
+      const randomCode = `EDF${Math.floor(10000 + Math.random() * 90000)}`;
       const mockOrder = {
         orderId: `order_${Date.now()}`,
-        orderCode: `EDF${Math.floor(10000 + Math.random() * 90000)}`,
+        orderCode: randomCode,
         packageId: selectedPlan.id,
         planName: selectedPlan.name,
         amount: selectedPlan.price,
         billingCycle: selectedPlan.durationLabel,
-        transferContent: `EDF${Math.floor(10000 + Math.random() * 90000)}`,
-        qrUrl: `https://img.vietqr.io/image/MB-0976294907-compact2.png?amount=${selectedPlan.price}&addInfo=EDF${Math.floor(
-          10000 + Math.random() * 90000
-        )}&accountName=DANG%20MINH%20CHIEN`,
+        transferContent: randomCode,
+        qrUrl: `https://img.vietqr.io/image/MB-0976294907-compact2.png?amount=${selectedPlan.price}&addInfo=${randomCode}&accountName=DANG%20MINH%20CHIEN`,
         bankInfo: {
           bankName: 'MB Bank (Ngân hàng TMCP Quân Đội)',
           bankShortName: 'MB',
@@ -198,40 +239,18 @@ export const UpgradeModal: React.FC<UpgradeModalProps> = ({
     }
   };
 
-  // Step 2 -> Step 3: Confirm Paid
-  const handleConfirmPaid = async () => {
-    if (!orderData) return;
-    setIsConfirming(true);
+  // Nút giả lập thanh toán phục vụ đánh giá đồ án (không cần chuyển tiền thật)
+  const handleSimulateTransfer = async () => {
+    if (!orderData?.orderCode) return;
     try {
-      const response = await fetch(`/api/payment/confirm-paid/${orderData.orderId}`, {
+      await fetch('/api/payment/simulate-transfer', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ orderCode: orderData.orderCode }),
       });
-
-      const resData = await response.json();
-      const expiry = resData.expiryDate || (selectedPlan.id === 'lifetime' ? 'Vĩnh viễn' : '30 ngày');
-
-      activateProPackage({
-        packageId: selectedPlan.id,
-        planName: selectedPlan.name,
-        expiryDate: expiry,
-        orderId: orderData.orderCode,
-      });
-
-      setStep('success');
-      if (onSuccess) onSuccess();
+      // Polling sẽ tự động đón nhận ngay trong 1-2 giây kế tiếp!
     } catch (e) {
-      // Fallback client activation
-      activateProPackage({
-        packageId: selectedPlan.id,
-        planName: selectedPlan.name,
-        expiryDate: selectedPlan.id === 'lifetime' ? 'Vĩnh viễn' : '30 ngày',
-        orderId: orderData.orderCode,
-      });
-      setStep('success');
-      if (onSuccess) onSuccess();
-    } finally {
-      setIsConfirming(false);
+      console.error('Simulation error:', e);
     }
   };
 
@@ -261,18 +280,18 @@ export const UpgradeModal: React.FC<UpgradeModalProps> = ({
               </span>
               <span className="inline-flex items-center gap-1 text-[11px] text-emerald-200">
                 <ShieldCheck size={13} />
-                <span>Cổng VietQR Napas 24/7</span>
+                <span>VietQR &bull; Tự động kích hoạt</span>
               </span>
             </div>
 
             <h3 className="text-xl sm:text-2xl font-serif font-bold text-white tracking-tight mt-2">
               {step === 'select' && 'Chọn Gói Học & Bứt Phá Band Điểm IELTS'}
-              {step === 'payment' && 'Quét Mã VietQR Ngân Hàng Để Kích Hoạt'}
+              {step === 'payment' && 'Quét Mã VietQR Ngân Hàng (Tự Động Kích Hoạt)'}
               {step === 'success' && 'Tài Khoản Đã Kích Hoạt EduFlow Pro!'}
             </h3>
             <p className="text-xs sm:text-sm text-emerald-100/90 mt-0.5">
               {step === 'select' && 'Luyện Viết & Luyện Nói không giới hạn cùng Giám khảo AI Cambridge'}
-              {step === 'payment' && 'Mở app ngân hàng bất kỳ (MB, VCB, TCB, MoMo...) và quét mã bên dưới'}
+              {step === 'payment' && 'Hệ thống tự động lắng nghe giao dịch từ MB Bank và tự đưa bạn về Trang Chủ'}
               {step === 'success' && 'Chúc mừng bạn đã sở hữu toàn bộ tính năng cao cấp không giới hạn'}
             </p>
           </div>
@@ -399,7 +418,7 @@ export const UpgradeModal: React.FC<UpgradeModalProps> = ({
               </div>
             )}
 
-            {/* ================= STEP 2: VIETQR SCANNER ================= */}
+            {/* ================= STEP 2: VIETQR SCANNER (AUTO LISTENING) ================= */}
             {step === 'payment' && orderData && (
               <div className="space-y-5">
                 {/* Back to package select */}
@@ -531,29 +550,35 @@ export const UpgradeModal: React.FC<UpgradeModalProps> = ({
                   </div>
                 </div>
 
-                {/* Confirm Button */}
-                <div className="space-y-2 pt-2">
+                {/* Real-time Listening Radar Box */}
+                <div className="p-4 rounded-2xl bg-emerald-50/80 border border-emerald-200 shadow-2xs space-y-2">
+                  <div className="flex items-center gap-2.5">
+                    <span className="relative flex h-3 w-3 shrink-0">
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                      <span className="relative inline-flex rounded-full h-3 w-3 bg-emerald-600"></span>
+                    </span>
+                    <span className="text-xs font-bold text-emerald-950 uppercase tracking-wide">
+                      Hệ thống đang tự động lắng nghe giao dịch từ MB Bank...
+                    </span>
+                  </div>
+                  <p className="text-xs text-stone-600 leading-relaxed pl-5.5">
+                    Ngay khi tài khoản <strong>0976294907</strong> nhận được tiền đúng số tiền và cú pháp <strong>{orderData.transferContent}</strong>, hệ thống SePay Webhook sẽ tự động xác nhận, kích hoạt bản quyền Pro và tự động đưa bạn về Trang Chủ.
+                  </p>
+                </div>
+
+                {/* Dev / Test helper and cancel button */}
+                <div className="flex items-center justify-between pt-2 text-xs">
                   <button
-                    onClick={handleConfirmPaid}
-                    disabled={isConfirming}
-                    className="w-full py-3.5 px-4 rounded-xl font-bold text-sm bg-gradient-to-r from-emerald-700 via-emerald-800 to-emerald-900 hover:opacity-95 text-white shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2 cursor-pointer"
+                    onClick={handleSimulateTransfer}
+                    className="text-[11px] text-stone-400 hover:text-emerald-700 underline cursor-pointer"
+                    title="Bắn giao dịch mẫu để kiểm thử tính năng tự động kích hoạt không mất tiền thật"
                   >
-                    {isConfirming ? (
-                      <>
-                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                        <span>Đang kiểm tra và kích hoạt bản quyền...</span>
-                      </>
-                    ) : (
-                      <>
-                        <CheckCircle2 size={18} className="text-amber-300" />
-                        <span>Tôi đã chuyển khoản thành công &bull; Kích hoạt Pro</span>
-                      </>
-                    )}
+                    ⚡ [Kiểm thử đồ án] Bắn giao dịch mẫu
                   </button>
 
                   <button
                     onClick={handleClose}
-                    className="w-full py-2 text-xs font-semibold text-stone-500 hover:text-stone-800 text-center cursor-pointer"
+                    className="text-stone-500 hover:text-stone-800 cursor-pointer font-medium"
                   >
                     Để sau, tiếp tục học tập
                   </button>
@@ -561,19 +586,19 @@ export const UpgradeModal: React.FC<UpgradeModalProps> = ({
               </div>
             )}
 
-            {/* ================= STEP 3: SUCCESS CELEBRATION ================= */}
+            {/* ================= STEP 3: SUCCESS & REDIRECT ================= */}
             {step === 'success' && (
               <div className="text-center py-6 space-y-4">
-                <div className="w-16 h-16 rounded-full bg-emerald-100 text-emerald-800 flex items-center justify-center mx-auto shadow-inner border border-emerald-300">
+                <div className="w-16 h-16 rounded-full bg-emerald-100 text-emerald-800 flex items-center justify-center mx-auto shadow-inner border border-emerald-300 animate-bounce">
                   <Award size={32} />
                 </div>
 
                 <div>
                   <h4 className="text-xl font-serif font-bold text-[#064E3B]">
-                    Kích Hoạt Bản Quyền Thành Công!
+                    Thanh Toán &amp; Kích Hoạt Thành Công!
                   </h4>
                   <p className="text-xs text-stone-600 mt-1 max-w-md mx-auto leading-relaxed">
-                    Tài khoản của bạn đã được nâng cấp lên <strong>EduFlow Pro ({planName})</strong>. Giờ đây bạn có thể luyện viết và luyện nói không giới hạn cùng Giám khảo AI.
+                    Tài khoản của bạn đã được nâng cấp lên <strong>EduFlow Pro ({planName})</strong>. Đang tự động chuyển bạn về Trang Chủ trong giây lát...
                   </p>
                 </div>
 
@@ -594,10 +619,14 @@ export const UpgradeModal: React.FC<UpgradeModalProps> = ({
 
                 <div className="pt-3 space-y-2 max-w-sm mx-auto">
                   <button
-                    onClick={handleClose}
-                    className="w-full py-3 px-4 rounded-xl font-bold text-xs bg-[#064E3B] hover:bg-[#043327] text-white shadow-md transition-colors cursor-pointer"
+                    onClick={() => {
+                      handleClose();
+                      if (onNavigateHome) onNavigateHome();
+                    }}
+                    className="w-full py-3 px-4 rounded-xl font-bold text-xs bg-[#064E3B] hover:bg-[#043327] text-white shadow-md transition-colors cursor-pointer flex items-center justify-center gap-2"
                   >
-                    Bắt đầu luyện thi ngay
+                    <span>Về Trang Chủ Ngay</span>
+                    <ArrowRight size={14} />
                   </button>
 
                   <button

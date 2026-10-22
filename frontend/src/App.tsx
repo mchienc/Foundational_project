@@ -648,7 +648,13 @@ const AppContent: React.FC = () => {
       <ToastContainer toasts={toasts} onDismiss={removeToast} />
 
       {/* Global EduFlow Pro Upgrade Modal */}
-      <UpgradeModal onSuccess={() => addToast('Đã kích hoạt trải nghiệm EduFlow Pro thành công!', 'success')} />
+      <UpgradeModal
+        onSuccess={() => addToast('Thanh toán thành công! Đã kích hoạt EduFlow Pro.', 'success')}
+        onNavigateHome={() => {
+          setCurrentScreen('landing');
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }}
+      />
 
       {/* Trợ Lý Học Tập AI (Floating Widget) */}
       <AiTutorFloatingChatbot currentScreen={currentScreen} onNotify={addToast} />
