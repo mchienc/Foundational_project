@@ -94,6 +94,7 @@ export const UpgradeModal: React.FC<UpgradeModalProps> = ({
   const [step, setStep] = useState<'select' | 'payment' | 'success'>('select');
   const [selectedPlan, setSelectedPlan] = useState<PlanOption>(PRO_PLANS[1]); // Default 6 months
   const [isLoadingOrder, setIsLoadingOrder] = useState<boolean>(false);
+  const [isConfirmingPaid, setIsConfirmingPaid] = useState<boolean>(false);
   const [orderData, setOrderData] = useState<any>(null);
 
   // Copy feedback state
@@ -251,6 +252,62 @@ export const UpgradeModal: React.FC<UpgradeModalProps> = ({
       // Polling sẽ tự động đón nhận ngay trong 1-2 giây kế tiếp!
     } catch (e) {
       console.error('Simulation error:', e);
+    }
+  };
+
+  // Nút người dùng xác nhận đã chuyển khoản thành công
+  const handleConfirmPaidByUser = async () => {
+    setIsConfirmingPaid(true);
+    try {
+      if (orderData?.orderId) {
+        await fetch(`/api/payment/confirm-paid/${orderData.orderId}`, {
+          method: 'POST',
+        }).catch(() => {});
+      }
+
+      const expiry =
+        orderData?.expiryDate ||
+        (selectedPlan.id === 'lifetime'
+          ? 'Vĩnh viễn'
+          : selectedPlan.id === 'year'
+          ? '365 ngày'
+          : selectedPlan.id === '6months'
+          ? '180 ngày'
+          : '30 ngày');
+
+      activateProPackage({
+        packageId: selectedPlan.id,
+        planName: selectedPlan.name,
+        expiryDate: expiry,
+        orderId: orderData?.orderCode || `EDF_${Date.now()}`,
+      });
+
+      setStep('success');
+      if (onSuccess) onSuccess();
+
+      // Tự động đóng modal và điều hướng về Trang Chủ sau 1.8 giây!
+      setTimeout(() => {
+        handleClose();
+        if (onNavigateHome) {
+          onNavigateHome();
+        }
+      }, 1800);
+    } catch (e) {
+      console.error('Error confirming payment:', e);
+      activateProPackage({
+        packageId: selectedPlan.id,
+        planName: selectedPlan.name,
+        expiryDate: '30 ngày',
+        orderId: orderData?.orderCode || `EDF_${Date.now()}`,
+      });
+      setStep('success');
+      if (onSuccess) onSuccess();
+      setTimeout(() => {
+        handleClose();
+        if (onNavigateHome) onNavigateHome();
+      }, 1800);
+    } finally {
+      setIsConfirmingPaid(false);
     }
   };
 
@@ -550,19 +607,28 @@ export const UpgradeModal: React.FC<UpgradeModalProps> = ({
                   </div>
                 </div>
 
-                {/* Real-time Listening Radar Box */}
-                <div className="p-4 rounded-2xl bg-emerald-50/80 border border-emerald-200 shadow-2xs space-y-2">
-                  <div className="flex items-center gap-2.5">
-                    <span className="relative flex h-3 w-3 shrink-0">
-                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                      <span className="relative inline-flex rounded-full h-3 w-3 bg-emerald-600"></span>
-                    </span>
-                    <span className="text-xs font-bold text-emerald-950 uppercase tracking-wide">
-                      Hệ thống đang tự động lắng nghe giao dịch từ MB Bank...
-                    </span>
-                  </div>
-                  <p className="text-xs text-stone-600 leading-relaxed pl-5.5">
-                    Ngay khi tài khoản <strong>0976294907</strong> nhận được tiền đúng số tiền và cú pháp <strong>{orderData.transferContent}</strong>, hệ thống SePay Webhook sẽ tự động xác nhận, kích hoạt bản quyền Pro và tự động đưa bạn về Trang Chủ.
+                {/* Nút bấm xác nhận: Tôi Đã Chuyển Tiền Thành Công */}
+                <div className="space-y-2 pt-1">
+                  <button
+                    onClick={handleConfirmPaidByUser}
+                    disabled={isConfirmingPaid}
+                    className="w-full py-3.5 px-6 rounded-2xl bg-[#064E3B] hover:bg-[#043327] text-white font-bold text-sm shadow-lg shadow-emerald-950/20 transition-all flex items-center justify-center gap-2.5 cursor-pointer group hover:scale-[1.01] active:scale-[0.99]"
+                  >
+                    {isConfirmingPaid ? (
+                      <>
+                        <RefreshCw size={18} className="animate-spin text-amber-300" />
+                        <span>Đang kích hoạt gói Pro...</span>
+                      </>
+                    ) : (
+                      <>
+                        <Check size={20} className="text-amber-300 stroke-[3]" />
+                        <span>Tôi Đã Chuyển Tiền Thành Công</span>
+                        <ArrowRight size={16} className="text-emerald-300 group-hover:translate-x-1 transition-transform" />
+                      </>
+                    )}
+                  </button>
+                  <p className="text-[11px] text-center text-stone-500">
+                    Bấm xác nhận sau khi bạn đã chuyển khoản để hệ thống kích hoạt gói Pro và tự động đưa bạn về Trang Chủ.
                   </p>
                 </div>
 

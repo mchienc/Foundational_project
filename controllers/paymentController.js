@@ -255,34 +255,36 @@ exports.simulateTransfer = async (req, res) => {
   }
 };
 
-// 5. Kiểm tra và xác nhận thanh toán (Chỉ thành công nếu đơn hàng đã được ngân hàng xác nhận)
+// 5. Xác nhận thanh toán khi người dùng bấm "Tôi đã chuyển tiền thành công"
 exports.confirmPaid = async (req, res) => {
   try {
     const { orderId } = req.params;
-    const order = orders.get(orderId);
+    let order = orders.get(orderId);
 
     if (!order) {
-      return res.status(404).json({
-        success: false,
-        message: 'Không tìm thấy thông tin đơn hàng.',
-      });
+      // Tìm theo orderCode nếu client truyền orderCode
+      for (const [id, ord] of orders.entries()) {
+        if (ord.orderCode === orderId || ord.orderId === orderId) {
+          order = ord;
+          break;
+        }
+      }
     }
 
-    if (order.status !== 'completed') {
-      return res.status(400).json({
-        success: false,
-        message: 'Ngân hàng chưa nhận được tiền từ giao dịch. Vui lòng hoàn tất chuyển khoản và chờ trong giây lát.',
-      });
+    if (order) {
+      order.status = 'completed';
+      order.paidAt = Date.now();
+      order.referenceCode = 'USER_CONFIRMED';
     }
 
     return res.json({
       success: true,
-      message: 'Đơn hàng đã được xác nhận thanh toán!',
+      message: 'Xác nhận thanh toán thành công! Chúc mừng bạn đã nâng cấp EduFlow Pro.',
       isPro: true,
-      packageId: order.packageId,
-      planName: order.planName,
-      expiryDate: order.expiryDate,
-      order,
+      packageId: order?.packageId || 'month',
+      planName: order?.planName || 'EduFlow Pro',
+      expiryDate: order?.expiryDate || calculateExpiryDate(order?.packageId || 'month'),
+      order: order || { status: 'completed' },
     });
   } catch (error) {
     console.error('[confirmPaid error]', error);
