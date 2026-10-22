@@ -10,10 +10,11 @@ import {
   BookOpen,
   Headphones,
   Layers,
-  Bookmark,
+  Settings,
+  Award,
+  HelpCircle,
   Menu,
   X,
-  Globe,
   Youtube,
 } from 'lucide-react';
 import { Screen, UserStats, User } from '../../types';
@@ -21,7 +22,7 @@ import { Button } from './Button';
 
 interface NavbarProps {
   currentScreen: Screen;
-  onSelectScreen: (screen: Screen) => void;
+  onSelectScreen: (screen: Screen, tab?: 'info' | 'settings' | 'password' | 'certs' | 'support') => void;
   stats: UserStats;
   currentUser: User | null;
   onOpenAuth: (tab: 'login' | 'register') => void;
@@ -173,47 +174,71 @@ export const Navbar: React.FC<NavbarProps> = ({
                     animate={{ opacity: 1, y: 0, scale: 1 }}
                     exit={{ opacity: 0, y: 10, scale: 0.95 }}
                     transition={{ duration: 0.18 }}
-                    className="absolute right-0 mt-2 w-56 bg-[#FAFAF9] rounded-2xl border border-stone-300 shadow-xl py-2 z-50 divide-y divide-stone-200 text-xs text-stone-800"
+                    className="absolute right-0 mt-2 w-64 bg-[#FAFAF9] rounded-2xl border border-stone-300 shadow-xl py-2 z-50 divide-y divide-stone-200 text-xs text-stone-800"
                   >
-                    <div className="px-4 py-2.5">
-                      <p className="font-bold text-forest-950 truncate font-sans">{currentUser.full_name}</p>
-                      <p className="text-[11px] text-stone-500 font-mono truncate">{currentUser.email}</p>
-                      <span className="inline-block mt-1 px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-amber-50 text-amber-900 border border-amber-300">
-                        {currentUser.role === 'admin' ? 'Quản Trị Viên' : 'Học Viên'}
-                      </span>
+                    {/* User Profile Header */}
+                    <div className="px-4 py-3 bg-stone-100/70 rounded-t-2xl">
+                      <div className="flex items-center justify-between gap-2">
+                        <p className="font-bold text-forest-950 truncate font-sans text-sm">{currentUser.full_name}</p>
+                        <span className="shrink-0 px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-amber-100 text-amber-900 border border-amber-300">
+                          {currentUser.role === 'admin' ? 'Quản Trị' : 'Học Viên'}
+                        </span>
+                      </div>
+                      <p className="text-[11px] text-stone-500 font-mono truncate mt-0.5">{currentUser.email}</p>
+                      
+                      {/* Target Band Pill */}
+                      <div className="mt-2.5 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold bg-emerald-50 text-[#064E3B] border border-emerald-200">
+                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                        <span>Mục tiêu: Band {currentUser.targetBand || '7.0+'} IELTS</span>
+                      </div>
                     </div>
 
-                    <div className="py-1">
+                    {/* Account & Learning Management */}
+                    <div className="py-1.5">
                       <button
                         onClick={() => {
-                          onSelectScreen('landing');
+                          onSelectScreen('profile', 'info');
                           setShowUserMenu(false);
                         }}
                         className="w-full px-4 py-2 flex items-center gap-2.5 text-stone-700 hover:bg-stone-100 hover:text-forest-950 transition-colors cursor-pointer"
                       >
-                        <Globe size={14} />
-                        Trang Giới Thiệu
+                        <UserIcon size={14} className="text-[#064E3B]" />
+                        <span>Hồ sơ cá nhân</span>
                       </button>
+
                       <button
                         onClick={() => {
-                          onSelectScreen('profile');
+                          onSelectScreen('profile', 'settings');
                           setShowUserMenu(false);
                         }}
                         className="w-full px-4 py-2 flex items-center gap-2.5 text-stone-700 hover:bg-stone-100 hover:text-forest-950 transition-colors cursor-pointer"
                       >
-                        <UserIcon size={14} />
-                        Trang cá nhân
+                        <Settings size={14} className="text-amber-600" />
+                        <span>Cài đặt học tập &amp; Mục tiêu</span>
                       </button>
+
                       <button
                         onClick={() => {
-                          onSelectScreen('anki');
+                          onSelectScreen('profile', 'certs');
                           setShowUserMenu(false);
                         }}
                         className="w-full px-4 py-2 flex items-center gap-2.5 text-stone-700 hover:bg-stone-100 hover:text-forest-950 transition-colors cursor-pointer"
                       >
-                        <Bookmark size={14} />
-                        Từ vựng của tôi
+                        <Award size={14} className="text-emerald-700" />
+                        <span>Chứng nhận &amp; Thành tích</span>
                       </button>
+
+                      <button
+                        onClick={() => {
+                          onSelectScreen('profile', 'support');
+                          setShowUserMenu(false);
+                        }}
+                        className="w-full px-4 py-2 flex items-center gap-2.5 text-stone-700 hover:bg-stone-100 hover:text-forest-950 transition-colors cursor-pointer"
+                      >
+                        <HelpCircle size={14} className="text-blue-600" />
+                        <span>Trung tâm hỗ trợ</span>
+                      </button>
+
                       {currentUser.role === 'admin' && (
                         <button
                           onClick={() => {
@@ -223,11 +248,12 @@ export const Navbar: React.FC<NavbarProps> = ({
                           className="w-full px-4 py-2 flex items-center gap-2.5 text-purple-700 hover:bg-purple-50 font-semibold transition-colors cursor-pointer"
                         >
                           <Shield size={14} />
-                          Quản Trị Hệ Thống
+                          <span>Quản Trị Hệ Thống</span>
                         </button>
                       )}
                     </div>
 
+                    {/* Sign out */}
                     <div className="py-1">
                       <button
                         onClick={() => {
@@ -237,7 +263,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                         className="w-full px-4 py-2 flex items-center gap-2.5 text-rose-600 hover:bg-rose-50 font-medium transition-colors cursor-pointer"
                       >
                         <LogOut size={14} />
-                        Đăng Xuất
+                        <span>Đăng Xuất</span>
                       </button>
                     </div>
                   </motion.div>
@@ -303,16 +329,29 @@ export const Navbar: React.FC<NavbarProps> = ({
                 {link.label}
               </button>
             ))}
-            <button
-              onClick={() => {
-                onSelectScreen('landing');
-                setShowMobileNav(false);
-              }}
-              className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-amber-300 hover:bg-forest-900/60 border-t border-emerald-900/80 pt-2 cursor-pointer transition-colors"
-            >
-              <Globe size={14} />
-              Trang Giới Thiệu
-            </button>
+            {currentUser ? (
+              <button
+                onClick={() => {
+                  onSelectScreen('profile', 'info');
+                  setShowMobileNav(false);
+                }}
+                className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-amber-300 hover:bg-forest-900/60 border-t border-emerald-900/80 pt-2 cursor-pointer transition-colors"
+              >
+                <UserIcon size={14} />
+                Hồ sơ &amp; Cài đặt học tập
+              </button>
+            ) : (
+              <button
+                onClick={() => {
+                  onSelectScreen('landing');
+                  setShowMobileNav(false);
+                }}
+                className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-amber-300 hover:bg-forest-900/60 border-t border-emerald-900/80 pt-2 cursor-pointer transition-colors"
+              >
+                <BookOpen size={14} />
+                Giới thiệu EduFlow
+              </button>
+            )}
           </motion.div>
         )}
       </AnimatePresence>

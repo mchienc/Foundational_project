@@ -6,7 +6,7 @@ import { Navbar } from './components/common/Navbar';
 import { ToastContainer } from './components/common/ToastContainer';
 import { AcademicAuthModal } from './components/auth/AcademicAuthModal';
 import { CertificateModal } from './components/common/CertificateModal';
-import { Profile } from './components/profile/Profile';
+import { Profile, ProfileTab } from './components/profile/Profile';
 import { AdminDashboard } from './components/admin/AdminDashboard';
 import { ReadingLibrary, CambridgeTestGroup } from './modules/reading/ReadingLibrary';
 import { ReadingTestRoom } from './modules/reading/ReadingTestRoom';
@@ -147,8 +147,9 @@ const AppContent: React.FC = () => {
   const [showCertModal, setShowCertModal] = useState<boolean>(false);
   const [certCourseTitle, setCertCourseTitle] = useState<string>(sampleCourses[0].title);
 
-  // User Learning Stats
+  // User Learning Stats & Profile Tab
   const [stats, setStats] = useState(initialUserStats);
+  const [profileInitialTab, setProfileInitialTab] = useState<ProfileTab>('info');
 
   // Global Toast Notifications
   const [toasts, setToasts] = useState<ToastMessage[]>([]);
@@ -196,7 +197,10 @@ const AppContent: React.FC = () => {
   ];
 
   // Auth Guard Navigation Handler
-  const handleScreenNavigate = (screen: Screen) => {
+  const handleScreenNavigate = (screen: Screen, tab?: ProfileTab) => {
+    if (screen === 'profile' && tab) {
+      setProfileInitialTab(tab);
+    }
     if (screen === 'dictation') {
       if (typeof window !== 'undefined' && !window.location.pathname.startsWith('/dictation')) {
         window.history.pushState({}, '', '/dictation');
@@ -539,6 +543,7 @@ const AppContent: React.FC = () => {
             user={user}
             stats={stats}
             courses={courses}
+            initialTab={profileInitialTab}
             onUpdateUser={(updated) => {
               login({ ...user, ...updated });
             }}

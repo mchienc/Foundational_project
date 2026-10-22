@@ -30,6 +30,8 @@ const defaultUserStudent: User = {
   email: 'dangchien2005@gmail.com',
   full_name: 'Minh Chiến Đặng',
   role: 'student',
+  phone: '0976294907',
+  targetBand: '7.5',
   avatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=120&auto=format&fit=crop&q=80',
 };
 

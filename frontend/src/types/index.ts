@@ -4,6 +4,11 @@ export interface User {
   full_name: string;
   role: 'student' | 'admin';
   avatar?: string;
+  phone?: string;
+  targetBand?: string;
+  preferredAccent?: 'uk' | 'us';
+  audioSpeed?: number;
+  dailyReminder?: boolean;
   createdAt?: string;
 }
 
