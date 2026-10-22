@@ -98,7 +98,33 @@ exports.createOrder = async (req, res) => {
 exports.checkOrderStatus = async (req, res) => {
   try {
     const { orderId } = req.params;
-    const order = orders.get(orderId);
+    let order = orders.get(orderId);
+
+    if (!order) {
+      for (const [id, ord] of orders.entries()) {
+        if (ord.orderCode === orderId || ord.orderId === orderId) {
+          order = ord;
+          break;
+        }
+      }
+    }
+
+    if (!order && /EDF\d{5}/i.test(orderId)) {
+      const matched = orderId.match(/EDF\d{5}/i);
+      const extractedCode = matched ? matched[0].toUpperCase() : orderId.toUpperCase();
+      order = {
+        orderId: `order_${extractedCode}`,
+        orderCode: extractedCode,
+        packageId: 'month',
+        planName: 'EduFlow Pro',
+        amount: 19000,
+        status: 'pending',
+        createdAt: Date.now(),
+        expiresAt: Date.now() + 15 * 60 * 1000,
+        expiryDate: calculateExpiryDate('month'),
+      };
+      orders.set(order.orderId, order);
+    }
 
     if (!order) {
       return res.status(404).json({
@@ -260,12 +286,14 @@ exports.simulateTransfer = async (req, res) => {
   }
 };
 
+const DEFAULT_SEPAY_API_KEY = 'SIZPLQIMNLCWVWOGWR8V7VC3UYMK17GTXDYAXGA6LKTICFMKD1HSOHEJ4PEXEFSQ';
+
 // 4.1. Hàm đối soát giao dịch thực tế từ MB Bank thông qua SePay API
 async function verifyBankTransaction(order) {
   if (!order) return false;
   if (order.status === 'completed') return true;
 
-  const apiKey = process.env.SEPAY_API_KEY || process.env.SEPAY_API_TOKEN;
+  const apiKey = (process.env.SEPAY_API_KEY || process.env.SEPAY_API_TOKEN || DEFAULT_SEPAY_API_KEY || '').trim();
   if (!apiKey) {
     console.warn('[SePay API] Chưa cấu hình SEPAY_API_KEY / SEPAY_API_TOKEN trong .env');
     return false;
@@ -276,7 +304,7 @@ async function verifyBankTransaction(order) {
     const response = await fetch(url, {
       method: 'GET',
       headers: {
-        'Authorization': `Bearer ${apiKey.trim()}`,
+        'Authorization': `Bearer ${apiKey}`,
         'Content-Type': 'application/json',
       },
     });
@@ -285,20 +313,20 @@ async function verifyBankTransaction(order) {
     if (!data) return false;
 
     const txs = Array.isArray(data.transactions) ? data.transactions : (Array.isArray(data.data) ? data.data : []);
-    const cleanCode = order.orderCode.toUpperCase();
+    const cleanCode = (order.orderCode || '').toUpperCase();
 
     const matchedTx = txs.find((tx) => {
       const content = `${tx.transaction_content || ''} ${tx.description || ''}`.toUpperCase();
       const amountIn = Number(tx.amount_in || tx.transfer_amount || 0);
       const isIncoming = tx.transfer_type === 'in' || amountIn > 0;
-      return content.includes(cleanCode) && isIncoming && amountIn >= order.amount;
+      return content.includes(cleanCode) && isIncoming && amountIn >= (order.amount || 19000);
     });
 
     if (matchedTx) {
       order.status = 'completed';
       order.paidAt = Date.now();
       order.referenceCode = matchedTx.reference_number || matchedTx.id || 'SEPAY_API_VERIFIED';
-      order.actualAmountPaid = Number(matchedTx.amount_in || matchedTx.transfer_amount || order.amount);
+      order.actualAmountPaid = Number(matchedTx.amount_in || matchedTx.transfer_amount || order.amount || 19000);
       console.log(`[SePay API] Đã đối soát thành công đơn hàng ${order.orderCode} từ giao dịch thực tế MB Bank!`);
       return true;
     }
@@ -325,6 +353,25 @@ exports.confirmPaid = async (req, res) => {
       }
     }
 
+    // Tự động khôi phục đơn nếu server vừa khởi động lại mà client gửi mã EDF
+    if (!order && /EDF\d{5}/i.test(orderId)) {
+      const matched = orderId.match(/EDF\d{5}/i);
+      const extractedCode = matched ? matched[0].toUpperCase() : orderId.toUpperCase();
+      const pkg = req.body?.packageId || 'month';
+      order = {
+        orderId: `order_${extractedCode}`,
+        orderCode: extractedCode,
+        packageId: pkg,
+        planName: req.body?.planName || 'EduFlow Pro',
+        amount: Number(req.body?.amount) || 19000,
+        status: 'pending',
+        createdAt: Date.now(),
+        expiresAt: Date.now() + 15 * 60 * 1000,
+        expiryDate: calculateExpiryDate(pkg),
+      };
+      orders.set(order.orderId, order);
+    }
+
     if (!order) {
       return res.status(404).json({
         success: false,
@@ -337,7 +384,7 @@ exports.confirmPaid = async (req, res) => {
 
     // 2. Nếu đơn hàng vẫn chưa hoàn tất (chưa có Webhook và chưa có giao dịch trên SePay API)
     if (!isPaid && order.status !== 'completed') {
-      const apiKey = process.env.SEPAY_API_KEY || process.env.SEPAY_API_TOKEN;
+      const apiKey = (process.env.SEPAY_API_KEY || process.env.SEPAY_API_TOKEN || DEFAULT_SEPAY_API_KEY || '').trim();
       if (!apiKey) {
         return res.status(400).json({
           success: false,

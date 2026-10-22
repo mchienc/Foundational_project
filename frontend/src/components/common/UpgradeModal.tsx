@@ -265,8 +265,16 @@ export const UpgradeModal: React.FC<UpgradeModalProps> = ({
         throw new Error('Chưa có thông tin đơn hàng.');
       }
 
-      const res = await fetch(`/api/payment/confirm-paid/${orderData.orderId}`, {
+      const lookupKey = orderData.orderCode || orderData.orderId;
+      const res = await fetch(`/api/payment/confirm-paid/${lookupKey}`, {
         method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          orderCode: orderData.orderCode,
+          amount: orderData.amount,
+          packageId: selectedPlan.id,
+          planName: selectedPlan.name,
+        }),
       });
       const data = await res.json().catch(() => null);
 
