@@ -9,6 +9,9 @@ export interface User {
   preferredAccent?: 'uk' | 'us';
   audioSpeed?: number;
   dailyReminder?: boolean;
+  isPro?: boolean;
+  proPackage?: string;
+  proExpiry?: string;
   createdAt?: string;
 }
 

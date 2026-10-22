@@ -30,6 +30,7 @@ import { AiTutorFloatingChatbot } from './components/chat/AiTutorFloatingChatbot
 import { WritingWorkspace } from './modules/writing/WritingWorkspace';
 import { SpeakingRandomStudio } from './modules/speaking/SpeakingRandomStudio';
 import { UpgradeModal } from './components/common/UpgradeModal';
+import { useProStore } from './modules/pro/useProStore';
 
 // Error Boundary to prevent white screen crashes
 interface ErrorBoundaryProps {
@@ -104,6 +105,12 @@ const AppContent: React.FC = () => {
     authModalConfig,
     setNotifyHandler,
   } = useAuth();
+
+  const syncWithUser = useProStore((state) => state.syncWithUser);
+
+  useEffect(() => {
+    syncWithUser(user);
+  }, [user, syncWithUser]);
 
   // Navigation Screen State: Supports direct URL /dictation or /dictation/:id
   const [currentScreen, setCurrentScreen] = useState<Screen>(() => {

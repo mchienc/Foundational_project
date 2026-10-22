@@ -14,6 +14,9 @@ router.get('/users', adminController.getAllUsers);
 // 3. Phân quyền / Cập nhật vai trò (student <-> admin)
 router.put('/users/:id/role', adminController.updateUserRole);
 
+// 3.1. Quản lý tư cách Pro (Cấp / Hủy Pro)
+router.put('/users/:id/pro', adminController.updateUserProStatus);
+
 // 4. Xoá tài khoản người dùng
 router.delete('/users/:id', adminController.deleteUser);
 

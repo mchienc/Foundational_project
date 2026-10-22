@@ -59,6 +59,9 @@ async function apiLogin(req, res) {
             email: dbUser.email,
             role: dbUser.role || 'student',
             avatar: getAvatarByRole(dbUser.role),
+            isPro: Boolean(dbUser.is_pro),
+            proPackage: dbUser.pro_package || null,
+            proExpiry: dbUser.pro_expiry || null,
           };
         }
       }

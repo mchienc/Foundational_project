@@ -5,12 +5,12 @@ const db = require('../config/db');
 
 // Dữ liệu mẫu dự phòng (fallback khi chưa khởi động MySQL local)
 let memoryUsers = [
-  { id: '1', full_name: 'Quản Trị Viên Hệ Thống', email: 'admin@example.com', role: 'admin', created_at: '2026-08-01T08:00:00Z', exams_taken: 12 },
-  { id: '2', full_name: 'Minh Chiến Đặng', email: 'dangchien2005@gmail.com', role: 'student', created_at: '2026-08-15T10:30:00Z', exams_taken: 8 },
-  { id: '3', full_name: 'Hoàng Kim Yến', email: 'kimyen@example.com', role: 'student', created_at: '2026-08-22T14:15:00Z', exams_taken: 5 },
-  { id: '4', full_name: 'Trần Hải Đăng', email: 'haidang@example.com', role: 'admin', created_at: '2026-08-28T09:00:00Z', exams_taken: 9 },
-  { id: '5', full_name: 'Lê Quốc Bảo', email: 'quocbao@example.com', role: 'student', created_at: '2026-09-02T16:20:00Z', exams_taken: 3 },
-  { id: '6', full_name: 'Nguyễn Phương Thảo', email: 'phuongthao@example.com', role: 'student', created_at: '2026-09-10T11:45:00Z', exams_taken: 6 },
+  { id: '1', full_name: 'Quản Trị Viên Hệ Thống', email: 'admin@example.com', role: 'admin', created_at: '2026-08-01T08:00:00Z', exams_taken: 12, is_pro: true, pro_package: 'lifetime', pro_expiry: 'Vĩnh viễn' },
+  { id: '2', full_name: 'Minh Chiến Đặng', email: 'dangchien2005@gmail.com', role: 'student', created_at: '2026-08-15T10:30:00Z', exams_taken: 8, is_pro: false, pro_package: null, pro_expiry: null },
+  { id: '3', full_name: 'Hoàng Kim Yến', email: 'kimyen@example.com', role: 'student', created_at: '2026-08-22T14:15:00Z', exams_taken: 5, is_pro: false, pro_package: null, pro_expiry: null },
+  { id: '4', full_name: 'Trần Hải Đăng', email: 'haidang@example.com', role: 'admin', created_at: '2026-08-28T09:00:00Z', exams_taken: 9, is_pro: true, pro_package: 'lifetime', pro_expiry: 'Vĩnh viễn' },
+  { id: '5', full_name: 'Lê Quốc Bảo', email: 'quocbao@example.com', role: 'student', created_at: '2026-09-02T16:20:00Z', exams_taken: 3, is_pro: false, pro_package: null, pro_expiry: null },
+  { id: '6', full_name: 'Nguyễn Phương Thảo', email: 'phuongthao@example.com', role: 'student', created_at: '2026-09-10T11:45:00Z', exams_taken: 6, is_pro: false, pro_package: null, pro_expiry: null },
 ];
 
 let memoryExamResults = [
@@ -162,6 +162,54 @@ exports.updateUserRole = async (req, res) => {
   } catch (error) {
     console.error('updateUserRole error:', error);
     res.status(500).json({ success: false, message: 'Lỗi máy chủ khi cập nhật vai trò.' });
+  }
+};
+
+// 3.1. Quản lý tư cách Pro của học viên (Cấp / Hủy Pro)
+exports.updateUserProStatus = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { isPro, proPackage, proExpiry } = req.body;
+
+    const booleanPro = Boolean(isPro);
+    let selectedPackage = booleanPro ? (proPackage || '6months') : null;
+    let selectedExpiry = booleanPro ? (proExpiry || '180 ngày') : null;
+
+    // Cập nhật CSDL MySQL nếu có
+    try {
+      await db.query(
+        'UPDATE users SET is_pro = ?, pro_package = ?, pro_expiry = ? WHERE id = ?',
+        [booleanPro ? 1 : 0, selectedPackage, selectedExpiry, id]
+      );
+    } catch (dbErr) {
+      // Fallback
+    }
+
+    // Cập nhật memoryUsers
+    memoryUsers = memoryUsers.map((u) => {
+      if (String(u.id) === String(id)) {
+        return {
+          ...u,
+          is_pro: booleanPro,
+          pro_package: selectedPackage,
+          pro_expiry: selectedExpiry,
+        };
+      }
+      return u;
+    });
+
+    const updated = memoryUsers.find((u) => String(u.id) === String(id));
+
+    res.json({
+      success: true,
+      message: booleanPro
+        ? `Đã cấp tư cách EduFlow Pro (${selectedPackage}) thành công!`
+        : 'Đã hủy tư cách Pro, chuyển về tài khoản miễn phí.',
+      data: updated,
+    });
+  } catch (error) {
+    console.error('updateUserProStatus error:', error);
+    res.status(500).json({ success: false, message: 'Lỗi máy chủ khi cập nhật tư cách Pro.' });
   }
 };
 

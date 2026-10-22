@@ -20,6 +20,10 @@ import {
   EyeOff,
   Filter,
   Globe,
+  Sparkles,
+  Crown,
+  Check,
+  Calendar,
 } from 'lucide-react';
 import { Course, Screen } from '../../types';
 import { Card } from '../common/Card';
@@ -39,6 +43,9 @@ interface AdminUserRow {
   role: 'student' | 'admin';
   created_at: string;
   exams_taken?: number;
+  is_pro?: boolean;
+  pro_package?: string;
+  pro_expiry?: string;
 }
 
 interface ExamSubmissionRow {
@@ -146,12 +153,12 @@ const INITIAL_CAMBRIDGE_TESTS: CambridgeTestSummary[] = [
 ];
 
 const fallbackUsers: AdminUserRow[] = [
-  { id: '1', full_name: 'Quản Trị Viên Hệ Thống', email: 'admin@example.com', role: 'admin', created_at: '2026-08-01T08:00:00Z', exams_taken: 12 },
-  { id: '2', full_name: 'Minh Chiến Đặng', email: 'dangchien2005@gmail.com', role: 'student', created_at: '2026-08-15T10:30:00Z', exams_taken: 8 },
-  { id: '3', full_name: 'Hoàng Kim Yến', email: 'kimyen@example.com', role: 'student', created_at: '2026-08-22T14:15:00Z', exams_taken: 5 },
-  { id: '4', full_name: 'Trần Hải Đăng', email: 'haidang@example.com', role: 'admin', created_at: '2026-08-28T09:00:00Z', exams_taken: 9 },
-  { id: '5', full_name: 'Lê Quốc Bảo', email: 'quocbao@example.com', role: 'student', created_at: '2026-09-02T16:20:00Z', exams_taken: 3 },
-  { id: '6', full_name: 'Nguyễn Phương Thảo', email: 'phuongthao@example.com', role: 'student', created_at: '2026-09-10T11:45:00Z', exams_taken: 6 },
+  { id: '1', full_name: 'Quản Trị Viên Hệ Thống', email: 'admin@example.com', role: 'admin', created_at: '2026-08-01T08:00:00Z', exams_taken: 12, is_pro: true, pro_package: 'Gói Trọn Đời', pro_expiry: 'Vĩnh viễn' },
+  { id: '2', full_name: 'Minh Chiến Đặng', email: 'dangchien2005@gmail.com', role: 'student', created_at: '2026-08-15T10:30:00Z', exams_taken: 8, is_pro: false, pro_package: '', pro_expiry: '' },
+  { id: '3', full_name: 'Hoàng Kim Yến', email: 'kimyen@example.com', role: 'student', created_at: '2026-08-22T14:15:00Z', exams_taken: 5, is_pro: false, pro_package: '', pro_expiry: '' },
+  { id: '4', full_name: 'Trần Hải Đăng', email: 'haidang@example.com', role: 'admin', created_at: '2026-08-28T09:00:00Z', exams_taken: 9, is_pro: true, pro_package: 'Gói Trọn Đời', pro_expiry: 'Vĩnh viễn' },
+  { id: '5', full_name: 'Lê Quốc Bảo', email: 'quocbao@example.com', role: 'student', created_at: '2026-09-02T16:20:00Z', exams_taken: 3, is_pro: false, pro_package: '', pro_expiry: '' },
+  { id: '6', full_name: 'Nguyễn Phương Thảo', email: 'phuongthao@example.com', role: 'student', created_at: '2026-09-10T11:45:00Z', exams_taken: 6, is_pro: false, pro_package: '', pro_expiry: '' },
 ];
 
 const fallbackResults: ExamSubmissionRow[] = [
@@ -209,12 +216,24 @@ const fallbackResults: ExamSubmissionRow[] = [
   },
 ];
 
+const PRO_PACKAGES = [
+  { id: '1month', name: 'Gói 1 Tháng', durationDays: 30, desc: '30 ngày trải nghiệm AI Chấm Chữa & Luyện Đề' },
+  { id: '6months', name: 'Gói 6 Tháng', durationDays: 180, desc: '180 ngày (Khuyên dùng cho kỳ ôn thi nước rút)' },
+  { id: '1year', name: 'Gói 1 Năm', durationDays: 365, desc: '365 ngày toàn diện bứt phá mục tiêu IELTS 7.5+' },
+  { id: 'lifetime', name: 'Gói Trọn Đời', durationDays: 0, desc: 'Không giới hạn thời gian sử dụng tài nguyên PRO' },
+];
+
 export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate, onNotify }) => {
   const [adminTab, setAdminTab] = useState<'users' | 'results' | 'tests'>('tests');
   const [userList, setUserList] = useState<AdminUserRow[]>(fallbackUsers);
   const [examResults, setExamResults] = useState<ExamSubmissionRow[]>(fallbackResults);
   const [cambridgeTests, setCambridgeTests] = useState<CambridgeTestSummary[]>(INITIAL_CAMBRIDGE_TESTS);
   const [isLoading, setIsLoading] = useState(false);
+
+  // Quản lý cấp / hủy gói Pro
+  const [proModalUser, setProModalUser] = useState<AdminUserRow | null>(null);
+  const [selectedPackage, setSelectedPackage] = useState<'1month' | '6months' | '1year' | 'lifetime'>('6months');
+  const [isUpdatingPro, setIsUpdatingPro] = useState(false);
 
   // Bộ lọc
   const [searchUserQuery, setSearchUserQuery] = useState('');
@@ -241,7 +260,11 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate, onNo
       ]);
 
       if (usersRes.status === 'fulfilled' && usersRes.value?.success && Array.isArray(usersRes.value.data)) {
-        setUserList(usersRes.value.data);
+        const normalized = usersRes.value.data.map((u: any) => ({
+          ...u,
+          is_pro: Boolean(u.is_pro),
+        }));
+        setUserList(normalized);
       }
       if (resultsRes.status === 'fulfilled' && resultsRes.value?.success && Array.isArray(resultsRes.value.data)) {
         setExamResults(resultsRes.value.data);
@@ -307,6 +330,148 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate, onNo
     } catch {
       setUserList((prev) => prev.filter((u) => u.id !== userId));
       onNotify(`Đã xóa tài khoản "${userName}" thành công.`, 'success');
+    }
+  };
+
+  // 2.1. Cấp quyền EduFlow Pro cho học viên
+  const handleConfirmGrantPro = async () => {
+    if (!proModalUser) return;
+    setIsUpdatingPro(true);
+    const pkg = PRO_PACKAGES.find((p) => p.id === selectedPackage) || PRO_PACKAGES[1];
+    const expiryDate = pkg.durationDays > 0
+      ? new Date(Date.now() + pkg.durationDays * 86400000).toLocaleDateString('vi-VN')
+      : 'Vĩnh viễn';
+
+    try {
+      const res = await fetch(`/api/admin/users/${proModalUser.id}/pro`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          isPro: true,
+          proPackage: pkg.name,
+          proExpiry: expiryDate,
+        }),
+      });
+      const data = await res.json().catch(() => null);
+
+      setUserList((prev) =>
+        prev.map((u) =>
+          u.id === proModalUser.id
+            ? { ...u, is_pro: true, pro_package: pkg.name, pro_expiry: expiryDate }
+            : u
+        )
+      );
+
+      // Cập nhật isolated localStorage key cho tài khoản này nếu đang test chung trình duyệt
+      try {
+        const userStorageKey = `eduflow_pro_user_${proModalUser.email.trim().toLowerCase()}`;
+        const proData = {
+          isPro: true,
+          writingQuotaLeft: 9999,
+          speakingQuotaLeft: 9999,
+          lastResetDate: new Date().toISOString().slice(0, 10),
+          planName: pkg.name,
+          packageId: pkg.id,
+          packageExpiry: expiryDate,
+          lastOrderId: `ADMIN_GRANT_${Date.now()}`,
+        };
+        localStorage.setItem(userStorageKey, JSON.stringify(proData));
+      } catch (e) {}
+
+      onNotify(data?.message || `Đã cấp thành công ${pkg.name} cho "${proModalUser.full_name}"!`, 'success');
+      setProModalUser(null);
+    } catch {
+      setUserList((prev) =>
+        prev.map((u) =>
+          u.id === proModalUser.id
+            ? { ...u, is_pro: true, pro_package: pkg.name, pro_expiry: expiryDate }
+            : u
+        )
+      );
+      try {
+        const userStorageKey = `eduflow_pro_user_${proModalUser.email.trim().toLowerCase()}`;
+        localStorage.setItem(userStorageKey, JSON.stringify({
+          isPro: true,
+          writingQuotaLeft: 9999,
+          speakingQuotaLeft: 9999,
+          lastResetDate: new Date().toISOString().slice(0, 10),
+          planName: pkg.name,
+          packageId: pkg.id,
+          packageExpiry: expiryDate,
+          lastOrderId: `ADMIN_GRANT_${Date.now()}`,
+        }));
+      } catch {}
+      onNotify(`Đã cấp thành công ${pkg.name} cho "${proModalUser.full_name}"!`, 'success');
+      setProModalUser(null);
+    } finally {
+      setIsUpdatingPro(false);
+    }
+  };
+
+  // 2.2. Hủy tư cách Pro của học viên
+  const handleRevokePro = async (user: AdminUserRow) => {
+    if (!confirm(`Bạn có chắc chắn muốn hủy tư cách Pro của "${user.full_name}" (${user.email})?`)) {
+      return;
+    }
+
+    try {
+      const res = await fetch(`/api/admin/users/${user.id}/pro`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          isPro: false,
+          proPackage: null,
+          proExpiry: null,
+        }),
+      });
+      const data = await res.json().catch(() => null);
+
+      setUserList((prev) =>
+        prev.map((u) =>
+          u.id === user.id
+            ? { ...u, is_pro: false, pro_package: undefined, pro_expiry: undefined }
+            : u
+        )
+      );
+
+      // Reset user isolated localStorage key
+      try {
+        const userStorageKey = `eduflow_pro_user_${user.email.trim().toLowerCase()}`;
+        localStorage.setItem(userStorageKey, JSON.stringify({
+          isPro: false,
+          writingQuotaLeft: 0,
+          speakingQuotaLeft: 0,
+          lastResetDate: new Date().toISOString().slice(0, 10),
+          planName: 'Gói Free',
+          packageId: '',
+          packageExpiry: '',
+          lastOrderId: '',
+        }));
+      } catch (e) {}
+
+      onNotify(data?.message || `Đã hủy tư cách Pro của "${user.full_name}".`, 'info');
+    } catch {
+      setUserList((prev) =>
+        prev.map((u) =>
+          u.id === user.id
+            ? { ...u, is_pro: false, pro_package: undefined, pro_expiry: undefined }
+            : u
+        )
+      );
+      try {
+        const userStorageKey = `eduflow_pro_user_${user.email.trim().toLowerCase()}`;
+        localStorage.setItem(userStorageKey, JSON.stringify({
+          isPro: false,
+          writingQuotaLeft: 0,
+          speakingQuotaLeft: 0,
+          lastResetDate: new Date().toISOString().slice(0, 10),
+          planName: 'Gói Free',
+          packageId: '',
+          packageExpiry: '',
+          lastOrderId: '',
+        }));
+      } catch {}
+      onNotify(`Đã hủy tư cách Pro của "${user.full_name}".`, 'info');
     }
   };
 
@@ -450,6 +615,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate, onNo
 
   const studentCount = userList.filter((u) => u.role === 'student').length;
   const adminCount = userList.filter((u) => u.role === 'admin').length;
+  const proCount = userList.filter((u) => u.is_pro).length;
   const activeTestsCount = cambridgeTests.filter((t) => t.status === 'Sẵn Sàng').length;
   const lockedTestsCount = cambridgeTests.filter((t) => t.status === 'Tạm Khóa').length;
 
@@ -531,12 +697,14 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate, onNo
 
         <Card className="p-5 flex items-center justify-between border-stone-200 bg-white">
           <div className="space-y-1">
-            <span className="text-xs text-stone-500 font-medium">Học Viên Đã Thi</span>
+            <span className="text-xs text-stone-500 font-medium">Học Viên & Bản Quyền</span>
             <div className="text-2xl font-bold font-mono text-[#D97706]">{studentCount} Bạn</div>
-            <div className="text-[11px] text-stone-400">Quyền thi & luyện tập</div>
+            <div className="text-[11px] text-stone-400">
+              <span className="text-amber-700 font-semibold">{proCount} gói PRO</span> • <span className="text-stone-500">{studentCount - proCount} miễn phí</span>
+            </div>
           </div>
           <div className="p-3 rounded-2xl bg-amber-50 text-[#D97706]">
-            <Users size={22} />
+            <Crown size={22} />
           </div>
         </Card>
 
@@ -586,7 +754,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate, onNo
                 : 'bg-white text-stone-600 border border-stone-200 hover:bg-stone-50'
             }`}
           >
-            <Shield size={14} />
+            <Users size={14} />
             Quản Lý Người Dùng & Phân Quyền ({userList.length})
           </button>
 
@@ -763,7 +931,8 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate, onNo
                     <tr>
                       <th className="p-4">Người Dùng</th>
                       <th className="p-4">Email</th>
-                      <th className="p-4">Vai Trò Hiện Tại</th>
+                      <th className="p-4">Vai Trò</th>
+                      <th className="p-4">Gói Bản Quyền</th>
                       <th className="p-4">Số Bài Đã Nộp</th>
                       <th className="p-4">Ngày Tham Gia</th>
                       <th className="p-4 text-right">Phân Quyền / Thao Tác</th>
@@ -802,6 +971,26 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate, onNo
                             {user.role === 'admin' ? 'Quản Trị Viên' : 'Học Viên'}
                           </span>
                         </td>
+                        <td className="p-4">
+                          {user.is_pro ? (
+                            <div className="inline-flex flex-col">
+                              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold bg-amber-50 text-amber-900 border border-amber-300 shadow-xs">
+                                <Sparkles size={11} className="text-amber-600" />
+                                <span>{user.pro_package || 'EduFlow PRO'}</span>
+                              </span>
+                              {user.pro_expiry && (
+                                <span className="text-[10px] text-stone-500 font-mono mt-0.5 ml-1 flex items-center gap-1">
+                                  <Calendar size={10} className="text-stone-400" />
+                                  Hạn: {user.pro_expiry}
+                                </span>
+                              )}
+                            </div>
+                          ) : (
+                            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-medium bg-stone-100 text-stone-600 border border-stone-200">
+                              Miễn phí (Free)
+                            </span>
+                          )}
+                        </td>
                         <td className="p-4 font-mono font-semibold text-stone-700">
                           {user.exams_taken ?? 0} bài thi
                         </td>
@@ -810,19 +999,45 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate, onNo
                         </td>
                         <td className="p-4 text-right">
                           <div className="flex items-center justify-end gap-2">
+                            {/* Cấp / Hủy Quyền Pro */}
+                            {user.is_pro ? (
+                              <button
+                                onClick={() => handleRevokePro(user)}
+                                className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl text-xs font-semibold bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 transition-colors cursor-pointer"
+                                title="Hủy tư cách PRO của người dùng này"
+                              >
+                                <X size={12} />
+                                <span>Hủy PRO</span>
+                              </button>
+                            ) : (
+                              <button
+                                onClick={() => {
+                                  setProModalUser(user);
+                                  setSelectedPackage('6months');
+                                }}
+                                className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl text-xs font-bold bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-300 transition-colors cursor-pointer shadow-xs"
+                                title="Cấp quyền EduFlow Pro cho học viên"
+                              >
+                                <Sparkles size={12} className="text-amber-600" />
+                                <span>Cấp PRO</span>
+                              </button>
+                            )}
+
+                            {/* Thăng cấp / Hạ cấp Role */}
                             <button
                               onClick={() => handleToggleRole(user)}
-                              className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-colors cursor-pointer ${
+                              className={`inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl text-xs font-bold transition-colors cursor-pointer ${
                                 user.role === 'admin'
                                   ? 'bg-stone-100 hover:bg-stone-200 text-stone-700'
                                   : 'bg-emerald-50 hover:bg-emerald-100 text-[#064E3B] border border-emerald-200'
                               }`}
                               title={user.role === 'admin' ? 'Hạ cấp về Học Viên' : 'Nâng cấp lên Quản Trị Viên'}
                             >
-                              <Shield size={13} />
-                              {user.role === 'admin' ? 'Hạ cấp Học Viên' : 'Thăng cấp Admin'}
+                              <Shield size={12} />
+                              <span>{user.role === 'admin' ? 'Hạ cấp' : 'Thăng cấp'}</span>
                             </button>
 
+                            {/* Xóa User */}
                             <button
                               onClick={() => handleDeleteUser(user.id, user.full_name)}
                               className="p-1.5 rounded-xl text-stone-400 hover:text-rose-600 hover:bg-rose-50 transition-colors cursor-pointer"
@@ -1132,6 +1347,95 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate, onNo
                   {isSavingTest ? 'Đang lưu...' : 'Lưu Thay Đổi & Đính Chính'}
                 </button>
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ================= MODAL CẤP QUYỀN PRO CHO HỌC VIÊN ================= */}
+      {proModalUser && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-stone-900/60 backdrop-blur-xs animate-in fade-in">
+          <div className="bg-white w-full max-w-md rounded-3xl p-6 shadow-2xl border border-stone-200 space-y-5 animate-in zoom-in-95">
+            <div className="flex items-start justify-between">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-2xl bg-amber-100 border border-amber-300 flex items-center justify-center text-amber-700">
+                  <Crown size={20} />
+                </div>
+                <div>
+                  <h3 className="font-serif font-bold text-stone-900 text-lg">Cấp Quyền EduFlow PRO</h3>
+                  <p className="text-xs text-stone-500">
+                    Dành cho học viên <strong className="text-stone-800">{proModalUser.full_name}</strong>
+                  </p>
+                </div>
+              </div>
+              <button
+                onClick={() => setProModalUser(null)}
+                className="p-1.5 rounded-full text-stone-400 hover:text-stone-700 hover:bg-stone-100 transition-colors cursor-pointer"
+              >
+                <X size={18} />
+              </button>
+            </div>
+
+            <div className="p-3 bg-stone-50 rounded-2xl border border-stone-200 text-xs space-y-1">
+              <div className="text-stone-500">Email học viên:</div>
+              <div className="font-mono font-bold text-stone-800">{proModalUser.email}</div>
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-xs font-bold text-stone-700 block">Chọn thời hạn gói PRO:</label>
+              <div className="space-y-2">
+                {PRO_PACKAGES.map((pkg) => {
+                  const isSelected = selectedPackage === pkg.id;
+                  return (
+                    <div
+                      key={pkg.id}
+                      onClick={() => setSelectedPackage(pkg.id as any)}
+                      className={`p-3 rounded-2xl border-2 cursor-pointer transition-all flex items-center justify-between ${
+                        isSelected
+                          ? 'border-amber-500 bg-amber-50/60 shadow-xs'
+                          : 'border-stone-200 hover:border-stone-300 bg-white'
+                      }`}
+                    >
+                      <div>
+                        <div className="text-xs font-bold text-stone-900 flex items-center gap-1.5">
+                          {pkg.name}
+                          {pkg.id === '6months' && (
+                            <span className="text-[10px] bg-amber-500 text-white px-2 py-0.5 rounded-full font-sans font-medium">
+                              Khuyên dùng
+                            </span>
+                          )}
+                        </div>
+                        <div className="text-[11px] text-stone-500 mt-0.5">{pkg.desc}</div>
+                      </div>
+                      <div
+                        className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
+                          isSelected ? 'border-amber-600 bg-amber-600 text-white' : 'border-stone-300'
+                        }`}
+                      >
+                        {isSelected && <Check size={12} strokeWidth={3} />}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            <div className="flex items-center gap-2 pt-2">
+              <button
+                onClick={() => setProModalUser(null)}
+                disabled={isUpdatingPro}
+                className="flex-1 py-2.5 rounded-xl border border-stone-300 text-stone-700 text-xs font-semibold hover:bg-stone-50 transition-colors cursor-pointer"
+              >
+                Hủy bỏ
+              </button>
+              <button
+                onClick={handleConfirmGrantPro}
+                disabled={isUpdatingPro}
+                className="flex-1 py-2.5 rounded-xl bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold transition-all shadow-md shadow-amber-600/20 cursor-pointer flex items-center justify-center gap-1.5"
+              >
+                <Sparkles size={14} />
+                <span>{isUpdatingPro ? 'Đang kích hoạt...' : 'Xác Nhận Cấp PRO'}</span>
+              </button>
             </div>
           </div>
         </div>

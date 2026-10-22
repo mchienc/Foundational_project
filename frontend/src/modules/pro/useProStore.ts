@@ -1,9 +1,11 @@
 // frontend/src/modules/pro/useProStore.ts
-// Quản lý trạng thái gói Pro và hạn mức miễn phí (Freemium Quota & VietQR Payment)
+// Quản lý trạng thái gói Pro và hạn mức miễn phí (Freemium Quota & User Isolation)
 
 import { create } from 'zustand';
+import { User } from '../../types';
 
 interface ProState {
+  currentUserEmail: string | null;
   isPro: boolean;
   writingQuotaLeft: number;
   speakingQuotaLeft: number;
@@ -17,6 +19,7 @@ interface ProState {
   lastOrderId: string;
 
   // Actions
+  syncWithUser: (user: User | null) => void;
   checkAndResetDailyQuota: () => void;
   consumeWritingQuota: () => boolean;
   consumeSpeakingQuota: () => boolean;
@@ -32,72 +35,125 @@ interface ProState {
   resetToFree: () => void;
 }
 
-const STORAGE_KEY = 'eduflow_pro_quota';
-
 const getTodayString = (): string => {
   const now = new Date();
   return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
 };
 
-const loadInitialState = () => {
+const getStorageKey = (email?: string | null): string => {
+  if (email && email.trim()) {
+    return `eduflow_pro_user_${email.trim().toLowerCase()}`;
+  }
+  return 'eduflow_pro_user_guest';
+};
+
+// Đọc dữ liệu riêng biệt của từng tài khoản
+const loadUserState = (email?: string | null, userObj?: User | null) => {
   const today = getTodayString();
+  const key = getStorageKey(email);
+
   try {
-    const raw = localStorage.getItem(STORAGE_KEY);
+    const raw = localStorage.getItem(key);
     if (raw) {
       const parsed = JSON.parse(raw);
       const isDailyNew = parsed.lastResetDate !== today;
+
+      // Ưu tiên trạng thái được Admin cấp trực tiếp nếu có
+      const effectiveIsPro = userObj?.isPro !== undefined ? Boolean(userObj.isPro) : Boolean(parsed.isPro);
+
       return {
-        isPro: Boolean(parsed.isPro),
+        currentUserEmail: email ? email.trim().toLowerCase() : null,
+        isPro: effectiveIsPro,
         writingQuotaLeft: isDailyNew ? 1 : (typeof parsed.writingQuotaLeft === 'number' ? parsed.writingQuotaLeft : 1),
         speakingQuotaLeft: isDailyNew ? 1 : (typeof parsed.speakingQuotaLeft === 'number' ? parsed.speakingQuotaLeft : 1),
         lastResetDate: today,
         isUpgradeModalOpen: false,
-        planName: parsed.planName || 'EduFlow Pro',
-        packageId: parsed.packageId || 'month',
-        packageExpiry: parsed.packageExpiry || 'Vĩnh viễn',
+        planName: userObj?.proPackage || parsed.planName || (effectiveIsPro ? 'EduFlow Pro' : 'Tài khoản miễn phí'),
+        packageId: userObj?.proPackage || parsed.packageId || 'month',
+        packageExpiry: userObj?.proExpiry || parsed.packageExpiry || (effectiveIsPro ? 'Vĩnh viễn' : 'Hết hạn'),
         lastOrderId: parsed.lastOrderId || '',
       };
     }
   } catch (e) {
-    console.warn('Lỗi đọc quota từ localStorage:', e);
+    console.warn('Lỗi đọc quota người dùng từ localStorage:', e);
   }
 
+  // Nếu chưa có lịch sử, khởi tạo mặc định cho người dùng này
+  const effectiveIsPro = Boolean(userObj?.isPro);
   return {
-    isPro: false,
+    currentUserEmail: email ? email.trim().toLowerCase() : null,
+    isPro: effectiveIsPro,
     writingQuotaLeft: 1,
     speakingQuotaLeft: 1,
     lastResetDate: today,
     isUpgradeModalOpen: false,
-    planName: 'EduFlow Pro',
-    packageId: 'month',
-    packageExpiry: 'Chưa kích hoạt',
+    planName: userObj?.proPackage || (effectiveIsPro ? 'EduFlow Pro' : 'Tài khoản miễn phí'),
+    packageId: userObj?.proPackage || 'month',
+    packageExpiry: userObj?.proExpiry || (effectiveIsPro ? 'Vĩnh viễn' : 'Hết hạn'),
     lastOrderId: '',
   };
 };
 
+// Khởi tạo ban đầu từ tài khoản đang đăng nhập hiện tại
+const getInitialUser = (): User | null => {
+  try {
+    const saved = localStorage.getItem('eduflow_current_user');
+    return saved ? JSON.parse(saved) : null;
+  } catch (e) {
+    return null;
+  }
+};
+
 export const useProStore = create<ProState>((set, get) => {
-  const initial = loadInitialState();
+  const initialUser = getInitialUser();
+  const initial = loadUserState(initialUser?.email, initialUser);
 
   const syncToStorage = (state: Partial<ProState>) => {
     try {
+      const email = state.currentUserEmail !== undefined ? state.currentUserEmail : get().currentUserEmail;
+      const key = getStorageKey(email);
+
       const current = {
-        isPro: state.isPro ?? get().isPro,
-        writingQuotaLeft: state.writingQuotaLeft ?? get().writingQuotaLeft,
-        speakingQuotaLeft: state.speakingQuotaLeft ?? get().speakingQuotaLeft,
-        lastResetDate: state.lastResetDate ?? get().lastResetDate,
-        planName: state.planName ?? get().planName,
-        packageId: state.packageId ?? get().packageId,
-        packageExpiry: state.packageExpiry ?? get().packageExpiry,
-        lastOrderId: state.lastOrderId ?? get().lastOrderId,
+        isPro: state.isPro !== undefined ? state.isPro : get().isPro,
+        writingQuotaLeft: state.writingQuotaLeft !== undefined ? state.writingQuotaLeft : get().writingQuotaLeft,
+        speakingQuotaLeft: state.speakingQuotaLeft !== undefined ? state.speakingQuotaLeft : get().speakingQuotaLeft,
+        lastResetDate: state.lastResetDate !== undefined ? state.lastResetDate : get().lastResetDate,
+        planName: state.planName !== undefined ? state.planName : get().planName,
+        packageId: state.packageId !== undefined ? state.packageId : get().packageId,
+        packageExpiry: state.packageExpiry !== undefined ? state.packageExpiry : get().packageExpiry,
+        lastOrderId: state.lastOrderId !== undefined ? state.lastOrderId : get().lastOrderId,
       };
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(current));
+
+      localStorage.setItem(key, JSON.stringify(current));
+
+      // Đồng bộ vào eduflow_current_user nếu đang đăng nhập
+      const userJson = localStorage.getItem('eduflow_current_user');
+      if (userJson) {
+        try {
+          const parsedUser = JSON.parse(userJson);
+          if (parsedUser && (!email || parsedUser.email?.toLowerCase() === email.toLowerCase())) {
+            parsedUser.isPro = current.isPro;
+            parsedUser.proPackage = current.packageId;
+            parsedUser.proExpiry = current.packageExpiry;
+            localStorage.setItem('eduflow_current_user', JSON.stringify(parsedUser));
+          }
+        } catch (err) {}
+      }
     } catch (e) {
-      console.warn('Lỗi ghi quota vào localStorage:', e);
+      console.warn('Lỗi ghi quota người dùng vào localStorage:', e);
     }
   };
 
   return {
     ...initial,
+
+    // Đồng bộ trạng thái khi đăng nhập / chuyển đổi tài khoản
+    syncWithUser: (user: User | null) => {
+      const email = user?.email || null;
+      const nextState = loadUserState(email, user);
+      set(nextState);
+      syncToStorage(nextState);
+    },
 
     checkAndResetDailyQuota: () => {
       const today = getTodayString();
@@ -164,10 +220,10 @@ export const useProStore = create<ProState>((set, get) => {
         isPro: true,
         writingQuotaLeft: 999,
         speakingQuotaLeft: 999,
-        planName: 'EduFlow Pro Demo VIP',
-        packageId: 'demo',
-        packageExpiry: 'Trải nghiệm không giới hạn',
-        lastOrderId: 'DEMO-1CLICK',
+        planName: 'EduFlow Pro VIP',
+        packageId: 'lifetime',
+        packageExpiry: 'Vĩnh viễn không giới hạn',
+        lastOrderId: 'DEMO-VIP',
         isUpgradeModalOpen: false,
       };
       set(next);
