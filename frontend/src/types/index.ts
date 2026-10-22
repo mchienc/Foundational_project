@@ -82,6 +82,8 @@ export type Screen =
   | 'listening-review'
   | 'dictation'
   | 'anki'
+  | 'writing'
+  | 'speaking'
   | 'profile'
   | 'admin';
 

@@ -16,6 +16,9 @@ import {
   Menu,
   X,
   Youtube,
+  PenTool,
+  Mic,
+  Sparkles,
 } from 'lucide-react';
 import { Screen, UserStats, User } from '../../types';
 import { Button } from './Button';
@@ -41,7 +44,7 @@ export const Navbar: React.FC<NavbarProps> = ({
   const [showMobileNav, setShowMobileNav] = useState<boolean>(false);
 
   // Core Routes for Cambridge IELTS & Flashcard Platform
-  const navLinks: { id: Screen; label: string; icon: React.ReactNode; adminOnly?: boolean }[] = [
+  const navLinks: { id: Screen; label: string; icon: React.ReactNode; badge?: string; adminOnly?: boolean }[] = [
     {
       id: 'reading',
       label: 'Luyện Reading',
@@ -51,6 +54,18 @@ export const Navbar: React.FC<NavbarProps> = ({
       id: 'listening',
       label: 'Luyện Listening',
       icon: <Headphones size={15} />,
+    },
+    {
+      id: 'writing',
+      label: 'Luyện Viết',
+      icon: <PenTool size={15} />,
+      badge: 'PRO',
+    },
+    {
+      id: 'speaking',
+      label: 'Luyện Nói',
+      icon: <Mic size={15} />,
+      badge: 'PRO',
     },
     {
       id: 'dictation',
@@ -133,7 +148,13 @@ export const Navbar: React.FC<NavbarProps> = ({
                 )}
                 <span className="relative z-10 flex items-center gap-1.5">
                   {link.icon}
-                  {link.label}
+                  <span>{link.label}</span>
+                  {link.badge && (
+                    <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-full text-[9px] font-bold bg-amber-400 text-stone-900 border border-amber-300 shadow-2xs leading-none">
+                      <Sparkles size={8} />
+                      {link.badge}
+                    </span>
+                  )}
                 </span>
               </button>
             );
@@ -325,8 +346,16 @@ export const Navbar: React.FC<NavbarProps> = ({
                     : 'text-stone-300 hover:bg-forest-900/60 hover:text-white'
                 }`}
               >
-                {link.icon}
-                {link.label}
+                <span className="flex items-center gap-2 flex-1">
+                  {link.icon}
+                  <span>{link.label}</span>
+                </span>
+                {link.badge && (
+                  <span className="inline-flex items-center gap-0.5 px-2 py-0.5 rounded-full text-[9px] font-bold bg-amber-400 text-stone-900 shrink-0">
+                    <Sparkles size={8} />
+                    {link.badge}
+                  </span>
+                )}
               </button>
             ))}
             {currentUser ? (

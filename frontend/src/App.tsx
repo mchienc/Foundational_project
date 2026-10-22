@@ -27,6 +27,9 @@ import { AnkiProvider } from './context/AnkiContext';
 import { SmoothScrollProvider } from './context/SmoothScrollProvider';
 import { SoftAtmosphereBackground } from './components/common/SoftAtmosphereBackground';
 import { AiTutorFloatingChatbot } from './components/chat/AiTutorFloatingChatbot';
+import { WritingWorkspace } from './modules/writing/WritingWorkspace';
+import { SpeakingRandomStudio } from './modules/speaking/SpeakingRandomStudio';
+import { UpgradeModal } from './components/common/UpgradeModal';
 
 // Error Boundary to prevent white screen crashes
 interface ErrorBoundaryProps {
@@ -536,6 +539,12 @@ const AppContent: React.FC = () => {
           />
         );
 
+      case 'writing':
+        return <WritingWorkspace onNotify={addToast} />;
+
+      case 'speaking':
+        return <SpeakingRandomStudio onNotify={addToast} />;
+
       case 'profile':
         if (!user) return null;
         return (
@@ -637,6 +646,9 @@ const AppContent: React.FC = () => {
 
       {/* Global Toast Notifications Container */}
       <ToastContainer toasts={toasts} onDismiss={removeToast} />
+
+      {/* Global EduFlow Pro Upgrade Modal */}
+      <UpgradeModal onSuccess={() => addToast('Đã kích hoạt trải nghiệm EduFlow Pro thành công!', 'success')} />
 
       {/* Trợ Lý Học Tập AI (Floating Widget) */}
       <AiTutorFloatingChatbot currentScreen={currentScreen} onNotify={addToast} />

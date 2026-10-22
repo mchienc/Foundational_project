@@ -23,6 +23,8 @@ export const AcademicNavbar: React.FC<AcademicNavbarProps> = ({
   const navLinks: { label: string; href?: string; screen?: Screen; badge?: string }[] = [
     { label: 'Luyện Reading', screen: 'reading' },
     { label: 'Luyện Listening', screen: 'listening-exam' },
+    { label: 'Luyện Viết', screen: 'writing', badge: 'PRO' },
+    { label: 'Luyện Nói', screen: 'speaking', badge: 'PRO' },
     { label: 'Chép chính tả', screen: 'dictation', badge: 'MỚI' },
     { label: 'Flashcard', screen: 'anki' },
   ];
