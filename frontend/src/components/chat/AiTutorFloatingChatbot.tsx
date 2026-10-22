@@ -1,7 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-  MessageSquare,
   X,
   RotateCcw,
   Send,
@@ -12,15 +11,10 @@ import {
   Check,
   Volume2,
   BookOpen,
-  Wand2,
-  MessageCircle,
-  BookmarkPlus,
 } from 'lucide-react';
 import { Screen } from '../../types';
 import { useAnki } from '../../context/AnkiContext';
 import { useVocabularyVault } from '../../context/VocabularyVaultContext';
-
-export type ChatMode = 'tips' | 'upgrade' | 'speaking' | 'anki';
 
 export interface ChatVocabItem {
   word: string;
@@ -43,101 +37,87 @@ interface AiTutorFloatingChatbotProps {
   onNotify?: (message: string, type?: 'success' | 'error' | 'info') => void;
 }
 
-const MODE_TABS: Array<{
-  id: ChatMode;
-  label: string;
-  shortDesc: string;
-  placeholder: string;
-  icon: React.ReactNode;
-}> = [
-  {
-    id: 'tips',
-    label: 'Hỏi đáp mẹo thi',
-    shortDesc: 'Giải đáp nhanh mẹo làm bài Reading, Listening, ngữ pháp và cách chia thời gian.',
-    placeholder: 'Nhập câu hỏi về mẹo thi, ngữ pháp...',
-    icon: <BookOpen size={13} />,
-  },
-  {
-    id: 'upgrade',
-    label: 'Nâng cấp câu',
-    shortDesc: 'Nhập 1 câu tiếng Anh đơn giản, AI sẽ viết lại ở 3 mức: 6.5, 7.5 và 8.5+.',
-    placeholder: 'Nhập câu muốn nâng cấp (VD: Technology is important)...',
-    icon: <Wand2 size={13} />,
-  },
-  {
-    id: 'speaking',
-    label: 'Luyện nói Speaking',
-    shortDesc: 'Đóng vai Giám khảo hỏi Speaking Part 1 & 3. Bấm nút Mic để nói hoặc gõ câu trả lời.',
-    placeholder: 'Trả lời tiếng Anh hoặc bấm Mic để nói...',
-    icon: <MessageCircle size={13} />,
-  },
-  {
-    id: 'anki',
-    label: 'Lưu từ vào Anki',
-    shortDesc: 'Tra nghĩa từ vựng hoặc xin cụm từ theo chủ đề và lưu 1-click vào Flashcard Anki.',
-    placeholder: 'Nhập từ vựng hoặc chủ đề muốn học...',
-    icon: <BookmarkPlus size={13} />,
-  },
-];
-
-const QUICK_CHIPS: Array<{ text: string; targetMode?: ChatMode }> = [
-  { text: 'Mẹo phân biệt False và Not Given', targetMode: 'tips' },
-  { text: 'Nâng cấp câu: "Money is important"', targetMode: 'upgrade' },
-  { text: 'Cho 5 cụm từ hay chủ đề Môi trường', targetMode: 'anki' },
-  { text: 'Hỏi tôi 1 câu Speaking Part 1', targetMode: 'speaking' },
+const STARTER_PROMPTS = [
+  '💡 Phân biệt FALSE và NOT GIVEN trong Reading',
+  '✨ Nâng cấp câu: "Education is very important"',
+  '📚 Cho 4 collocations hay về chủ đề Environment',
+  '🎤 Gợi ý câu trả lời Speaking Part 1 chủ đề Hometown',
 ];
 
 export const AiTutorFloatingChatbot: React.FC<AiTutorFloatingChatbotProps> = ({
-  currentScreen,
+  currentScreen: _currentScreen,
   onNotify,
 }) => {
   const [isOpen, setIsOpen] = useState<boolean>(false);
-  const [activeMode, setActiveMode] = useState<ChatMode>('tips');
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [inputText, setInputText] = useState<string>('');
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isRecording, setIsRecording] = useState<boolean>(false);
   const [savedWordsMap, setSavedWordsMap] = useState<Record<string, boolean>>({});
 
-  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const messagesEndRef = useRef<HTMLDivElement | null>(null);
+  const inputRef = useRef<HTMLInputElement | null>(null);
   const recognitionRef = useRef<any>(null);
-  const inputRef = useRef<HTMLInputElement>(null);
 
-  const { addCardToPersonalDeck, isWordSavedInAnki } = useAnki();
-  const { saveAiGeneratedWord, isWordSaved } = useVocabularyVault();
+  // Context lưu thẻ vào Anki
+  const { addCardToPersonalDeck } = useAnki();
+  const { saveAiGeneratedWord } = useVocabularyVault();
 
-  // Kiểm tra người dùng có đang trong phòng thi bấm giờ hay không
-  const isInTimedExam =
-    currentScreen === 'computer-exam' ||
-    currentScreen === 'listening-exam' ||
-    (typeof window !== 'undefined' && window.location.pathname.startsWith('/exam'));
+  // Tự động cuộn xuống cuối khi có tin nhắn mới
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  };
 
-  // Tự động cuộn xuống tin nhắn mới nhất
   useEffect(() => {
     if (isOpen) {
-      messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+      scrollToBottom();
+      setTimeout(() => inputRef.current?.focus(), 250);
     }
-  }, [messages, isOpen, isLoading]);
+  }, [isOpen, messages]);
 
-  // Dừng ghi âm nếu đóng khung chat
+  // Khởi tạo Web Speech API cho Voice Input (Nhận diện giọng nói)
   useEffect(() => {
-    if (!isOpen && isRecording && recognitionRef.current) {
-      try {
-        recognitionRef.current.stop();
-      } catch {}
-      setIsRecording(false);
-    }
-  }, [isOpen, isRecording]);
+    const SpeechRecognition =
+      (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
 
-  // Gửi tin nhắn tới Backend /api/chat
-  const sendMessage = async (textToSend?: string, overrideMode?: ChatMode) => {
+    if (SpeechRecognition) {
+      const recognition = new SpeechRecognition();
+      recognition.continuous = false;
+      recognition.interimResults = false;
+      recognition.lang = 'en-US';
+
+      recognition.onresult = (event: any) => {
+        const transcript = event.results[0][0].transcript;
+        if (transcript) {
+          setInputText((prev) => (prev ? `${prev} ${transcript}` : transcript));
+        }
+        setIsRecording(false);
+      };
+
+      recognition.onerror = () => {
+        setIsRecording(false);
+      };
+
+      recognition.onend = () => {
+        setIsRecording(false);
+      };
+
+      recognitionRef.current = recognition;
+    }
+
+    return () => {
+      if (recognitionRef.current) {
+        try {
+          recognitionRef.current.abort();
+        } catch {}
+      }
+    };
+  }, []);
+
+  // Gửi câu hỏi tới Backend /api/chat ("Hỏi gì đáp đó")
+  const sendMessage = async (textToSend?: string) => {
     const cleanText = (textToSend !== undefined ? textToSend : inputText).trim();
     if (!cleanText || isLoading) return;
-
-    const modeToUse = overrideMode || activeMode;
-    if (overrideMode && overrideMode !== activeMode) {
-      setActiveMode(overrideMode);
-    }
 
     const userMessage: ChatMessage = {
       id: `user-${Date.now()}`,
@@ -158,7 +138,6 @@ export const AiTutorFloatingChatbot: React.FC<AiTutorFloatingChatbotProps> = ({
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          mode: modeToUse,
           messages: updatedHistory.map((m) => ({
             role: m.role,
             content: m.content,
@@ -188,7 +167,7 @@ export const AiTutorFloatingChatbot: React.FC<AiTutorFloatingChatbotProps> = ({
         };
         setMessages((prev) => [...prev, errorMsg]);
       }
-    } catch (error) {
+    } catch {
       const netErr: ChatMessage = {
         id: `err-${Date.now()}`,
         role: 'model',
@@ -213,7 +192,7 @@ export const AiTutorFloatingChatbot: React.FC<AiTutorFloatingChatbotProps> = ({
     }
   };
 
-  // Bật / Tắt thu âm giọng nói bằng Web Speech API
+  // Bật / Tắt thu âm giọng nói
   const handleToggleMic = () => {
     if (isRecording) {
       if (recognitionRef.current) {
@@ -222,237 +201,201 @@ export const AiTutorFloatingChatbot: React.FC<AiTutorFloatingChatbotProps> = ({
         } catch {}
       }
       setIsRecording(false);
-      return;
+    } else {
+      if (recognitionRef.current) {
+        try {
+          recognitionRef.current.start();
+          setIsRecording(true);
+        } catch {
+          setIsRecording(false);
+          onNotify?.('Không thể mở micro. Bạn vui lòng cấp quyền micro cho trình duyệt nhé.', 'error');
+        }
+      } else {
+        onNotify?.('Trình duyệt hiện tại chưa hỗ trợ nhận diện giọng nói Web Speech.', 'info');
+      }
     }
+  };
 
-    const SpeechRecognition =
-      (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+  // Phát âm từ vựng
+  const handlePronounce = (text: string) => {
+    if ('speechSynthesis' in window) {
+      window.speechSynthesis.cancel();
+      const utter = new SpeechSynthesisUtterance(text);
+      utter.lang = 'en-GB';
+      utter.rate = 0.95;
+      window.speechSynthesis.speak(utter);
+    }
+  };
 
-    if (!SpeechRecognition) {
-      onNotify?.(
-        'Trình duyệt của bạn chưa hỗ trợ thu âm giọng nói. Hãy dùng Google Chrome hoặc Edge nhé!',
-        'info'
-      );
+  // Lưu từ vựng 1-click vào Flashcard Anki
+  const handleSaveToAnki = (item: ChatVocabItem) => {
+    if (savedWordsMap[item.word]) {
+      onNotify?.(`Từ "${item.word}" đã có trong bộ thẻ Anki rồi bạn nhé!`, 'info');
       return;
     }
 
     try {
-      const recognition = new SpeechRecognition();
-      recognition.lang = 'en-US';
-      recognition.continuous = false;
-      recognition.interimResults = false;
+      addCardToPersonalDeck({
+        word: item.word,
+        ipa: item.ipa,
+        pos: item.pos,
+        definitionVi: item.meaningVi,
+        contextSentence: item.exampleSentence,
+        source: 'Trợ Lý AI EduFlow',
+      });
 
-      recognition.onstart = () => {
-        setIsRecording(true);
-      };
+      saveAiGeneratedWord({
+        word: item.word,
+        clozeText: item.exampleSentence,
+        backExtra: item.meaningVi,
+        tags: 'AI-Tutor',
+        contextSentence: item.exampleSentence,
+        sourceArticleTitle: 'Trợ Lý AI EduFlow',
+        ipa: item.ipa,
+        pos: item.pos,
+        contextMeaning: item.meaningVi,
+      });
 
-      recognition.onresult = (event: any) => {
-        const transcript = event.results?.[0]?.[0]?.transcript;
-        if (transcript) {
-          setInputText((prev) => (prev ? `${prev} ${transcript}` : transcript));
-          inputRef.current?.focus();
-        }
-      };
-
-      recognition.onerror = () => {
-        setIsRecording(false);
-      };
-
-      recognition.onend = () => {
-        setIsRecording(false);
-      };
-
-      recognitionRef.current = recognition;
-      recognition.start();
+      setSavedWordsMap((prev) => ({ ...prev, [item.word]: true }));
+      onNotify?.(`Đã lưu "${item.word}" vào Flashcard Anki thành công!`, 'success');
     } catch {
-      setIsRecording(false);
+      onNotify?.('Không thể lưu thẻ vào Anki. Vui lòng thử lại sau.', 'error');
     }
   };
 
-  // Phát âm từ vựng tiếng Anh
-  const speakEnglishText = (text: string) => {
-    if (typeof window === 'undefined' || !('speechSynthesis' in window)) return;
-    window.speechSynthesis.cancel();
-    const utterance = new SpeechSynthesisUtterance(text);
-    utterance.lang = 'en-GB';
-    utterance.rate = 0.92;
-    window.speechSynthesis.speak(utterance);
-  };
-
-  // Lưu 1-Click từ vựng vào bộ thẻ Flashcard Anki & Sổ tay
-  const handleSaveVocabToAnki = (item: ChatVocabItem) => {
-    const cleanWord = item.word.trim();
-    const key = cleanWord.toLowerCase();
-
-    // Lưu vào AnkiContext
-    addCardToPersonalDeck({
-      word: cleanWord,
-      ipa: item.ipa || '/.../',
-      pos: item.pos || 'vocab',
-      definitionEn: item.meaningVi,
-      definitionVi: item.meaningVi,
-      contextSentence: item.exampleSentence || `Example with ${cleanWord}.`,
-      source: 'Trợ Lý AI EduFlow',
-      backExtra: `${item.ipa || ''} • (${item.pos || 'vocab'}) — ${item.meaningVi}`,
-      tags: 'AI_Tutor EduFlow',
-    });
-
-    // Đồng bộ vào VocabularyVaultContext
-    saveAiGeneratedWord({
-      word: cleanWord,
-      clozeText: (item.exampleSentence || cleanWord).replace(
-        new RegExp(cleanWord.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i'),
-        `{{c1::${cleanWord}::${item.meaningVi}}}`
-      ),
-      backExtra: `${item.ipa || ''} • (${item.pos || 'vocab'}) — ${item.meaningVi}`,
-      tags: 'AI_Tutor EduFlow',
-      contextSentence: item.exampleSentence,
-      sourceArticleTitle: 'Trợ Lý AI EduFlow',
-      ipa: item.ipa,
-      pos: item.pos,
-      contextMeaning: item.meaningVi,
-    });
-
-    setSavedWordsMap((prev) => ({ ...prev, [key]: true }));
-    onNotify?.('Đã lưu vào bộ thẻ của bạn!', 'success');
-  };
-
-  // Hiển thị nội dung tin nhắn có định dạng in đậm (**text**) tự nhiên
-  const renderFormattedContent = (text: string) => {
+  // Định dạng hiển thị tin nhắn (hỗ trợ in đậm và gạch đầu dòng)
+  const renderMessageContent = (text: string) => {
     const lines = text.split('\n');
-    return lines.map((line, lineIdx) => {
-      const parts = line.split(/(\*\*.*?\*\*)/g);
-      return (
-        <p
-          key={lineIdx}
-          className={`${line.trim() === '' ? 'h-2' : 'leading-relaxed mb-1 last:mb-0'}`}
-        >
-          {parts.map((part, partIdx) => {
-            if (part.startsWith('**') && part.endsWith('**')) {
-              return (
-                <strong key={partIdx} className="font-bold text-[#064E3B]">
-                  {part.slice(2, -2)}
-                </strong>
-              );
-            }
-            return <span key={partIdx}>{part}</span>;
-          })}
-        </p>
-      );
-    });
-  };
+    return (
+      <div className="space-y-1 text-xs leading-relaxed font-sans">
+        {lines.map((line, idx) => {
+          if (!line.trim()) {
+            return <div key={idx} className="h-1.5" />;
+          }
 
-  const currentTabInfo = MODE_TABS.find((t) => t.id === activeMode) || MODE_TABS[0];
+          const parts = line.split(/(\*\*.*?\*\*)/g);
+
+          return (
+            <p key={idx} className={line.startsWith('•') || line.startsWith('-') ? 'pl-2' : ''}>
+              {parts.map((part, pIdx) => {
+                if (part.startsWith('**') && part.endsWith('**')) {
+                  return (
+                    <strong key={pIdx} className="font-bold text-[#064E3B]">
+                      {part.slice(2, -2)}
+                    </strong>
+                  );
+                }
+                return <span key={pIdx}>{part}</span>;
+              })}
+            </p>
+          );
+        })}
+      </div>
+    );
+  };
 
   return (
-    <div className="fixed bottom-6 right-6 z-50 font-sans">
-      <AnimatePresence mode="wait">
-        {isOpen ? (
-          /* CỬA SỔ KHUNG CHAT */
+    <>
+      {/* 1. NÚT BONG BÓNG CHAT NỔI (FLOATING BUTTON GÓC DƯỚI BÊN PHẢI) */}
+      <div className="fixed bottom-6 right-6 z-40 select-none">
+        <button
+          type="button"
+          onClick={() => setIsOpen(!isOpen)}
+          className="group relative flex items-center gap-2.5 px-4 py-3 rounded-full bg-[#064E3B] text-white shadow-xl hover:shadow-2xl hover:scale-105 active:scale-95 border-2 border-amber-400/50 transition-all duration-300 cursor-pointer"
+          title="Mở Trợ Lý Học Tập AI"
+        >
+          <div className="relative">
+            <Sparkles className="w-5 h-5 text-amber-300 transition-transform duration-500 group-hover:rotate-180" />
+            <span className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping" />
+            <span className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-emerald-400" />
+          </div>
+          <span className="text-xs font-bold font-sans text-stone-100 hidden sm:inline">
+            Hỏi Trợ Lý AI
+          </span>
+        </button>
+      </div>
+
+      {/* 2. CỬA SỔ HỘI THOẠI (CHAT WIDGET MODAL) */}
+      <AnimatePresence>
+        {isOpen && (
           <motion.div
-            key="chat-window"
             initial={{ opacity: 0, y: 20, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 20, scale: 0.95 }}
             transition={{ duration: 0.2 }}
-            data-lenis-prevent="true"
-            className="w-[380px] max-w-[calc(100vw-32px)] h-[560px] max-h-[calc(100vh-48px)] rounded-2xl border border-stone-200 bg-white shadow-2xl flex flex-col overflow-hidden"
+            className="fixed bottom-20 right-4 sm:right-6 z-50 w-[92vw] sm:w-[420px] h-[560px] max-h-[82vh] rounded-3xl bg-white border border-stone-200/90 shadow-2xl flex flex-col overflow-hidden text-stone-800"
           >
-            {/* 1. HEADER */}
-            <div className="bg-[#064E3B] text-white px-4 py-3 flex items-center justify-between shrink-0">
+            {/* Header */}
+            <div className="bg-[#064E3B] px-4 py-3.5 flex items-center justify-between text-white shrink-0 border-b border-emerald-900/60">
               <div className="flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded-full bg-white/10 border border-[#D97706]/50 flex items-center justify-center text-[#D97706]">
+                <div className="w-8 h-8 rounded-xl bg-[#022C22] text-amber-300 border border-amber-400/40 flex items-center justify-center shadow-xs">
                   <Sparkles size={16} />
                 </div>
                 <div>
-                  <h3 className="font-serif font-bold text-sm tracking-wide text-white leading-tight">
-                    Trợ Lý AI EduFlow
+                  <h3 className="text-sm font-bold font-serif tracking-tight text-white flex items-center gap-1.5">
+                    Trợ Lý Học Tập AI
                   </h3>
                   <div className="flex items-center gap-1.5 mt-0.5">
                     <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-                    <span className="text-[11px] text-emerald-100/90 font-medium">
-                      Đang hoạt động
+                    <span className="text-[10px] text-emerald-200/90 font-sans">
+                      Chuyên sâu Tiếng Anh &amp; IELTS
                     </span>
                   </div>
                 </div>
               </div>
 
               <div className="flex items-center gap-1">
-                <button
-                  type="button"
-                  onClick={handleResetChat}
-                  title="Làm mới đoạn chat"
-                  className="p-2 rounded-lg text-emerald-100 hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
-                >
-                  <RotateCcw size={15} />
-                </button>
+                {messages.length > 0 && (
+                  <button
+                    type="button"
+                    onClick={handleResetChat}
+                    className="p-1.5 rounded-lg text-emerald-200 hover:text-white hover:bg-emerald-900/60 transition-colors cursor-pointer"
+                    title="Làm mới cuộc trò chuyện"
+                  >
+                    <RotateCcw size={15} />
+                  </button>
+                )}
                 <button
                   type="button"
                   onClick={() => setIsOpen(false)}
-                  title="Đóng"
-                  className="p-2 rounded-lg text-emerald-100 hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
+                  className="p-1.5 rounded-lg text-emerald-200 hover:text-white hover:bg-emerald-900/60 transition-colors cursor-pointer"
+                  title="Đóng cửa sổ chat"
                 >
                   <X size={17} />
                 </button>
               </div>
             </div>
 
-            {/* 2. 4 TABS CHẾ ĐỘ CHUYÊN BIỆT */}
-            <div className="bg-[#FAFAF9] border-b border-stone-200 px-2.5 py-2 shrink-0">
-              <div className="grid grid-cols-2 gap-1.5">
-                {MODE_TABS.map((tab) => {
-                  const isActive = activeMode === tab.id;
-                  return (
-                    <button
-                      key={tab.id}
-                      type="button"
-                      onClick={() => setActiveMode(tab.id)}
-                      className={`px-2.5 py-1.5 rounded-xl text-[11px] font-bold flex items-center gap-1.5 transition-all cursor-pointer truncate ${
-                        isActive
-                          ? 'bg-[#064E3B] text-amber-300 shadow-xs'
-                          : 'bg-white text-stone-700 border border-stone-200/80 hover:bg-stone-100'
-                      }`}
-                    >
-                      <span className="shrink-0">{tab.icon}</span>
-                      <span className="truncate">{tab.label}</span>
-                    </button>
-                  );
-                })}
-              </div>
-              <p className="text-[11px] text-stone-500 mt-1.5 px-1 leading-snug">
-                {currentTabInfo.shortDesc}
-              </p>
-            </div>
-
-            {/* 3. KHU VỰC TIN NHẮN & GỢI Ý NHANH */}
-            <div className="flex-1 overflow-y-auto p-3.5 space-y-3 bg-[#FAFAF9]/60">
+            {/* Khu vực tin nhắn */}
+            <div className="flex-1 overflow-y-auto p-4 space-y-3 bg-[#FAFAF9]/70">
               {messages.length === 0 ? (
                 <div className="h-full flex flex-col justify-between py-2">
-                  <div className="bg-white border border-stone-200/90 rounded-2xl p-3.5 shadow-2xs">
-                    <p className="text-xs font-bold text-[#064E3B] mb-1">
-                      👋 Xin chào! Mình có thể giúp gì cho bạn hôm nay?
-                    </p>
-                    <p className="text-xs text-stone-600 leading-relaxed">
-                      Bạn có thể chọn chế độ ở trên, tự gõ câu hỏi hoặc bấm vào một trong các gợi ý nhanh bên dưới để bắt đầu ngay:
+                  <div className="bg-white border border-stone-200/90 rounded-2xl p-4 shadow-2xs space-y-2">
+                    <div className="flex items-center gap-2 text-xs font-bold text-[#064E3B]">
+                      <Sparkles size={15} className="text-amber-600" />
+                      <span>Gia sư AI luôn sẵn sàng hỗ trợ bạn</span>
+                    </div>
+                    <p className="text-xs text-stone-600 leading-relaxed font-sans">
+                      Bạn có thể hỏi bất kỳ câu hỏi nào về từ vựng, ngữ pháp, mẹo giải đề thi Cambridge IELTS hoặc gửi câu tiếng Anh để mình nâng cấp lên Band cao hơn nhé!
                     </p>
                   </div>
 
-                  {/* 4 QUICK CHIPS */}
-                  <div className="space-y-1.5 mt-3">
-                    <p className="text-[11px] font-bold text-stone-500 uppercase tracking-wider px-1">
-                      Gợi ý thử nhanh (1-Click):
+                  {/* Starter Prompts */}
+                  <div className="space-y-1.5 mt-4">
+                    <p className="text-[11px] font-bold text-stone-500 uppercase tracking-wider px-1 font-mono">
+                      Gợi ý câu hỏi thường gặp:
                     </p>
                     <div className="flex flex-col gap-1.5">
-                      {QUICK_CHIPS.map((chip, idx) => (
+                      {STARTER_PROMPTS.map((promptText, idx) => (
                         <button
                           key={idx}
                           type="button"
-                          onClick={() => sendMessage(chip.text, chip.targetMode)}
-                          className="text-left px-3 py-2 rounded-xl bg-white hover:bg-emerald-50/70 border border-stone-200 hover:border-[#064E3B]/40 text-xs font-medium text-stone-800 hover:text-[#064E3B] transition-all flex items-center justify-between group cursor-pointer shadow-2xs"
+                          onClick={() => sendMessage(promptText.replace(/^[^\s]+\s/, ''))}
+                          className="text-left px-3.5 py-2.5 rounded-xl bg-white hover:bg-emerald-50/70 border border-stone-200 hover:border-[#064E3B]/40 text-xs font-medium text-stone-800 hover:text-[#064E3B] transition-all flex items-center justify-between group cursor-pointer shadow-2xs"
                         >
-                          <span>{chip.text}</span>
-                          <span className="text-[10px] text-[#D97706] font-bold opacity-70 group-hover:opacity-100">
-                            Thử ngay →
+                          <span>{promptText}</span>
+                          <span className="text-[10px] text-[#D97706] font-bold opacity-70 group-hover:opacity-100 shrink-0 ml-2">
+                            Hỏi ngay →
                           </span>
                         </button>
                       ))}
@@ -478,105 +421,88 @@ export const AiTutorFloatingChatbot: React.FC<AiTutorFloatingChatbotProps> = ({
                         {msg.role === 'user' ? (
                           <p className="leading-relaxed whitespace-pre-wrap">{msg.content}</p>
                         ) : (
-                          <div className="space-y-1">{renderFormattedContent(msg.content)}</div>
-                        )}
-                      </div>
+                          <div className="space-y-2">
+                            {renderMessageContent(msg.content)}
 
-                      {/* DANH SÁCH TỪ VỰNG KÈM NÚT LƯU 1-CLICK VÀO ANKI */}
-                      {msg.role === 'model' &&
-                        msg.vocabItems &&
-                        msg.vocabItems.length > 0 && (
-                          <div className="mt-2 w-[92%] space-y-1.5">
-                            {msg.vocabItems.map((vocab, vIdx) => {
-                              const wordKey = vocab.word.toLowerCase().trim();
-                              const alreadySaved =
-                                savedWordsMap[wordKey] ||
-                                isWordSavedInAnki(vocab.word) ||
-                                isWordSaved(vocab.word);
-
-                              return (
-                                <div
-                                  key={vIdx}
-                                  className="p-2.5 rounded-xl bg-amber-50/70 border border-amber-200/90 text-xs space-y-1.5"
-                                >
-                                  <div className="flex items-center justify-between gap-2">
-                                    <div className="flex items-center gap-1.5 min-w-0">
-                                      <span className="font-bold text-[#064E3B] truncate">
-                                        {vocab.word}
-                                      </span>
-                                      {vocab.ipa && (
-                                        <span className="text-[11px] font-mono text-stone-500 shrink-0">
-                                          {vocab.ipa}
-                                        </span>
-                                      )}
-                                      <button
-                                        type="button"
-                                        onClick={() => speakEnglishText(vocab.word)}
-                                        title="Nghe phát âm"
-                                        className="p-1 rounded-md hover:bg-amber-200/60 text-stone-600 cursor-pointer shrink-0"
-                                      >
-                                        <Volume2 size={12} />
-                                      </button>
-                                    </div>
-                                    <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-white border border-amber-200 text-amber-900 shrink-0">
-                                      {vocab.pos}
-                                    </span>
-                                  </div>
-
-                                  <p className="text-[11px] text-stone-700 font-medium">
-                                    Nghĩa: {vocab.meaningVi}
-                                  </p>
-
-                                  <button
-                                    type="button"
-                                    disabled={alreadySaved}
-                                    onClick={() => handleSaveVocabToAnki(vocab)}
-                                    className={`w-full py-1.5 px-2.5 rounded-lg text-[11px] font-bold flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
-                                      alreadySaved
-                                        ? 'bg-emerald-100 text-emerald-800 border border-emerald-300 cursor-default'
-                                        : 'bg-[#064E3B] hover:bg-[#043327] text-amber-300 shadow-2xs'
-                                    }`}
-                                  >
-                                    {alreadySaved ? (
-                                      <>
-                                        <Check size={12} />
-                                        <span>Đã lưu vào bộ thẻ của bạn!</span>
-                                      </>
-                                    ) : (
-                                      <>
-                                        <Plus size={12} />
-                                        <span>+ Lưu vào Flashcard Anki</span>
-                                      </>
-                                    )}
-                                  </button>
+                            {/* Danh sách từ vựng gợi ý lưu vào Anki (nếu có) */}
+                            {msg.vocabItems && msg.vocabItems.length > 0 && (
+                              <div className="mt-3 pt-2.5 border-t border-stone-200 space-y-2">
+                                <div className="text-[11px] font-bold text-[#064E3B] flex items-center gap-1 font-sans">
+                                  <BookOpen size={13} className="text-amber-600" />
+                                  <span>Từ vựng hữu ích vừa nhắc tới:</span>
                                 </div>
-                              );
-                            })}
+                                <div className="space-y-1.5">
+                                  {msg.vocabItems.map((vocab, vIdx) => {
+                                    const isSaved = !!savedWordsMap[vocab.word];
+                                    return (
+                                      <div
+                                        key={vIdx}
+                                        className="p-2 rounded-xl bg-stone-50 border border-stone-200/80 flex items-center justify-between gap-2"
+                                      >
+                                        <div className="min-w-0">
+                                          <div className="flex items-center gap-1.5 flex-wrap">
+                                            <span className="font-bold text-stone-900 font-sans">
+                                              {vocab.word}
+                                            </span>
+                                            <span className="text-[10px] text-stone-500 font-mono">
+                                              {vocab.ipa}
+                                            </span>
+                                            <button
+                                              type="button"
+                                              onClick={() => handlePronounce(vocab.word)}
+                                              className="p-0.5 rounded text-amber-700 hover:text-amber-900 hover:bg-amber-100/60"
+                                              title="Nghe phát âm UK"
+                                            >
+                                              <Volume2 size={12} />
+                                            </button>
+                                          </div>
+                                          <div className="text-[11px] text-stone-600 truncate font-sans">
+                                            {vocab.meaningVi}
+                                          </div>
+                                        </div>
+
+                                        <button
+                                          type="button"
+                                          onClick={() => handleSaveToAnki(vocab)}
+                                          disabled={isSaved}
+                                          className={`shrink-0 px-2.5 py-1 rounded-lg text-[10px] font-bold flex items-center gap-1 transition-colors cursor-pointer ${
+                                            isSaved
+                                              ? 'bg-emerald-100 text-emerald-800 border border-emerald-300'
+                                              : 'bg-[#064E3B] hover:bg-[#032B20] text-amber-300 shadow-2xs'
+                                          }`}
+                                        >
+                                          {isSaved ? (
+                                            <>
+                                              <Check size={11} />
+                                              Đã lưu
+                                            </>
+                                          ) : (
+                                            <>
+                                              <Plus size={11} />
+                                              Lưu Anki
+                                            </>
+                                          )}
+                                        </button>
+                                      </div>
+                                    );
+                                  })}
+                                </div>
+                              </div>
+                            )}
                           </div>
                         )}
-
-                      <span className="text-[10px] text-stone-400 mt-1 px-1">
+                      </div>
+                      <span className="text-[9px] text-stone-400 mt-1 px-1 font-mono">
                         {msg.timestamp}
                       </span>
                     </div>
                   ))}
 
+                  {/* Trạng thái AI đang suy nghĩ */}
                   {isLoading && (
-                    <div className="flex items-start">
-                      <div className="bg-white border border-stone-200 rounded-2xl rounded-bl-xs px-3.5 py-2.5 text-xs text-stone-600 flex items-center gap-2 shadow-2xs">
-                        <span className="w-2 h-2 rounded-full bg-[#064E3B] animate-bounce" />
-                        <span
-                          className="w-2 h-2 rounded-full bg-[#D97706] animate-bounce"
-                          style={{ animationDelay: '0.15s' }}
-                        />
-                        <span
-                          className="w-2 h-2 rounded-full bg-[#064E3B] animate-bounce"
-                          style={{ animationDelay: '0.3s' }}
-                        />
-                        <span className="text-[11px] font-medium text-stone-500 ml-1">
-                          Trợ lý đang trả lời...
-                        </span>
-                      </div>
+                    <div className="flex items-center gap-2 text-xs text-stone-500 bg-white border border-stone-200/80 rounded-2xl px-3.5 py-2 w-fit shadow-2xs">
+                      <Sparkles size={13} className="text-amber-600 animate-spin" />
+                      <span className="font-sans">Trợ lý AI đang suy nghĩ câu trả lời...</span>
                     </div>
                   )}
 
@@ -585,98 +511,71 @@ export const AiTutorFloatingChatbot: React.FC<AiTutorFloatingChatbotProps> = ({
               )}
             </div>
 
-            {/* 4. THANH GỢI Ý NHỎ KHI ĐANG CHAT */}
-            {messages.length > 0 && (
-              <div className="px-3 py-1.5 bg-[#FAFAF9] border-t border-stone-200/70 flex items-center gap-1.5 overflow-x-auto no-scrollbar shrink-0">
-                {QUICK_CHIPS.map((chip, idx) => (
-                  <button
-                    key={idx}
-                    type="button"
-                    disabled={isLoading}
-                    onClick={() => sendMessage(chip.text, chip.targetMode)}
-                    className="px-2.5 py-1 rounded-full bg-white hover:bg-emerald-50 border border-stone-200 text-[11px] text-stone-700 hover:text-[#064E3B] whitespace-nowrap transition-colors cursor-pointer shrink-0"
-                  >
-                    {chip.text}
-                  </button>
-                ))}
-              </div>
-            )}
-
-            {/* 5. Ô NHẬP TIN NHẮN & NÚT MIC */}
+            {/* Khung nhập câu hỏi (Input Bar) */}
             <form
               onSubmit={(e) => {
                 e.preventDefault();
                 sendMessage();
               }}
-              className="p-2.5 bg-white border-t border-stone-200 flex items-center gap-1.5 shrink-0"
+              className="p-3 bg-white border-t border-stone-200 shrink-0 space-y-1.5"
             >
-              <button
-                type="button"
-                onClick={handleToggleMic}
-                title={isRecording ? 'Dừng nói' : 'Bấm để nói tiếng Anh (Speaking)'}
-                className={`p-2.5 rounded-xl border transition-all cursor-pointer shrink-0 ${
-                  isRecording
-                    ? 'bg-rose-600 text-white border-rose-600 animate-pulse'
-                    : 'bg-stone-100 hover:bg-stone-200 text-stone-700 border-stone-200'
-                }`}
-              >
-                {isRecording ? <MicOff size={15} /> : <Mic size={15} />}
-              </button>
+              <div className="flex items-center gap-2">
+                <div className="relative flex-1">
+                  <input
+                    ref={inputRef}
+                    type="text"
+                    value={inputText}
+                    onChange={(e) => setInputText(e.target.value)}
+                    placeholder="Hỏi về từ vựng, ngữ pháp, mẹo thi IELTS..."
+                    disabled={isLoading}
+                    className="w-full pl-3.5 pr-10 py-2.5 rounded-xl border border-stone-200 text-xs text-stone-800 placeholder-stone-400 focus:outline-none focus:ring-2 focus:ring-[#064E3B] bg-stone-50/60 font-sans"
+                  />
 
-              <input
-                ref={inputRef}
-                type="text"
-                value={inputText}
-                onChange={(e) => setInputText(e.target.value)}
-                placeholder={
-                  isRecording ? 'Đang nghe bạn nói tiếng Anh...' : currentTabInfo.placeholder
-                }
-                className="flex-1 px-3 py-2 rounded-xl border border-stone-200 bg-[#FAFAF9] text-xs text-stone-900 focus:outline-none focus:bg-white focus:ring-2 focus:ring-[#D97706] transition-all"
-              />
+                  {/* Nút thu âm giọng nói */}
+                  <button
+                    type="button"
+                    onClick={handleToggleMic}
+                    className={`absolute right-2 top-1/2 -translate-y-1/2 p-1.5 rounded-lg transition-colors cursor-pointer ${
+                      isRecording
+                        ? 'bg-rose-500 text-white animate-pulse'
+                        : 'text-stone-400 hover:text-[#064E3B] hover:bg-stone-100'
+                    }`}
+                    title={isRecording ? 'Đang nghe... Bấm để dừng' : 'Bấm để nói bằng giọng nói'}
+                  >
+                    {isRecording ? <MicOff size={14} /> : <Mic size={14} />}
+                  </button>
+                </div>
 
-              <button
-                type="submit"
-                disabled={!inputText.trim() || isLoading}
-                title="Gửi tin nhắn"
-                className="p-2.5 rounded-xl bg-[#064E3B] hover:bg-[#043327] text-amber-300 disabled:opacity-40 transition-all cursor-pointer shrink-0"
-              >
-                <Send size={15} />
-              </button>
+                {/* Nút gửi */}
+                <button
+                  type="submit"
+                  disabled={!inputText.trim() || isLoading}
+                  className={`p-2.5 rounded-xl transition-all cursor-pointer ${
+                    !inputText.trim() || isLoading
+                      ? 'bg-stone-100 text-stone-400 cursor-not-allowed'
+                      : 'bg-[#064E3B] hover:bg-[#032B20] text-amber-300 shadow-sm active:scale-95'
+                  }`}
+                  title="Gửi câu hỏi"
+                >
+                  <Send size={15} />
+                </button>
+              </div>
+
+              <div className="flex items-center justify-between px-1">
+                <span className="text-[10px] text-stone-400 font-sans">
+                  Chuyên môn: Tiếng Anh &amp; Luyện thi Cambridge IELTS
+                </span>
+                {isRecording && (
+                  <span className="text-[10px] text-rose-600 font-semibold flex items-center gap-1 font-mono">
+                    <span className="w-1.5 h-1.5 rounded-full bg-rose-500 animate-ping" />
+                    Đang nghe giọng nói của bạn...
+                  </span>
+                )}
+              </div>
             </form>
           </motion.div>
-        ) : isInTimedExam ? (
-          /* CHẾ ĐỘ THU NHỎ KHI ĐANG TRONG PHÒNG THI TÍNH GIỜ */
-          <motion.button
-            key="exam-minimized-dot"
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.8 }}
-            type="button"
-            onClick={() => setIsOpen(true)}
-            title="Mở Trợ lý AI EduFlow"
-            className="w-9 h-9 bg-[#064E3B]/40 hover:bg-[#064E3B] text-white rounded-full shadow-md flex items-center justify-center transition-all cursor-pointer ring-1 ring-[#D97706]/30"
-          >
-            <MessageSquare size={15} />
-          </motion.button>
-        ) : (
-          /* NÚT MỞ CHAT BONG BÓNG NỔI BÌNH THƯỜNG */
-          <motion.button
-            key="floating-button"
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.8 }}
-            type="button"
-            onClick={() => setIsOpen(true)}
-            title="Trợ Lý AI EduFlow"
-            className="w-14 h-14 bg-[#064E3B] text-white rounded-full shadow-xl ring-2 ring-[#D97706]/40 flex items-center justify-center hover:scale-105 transition-all cursor-pointer group relative"
-          >
-            <MessageSquare size={24} className="text-amber-300 group-hover:scale-110 transition-transform" />
-            <span className="absolute -top-1 -right-1 px-1.5 py-0.5 rounded-full bg-[#D97706] text-white text-[9px] font-extrabold tracking-tight shadow-xs">
-              AI
-            </span>
-          </motion.button>
         )}
       </AnimatePresence>
-    </div>
+    </>
   );
 };

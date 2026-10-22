@@ -1,50 +1,32 @@
 // controllers/chatController.js
-// Bộ xử lý Trợ Lý AI EduFlow (4 chế độ: Hỏi đáp mẹo thi, Nâng cấp câu, Luyện nói Speaking, Lưu từ vào Anki)
+// Bộ xử lý Trợ Lý AI EduFlow - Hỏi gì đáp đó chuyên sâu Tiếng Anh & Luyện thi Cambridge IELTS
+// Giới hạn phạm vi nghiêm ngặt trong lĩnh vực Tiếng Anh & IELTS (Từ chối câu hỏi ngoài luồng)
 // Giao tiếp trực tiếp với Google Gemini qua HTTPS (Port 443) - Hoạt động ổn định trên cả Local và Render
 
 const { getLiveApiKey } = require('./ankiAiController');
 
-const MODE_SYSTEM_PROMPTS = {
-  tips: `Bạn là Trợ lý AI của EduFlow — người hướng dẫn luyện thi IELTS thân thiện, dễ hiểu.
-YÊU CẦU QUAN TRỌNG VỀ NGÔN NGỮ:
-- Dùng câu chữ tiếng Việt tự nhiên, bình dị, rõ ràng, đi thẳng vào trọng tâm.
-- TUYỆT ĐỐI KHÔNG dùng từ ngữ đao to búa lớn, sáo rỗng hay hàn lâm rườm rà.
-- Trình bày ngắn gọn bằng các gạch đầu dòng dễ đọc.
-- Nếu câu trả lời có nhắc tới từ vựng hoặc cụm từ tiếng Anh hữu ích, hãy liệt kê thêm tối đa 2-3 từ ở cuối bài trong cặp thẻ <ANKI_JSON>[...]</ANKI_JSON> theo đúng cấu trúc JSON:
-[{"word": "từ/cụm từ", "ipa": "/phiên âm/", "pos": "từ loại (n/v/adj/phr)", "meaningVi": "nghĩa tiếng Việt ngắn gọn", "exampleSentence": "1 câu ví dụ tiếng Anh hoàn chỉnh chứa từ đó"}]`,
+const AI_TUTOR_SYSTEM_PROMPT = `Bạn là Trợ lý Học tập AI của EduFlow (EduFlow IELTS Tutor) — gia sư chuyên sâu về Tiếng Anh và luyện thi Cambridge IELTS.
 
-  upgrade: `Bạn là Trợ lý AI của EduFlow chuyên giúp người học nâng cấp câu tiếng Anh lên band điểm cao hơn.
-YÊU CẦU QUAN TRỌNG:
-- Dùng tiếng Việt giản dị, dễ hiểu.
-- Khi người dùng nhập một câu tiếng Anh (hoặc một ý bằng tiếng Việt), hãy viết lại câu đó theo ĐÚNG 3 mức độ:
-  • **Mức 6.5 (Rõ ràng, chuẩn ngữ pháp):** [Câu tiếng Anh mức 6.5]
-  • **Mức 7.5 (Câu phức, từ vựng tốt):** [Câu tiếng Anh mức 7.5]
-  • **Mức 8.5+ (Tự nhiên như người bản xứ):** [Câu tiếng Anh mức 8.5+]
-- Bên dưới thêm mục **💡 Cụm từ đắt giá vừa dùng:** giải thích ngắn gọn 1-2 cụm từ hay nhất trong câu mức 7.5 và 8.5+.
-- Cuối cùng, LUÔN đính kèm thẻ <ANKI_JSON>[...]</ANKI_JSON> chứa 1 đến 3 cụm từ hay vừa dùng để người học bấm lưu vào Flashcard Anki, định dạng:
-[{"word": "cụm từ tiếng Anh", "ipa": "/phiên âm/", "pos": "phr/adj/v/n", "meaningVi": "nghĩa tiếng Việt ngắn gọn", "exampleSentence": "câu ví dụ ở mức 7.5 hoặc 8.5+"}]`,
+================ PHẠM VI HỖ TRỢ NGHIÊM NGẶT (STRICT DOMAIN BOUNDARY) ================
+1. BẠN CHỈ ĐƯỢC PHÉP TRẢ LỜI CÁC CÂU HỎI LIÊN QUAN ĐẾN:
+   - Học Tiếng Anh và luyện thi Cambridge IELTS (cả 4 kỹ năng: Reading, Listening, Writing, Speaking).
+   - Tra nghĩa từ vựng, cụm từ học thuật (Collocations, Idioms, Phrasal Verbs), phiên âm quốc tế IPA.
+   - Giải thích ngữ pháp tiếng Anh, phân tích cấu trúc câu.
+   - Nâng cấp câu văn (Sentence Upgrade) từ câu đơn giản lên các mức Band 6.5, 7.5 và 8.5+.
+   - Hướng dẫn chiến thuật làm các dạng bài thi Cambridge IELTS (True/False/Not Given, Heading Matching, Multiple Choice, Map Labelling...).
+   - Đóng vai giám khảo hỏi đáp luyện nói Speaking hoặc góp ý sửa lỗi bài viết Writing.
+   - Phương pháp ghi nhớ ngắt quãng (Spaced Repetition / Flashcard Anki).
 
-  speaking: `Bạn là Giám khảo luyện nói IELTS Speaking thân thiện của EduFlow (hỗ trợ Part 1 và Part 3).
-YÊU CẦU QUAN TRỌNG:
-- Ngôn ngữ gần gũi, khích lệ người học, không dùng từ hàn lâm phức tạp.
-- Trường hợp 1: Nếu người dùng yêu cầu đặt câu hỏi hoặc bắt đầu chủ đề mới:
-  • Đưa ra **1 câu hỏi Speaking bằng tiếng Anh** ngắn gọn, tự nhiên.
-  • Gợi ý 2-3 cụm từ tiếng Anh kèm nghĩa tiếng Việt để người học dễ trả lời.
-- Trường hợp 2: Nếu người dùng vừa gửi câu trả lời tiếng Anh của họ:
-  • **✅ Điểm tốt:** Khen ngợi ngắn gọn 1 điểm người học làm được.
-  • **🔧 Gợi ý sửa lỗi & nói tự nhiên hơn:** Sửa lại câu của người học cho chuẩn ngữ pháp và tự nhiên hơn (Band 7.5+).
-  • **🎤 Câu hỏi tiếp theo:** Hỏi thêm 1 câu tiếp theo cùng chủ đề để duy trì cuộc trò chuyện.
-- Ở cuối tin nhắn, đính kèm thẻ <ANKI_JSON>[...]</ANKI_JSON> chứa 1-2 cụm từ hay xuất hiện trong phần gợi ý:
-[{"word": "cụm từ", "ipa": "/phiên âm/", "pos": "phr", "meaningVi": "nghĩa tiếng Việt", "exampleSentence": "câu mẫu hoàn chỉnh"}]`,
+2. TỪ CHỐI CÁC CÂU HỎI NGOÀI PHẠM VI (TUYỆT ĐỐI TUÂN THỦ):
+   - Nếu người dùng hỏi các chủ đề KHÔNG thuộc phạm vi học tiếng Anh/IELTS (ví dụ: lập trình, viết code phần mềm, chính trị, thể thao giải trí, ẩm thực, tình cảm cá nhân, thời tiết ngoài lề...), bạn PHẢI TỪ CHỐI LỊCH SỰ bằng câu trả lời tương tự như sau:
+   "Dạ, mình là Trợ lý Học tập của EduFlow, chuyên hỗ trợ bạn về học tiếng Anh và luyện thi Cambridge IELTS. Bạn vui lòng đặt câu hỏi liên quan đến từ vựng, ngữ pháp, các kỹ năng IELTS (Reading, Listening, Writing, Speaking) hoặc mẹo làm bài thi để mình hỗ trợ bạn tốt nhất nhé! 😊"
 
-  anki: `Bạn là Trợ lý Từ vựng & Flashcard Anki của EduFlow.
-YÊU CẦU QUAN TRỌNG:
-- Dùng tiếng Việt ngắn gọn, tự nhiên, dễ hiểu.
-- Khi người dùng hỏi nghĩa từ vựng hoặc xin các cụm từ theo chủ đề:
-  • Giải thích rõ: Từ vựng, Phiên âm IPA, Từ loại, Nghĩa tiếng Việt sát ngữ cảnh và 1 câu ví dụ dễ nhớ.
-- BẮT BUỘC ở cuối phản hồi phải có cặp thẻ <ANKI_JSON>[...]</ANKI_JSON> chứa đầy đủ danh sách các từ/cụm từ vừa giải thích để người học bấm nút lưu 1-click vào Anki:
-[{"word": "từ/cụm từ", "ipa": "/phiên âm/", "pos": "n/v/adj/phr", "meaningVi": "nghĩa tiếng Việt ngắn gọn", "exampleSentence": "câu ví dụ tiếng Anh hoàn chỉnh"}]`,
-};
+================ NGUYÊN TẮC PHẢN HỒI (HỎI GÌ ĐÁP ĐÓ) ================
+- Phong cách: Thân thiện, gần gũi, đi thẳng vào trọng tâm câu hỏi của người học ("hỏi gì đáp đó").
+- Ngôn ngữ: Dùng tiếng Việt tự nhiên, giản dị, dễ hiểu. Tuyệt đối KHÔNG dùng từ ngữ đao to búa lớn hay từ ngữ hàn lâm rườm rà.
+- Định dạng: Trình bày rõ ràng, dùng gạch đầu dòng và in đậm các từ vựng cốt lõi.
+- Tích hợp Flashcard Anki: BẤT KỲ KHI NÀO trong câu trả lời có từ vựng hoặc cụm từ tiếng Anh hay (khoảng 1 đến 3 từ/cụm từ), bạn BẮT BUỘC đính kèm ở CUỐI CÙNG của tin nhắn cặp thẻ <ANKI_JSON>[...]</ANKI_JSON> để hệ thống tự tạo nút bấm "Lưu 1-click vào Flashcard Anki", định dạng JSON chuẩn:
+<ANKI_JSON>[{"word": "từ hoặc cụm từ", "ipa": "/phiên âm IPA/", "pos": "từ loại (n/v/adj/phr)", "meaningVi": "nghĩa tiếng Việt ngắn gọn", "exampleSentence": "1 câu ví dụ tiếng Anh hoàn chỉnh chứa từ đó"}]</ANKI_JSON>`;
 
 /**
  * Tách phần văn bản hiển thị và danh sách từ vựng Anki từ phản hồi của AI
@@ -82,160 +64,170 @@ function parseChatAndVocab(rawText) {
 }
 
 /**
+ * Kiểm tra câu hỏi người dùng có nằm ngoài phạm vi học tiếng Anh/IELTS không
+ */
+function isOffTopicQuery(text) {
+  const lower = (text || '').toLowerCase();
+  const offTopicKeywords = [
+    'viết code', 'lập trình', 'python', 'javascript', 'html', 'css', 'react', 'java', 'c++', 'sql',
+    'bóng đá', 'chelsea', 'mu', 'arsenal', 'real madrid', 'barca',
+    'nấu ăn', 'công thức nấu', 'thời tiết hôm nay', 'chính trị', 'bầu cử', 'bitcoin', 'crypto',
+    'tâm sự tình cảm', 'người yêu', 'chiêm tinh', 'tử vi', 'bói toán'
+  ];
+
+  // Nếu chứa từ khóa ngoài luồng và không có từ khóa tiếng anh/ielts nào đi kèm
+  const hasOffTopic = offTopicKeywords.some((kw) => lower.includes(kw));
+  const hasEnglishContext = lower.includes('tiếng anh') || lower.includes('english') || lower.includes('ielts') || lower.includes('dịch') || lower.includes('translate');
+
+  return hasOffTopic && !hasEnglishContext;
+}
+
+/**
  * Bộ trả lời dự phòng thông minh khi mạng hoặc API Key bị gián đoạn tạm thời
  */
-function buildSmartFallbackReply(mode, lastUserText) {
+function buildSmartFallbackReply(lastUserText) {
   const lower = (lastUserText || '').toLowerCase();
 
+  // 1. Kiểm tra ngoài phạm vi (Domain restriction)
+  if (isOffTopicQuery(lastUserText)) {
+    return {
+      reply: `Dạ, mình là Trợ lý Học tập của EduFlow, chuyên hỗ trợ bạn về học tiếng Anh và luyện thi Cambridge IELTS.
+
+Bạn vui lòng đặt câu hỏi liên quan đến từ vựng, ngữ pháp, các kỹ năng IELTS (Reading, Listening, Writing, Speaking) hoặc mẹo làm đề thi để mình hỗ trợ tốt nhất nhé! 😊`,
+      vocabItems: [],
+    };
+  }
+
+  // 2. Phân biệt False vs Not Given
   if (lower.includes('false') && lower.includes('not given')) {
     return {
-      reply: `Đây là mẹo đơn giản nhất để phân biệt **FALSE** và **NOT GIVEN** trong bài đọc Reading:
+      reply: `Đây là mẹo đơn giản và hiệu quả nhất để bạn phân biệt **FALSE** và **NOT GIVEN** trong bài đọc Cambridge IELTS:
 
-• **Chọn FALSE khi:** Bài đọc có thông tin **trái ngược hoàn toàn** với câu hỏi (bạn có thể gạch chân được từ đối nghĩa trong bài).
-  *Ví dụ:* Bài viết "Công viên mở cửa miễn phí", câu hỏi ghi "Khách phải mua vé vào cổng" → **FALSE**.
+• **Chọn FALSE khi:** Bài đọc có thông tin **trái ngược hoàn toàn** với câu đề bài (bạn có thể gạch chân được dẫn chứng mang nghĩa đối lập trực tiếp trong bài).
+  *Ví dụ:* Bài đọc viết "Khách được vào cổng miễn phí", câu hỏi ghi "Khách phải mua vé vào cổng" → Chọn **FALSE**.
 
-• **Chọn NOT GIVEN khi:** Bài đọc **không hề nhắc tới** thông tin đó, hoặc bạn phải tự suy đoán thêm mới ra.
-  *Ví dụ:* Bài viết "Công viên mở cửa từ 8h sáng", câu hỏi ghi "Công viên đông khách nhất vào Chủ nhật" (bài không nói ngày nào đông nhất) → **NOT GIVEN**.
+• **Chọn NOT GIVEN khi:** Bài đọc **không hề nhắc tới** khía cạnh thông tin đó, hoặc bạn phải tự suy diễn thêm chứ tác giả không khẳng định.
+  *Ví dụ:* Bài đọc viết "Công viên mở cửa lúc 8h sáng", câu hỏi ghi "Công viên đông khách nhất vào ngày Chủ nhật" (bài không hề so sánh số lượng khách giữa các ngày) → Chọn **NOT GIVEN**.
 
-💡 **Quy tắc vàng:** Nếu tìm đỏ mắt trong đoạn văn không thấy từ khóa hoặc ý tương đương để chứng minh nó đúng hay sai → Chọn ngay **NOT GIVEN**!`,
+💡 **Quy tắc vàng:** Nếu tìm khắp đoạn văn liên quan mà không thấy từ khóa hoặc ý tương đương để chứng minh đúng hay sai → Hãy tự tin chọn **NOT GIVEN**!`,
       vocabItems: [
         {
           word: 'contradict',
           ipa: '/ˌkɒn.trəˈdɪkt/',
           pos: 'v',
           meaningVi: 'mâu thuẫn, trái ngược với thông tin trong bài',
-          exampleSentence: 'The statement directly contradicts the information in the second paragraph.',
+          exampleSentence: 'The statement directly contradicts the information provided in paragraph 3.',
         },
       ],
     };
   }
 
-  if (lower.includes('money is important') || mode === 'upgrade') {
-    const inputSentence = lastUserText.replace(/nâng cấp câu:?/i, '').replace(/["']/g, '').trim() || 'Money is important.';
+  // 3. Nâng cấp câu (Sentence Upgrade)
+  if (lower.includes('nâng cấp') || lower.includes('upgrade') || lower.includes('viết lại')) {
+    const inputSentence = lastUserText.replace(/nâng cấp câu:?/i, '').replace(/nâng cấp:?/i, '').replace(/["']/g, '').trim() || 'Education is very important.';
     return {
-      reply: `Dưới đây là 3 mức nâng cấp cho câu **"${inputSentence}"**:
+      reply: `Dưới đây là 3 mức nâng cấp tự nhiên cho ý câu của bạn:
 
 • **Mức 6.5 (Rõ ràng, chuẩn ngữ pháp):**
-  "Financial stability plays a vital role in people's daily lives."
+  "Acquiring a solid education plays a crucial role in shaping a person's future."
 
-• **Mức 7.5 (Câu phức, từ vựng tốt):**
-  "It is undeniable that financial security serves as a cornerstone for a fulfilling and comfortable life."
+• **Mức 7.5 (Câu phức, từ vựng học thuật tốt):**
+  "It is widely acknowledged that access to quality education serves as a fundamental catalyst for personal and professional advancement."
 
-• **Mức 8.5+ (Tự nhiên như người bản xứ):**
-  "Sound financial standing is indispensable for ensuring a high standard of living and long-term well-being."
+• **Mức 8.5+ (Tự nhiên và sắc sảo như người bản xứ):**
+  "Quality education remains an indispensable cornerstone for fostering intellectual growth and societal prosperity."
 
 💡 **Cụm từ đắt giá vừa dùng:**
-- **play a vital role in**: đóng vai trò thiết yếu trong việc gì.
-- **serve as a cornerstone**: đóng vai trò là nền tảng cốt lõi.
-- **indispensable**: không thể thiếu được (thay thế hoàn hảo cho *very important*).`,
+- **serve as a fundamental catalyst**: đóng vai trò như một đòn bẩy nền tảng.
+- **indispensable cornerstone**: nền tảng cốt lõi không thể thiếu.
+- **foster intellectual growth**: thúc đẩy sự phát triển trí tuệ.`,
       vocabItems: [
         {
-          word: 'indispensable',
-          ipa: '/ˌɪn.dɪˈspen.sə.bəl/',
-          pos: 'adj',
-          meaningVi: 'không thể thiếu, vô cùng quan trọng',
-          exampleSentence: 'Sound financial standing is indispensable for ensuring a high standard of living.',
+          word: 'indispensable cornerstone',
+          ipa: '/ˌɪn.dɪˈspen.sə.bəl ˈkɔː.nə.stəʊn/',
+          pos: 'phr',
+          meaningVi: 'nền tảng cốt lõi không thể thiếu',
+          exampleSentence: 'Quality education remains an indispensable cornerstone for societal prosperity.',
         },
         {
-          word: 'serve as a cornerstone',
-          ipa: '/sɜːv æz ə ˈkɔː.nə.stəʊn/',
+          word: 'foster intellectual growth',
+          ipa: '/ˈfɒs.tər ˌɪn.təˈlek.tʃu.əl ɡrəʊθ/',
           pos: 'phr',
-          meaningVi: 'đóng vai trò là nền tảng cốt lõi',
-          exampleSentence: 'Financial security serves as a cornerstone for a comfortable life.',
+          meaningVi: 'thúc đẩy sự phát triển trí tuệ',
+          exampleSentence: 'Universities aim to foster intellectual growth and critical thinking among students.',
         },
       ],
     };
   }
 
+  // 4. Tra từ vựng chủ đề Môi trường / Environment
   if (lower.includes('môi trường') || lower.includes('environment')) {
     return {
-      reply: `Dưới đây là **5 cụm từ (Collocations) cực kỳ dễ dùng** cho chủ đề **Môi trường (Environment)**:
+      reply: `Dưới đây là **các cụm từ học thuật (Collocations) rất dễ ghi điểm** trong IELTS chủ đề **Môi trường (Environment)**:
 
-1. **curb carbon emissions** (/kɜːb ˈkɑː.bən ɪˈmɪʃ.ənz/): cắt giảm lượng khí thải carbon.
-2. **renewable energy sources** (/rɪˈnjuː.ə.bəl ˈen.ə.dʒi/): các nguồn năng lượng tái tạo.
-3. **deplete natural resources** (/dɪˈpliːt ˈnætʃ.ər.əl rɪˈzɔː.sɪz/): làm cạn kiệt tài nguyên thiên nhiên.
-4. **eco-friendly alternatives** (/ˈiː.kəʊˌfrend.li/): các giải pháp thay thế thân thiện với môi trường.
-5. **maintain ecological balance** (/meɪnˈteɪn ˌiː.kəˈlɒdʒ.ɪ.kəl ˈbæl.əns/): duy trì cân bằng sinh thái.
+1. **curb carbon emissions** (/kɜːb ˈkɑː.bən ɪˈmɪʃ.ənz/): cắt giảm lượng khí thải nhà kính/carbon.
+2. **deplete natural resources** (/dɪˈpliːt ˈnætʃ.ər.əl rɪˈzɔː.sɪz/): làm cạn kiệt tài nguyên thiên nhiên.
+3. **eco-friendly alternatives** (/ˈiː.kəʊˌfrend.li ɒlˈtɜː.nə.tɪvz/): các giải pháp thay thế thân thiện với môi trường.
+4. **maintain ecological balance** (/meɪnˈteɪn ˌiː.kəˈlɒdʒ.ɪ.kəl ˈbæl.əns/): duy trì cân bằng sinh thái.
 
-Bạn có thể bấm nút bên dưới để lưu ngay các cụm từ này vào bộ thẻ Anki của mình nhé!`,
+Bạn có thể bấm nút **+ Lưu vào Flashcard Anki** bên dưới để học và ôn lại bất cứ lúc nào nhé!`,
       vocabItems: [
         {
           word: 'curb carbon emissions',
           ipa: '/kɜːb ˈkɑː.bən ɪˈmɪʃ.ənz/',
           pos: 'phr',
           meaningVi: 'cắt giảm lượng khí thải carbon',
-          exampleSentence: 'Governments must take urgent action to curb carbon emissions.',
+          exampleSentence: 'Strict policies are urgently needed to curb carbon emissions.',
         },
         {
           word: 'deplete natural resources',
           ipa: '/dɪˈpliːt ˈnætʃ.ər.əl rɪˈzɔː.sɪz/',
           pos: 'phr',
           meaningVi: 'làm cạn kiệt tài nguyên thiên nhiên',
-          exampleSentence: 'Rapid industrialization continues to deplete natural resources at an alarming rate.',
-        },
-        {
-          word: 'eco-friendly alternatives',
-          ipa: '/ˈiː.kəʊˌfrend.li ɒlˈtɜː.nə.tɪvz/',
-          pos: 'phr',
-          meaningVi: 'các giải pháp thay thế thân thiện với môi trường',
-          exampleSentence: 'Consumers are increasingly switching to eco-friendly alternatives.',
+          exampleSentence: 'Overconsumption threatens to deplete natural resources rapidly.',
         },
       ],
     };
   }
 
-  if (mode === 'speaking' || lower.includes('speaking')) {
-    return {
-      reply: `🎤 **Chủ đề Speaking Part 1: Daily Routine & Study**
-
-**Câu hỏi của Giám khảo:**
-*"Do you prefer studying in the morning or in the evening? Why?"*
-
-💡 **Gợi ý cụm từ trả lời:**
-• **a morning person** (/ə ˈmɔː.nɪŋ ˈpɜː.sən/): người làm việc hiệu quả vào buổi sáng.
-• **recharge my batteries** (/ˌriːˈtʃɑːdʒ maɪ ˈbæt.ər.iz/): nạp lại năng lượng.
-• **peak concentration** (/piːk ˌkɒn.sənˈtreɪ.ʃən/): sự tập trung cao độ nhất.
-
-👉 Bạn hãy gõ câu trả lời hoặc bấm **nút Mic** để nói thử nhé, mình sẽ sửa lỗi giúp bạn!`,
-      vocabItems: [
-        {
-          word: 'recharge my batteries',
-          ipa: '/ˌriːˈtʃɑːdʒ maɪ ˈbæt.ər.iz/',
-          pos: 'phr',
-          meaningVi: 'nghỉ ngơi, nạp lại năng lượng',
-          exampleSentence: 'A good night of sleep helps me recharge my batteries for early morning study.',
-        },
-        {
-          word: 'peak concentration',
-          ipa: '/piːk ˌkɒn.sənˈtreɪ.ʃən/',
-          pos: 'phr',
-          meaningVi: 'mức độ tập trung cao nhất',
-          exampleSentence: 'I usually achieve my peak concentration during the quiet morning hours.',
-        },
-      ],
-    };
-  }
-
+  // 5. Câu hỏi tiếng Anh thông thường
   return {
-    reply: `Mình đã nhận được câu hỏi của bạn! Bạn có thể chọn 1 trong 4 tab ở trên (**Hỏi đáp mẹo thi**, **Nâng cấp câu**, **Luyện nói Speaking**, hoặc **Lưu từ vào Anki**) và gửi câu tiếng Anh bất kỳ để mình hỗ trợ chi tiết nhé.`,
+    reply: `Mình đã nhận được câu hỏi của bạn! Là trợ lý chuyên sâu về tiếng Anh và luyện thi IELTS của EduFlow, mình có thể giúp bạn:
+
+• Giải thích ngữ pháp và sửa lỗi câu tiếng Anh.
+• Nâng cấp câu văn đơn giản lên các mức Band 6.5, 7.5 và 8.5+.
+• Chia sẻ mẹo làm bài Reading & Listening các bộ đề Cambridge.
+• Gợi ý từ vựng học thuật theo chủ đề để lưu trực tiếp vào Flashcard Anki.
+
+Bạn hãy gửi câu tiếng Anh hoặc thắc mắc cụ thể để mình giải đáp ngay nhé!`,
     vocabItems: [],
   };
 }
 
 exports.handleChat = async (req, res) => {
   try {
-    const { mode = 'tips', messages = [] } = req.body || {};
+    const { messages = [] } = req.body || {};
 
     if (!Array.isArray(messages) || messages.length === 0) {
       return res.status(400).json({
         success: false,
-        message: 'Vui lòng nhập nội dung tin nhắn.',
+        message: 'Vui lòng nhập nội dung câu hỏi.',
       });
     }
 
     const lastMessage = messages[messages.length - 1];
     const lastUserText = lastMessage?.content || '';
-    const systemPrompt = MODE_SYSTEM_PROMPTS[mode] || MODE_SYSTEM_PROMPTS.tips;
+
+    // Kiểm tra nhanh câu hỏi ngoài phạm vi trước khi gọi API để tiết kiệm thời gian
+    if (isOffTopicQuery(lastUserText)) {
+      const offTopicReply = buildSmartFallbackReply(lastUserText);
+      return res.json({
+        success: true,
+        model: 'eduflow-domain-guard',
+        reply: offTopicReply.reply,
+        vocabItems: [],
+      });
+    }
 
     const apiKey = (getLiveApiKey() || '').replace(/["']/g, '').trim();
 
@@ -252,9 +244,9 @@ exports.handleChat = async (req, res) => {
       const recentMessages = messages.slice(-8);
       const contents = recentMessages.map((msg, idx) => {
         const role = msg.role === 'model' ? 'model' : 'user';
-        // Ghép system instruction vào tin nhắn đầu tiên của user để tương thích mọi phiên bản Gemini API
+        // Ghép system instruction vào tin nhắn đầu tiên của user
         const text = idx === 0 && role === 'user'
-          ? `${systemPrompt}\n\n---\nTin nhắn của người học:\n${msg.content}`
+          ? `${AI_TUTOR_SYSTEM_PROMPT}\n\n---\nCâu hỏi của người học:\n${msg.content}`
           : String(msg.content || '');
         return {
           role,
@@ -266,7 +258,7 @@ exports.handleChat = async (req, res) => {
       if (contents.length > 0 && contents[0].role !== 'user') {
         contents.unshift({
           role: 'user',
-          parts: [{ text: systemPrompt }],
+          parts: [{ text: AI_TUTOR_SYSTEM_PROMPT }],
         });
       }
 
@@ -283,7 +275,7 @@ exports.handleChat = async (req, res) => {
             body: JSON.stringify({
               contents,
               generationConfig: {
-                temperature: 0.4,
+                temperature: 0.35,
                 maxOutputTokens: 1200,
               },
             }),
@@ -313,8 +305,8 @@ exports.handleChat = async (req, res) => {
       }
     }
 
-    // Nếu không kết nối được Gemini hoặc hết quota, sử dụng bộ phản hồi thông minh để không bao giờ lỗi giao diện
-    const fallback = buildSmartFallbackReply(mode, lastUserText);
+    // Nếu không kết nối được Gemini hoặc hết quota, sử dụng bộ phản hồi thông minh dự phòng
+    const fallback = buildSmartFallbackReply(lastUserText);
     return res.json({
       success: true,
       model: 'eduflow-smart-assistant',
@@ -325,7 +317,7 @@ exports.handleChat = async (req, res) => {
     console.error('handleChat error:', error);
     return res.status(500).json({
       success: false,
-      message: 'Trợ lý AI đang bận, vui lòng thử lại sau giây lát.',
+      message: 'Trợ lý AI đang bận, bạn vui lòng thử lại sau giây lát nhé.',
     });
   }
 };
