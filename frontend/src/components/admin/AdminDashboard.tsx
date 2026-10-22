@@ -19,14 +19,16 @@ import {
   Eye,
   EyeOff,
   Filter,
+  Globe,
 } from 'lucide-react';
-import { Course } from '../../types';
+import { Course, Screen } from '../../types';
 import { Card } from '../common/Card';
 
 interface AdminDashboardProps {
   courses?: Course[];
   onAddCourse?: (newCourse: Partial<Course>) => void;
   onDeleteCourse?: (id: string) => void;
+  onNavigate?: (screen: Screen) => void;
   onNotify: (msg: string, type?: 'success' | 'error' | 'info') => void;
 }
 
@@ -207,7 +209,7 @@ const fallbackResults: ExamSubmissionRow[] = [
   },
 ];
 
-export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNotify }) => {
+export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate, onNotify }) => {
   const [adminTab, setAdminTab] = useState<'users' | 'results' | 'tests'>('tests');
   const [userList, setUserList] = useState<AdminUserRow[]>(fallbackUsers);
   const [examResults, setExamResults] = useState<ExamSubmissionRow[]>(fallbackResults);
@@ -478,14 +480,38 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNotify }) => {
           </p>
         </div>
 
-        <button
-          onClick={loadAdminData}
-          disabled={isLoading}
-          className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-semibold bg-white border border-stone-200 hover:bg-stone-50 text-stone-700 transition-colors shadow-xs cursor-pointer self-start sm:self-auto"
-        >
-          <RefreshCw size={14} className={isLoading ? 'animate-spin text-[#064E3B]' : ''} />
-          {isLoading ? 'Đang đồng bộ...' : 'Làm mới dữ liệu'}
-        </button>
+        <div className="flex items-center gap-2.5 self-start sm:self-auto flex-wrap">
+          {onNavigate && (
+            <>
+              <button
+                onClick={() => onNavigate('landing')}
+                className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold bg-white border border-stone-200 hover:bg-stone-50 text-stone-700 transition-colors shadow-xs cursor-pointer"
+                title="Quay về trang chủ giới thiệu EduFlow"
+              >
+                <Globe size={14} className="text-[#064E3B]" />
+                <span>Trang Giới Thiệu</span>
+              </button>
+
+              <button
+                onClick={() => onNavigate('reading')}
+                className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold bg-white border border-stone-200 hover:bg-stone-50 text-stone-700 transition-colors shadow-xs cursor-pointer"
+                title="Chuyển sang giao diện luyện thi của học viên"
+              >
+                <BookOpen size={14} className="text-[#D97706]" />
+                <span>Giao Diện Học Viên</span>
+              </button>
+            </>
+          )}
+
+          <button
+            onClick={loadAdminData}
+            disabled={isLoading}
+            className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-semibold bg-[#064E3B] text-amber-300 hover:bg-[#032B20] transition-colors shadow-xs cursor-pointer"
+          >
+            <RefreshCw size={14} className={isLoading ? 'animate-spin text-amber-300' : ''} />
+            {isLoading ? 'Đang đồng bộ...' : 'Làm mới dữ liệu'}
+          </button>
+        </div>
       </div>
 
       {/* 4 Stats Cards */}

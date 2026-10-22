@@ -559,6 +559,7 @@ const AppContent: React.FC = () => {
             courses={courses}
             onAddCourse={handleAddCourse}
             onDeleteCourse={handleDeleteCourse}
+            onNavigate={handleScreenNavigate}
             onNotify={addToast}
           />
         );
