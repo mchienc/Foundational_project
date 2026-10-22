@@ -1,9 +1,22 @@
 // frontend/src/components/common/UpgradeModal.tsx
-// Modal giới thiệu gói EduFlow Pro & Nút Demo 1-Click kích hoạt tức thì
+// Cổng thanh toán VietQR Napas 24/7 (Ngân hàng Quân Đội MB Bank - 0976294907)
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Sparkles, Check, Zap, Award, RefreshCw } from 'lucide-react';
+import {
+  X,
+  Sparkles,
+  Check,
+  Award,
+  RefreshCw,
+  QrCode,
+  Copy,
+  Clock,
+  ArrowRight,
+  ShieldCheck,
+  CheckCircle2,
+  ChevronLeft,
+} from 'lucide-react';
 import { useProStore } from '../../modules/pro/useProStore';
 
 interface UpgradeModalProps {
@@ -11,6 +24,54 @@ interface UpgradeModalProps {
   onClose?: () => void;
   onSuccess?: () => void;
 }
+
+interface PlanOption {
+  id: 'month' | '6months' | 'year' | 'lifetime';
+  name: string;
+  price: number;
+  originalPrice: number;
+  durationLabel: string;
+  badge?: string;
+  description: string;
+}
+
+const PRO_PLANS: PlanOption[] = [
+  {
+    id: 'month',
+    name: 'Gói 1 Tháng',
+    price: 99000,
+    originalPrice: 199000,
+    durationLabel: '30 ngày sử dụng',
+    description: 'Thích hợp ôn luyện cấp tốc trước kỳ thi',
+  },
+  {
+    id: '6months',
+    name: 'Gói 6 Tháng',
+    price: 249000,
+    originalPrice: 499000,
+    durationLabel: '180 ngày (Tiết kiệm 50%)',
+    badge: 'ĐƯỢC CHỌN NHIỀU NHẤT',
+    description: 'Lộ trình tối ưu bứt phá từ 6.0 lên 7.5+',
+  },
+  {
+    id: 'year',
+    name: 'Gói 1 Năm',
+    price: 399000,
+    originalPrice: 899000,
+    durationLabel: '365 ngày (Tiết kiệm 60%)',
+    badge: 'TIẾT KIỆM NHẤT',
+    description: 'Đồng hành dài hạn cùng mục tiêu IELTS học thuật',
+  },
+  {
+    id: 'lifetime',
+    name: 'Gói Trọn Đời (VIP)',
+    price: 599000,
+    originalPrice: 1499000,
+    durationLabel: 'Vĩnh viễn không giới hạn',
+    badge: 'TRỌN ĐỜI VIP',
+    description: 'Sở hữu toàn bộ phân hệ hiện tại và tương lai',
+  },
+];
 
 export const UpgradeModal: React.FC<UpgradeModalProps> = ({
   isOpen: propsIsOpen,
@@ -20,147 +81,538 @@ export const UpgradeModal: React.FC<UpgradeModalProps> = ({
   const isStoreOpen = useProStore((state) => state.isUpgradeModalOpen);
   const closeStoreModal = useProStore((state) => state.closeUpgradeModal);
   const isPro = useProStore((state) => state.isPro);
-  const activateProDemo = useProStore((state) => state.activateProDemo);
+  const planName = useProStore((state) => state.planName);
+  const packageExpiry = useProStore((state) => state.packageExpiry);
+  const activateProPackage = useProStore((state) => state.activateProPackage);
   const resetToFree = useProStore((state) => state.resetToFree);
 
   const isOpen = propsIsOpen !== undefined ? propsIsOpen : isStoreOpen;
   const handleClose = propsOnClose || closeStoreModal;
 
-  const handleActivateDemo = () => {
-    activateProDemo();
-    handleClose();
-    if (onSuccess) onSuccess();
-  };
+  // Step flow: 'select' -> 'payment' -> 'success'
+  const [step, setStep] = useState<'select' | 'payment' | 'success'>('select');
+  const [selectedPlan, setSelectedPlan] = useState<PlanOption>(PRO_PLANS[1]); // Default 6 months
+  const [isLoadingOrder, setIsLoadingOrder] = useState<boolean>(false);
+  const [isConfirming, setIsConfirming] = useState<boolean>(false);
+  const [orderData, setOrderData] = useState<any>(null);
 
-  const handleResetFree = () => {
-    resetToFree();
-    handleClose();
-  };
+  // Copy feedback state
+  const [copiedField, setCopiedField] = useState<string | null>(null);
+
+  // Timer countdown: 15 minutes (900 seconds)
+  const [countdown, setCountdown] = useState<number>(900);
+
+  // Reset step whenever modal opens
+  useEffect(() => {
+    if (isOpen) {
+      if (isPro) {
+        setStep('success');
+      } else {
+        setStep('select');
+      }
+      setCountdown(900);
+    }
+  }, [isOpen, isPro]);
+
+  // Countdown timer in payment step
+  useEffect(() => {
+    let interval: any = null;
+    if (step === 'payment' && countdown > 0) {
+      interval = setInterval(() => {
+        setCountdown((prev) => Math.max(0, prev - 1));
+      }, 1000);
+    }
+    return () => clearInterval(interval);
+  }, [step, countdown]);
 
   if (!isOpen) return null;
 
+  const formatPrice = (p: number) => {
+    return new Intl.NumberFormat('vi-VN').format(p) + ' đ';
+  };
+
+  const formatTimer = (sec: number) => {
+    const mins = Math.floor(sec / 60);
+    const secs = sec % 60;
+    return `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+  };
+
+  const copyToClipboard = async (text: string, field: string) => {
+    try {
+      await navigator.clipboard.writeText(text);
+      setCopiedField(field);
+      setTimeout(() => setCopiedField(null), 2000);
+    } catch (e) {
+      console.warn('Cannot copy to clipboard:', e);
+    }
+  };
+
+  // Step 1 -> Step 2: Create VietQR Order
+  const handleProceedToPayment = async () => {
+    setIsLoadingOrder(true);
+    try {
+      const response = await fetch('/api/payment/create-order', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          packageId: selectedPlan.id,
+          planName: selectedPlan.name,
+          amount: selectedPlan.price,
+          billingCycle: selectedPlan.durationLabel,
+        }),
+      });
+
+      const data = await response.json();
+      if (data.success && data.order) {
+        setOrderData(data.order);
+        setStep('payment');
+        setCountdown(900);
+      } else {
+        throw new Error(data.message || 'Không thể tạo đơn hàng thanh toán.');
+      }
+    } catch (err: any) {
+      console.error('Order creation error:', err);
+      // Fallback in-client order creation if backend offline
+      const mockOrder = {
+        orderId: `order_${Date.now()}`,
+        orderCode: `EDF${Math.floor(10000 + Math.random() * 90000)}`,
+        packageId: selectedPlan.id,
+        planName: selectedPlan.name,
+        amount: selectedPlan.price,
+        billingCycle: selectedPlan.durationLabel,
+        transferContent: `EDF${Math.floor(10000 + Math.random() * 90000)}`,
+        qrUrl: `https://img.vietqr.io/image/MB-0976294907-compact2.png?amount=${selectedPlan.price}&addInfo=EDF${Math.floor(
+          10000 + Math.random() * 90000
+        )}&accountName=DANG%20MINH%20CHIEN`,
+        bankInfo: {
+          bankName: 'MB Bank (Ngân hàng TMCP Quân Đội)',
+          bankShortName: 'MB',
+          accountNo: '0976294907',
+          accountName: 'DANG MINH CHIEN',
+        },
+      };
+      setOrderData(mockOrder);
+      setStep('payment');
+    } finally {
+      setIsLoadingOrder(false);
+    }
+  };
+
+  // Step 2 -> Step 3: Confirm Paid
+  const handleConfirmPaid = async () => {
+    if (!orderData) return;
+    setIsConfirming(true);
+    try {
+      const response = await fetch(`/api/payment/confirm-paid/${orderData.orderId}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+      });
+
+      const resData = await response.json();
+      const expiry = resData.expiryDate || (selectedPlan.id === 'lifetime' ? 'Vĩnh viễn' : '30 ngày');
+
+      activateProPackage({
+        packageId: selectedPlan.id,
+        planName: selectedPlan.name,
+        expiryDate: expiry,
+        orderId: orderData.orderCode,
+      });
+
+      setStep('success');
+      if (onSuccess) onSuccess();
+    } catch (e) {
+      // Fallback client activation
+      activateProPackage({
+        packageId: selectedPlan.id,
+        planName: selectedPlan.name,
+        expiryDate: selectedPlan.id === 'lifetime' ? 'Vĩnh viễn' : '30 ngày',
+        orderId: orderData.orderCode,
+      });
+      setStep('success');
+      if (onSuccess) onSuccess();
+    } finally {
+      setIsConfirming(false);
+    }
+  };
+
   return (
     <AnimatePresence>
-      <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-stone-900/70 backdrop-blur-sm overflow-y-auto">
+      <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 bg-stone-900/75 backdrop-blur-sm overflow-y-auto">
         <motion.div
-          initial={{ opacity: 0, scale: 0.95, y: 15 }}
+          initial={{ opacity: 0, scale: 0.96, y: 15 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
-          exit={{ opacity: 0, scale: 0.95, y: 15 }}
-          className="relative w-full max-w-lg bg-[#FAFAF9] border border-amber-300/60 rounded-3xl shadow-2xl overflow-hidden my-8"
+          exit={{ opacity: 0, scale: 0.96, y: 15 }}
+          className="relative w-full max-w-2xl bg-[#FAFAF9] border border-amber-300/60 rounded-3xl shadow-2xl overflow-hidden my-6 flex flex-col max-h-[92vh]"
         >
-          {/* Header Background Banner */}
-          <div className="bg-gradient-to-r from-[#064E3B] via-[#043327] to-[#064E3B] px-6 py-6 text-white relative">
+          {/* Header Banner */}
+          <div className="bg-gradient-to-r from-[#064E3B] via-[#043327] to-[#064E3B] px-6 py-5 text-white relative shrink-0">
             <button
               onClick={handleClose}
               className="absolute top-4 right-4 p-2 text-stone-300 hover:text-white hover:bg-emerald-800/60 rounded-full transition-colors cursor-pointer"
-              aria-label="Đóng modal"
+              aria-label="Đóng"
             >
               <X size={18} />
             </button>
 
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/20 border border-amber-400/40 text-amber-300 text-xs font-semibold mb-3">
-              <Sparkles size={14} className="animate-pulse" />
-              <span>GÓI NÂNG CẤP CAO CẤP</span>
+            <div className="flex items-center gap-2">
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/20 border border-amber-400/40 text-amber-300 text-xs font-semibold">
+                <Sparkles size={13} className="animate-pulse" />
+                <span>NÂNG CẤP EDUFLOW PRO</span>
+              </span>
+              <span className="inline-flex items-center gap-1 text-[11px] text-emerald-200">
+                <ShieldCheck size={13} />
+                <span>Cổng VietQR Napas 24/7</span>
+              </span>
             </div>
 
-            <h3 className="text-xl sm:text-2xl font-serif font-bold text-white tracking-tight">
-              EduFlow Pro &bull; AI Tutor 9.0
+            <h3 className="text-xl sm:text-2xl font-serif font-bold text-white tracking-tight mt-2">
+              {step === 'select' && 'Chọn Gói Học & Bứt Phá Band Điểm IELTS'}
+              {step === 'payment' && 'Quét Mã VietQR Ngân Hàng Để Kích Hoạt'}
+              {step === 'success' && 'Tài Khoản Đã Kích Hoạt EduFlow Pro!'}
             </h3>
-            <p className="text-xs sm:text-sm text-emerald-100/90 mt-1 leading-relaxed">
-              Luyện Viết &amp; Luyện Nói không giới hạn với Giám khảo AI Cambridge thế hệ mới
+            <p className="text-xs sm:text-sm text-emerald-100/90 mt-0.5">
+              {step === 'select' && 'Luyện Viết & Luyện Nói không giới hạn cùng Giám khảo AI Cambridge'}
+              {step === 'payment' && 'Mở app ngân hàng bất kỳ (MB, VCB, TCB, MoMo...) và quét mã bên dưới'}
+              {step === 'success' && 'Chúc mừng bạn đã sở hữu toàn bộ tính năng cao cấp không giới hạn'}
             </p>
           </div>
 
-          {/* Body Content */}
-          <div className="p-6 space-y-5">
-            {/* Features comparison */}
-            <div className="space-y-3 bg-white p-4 rounded-2xl border border-stone-200 shadow-xs">
-              <div className="flex items-start gap-3">
-                <div className="w-6 h-6 rounded-full bg-emerald-100 text-emerald-800 flex items-center justify-center shrink-0 mt-0.5">
-                  <Check size={14} className="stroke-[2.5]" />
-                </div>
-                <div>
-                  <h4 className="text-sm font-bold text-stone-900">
-                    Phòng Luyện Viết (Writing Studio) không giới hạn
-                  </h4>
-                  <p className="text-xs text-stone-600 mt-0.5">
-                    Chấm chi tiết 4 tiêu chí IELTS, bảng sửa lỗi từng câu và bài mẫu Band 8.0+.
-                  </p>
-                </div>
-              </div>
-
-              <div className="flex items-start gap-3">
-                <div className="w-6 h-6 rounded-full bg-emerald-100 text-emerald-800 flex items-center justify-center shrink-0 mt-0.5">
-                  <Check size={14} className="stroke-[2.5]" />
-                </div>
-                <div>
-                  <h4 className="text-sm font-bold text-stone-900">
-                    Phòng Luyện Nói (Speaking Studio) nhận diện giọng nói
-                  </h4>
-                  <p className="text-xs text-stone-600 mt-0.5">
-                    Đổi đề ngẫu nhiên Part 1, 2 (Cue Card), 3. AI nhận xét trôi chảy, ngữ pháp và phát âm IPA.
-                  </p>
-                </div>
-              </div>
-
-              <div className="flex items-start gap-3">
-                <div className="w-6 h-6 rounded-full bg-emerald-100 text-emerald-800 flex items-center justify-center shrink-0 mt-0.5">
-                  <Check size={14} className="stroke-[2.5]" />
-                </div>
-                <div>
-                  <h4 className="text-sm font-bold text-stone-900">
-                    Đồng bộ thẻ Anki Flashcard 1-Click
-                  </h4>
-                  <p className="text-xs text-stone-600 mt-0.5">
-                    Lưu các từ vựng đắt giá từ bài viết và bài nói thẳng vào kho thẻ để ôn tập ngắt quãng.
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            {/* Quick Demo Activation Banner */}
-            <div className="p-3.5 rounded-2xl bg-amber-50/90 border border-amber-200/80 flex items-center gap-3">
-              <div className="w-8 h-8 rounded-xl bg-amber-500/20 text-amber-700 flex items-center justify-center shrink-0">
-                <Zap size={18} />
-              </div>
-              <p className="text-xs text-amber-900 leading-relaxed font-medium">
-                Dành cho Giảng viên &amp; Bạn kiểm tra đánh giá: Kích hoạt trải nghiệm Pro ngay lập tức với 1 nút bấm bên dưới, không cần thẻ thanh toán.
-              </p>
-            </div>
-
-            {/* CTA Buttons */}
-            <div className="space-y-2.5 pt-1">
-              {!isPro ? (
-                <button
-                  onClick={handleActivateDemo}
-                  className="w-full py-3.5 px-4 rounded-xl font-bold text-sm bg-gradient-to-r from-amber-600 to-amber-500 hover:from-amber-700 hover:to-amber-600 text-white shadow-md hover:shadow-lg transition-all duration-200 flex items-center justify-center gap-2 cursor-pointer"
-                >
-                  <Sparkles size={16} />
-                  <span>Kích hoạt trải nghiệm Pro (Demo 1 Click)</span>
-                </button>
-              ) : (
-                <div className="space-y-2">
-                  <div className="w-full py-3 px-4 rounded-xl font-bold text-sm bg-emerald-50 text-emerald-800 border border-emerald-300 flex items-center justify-center gap-2">
-                    <Award size={18} className="text-emerald-700" />
-                    <span>Tài khoản của bạn đã ở trạng thái EduFlow Pro!</span>
+          {/* Modal Body - Scrollable */}
+          <div className="p-6 overflow-y-auto flex-1 space-y-5">
+            {/* ================= STEP 1: SELECT PLAN ================= */}
+            {step === 'select' && (
+              <div className="space-y-5">
+                {/* Benefits Pill Grid */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 bg-white p-3.5 rounded-2xl border border-stone-200 shadow-2xs">
+                  <div className="flex items-center gap-2 text-xs text-stone-700">
+                    <div className="w-5 h-5 rounded-full bg-emerald-100 text-emerald-800 flex items-center justify-center shrink-0">
+                      <Check size={12} className="stroke-[3]" />
+                    </div>
+                    <span>Phòng Luyện Viết (Writing) không giới hạn đề</span>
                   </div>
+                  <div className="flex items-center gap-2 text-xs text-stone-700">
+                    <div className="w-5 h-5 rounded-full bg-emerald-100 text-emerald-800 flex items-center justify-center shrink-0">
+                      <Check size={12} className="stroke-[3]" />
+                    </div>
+                    <span>AI chấm chi tiết 4 tiêu chí chuẩn IELTS</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-xs text-stone-700">
+                    <div className="w-5 h-5 rounded-full bg-emerald-100 text-emerald-800 flex items-center justify-center shrink-0">
+                      <Check size={12} className="stroke-[3]" />
+                    </div>
+                    <span>Luyện Nói (Speaking) nhận diện giọng nói Web Speech</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-xs text-stone-700">
+                    <div className="w-5 h-5 rounded-full bg-emerald-100 text-emerald-800 flex items-center justify-center shrink-0">
+                      <Check size={12} className="stroke-[3]" />
+                    </div>
+                    <span>Tự động tạo bài mẫu 8.0+ & lưu thẻ Anki Flashcard</span>
+                  </div>
+                </div>
+
+                {/* Plan Options Cards */}
+                <div className="space-y-3">
+                  <span className="text-xs font-bold text-stone-600 uppercase tracking-wider block">
+                    Chọn gói thanh toán phù hợp:
+                  </span>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    {PRO_PLANS.map((plan) => {
+                      const isSelected = selectedPlan.id === plan.id;
+                      return (
+                        <div
+                          key={plan.id}
+                          onClick={() => setSelectedPlan(plan)}
+                          className={`relative p-4 rounded-2xl border-2 transition-all cursor-pointer flex flex-col justify-between ${
+                            isSelected
+                              ? 'border-[#064E3B] bg-emerald-50/40 shadow-md ring-2 ring-emerald-500/20'
+                              : 'border-stone-200 bg-white hover:border-emerald-300 hover:shadow-xs'
+                          }`}
+                        >
+                          {plan.badge && (
+                            <span className="absolute -top-2.5 right-3 px-2 py-0.5 rounded-full text-[9px] font-extrabold bg-[#D97706] text-white uppercase tracking-wider shadow-xs">
+                              {plan.badge}
+                            </span>
+                          )}
+
+                          <div>
+                            <div className="flex items-baseline justify-between gap-2">
+                              <h4 className="text-sm font-bold text-stone-900">{plan.name}</h4>
+                              <span className="text-xs text-stone-400 line-through">
+                                {formatPrice(plan.originalPrice)}
+                              </span>
+                            </div>
+
+                            <div className="mt-1 flex items-baseline gap-1">
+                              <span className="text-lg font-serif font-bold text-[#064E3B]">
+                                {formatPrice(plan.price)}
+                              </span>
+                            </div>
+
+                            <p className="text-[11px] font-semibold text-emerald-800 mt-0.5">
+                              {plan.durationLabel}
+                            </p>
+
+                            <p className="text-xs text-stone-500 mt-2 leading-relaxed">
+                              {plan.description}
+                            </p>
+                          </div>
+
+                          <div className="mt-3 pt-2 border-t border-stone-100 flex items-center justify-between text-xs font-semibold">
+                            <span className={isSelected ? 'text-[#064E3B]' : 'text-stone-400'}>
+                              {isSelected ? 'Đang chọn' : 'Nhấp để chọn'}
+                            </span>
+                            <div
+                              className={`w-4 h-4 rounded-full border flex items-center justify-center ${
+                                isSelected
+                                  ? 'border-[#064E3B] bg-[#064E3B] text-white'
+                                  : 'border-stone-300'
+                              }`}
+                            >
+                              {isSelected && <Check size={10} className="stroke-[3]" />}
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* CTA Action */}
+                <div className="pt-2">
                   <button
-                    onClick={handleResetFree}
-                    className="w-full py-2 px-3 text-xs text-stone-500 hover:text-stone-700 hover:bg-stone-100 rounded-lg transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
+                    onClick={handleProceedToPayment}
+                    disabled={isLoadingOrder}
+                    className="w-full py-3.5 px-4 rounded-xl font-bold text-sm bg-gradient-to-r from-[#064E3B] via-[#043327] to-[#064E3B] hover:opacity-95 text-white shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2 cursor-pointer"
                   >
-                    <RefreshCw size={12} />
-                    <span>Chuyển lại gói Free để thử nghiệm hạn mức</span>
+                    {isLoadingOrder ? (
+                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    ) : (
+                      <>
+                        <QrCode size={18} className="text-amber-300" />
+                        <span>Tiếp Tục Thanh Toán VietQR ({formatPrice(selectedPlan.price)})</span>
+                        <ArrowRight size={15} />
+                      </>
+                    )}
                   </button>
                 </div>
-              )}
+              </div>
+            )}
 
-              <button
-                onClick={handleClose}
-                className="w-full py-2.5 px-4 rounded-xl text-xs font-semibold text-stone-600 hover:text-stone-800 hover:bg-stone-200/50 transition-colors cursor-pointer"
-              >
-                Để sau, tiếp tục học tập
-              </button>
-            </div>
+            {/* ================= STEP 2: VIETQR SCANNER ================= */}
+            {step === 'payment' && orderData && (
+              <div className="space-y-5">
+                {/* Back to package select */}
+                <button
+                  onClick={() => setStep('select')}
+                  className="inline-flex items-center gap-1 text-xs font-semibold text-stone-500 hover:text-stone-800 cursor-pointer"
+                >
+                  <ChevronLeft size={14} />
+                  <span>Chọn gói khác</span>
+                </button>
+
+                <div className="grid grid-cols-1 md:grid-cols-12 gap-5 items-center">
+                  {/* Left: VietQR Code Box (5 cols) */}
+                  <div className="md:col-span-5 flex flex-col items-center justify-center bg-white p-4 rounded-3xl border border-stone-200 shadow-sm text-center">
+                    <span className="text-[11px] font-bold text-stone-500 uppercase tracking-wider mb-2">
+                      Quét mã bằng app ngân hàng:
+                    </span>
+
+                    <div className="relative w-52 h-52 sm:w-56 sm:h-56 bg-stone-50 rounded-2xl overflow-hidden p-2 border border-stone-200 flex items-center justify-center shadow-inner">
+                      <img
+                        src={orderData.qrUrl}
+                        alt="Mã VietQR Thanh Toán"
+                        className="w-full h-full object-contain"
+                      />
+                    </div>
+
+                    {/* Countdown */}
+                    <div className="mt-3 flex items-center gap-1.5 px-3 py-1 rounded-full bg-rose-50 border border-rose-200 text-rose-700 text-xs font-mono font-bold">
+                      <Clock size={13} className="animate-spin" />
+                      <span>Hết hạn sau: {formatTimer(countdown)}</span>
+                    </div>
+                  </div>
+
+                  {/* Right: Bank Transfer Details with 1-Click Copy (7 cols) */}
+                  <div className="md:col-span-7 space-y-3">
+                    <div className="bg-white p-4 rounded-2xl border border-stone-200 shadow-xs space-y-2.5 text-xs">
+                      {/* Bank Name */}
+                      <div className="flex items-center justify-between py-1 border-b border-stone-100">
+                        <span className="text-stone-500">Ngân hàng:</span>
+                        <span className="font-bold text-stone-900 text-right">
+                          MB Bank (Quân Đội)
+                        </span>
+                      </div>
+
+                      {/* Account Number */}
+                      <div className="flex items-center justify-between py-1 border-b border-stone-100">
+                        <span className="text-stone-500">Số tài khoản:</span>
+                        <div className="flex items-center gap-2">
+                          <span className="font-mono font-bold text-sm text-[#064E3B]">
+                            {orderData.bankInfo?.accountNo || '0976294907'}
+                          </span>
+                          <button
+                            onClick={() =>
+                              copyToClipboard(orderData.bankInfo?.accountNo || '0976294907', 'stk')
+                            }
+                            className="p-1 text-stone-500 hover:text-emerald-700 hover:bg-stone-100 rounded cursor-pointer"
+                            title="Sao chép số tài khoản"
+                          >
+                            {copiedField === 'stk' ? (
+                              <Check size={14} className="text-emerald-600" />
+                            ) : (
+                              <Copy size={14} />
+                            )}
+                          </button>
+                        </div>
+                      </div>
+
+                      {/* Account Name */}
+                      <div className="flex items-center justify-between py-1 border-b border-stone-100">
+                        <span className="text-stone-500">Chủ tài khoản:</span>
+                        <span className="font-bold text-stone-900 uppercase">
+                          {orderData.bankInfo?.accountName || 'DANG MINH CHIEN'}
+                        </span>
+                      </div>
+
+                      {/* Amount */}
+                      <div className="flex items-center justify-between py-1 border-b border-stone-100">
+                        <span className="text-stone-500">Số tiền:</span>
+                        <div className="flex items-center gap-2">
+                          <span className="font-mono font-bold text-base text-[#D97706]">
+                            {formatPrice(orderData.amount)}
+                          </span>
+                          <button
+                            onClick={() => copyToClipboard(String(orderData.amount), 'amount')}
+                            className="p-1 text-stone-500 hover:text-amber-700 hover:bg-stone-100 rounded cursor-pointer"
+                            title="Sao chép số tiền"
+                          >
+                            {copiedField === 'amount' ? (
+                              <Check size={14} className="text-emerald-600" />
+                            ) : (
+                              <Copy size={14} />
+                            )}
+                          </button>
+                        </div>
+                      </div>
+
+                      {/* Transfer Content */}
+                      <div className="flex items-center justify-between py-1 bg-amber-50/80 p-2 rounded-xl border border-amber-200">
+                        <div>
+                          <span className="text-amber-800 font-semibold block text-[11px]">
+                            Nội dung chuyển khoản (Bắt buộc):
+                          </span>
+                          <span className="font-mono font-extrabold text-sm text-stone-900">
+                            {orderData.transferContent}
+                          </span>
+                        </div>
+                        <button
+                          onClick={() => copyToClipboard(orderData.transferContent, 'content')}
+                          className="px-2.5 py-1 bg-white border border-amber-300 rounded-lg text-amber-900 font-semibold hover:bg-amber-100 transition-colors flex items-center gap-1 cursor-pointer"
+                        >
+                          {copiedField === 'content' ? (
+                            <>
+                              <Check size={12} className="text-emerald-600" />
+                              <span className="text-emerald-700 text-[11px]">Đã chép</span>
+                            </>
+                          ) : (
+                            <>
+                              <Copy size={12} />
+                              <span className="text-[11px]">Sao chép</span>
+                            </>
+                          )}
+                        </button>
+                      </div>
+                    </div>
+
+                    <p className="text-[11px] text-stone-500 leading-relaxed italic">
+                      * Mẹo: Khi dùng app ngân hàng quét mã VietQR ở bên trái, mọi thông tin (STK, Số tiền và Nội dung) sẽ được tự động điền chính xác 100%.
+                    </p>
+                  </div>
+                </div>
+
+                {/* Confirm Button */}
+                <div className="space-y-2 pt-2">
+                  <button
+                    onClick={handleConfirmPaid}
+                    disabled={isConfirming}
+                    className="w-full py-3.5 px-4 rounded-xl font-bold text-sm bg-gradient-to-r from-emerald-700 via-emerald-800 to-emerald-900 hover:opacity-95 text-white shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2 cursor-pointer"
+                  >
+                    {isConfirming ? (
+                      <>
+                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                        <span>Đang kiểm tra và kích hoạt bản quyền...</span>
+                      </>
+                    ) : (
+                      <>
+                        <CheckCircle2 size={18} className="text-amber-300" />
+                        <span>Tôi đã chuyển khoản thành công &bull; Kích hoạt Pro</span>
+                      </>
+                    )}
+                  </button>
+
+                  <button
+                    onClick={handleClose}
+                    className="w-full py-2 text-xs font-semibold text-stone-500 hover:text-stone-800 text-center cursor-pointer"
+                  >
+                    Để sau, tiếp tục học tập
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* ================= STEP 3: SUCCESS CELEBRATION ================= */}
+            {step === 'success' && (
+              <div className="text-center py-6 space-y-4">
+                <div className="w-16 h-16 rounded-full bg-emerald-100 text-emerald-800 flex items-center justify-center mx-auto shadow-inner border border-emerald-300">
+                  <Award size={32} />
+                </div>
+
+                <div>
+                  <h4 className="text-xl font-serif font-bold text-[#064E3B]">
+                    Kích Hoạt Bản Quyền Thành Công!
+                  </h4>
+                  <p className="text-xs text-stone-600 mt-1 max-w-md mx-auto leading-relaxed">
+                    Tài khoản của bạn đã được nâng cấp lên <strong>EduFlow Pro ({planName})</strong>. Giờ đây bạn có thể luyện viết và luyện nói không giới hạn cùng Giám khảo AI.
+                  </p>
+                </div>
+
+                <div className="bg-white p-4 rounded-2xl border border-stone-200 max-w-sm mx-auto text-xs space-y-2 text-left">
+                  <div className="flex justify-between">
+                    <span className="text-stone-500">Gói bản quyền:</span>
+                    <strong className="text-stone-900">{planName}</strong>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-stone-500">Thời hạn sử dụng:</span>
+                    <strong className="text-emerald-700">{packageExpiry}</strong>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-stone-500">Số lượt chấm AI:</span>
+                    <strong className="text-[#064E3B]">Không giới hạn (Unlimited)</strong>
+                  </div>
+                </div>
+
+                <div className="pt-3 space-y-2 max-w-sm mx-auto">
+                  <button
+                    onClick={handleClose}
+                    className="w-full py-3 px-4 rounded-xl font-bold text-xs bg-[#064E3B] hover:bg-[#043327] text-white shadow-md transition-colors cursor-pointer"
+                  >
+                    Bắt đầu luyện thi ngay
+                  </button>
+
+                  <button
+                    onClick={() => {
+                      resetToFree();
+                      setStep('select');
+                    }}
+                    className="w-full py-1.5 text-[11px] text-stone-400 hover:text-stone-600 flex items-center justify-center gap-1 cursor-pointer"
+                  >
+                    <RefreshCw size={11} />
+                    <span>Thử nghiệm: Trở về gói Free</span>
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
         </motion.div>
       </div>

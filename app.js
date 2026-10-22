@@ -14,6 +14,7 @@ const ankiRoutes = require('./routes/api/ankiRoutes');
 const dictationRoutes = require('./routes/api/dictationRoutes');
 const chatRoutes = require('./routes/api/chatRoutes');
 const aiRoutes = require('./routes/api/aiRoutes');
+const paymentRoutes = require('./routes/api/paymentRoutes');
 
 const app = express();
 
@@ -69,6 +70,7 @@ app.use('/api/anki', ankiRoutes);
 app.use('/api/dictation', dictationRoutes);
 app.use('/api/chat', chatRoutes);
 app.use('/api/ai', aiRoutes);
+app.use('/api/payment', paymentRoutes);
 
 // ----- SPA Fallback cho React Frontend -----
 if (fs.existsSync(frontendDist)) {
