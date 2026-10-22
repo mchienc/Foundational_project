@@ -80,7 +80,7 @@ export const Navbar: React.FC<NavbarProps> = ({
         {/* Brand Logo - Left Aligned */}
         <div className="flex items-center shrink-0">
           <button
-            onClick={() => onSelectScreen(currentUser ? 'reading' : 'landing')}
+            onClick={() => onSelectScreen('landing')}
             className="flex items-center gap-2.5 group cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 rounded-lg select-none text-left"
           >
             <div className="relative w-9 h-9 sm:w-10 sm:h-10 rounded-xl overflow-hidden bg-white p-1 border border-amber-400/40 shadow-sm group-hover:border-amber-400 group-hover:shadow-amber-400/20 group-hover:scale-105 transition-all duration-200 shrink-0 flex items-center justify-center">
