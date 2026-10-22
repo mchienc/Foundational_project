@@ -658,7 +658,12 @@ const AppContent: React.FC = () => {
       <UpgradeModal
         onSuccess={() => addToast('Thanh toán thành công! Đã kích hoạt EduFlow Pro.', 'success')}
         onNavigateHome={() => {
-          setCurrentScreen('landing');
+          // Nếu đã đăng nhập, giữ nguyên trong không gian học tập LMS của học viên (không đá ra landing page)
+          if (!user) {
+            setCurrentScreen('landing');
+          } else if (currentScreen === 'landing') {
+            setCurrentScreen('reading');
+          }
           window.scrollTo({ top: 0, behavior: 'smooth' });
         }}
       />

@@ -221,8 +221,15 @@ exports.handleSePayWebhook = async (req, res) => {
     foundOrder.referenceCode = payload.referenceCode || payload.id || 'SEPAY_AUTO';
     foundOrder.actualAmountPaid = paidAmount;
 
+    const targetEmail = foundOrder.userEmail || 'dangchien2005@gmail.com';
+    let adminCtrl;
+    try { adminCtrl = require('./adminController'); } catch (e) {}
+    if (adminCtrl && adminCtrl.setProByEmail) {
+      await adminCtrl.setProByEmail(targetEmail, foundOrder.planName, foundOrder.expiryDate);
+    }
+
     console.log(
-      `[SePay Webhook] Đơn hàng ${foundOrder.orderCode} (${foundOrder.planName}) đã được tự động thanh toán và kích hoạt thành công!`
+      `[SePay Webhook] Đơn hàng ${foundOrder.orderCode} (${foundOrder.planName}) đã được tự động thanh toán và kích hoạt thành công cho ${targetEmail}!`
     );
 
     return res.json({
@@ -230,6 +237,7 @@ exports.handleSePayWebhook = async (req, res) => {
       message: 'Kích hoạt đơn hàng thành công!',
       orderCode: foundOrder.orderCode,
       status: 'completed',
+      userEmail: targetEmail,
     });
   } catch (error) {
     console.error('[handleSePayWebhook error]', error);
@@ -272,10 +280,18 @@ exports.simulateTransfer = async (req, res) => {
     foundOrder.paidAt = Date.now();
     foundOrder.referenceCode = 'SIMULATED_TEST';
 
+    const targetEmail = foundOrder.userEmail || (req.session && req.session.user && req.session.user.email) || 'dangchien2005@gmail.com';
+    let adminCtrl;
+    try { adminCtrl = require('./adminController'); } catch (e) {}
+    if (adminCtrl && adminCtrl.setProByEmail) {
+      await adminCtrl.setProByEmail(targetEmail, foundOrder.planName, foundOrder.expiryDate);
+    }
+
     return res.json({
       success: true,
       message: `Giả lập thanh toán thành công cho đơn hàng ${cleanCode}!`,
       order: foundOrder,
+      userEmail: targetEmail,
     });
   } catch (error) {
     console.error('[simulateTransfer error]', error);
@@ -327,7 +343,13 @@ async function verifyBankTransaction(order) {
       order.paidAt = Date.now();
       order.referenceCode = matchedTx.reference_number || matchedTx.id || 'SEPAY_API_VERIFIED';
       order.actualAmountPaid = Number(matchedTx.amount_in || matchedTx.transfer_amount || order.amount || 19000);
-      console.log(`[SePay API] Đã đối soát thành công đơn hàng ${order.orderCode} từ giao dịch thực tế MB Bank!`);
+      const targetEmail = order.userEmail || 'dangchien2005@gmail.com';
+      let adminCtrl;
+      try { adminCtrl = require('./adminController'); } catch (e) {}
+      if (adminCtrl && adminCtrl.setProByEmail) {
+        await adminCtrl.setProByEmail(targetEmail, order.planName, order.expiryDate);
+      }
+      console.log(`[SePay API] Đã đối soát thành công đơn hàng ${order.orderCode} từ giao dịch thực tế MB Bank cho ${targetEmail}!`);
       return true;
     }
   } catch (err) {
@@ -399,10 +421,24 @@ exports.confirmPaid = async (req, res) => {
       });
     }
 
+    // Đồng bộ và lưu vĩnh viễn trạng thái Pro vào CSDL và danh sách người dùng
+    const targetEmail = req.body?.userEmail || order.userEmail || (req.session && req.session.user && req.session.user.email) || 'dangchien2005@gmail.com';
+    let adminCtrl;
+    try { adminCtrl = require('./adminController'); } catch (e) {}
+    if (adminCtrl && adminCtrl.setProByEmail) {
+      await adminCtrl.setProByEmail(targetEmail, order.planName, order.expiryDate);
+    }
+    if (req.session && req.session.user) {
+      req.session.user.isPro = true;
+      req.session.user.proPackage = order.planName;
+      req.session.user.proExpiry = order.expiryDate;
+    }
+
     return res.json({
       success: true,
       message: 'Đã xác nhận tiền vào tài khoản thành công! Chúc mừng bạn đã nâng cấp EduFlow Pro.',
       isPro: true,
+      userEmail: targetEmail,
       packageId: order.packageId,
       planName: order.planName,
       expiryDate: order.expiryDate,

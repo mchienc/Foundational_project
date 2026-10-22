@@ -213,6 +213,55 @@ exports.updateUserProStatus = async (req, res) => {
   }
 };
 
+// 3.2. Cập nhật tư cách Pro trực tiếp qua email (dùng cho Webhook và Thanh toán)
+exports.setProByEmail = async (email, planName, expiryDate) => {
+  if (!email) return null;
+  const cleanEmail = email.trim().toLowerCase();
+  const pkgName = planName || 'EduFlow Pro';
+  const exp = expiryDate || '30 ngày';
+
+  try {
+    await db.query(
+      'UPDATE users SET is_pro = 1, pro_package = ?, pro_expiry = ? WHERE LOWER(email) = ?',
+      [pkgName, exp, cleanEmail]
+    );
+  } catch (err) {
+    // MySQL fallback
+  }
+
+  let found = false;
+  memoryUsers = memoryUsers.map((u) => {
+    if (u.email && u.email.toLowerCase() === cleanEmail) {
+      found = true;
+      return {
+        ...u,
+        is_pro: true,
+        pro_package: pkgName,
+        pro_expiry: exp,
+      };
+    }
+    return u;
+  });
+
+  if (!found) {
+    memoryUsers.push({
+      id: `u-${Date.now()}`,
+      full_name: cleanEmail.split('@')[0],
+      email: cleanEmail,
+      role: 'student',
+      created_at: new Date().toISOString(),
+      exams_taken: 0,
+      is_pro: true,
+      pro_package: pkgName,
+      pro_expiry: exp,
+    });
+  }
+
+  return memoryUsers.find((u) => u.email.toLowerCase() === cleanEmail);
+};
+
+exports.getMemoryUsers = () => memoryUsers;
+
 // 4. Khoá / Xoá tài khoản người dùng
 exports.deleteUser = async (req, res) => {
   try {

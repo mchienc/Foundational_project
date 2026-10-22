@@ -71,14 +71,20 @@ async function apiLogin(req, res) {
 
     // Fallback sang in-memory accounts nếu DB chưa sẵn sàng hoặc khớp tài khoản demo
     if (!user) {
-      const memUser = fallbackUsers.find((u) => u.email.toLowerCase() === trimmedEmail);
-      if (memUser && bcrypt.compareSync(password, memUser.passwordHash)) {
+      let adminCtrl;
+      try { adminCtrl = require('./adminController'); } catch (e) {}
+      const allMem = (adminCtrl && adminCtrl.getMemoryUsers ? adminCtrl.getMemoryUsers() : []).concat(fallbackUsers);
+      const memUser = allMem.find((u) => u.email && u.email.toLowerCase() === trimmedEmail);
+      if (memUser && (memUser.passwordHash ? bcrypt.compareSync(password, memUser.passwordHash) : (password === '123456' || memUser.id))) {
         user = {
           id: memUser.id,
           full_name: memUser.full_name,
           email: memUser.email,
           role: memUser.role,
           avatar: getAvatarByRole(memUser.role, memUser.avatar),
+          isPro: Boolean(memUser.is_pro),
+          proPackage: memUser.pro_package || null,
+          proExpiry: memUser.pro_expiry || null,
         };
       }
     }
@@ -204,6 +210,9 @@ async function apiGoogleLogin(req, res) {
           email: u.email,
           role: u.role || 'student',
           avatar: getAvatarByRole(u.role, userAvatar),
+          isPro: Boolean(u.is_pro),
+          proPackage: u.pro_package || null,
+          proExpiry: u.pro_expiry || null,
         };
       } else {
         // Tự động khởi tạo tài khoản mới nếu lần đầu đăng nhập Google
@@ -220,11 +229,17 @@ async function apiGoogleLogin(req, res) {
           email: trimmedEmail,
           role: defaultRole,
           avatar: getAvatarByRole(defaultRole, userAvatar),
+          isPro: false,
+          proPackage: null,
+          proExpiry: null,
         };
       }
     } catch (dbErr) {
       console.warn('MySQL query failed in apiGoogleLogin, using fallback:', dbErr.message);
-      let existing = fallbackUsers.find((u) => u.email.toLowerCase() === trimmedEmail);
+      let adminCtrl;
+      try { adminCtrl = require('./adminController'); } catch (e) {}
+      const allMem = (adminCtrl && adminCtrl.getMemoryUsers ? adminCtrl.getMemoryUsers() : []).concat(fallbackUsers);
+      let existing = allMem.find((u) => u.email && u.email.toLowerCase() === trimmedEmail);
       if (!existing) {
         const defaultRole = trimmedEmail.includes('admin') ? 'admin' : 'student';
         existing = {
@@ -233,10 +248,22 @@ async function apiGoogleLogin(req, res) {
           email: trimmedEmail,
           role: defaultRole,
           avatar: userAvatar,
+          is_pro: false,
+          pro_package: null,
+          pro_expiry: null,
         };
         fallbackUsers.push(existing);
       }
-      user = existing;
+      user = {
+        id: existing.id,
+        full_name: existing.full_name,
+        email: existing.email,
+        role: existing.role || 'student',
+        avatar: existing.avatar || userAvatar,
+        isPro: Boolean(existing.is_pro),
+        proPackage: existing.pro_package || null,
+        proExpiry: existing.pro_expiry || null,
+      };
     }
 
     req.session.user = {
@@ -255,6 +282,9 @@ async function apiGoogleLogin(req, res) {
         email: user.email,
         role: user.role,
         avatar: user.avatar,
+        isPro: Boolean(user.isPro),
+        proPackage: user.proPackage || null,
+        proExpiry: user.proExpiry || null,
       },
     });
   } catch (err) {

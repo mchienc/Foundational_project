@@ -17,6 +17,7 @@ import {
   ChevronLeft,
 } from 'lucide-react';
 import { useProStore } from '../../modules/pro/useProStore';
+import { useAuth } from '../../context/AuthContext';
 
 interface UpgradeModalProps {
   isOpen?: boolean;
@@ -79,6 +80,7 @@ export const UpgradeModal: React.FC<UpgradeModalProps> = ({
   onSuccess,
   onNavigateHome,
 }) => {
+  const { user, login } = useAuth();
   const isStoreOpen = useProStore((state) => state.isUpgradeModalOpen);
   const closeStoreModal = useProStore((state) => state.closeUpgradeModal);
   const isPro = useProStore((state) => state.isPro);
@@ -147,10 +149,19 @@ export const UpgradeModal: React.FC<UpgradeModalProps> = ({
               orderId: orderData.orderCode,
             });
 
+            if (user) {
+              login({
+                ...user,
+                isPro: true,
+                proPackage: selectedPlan.name,
+                proExpiry: expiry,
+              });
+            }
+
             setStep('success');
             if (onSuccess) onSuccess();
 
-            // Tự động đóng modal và điều hướng về Trang Chủ sau 2 giây!
+            // Tự động đóng modal sau 2 giây
             setTimeout(() => {
               handleClose();
               if (onNavigateHome) {
@@ -167,7 +178,7 @@ export const UpgradeModal: React.FC<UpgradeModalProps> = ({
     return () => {
       if (pollInterval) clearInterval(pollInterval);
     };
-  }, [step, orderData, selectedPlan, activateProPackage, onSuccess, handleClose, onNavigateHome]);
+  }, [step, orderData, selectedPlan, activateProPackage, onSuccess, handleClose, onNavigateHome, user, login]);
 
   if (!isOpen) return null;
 
@@ -203,6 +214,7 @@ export const UpgradeModal: React.FC<UpgradeModalProps> = ({
           planName: selectedPlan.name,
           amount: selectedPlan.price,
           billingCycle: selectedPlan.durationLabel,
+          userEmail: user?.email || 'dangchien2005@gmail.com',
         }),
       });
 
@@ -274,6 +286,7 @@ export const UpgradeModal: React.FC<UpgradeModalProps> = ({
           amount: orderData.amount,
           packageId: selectedPlan.id,
           planName: selectedPlan.name,
+          userEmail: user?.email || 'dangchien2005@gmail.com',
         }),
       });
       const data = await res.json().catch(() => null);
@@ -304,16 +317,25 @@ export const UpgradeModal: React.FC<UpgradeModalProps> = ({
         orderId: orderData.orderCode,
       });
 
+      if (user) {
+        login({
+          ...user,
+          isPro: true,
+          proPackage: selectedPlan.name,
+          proExpiry: expiry,
+        });
+      }
+
       setStep('success');
       if (onSuccess) onSuccess();
 
-      // Tự động đóng modal và điều hướng về Trang Chủ sau 1.8 giây!
+      // Tự động đóng modal sau 2 giây
       setTimeout(() => {
         handleClose();
         if (onNavigateHome) {
           onNavigateHome();
         }
-      }, 1800);
+      }, 2000);
     } catch (e: any) {
       console.error('Error confirming payment:', e);
       setConfirmError(e.message || 'Lỗi kết nối kiểm tra thanh toán.');

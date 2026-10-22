@@ -58,19 +58,19 @@ const loadUserState = (email?: string | null, userObj?: User | null) => {
       const parsed = JSON.parse(raw);
       const isDailyNew = parsed.lastResetDate !== today;
 
-      // Ưu tiên trạng thái được Admin cấp trực tiếp nếu có
-      const effectiveIsPro = userObj?.isPro !== undefined ? Boolean(userObj.isPro) : Boolean(parsed.isPro);
+      // Giữ nguyên trạng thái Pro nếu tài khoản này đã có Pro (từ userObj hoặc từ lịch sử localStorage)
+      const effectiveIsPro = Boolean(userObj?.isPro) || Boolean(parsed?.isPro);
 
       return {
         currentUserEmail: email ? email.trim().toLowerCase() : null,
         isPro: effectiveIsPro,
-        writingQuotaLeft: isDailyNew ? 1 : (typeof parsed.writingQuotaLeft === 'number' ? parsed.writingQuotaLeft : 1),
-        speakingQuotaLeft: isDailyNew ? 1 : (typeof parsed.speakingQuotaLeft === 'number' ? parsed.speakingQuotaLeft : 1),
+        writingQuotaLeft: effectiveIsPro ? 999 : (isDailyNew ? 1 : (typeof parsed.writingQuotaLeft === 'number' ? parsed.writingQuotaLeft : 1)),
+        speakingQuotaLeft: effectiveIsPro ? 999 : (isDailyNew ? 1 : (typeof parsed.speakingQuotaLeft === 'number' ? parsed.speakingQuotaLeft : 1)),
         lastResetDate: today,
         isUpgradeModalOpen: false,
-        planName: userObj?.proPackage || parsed.planName || (effectiveIsPro ? 'EduFlow Pro' : 'Tài khoản miễn phí'),
-        packageId: userObj?.proPackage || parsed.packageId || 'month',
-        packageExpiry: userObj?.proExpiry || parsed.packageExpiry || (effectiveIsPro ? 'Vĩnh viễn' : 'Hết hạn'),
+        planName: (userObj?.isPro && userObj?.proPackage) || parsed.planName || (effectiveIsPro ? 'EduFlow Pro' : 'Tài khoản miễn phí'),
+        packageId: (userObj?.isPro && userObj?.proPackage) || parsed.packageId || 'month',
+        packageExpiry: (userObj?.isPro && userObj?.proExpiry) || parsed.packageExpiry || (effectiveIsPro ? 'Vĩnh viễn' : 'Hết hạn'),
         lastOrderId: parsed.lastOrderId || '',
       };
     }
