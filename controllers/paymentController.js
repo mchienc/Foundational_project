@@ -107,8 +107,13 @@ exports.checkOrderStatus = async (req, res) => {
       });
     }
 
-    if (order.status === 'pending' && Date.now() > order.expiresAt) {
-      order.status = 'expired';
+    if (order.status === 'pending') {
+      if (Date.now() > order.expiresAt) {
+        order.status = 'expired';
+      } else {
+        // Tự động đối soát giao dịch thực tế trên SePay nếu có API Key
+        await verifyBankTransaction(order);
+      }
     }
 
     return res.json({
@@ -255,7 +260,56 @@ exports.simulateTransfer = async (req, res) => {
   }
 };
 
-// 5. Xác nhận thanh toán khi người dùng bấm "Tôi đã chuyển tiền thành công"
+// 4.1. Hàm đối soát giao dịch thực tế từ MB Bank thông qua SePay API
+async function verifyBankTransaction(order) {
+  if (!order) return false;
+  if (order.status === 'completed') return true;
+
+  const apiKey = process.env.SEPAY_API_KEY || process.env.SEPAY_API_TOKEN;
+  if (!apiKey) {
+    console.warn('[SePay API] Chưa cấu hình SEPAY_API_KEY / SEPAY_API_TOKEN trong .env');
+    return false;
+  }
+
+  try {
+    const url = 'https://userapi.sepay.vn/v2/transactions?limit=25';
+    const response = await fetch(url, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${apiKey.trim()}`,
+        'Content-Type': 'application/json',
+      },
+    });
+
+    const data = await response.json().catch(() => null);
+    if (!data) return false;
+
+    const txs = Array.isArray(data.transactions) ? data.transactions : (Array.isArray(data.data) ? data.data : []);
+    const cleanCode = order.orderCode.toUpperCase();
+
+    const matchedTx = txs.find((tx) => {
+      const content = `${tx.transaction_content || ''} ${tx.description || ''}`.toUpperCase();
+      const amountIn = Number(tx.amount_in || tx.transfer_amount || 0);
+      const isIncoming = tx.transfer_type === 'in' || amountIn > 0;
+      return content.includes(cleanCode) && isIncoming && amountIn >= order.amount;
+    });
+
+    if (matchedTx) {
+      order.status = 'completed';
+      order.paidAt = Date.now();
+      order.referenceCode = matchedTx.reference_number || matchedTx.id || 'SEPAY_API_VERIFIED';
+      order.actualAmountPaid = Number(matchedTx.amount_in || matchedTx.transfer_amount || order.amount);
+      console.log(`[SePay API] Đã đối soát thành công đơn hàng ${order.orderCode} từ giao dịch thực tế MB Bank!`);
+      return true;
+    }
+  } catch (err) {
+    console.error('[verifyBankTransaction error]', err.message);
+  }
+
+  return false;
+}
+
+// 5. Xác thực tiền đã về tài khoản trước khi cho phép kích hoạt
 exports.confirmPaid = async (req, res) => {
   try {
     const { orderId } = req.params;
@@ -271,20 +325,41 @@ exports.confirmPaid = async (req, res) => {
       }
     }
 
-    if (order) {
-      order.status = 'completed';
-      order.paidAt = Date.now();
-      order.referenceCode = 'USER_CONFIRMED';
+    if (!order) {
+      return res.status(404).json({
+        success: false,
+        message: 'Không tìm thấy thông tin đơn hàng.',
+      });
+    }
+
+    // 1. Kiểm tra đối soát giao dịch thực tế từ SePay API nếu có token
+    const isPaid = await verifyBankTransaction(order);
+
+    // 2. Nếu đơn hàng vẫn chưa hoàn tất (chưa có Webhook và chưa có giao dịch trên SePay API)
+    if (!isPaid && order.status !== 'completed') {
+      const apiKey = process.env.SEPAY_API_KEY || process.env.SEPAY_API_TOKEN;
+      if (!apiKey) {
+        return res.status(400).json({
+          success: false,
+          needsApiKey: true,
+          message: `Chưa cấu hình SEPAY_API_KEY trong file .env để hệ thống tự động kiểm tra số dư MB Bank thật của bạn (mã đơn: ${order.orderCode}). Hãy thêm SEPAY_API_KEY để hệ thống đối soát giao dịch tự động.`,
+        });
+      }
+
+      return res.status(400).json({
+        success: false,
+        message: `Hệ thống đã kiểm tra tài khoản MB Bank (0976294907) nhưng chưa nhận được biến động số dư cho mã đơn "${order.orderCode}". Vui lòng kiểm tra lại xem app ngân hàng đã trừ tiền và chuyển đúng nội dung chưa!`,
+      });
     }
 
     return res.json({
       success: true,
-      message: 'Xác nhận thanh toán thành công! Chúc mừng bạn đã nâng cấp EduFlow Pro.',
+      message: 'Đã xác nhận tiền vào tài khoản thành công! Chúc mừng bạn đã nâng cấp EduFlow Pro.',
       isPro: true,
-      packageId: order?.packageId || 'month',
-      planName: order?.planName || 'EduFlow Pro',
-      expiryDate: order?.expiryDate || calculateExpiryDate(order?.packageId || 'month'),
-      order: order || { status: 'completed' },
+      packageId: order.packageId,
+      planName: order.planName,
+      expiryDate: order.expiryDate,
+      order,
     });
   } catch (error) {
     console.error('[confirmPaid error]', error);

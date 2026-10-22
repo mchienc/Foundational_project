@@ -95,6 +95,7 @@ export const UpgradeModal: React.FC<UpgradeModalProps> = ({
   const [selectedPlan, setSelectedPlan] = useState<PlanOption>(PRO_PLANS[1]); // Default 6 months
   const [isLoadingOrder, setIsLoadingOrder] = useState<boolean>(false);
   const [isConfirmingPaid, setIsConfirmingPaid] = useState<boolean>(false);
+  const [confirmError, setConfirmError] = useState<string | null>(null);
   const [orderData, setOrderData] = useState<any>(null);
 
   // Copy feedback state
@@ -258,15 +259,28 @@ export const UpgradeModal: React.FC<UpgradeModalProps> = ({
   // Nút người dùng xác nhận đã chuyển khoản thành công
   const handleConfirmPaidByUser = async () => {
     setIsConfirmingPaid(true);
+    setConfirmError(null);
     try {
-      if (orderData?.orderId) {
-        await fetch(`/api/payment/confirm-paid/${orderData.orderId}`, {
-          method: 'POST',
-        }).catch(() => {});
+      if (!orderData?.orderId) {
+        throw new Error('Chưa có thông tin đơn hàng.');
+      }
+
+      const res = await fetch(`/api/payment/confirm-paid/${orderData.orderId}`, {
+        method: 'POST',
+      });
+      const data = await res.json().catch(() => null);
+
+      if (!res.ok || !data?.success) {
+        setConfirmError(
+          data?.message ||
+            'Hệ thống chưa tìm thấy giao dịch tiền vào tài khoản MB Bank. Vui lòng kiểm tra lại app ngân hàng hoặc đợi trong giây lát!'
+        );
+        return;
       }
 
       const expiry =
-        orderData?.expiryDate ||
+        data.expiryDate ||
+        orderData.expiryDate ||
         (selectedPlan.id === 'lifetime'
           ? 'Vĩnh viễn'
           : selectedPlan.id === 'year'
@@ -279,7 +293,7 @@ export const UpgradeModal: React.FC<UpgradeModalProps> = ({
         packageId: selectedPlan.id,
         planName: selectedPlan.name,
         expiryDate: expiry,
-        orderId: orderData?.orderCode || `EDF_${Date.now()}`,
+        orderId: orderData.orderCode,
       });
 
       setStep('success');
@@ -292,20 +306,9 @@ export const UpgradeModal: React.FC<UpgradeModalProps> = ({
           onNavigateHome();
         }
       }, 1800);
-    } catch (e) {
+    } catch (e: any) {
       console.error('Error confirming payment:', e);
-      activateProPackage({
-        packageId: selectedPlan.id,
-        planName: selectedPlan.name,
-        expiryDate: '30 ngày',
-        orderId: orderData?.orderCode || `EDF_${Date.now()}`,
-      });
-      setStep('success');
-      if (onSuccess) onSuccess();
-      setTimeout(() => {
-        handleClose();
-        if (onNavigateHome) onNavigateHome();
-      }, 1800);
+      setConfirmError(e.message || 'Lỗi kết nối kiểm tra thanh toán.');
     } finally {
       setIsConfirmingPaid(false);
     }
@@ -617,7 +620,7 @@ export const UpgradeModal: React.FC<UpgradeModalProps> = ({
                     {isConfirmingPaid ? (
                       <>
                         <RefreshCw size={18} className="animate-spin text-amber-300" />
-                        <span>Đang kích hoạt gói Pro...</span>
+                        <span>Đang kiểm tra biến động số dư MB Bank...</span>
                       </>
                     ) : (
                       <>
@@ -627,8 +630,22 @@ export const UpgradeModal: React.FC<UpgradeModalProps> = ({
                       </>
                     )}
                   </button>
+
+                  {/* Cảnh báo nếu chưa nhận được tiền */}
+                  {confirmError && (
+                    <div className="p-3.5 bg-rose-50 border border-rose-200 text-rose-800 rounded-2xl text-xs space-y-1 animate-in fade-in">
+                      <div className="font-bold flex items-center gap-1.5 text-rose-900">
+                        <ShieldCheck size={14} className="text-rose-600 shrink-0" />
+                        <span>Chưa ghi nhận tiền vào tài khoản:</span>
+                      </div>
+                      <p className="leading-relaxed pl-5 text-[11px] text-rose-700">
+                        {confirmError}
+                      </p>
+                    </div>
+                  )}
+
                   <p className="text-[11px] text-center text-stone-500">
-                    Bấm xác nhận sau khi bạn đã chuyển khoản để hệ thống kích hoạt gói Pro và tự động đưa bạn về Trang Chủ.
+                    Bấm xác nhận sau khi bạn đã chuyển khoản để hệ thống đối soát số dư MB Bank và tự động đưa bạn về Trang Chủ.
                   </p>
                 </div>
 
