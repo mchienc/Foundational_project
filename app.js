@@ -38,8 +38,8 @@ app.use((req, res, next) => {
 });
 
 // ----- Middleware -----
-app.use(express.urlencoded({ extended: true }));
-app.use(express.json());
+app.use(express.urlencoded({ extended: true, limit: '25mb' }));
+app.use(express.json({ limit: '25mb' }));
 
 // Phục vụ file âm thanh: Tự động redirect sang Cloudflare R2 CDN
 app.use('/audio', (req, res) => {
@@ -84,8 +84,16 @@ if (fs.existsSync(frontendDist)) {
   app.get('/', (req, res) => res.redirect('http://localhost:5173'));
 }
 
-// ----- Khởi động server -----
+// ----- Khởi động server & Kiểm tra cấu trúc DB -----
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
+app.listen(PORT, async () => {
   console.log(`Server đang chạy tại http://localhost:${PORT}`);
+  try {
+    const db = require('./config/db');
+    await db.query('ALTER TABLE users ADD COLUMN IF NOT EXISTS avatar LONGTEXT');
+    await db.query('ALTER TABLE users ADD COLUMN IF NOT EXISTS phone VARCHAR(50)');
+    console.log('[DB] Đã kiểm tra và đảm bảo bảng users có cột avatar, phone.');
+  } catch (err) {
+    console.warn('[DB Check] Bỏ qua kiểm tra cấu trúc bảng users:', err.message);
+  }
 });

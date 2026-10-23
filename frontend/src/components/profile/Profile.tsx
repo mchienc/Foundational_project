@@ -56,7 +56,14 @@ export const Profile: React.FC<ProfileProps> = ({
   // Tab 1: Info states
   const [fullName, setFullName] = useState<string>(user.full_name || '');
   const [email, setEmail] = useState<string>(user.email || '');
-  const [phone, setPhone] = useState<string>(user.phone || '0976294907');
+  const [phone, setPhone] = useState<string>(user.phone || '');
+
+  // Cập nhật lại form khi user prop thay đổi
+  useEffect(() => {
+    setFullName(user.full_name || '');
+    setEmail(user.email || '');
+    setPhone(user.phone || '');
+  }, [user]);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Nén ảnh đại diện tự động để tối ưu dung lượng và sắc nét khung tròn

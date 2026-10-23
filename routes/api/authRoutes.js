@@ -12,6 +12,8 @@ router.post('/forgot-password', authController.apiForgotPassword);
 router.post('/verify-otp', authController.apiVerifyOtp);
 router.post('/reset-password', authController.apiResetPassword);
 router.post('/update-password', authController.apiUpdatePassword);
+router.post('/update-profile', authController.apiUpdateProfile);
+router.put('/update-profile', authController.apiUpdateProfile);
 router.get('/me', authController.apiMe);
 router.post('/logout', authController.apiLogout);
 

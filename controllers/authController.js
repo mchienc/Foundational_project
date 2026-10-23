@@ -57,8 +57,9 @@ async function apiLogin(req, res) {
             id: String(dbUser.id),
             full_name: dbUser.full_name,
             email: dbUser.email,
+            phone: dbUser.phone || '',
             role: dbUser.role || 'student',
-            avatar: getAvatarByRole(dbUser.role),
+            avatar: dbUser.avatar || getAvatarByRole(dbUser.role),
             isPro: Boolean(dbUser.is_pro),
             proPackage: dbUser.pro_package || null,
             proExpiry: dbUser.pro_expiry || null,
@@ -80,8 +81,9 @@ async function apiLogin(req, res) {
           id: memUser.id,
           full_name: memUser.full_name,
           email: memUser.email,
+          phone: memUser.phone || '',
           role: memUser.role,
-          avatar: getAvatarByRole(memUser.role, memUser.avatar),
+          avatar: memUser.avatar || getAvatarByRole(memUser.role, memUser.avatar),
           isPro: Boolean(memUser.is_pro),
           proPackage: memUser.pro_package || null,
           proExpiry: memUser.pro_expiry || null,
@@ -97,7 +99,9 @@ async function apiLogin(req, res) {
       id: user.id,
       full_name: user.full_name,
       email: user.email,
+      phone: user.phone || '',
       role: user.role,
+      avatar: user.avatar,
     };
 
     return res.json({
@@ -142,6 +146,7 @@ async function apiRegister(req, res) {
         id: String(result.insertId),
         full_name: full_name.trim(),
         email: trimmedEmail,
+        phone: '',
         role: 'student',
         avatar: getAvatarByRole('student'),
       };
@@ -155,6 +160,7 @@ async function apiRegister(req, res) {
         id: String(Date.now()),
         full_name: full_name.trim(),
         email: trimmedEmail,
+        phone: '',
         passwordHash: hashedPassword,
         role: 'student',
         avatar: getAvatarByRole('student'),
@@ -166,7 +172,9 @@ async function apiRegister(req, res) {
       id: newUser.id,
       full_name: newUser.full_name,
       email: newUser.email,
+      phone: '',
       role: newUser.role,
+      avatar: newUser.avatar,
     };
 
     return res.json({
@@ -208,8 +216,9 @@ async function apiGoogleLogin(req, res) {
           id: String(u.id),
           full_name: u.full_name,
           email: u.email,
+          phone: u.phone || '',
           role: u.role || 'student',
-          avatar: getAvatarByRole(u.role, userAvatar),
+          avatar: u.avatar || getAvatarByRole(u.role, userAvatar),
           isPro: Boolean(u.is_pro),
           proPackage: u.pro_package || null,
           proExpiry: u.pro_expiry || null,
@@ -220,15 +229,16 @@ async function apiGoogleLogin(req, res) {
         const randomPass = Math.random().toString(36).slice(-8) + 'Aa1!';
         const hashedPassword = await bcrypt.hash(randomPass, 10);
         const [insertRes] = await db.query(
-          'INSERT INTO users (full_name, email, password, role) VALUES (?, ?, ?, ?)',
-          [name, trimmedEmail, hashedPassword, defaultRole]
+          'INSERT INTO users (full_name, email, password, role, avatar) VALUES (?, ?, ?, ?, ?)',
+          [name, trimmedEmail, hashedPassword, defaultRole, userAvatar]
         );
         user = {
           id: String(insertRes.insertId),
           full_name: name,
           email: trimmedEmail,
+          phone: '',
           role: defaultRole,
-          avatar: getAvatarByRole(defaultRole, userAvatar),
+          avatar: userAvatar,
           isPro: false,
           proPackage: null,
           proExpiry: null,
@@ -246,6 +256,7 @@ async function apiGoogleLogin(req, res) {
           id: 'g-' + Date.now(),
           full_name: name,
           email: trimmedEmail,
+          phone: '',
           role: defaultRole,
           avatar: userAvatar,
           is_pro: false,
@@ -258,6 +269,7 @@ async function apiGoogleLogin(req, res) {
         id: existing.id,
         full_name: existing.full_name,
         email: existing.email,
+        phone: existing.phone || '',
         role: existing.role || 'student',
         avatar: existing.avatar || userAvatar,
         isPro: Boolean(existing.is_pro),
@@ -270,7 +282,9 @@ async function apiGoogleLogin(req, res) {
       id: user.id,
       full_name: user.full_name,
       email: user.email,
+      phone: user.phone || '',
       role: user.role,
+      avatar: user.avatar,
     };
 
     return res.json({
@@ -434,17 +448,41 @@ async function apiResetPassword(req, res) {
 }
 
 // 6. API Kiểm tra trạng thái phiên đăng nhập hiện tại
-function apiMe(req, res) {
+async function apiMe(req, res) {
   if (req.session && req.session.user) {
     const u = req.session.user;
+    try {
+      const [rows] = await db.query('SELECT * FROM users WHERE id = ? OR LOWER(email) = ?', [u.id, (u.email || '').toLowerCase()]);
+      if (rows && rows.length > 0) {
+        const dbUser = rows[0];
+        return res.json({
+          success: true,
+          user: {
+            id: String(dbUser.id),
+            full_name: dbUser.full_name,
+            email: dbUser.email,
+            phone: dbUser.phone || '',
+            role: dbUser.role || 'student',
+            avatar: dbUser.avatar || getAvatarByRole(dbUser.role),
+            isPro: Boolean(dbUser.is_pro),
+            proPackage: dbUser.pro_package || null,
+            proExpiry: dbUser.pro_expiry || null,
+          },
+        });
+      }
+    } catch (err) {
+      console.warn('apiMe db lookup fallback to session:', err.message);
+    }
+
     return res.json({
       success: true,
       user: {
         id: String(u.id),
         full_name: u.full_name,
         email: u.email,
+        phone: u.phone || '',
         role: u.role || 'student',
-        avatar: getAvatarByRole(u.role),
+        avatar: getAvatarByRole(u.role, u.avatar),
       },
     });
   }
@@ -515,6 +553,99 @@ async function apiUpdatePassword(req, res) {
   }
 }
 
+// 9. API Cập nhật thông tin hồ sơ & Ảnh đại diện Avatar
+async function apiUpdateProfile(req, res) {
+  try {
+    const { email, newEmail, full_name, phone, avatar } = req.body;
+    const sessionEmail = req.session && req.session.user && req.session.user.email;
+    const targetEmail = (sessionEmail || email || '').trim().toLowerCase();
+
+    if (!targetEmail) {
+      return res.status(400).json({ success: false, message: 'Không xác định được tài khoản người dùng.' });
+    }
+
+    let updatedUser = null;
+
+    try {
+      const [existing] = await db.query('SELECT * FROM users WHERE LOWER(email) = ?', [targetEmail]);
+      if (existing.length > 0) {
+        const u = existing[0];
+        const updatedName = full_name !== undefined ? full_name.trim() : u.full_name;
+        const updatedPhone = phone !== undefined ? phone.trim() : (u.phone || '');
+        const updatedAvatar = avatar !== undefined ? avatar : (u.avatar || '');
+        const updatedEmail = (newEmail && newEmail.trim().toLowerCase()) || targetEmail;
+
+        await db.query(
+          'UPDATE users SET full_name = ?, email = ?, phone = ?, avatar = ? WHERE id = ?',
+          [updatedName, updatedEmail, updatedPhone, updatedAvatar, u.id]
+        );
+
+        updatedUser = {
+          id: String(u.id),
+          full_name: updatedName,
+          email: updatedEmail,
+          phone: updatedPhone,
+          role: u.role || 'student',
+          avatar: updatedAvatar || getAvatarByRole(u.role),
+          isPro: Boolean(u.is_pro),
+          proPackage: u.pro_package || null,
+          proExpiry: u.pro_expiry || null,
+        };
+      }
+    } catch (dbErr) {
+      console.warn('MySQL update profile warning:', dbErr.message);
+    }
+
+    // Đồng bộ với tài khoản fallback/in-memory nếu có
+    let adminCtrl;
+    try { adminCtrl = require('./adminController'); } catch (e) {}
+    const allMem = (adminCtrl && adminCtrl.getMemoryUsers ? adminCtrl.getMemoryUsers() : []).concat(fallbackUsers);
+    const memUser = allMem.find((u) => u.email && u.email.toLowerCase() === targetEmail);
+    if (memUser) {
+      if (full_name !== undefined) memUser.full_name = full_name.trim();
+      if (newEmail) memUser.email = newEmail.trim().toLowerCase();
+      if (phone !== undefined) memUser.phone = phone.trim();
+      if (avatar !== undefined) memUser.avatar = avatar;
+      if (!updatedUser) {
+        updatedUser = {
+          id: memUser.id,
+          full_name: memUser.full_name,
+          email: memUser.email,
+          phone: memUser.phone || '',
+          role: memUser.role || 'student',
+          avatar: memUser.avatar || getAvatarByRole(memUser.role),
+          isPro: Boolean(memUser.is_pro),
+          proPackage: memUser.pro_package || null,
+          proExpiry: memUser.pro_expiry || null,
+        };
+      }
+    }
+
+    if (!updatedUser) {
+      return res.status(404).json({ success: false, message: 'Không tìm thấy thông tin tài khoản người dùng.' });
+    }
+
+    // Cập nhật session
+    req.session.user = {
+      id: updatedUser.id,
+      full_name: updatedUser.full_name,
+      email: updatedUser.email,
+      phone: updatedUser.phone,
+      role: updatedUser.role,
+      avatar: updatedUser.avatar,
+    };
+
+    return res.json({
+      success: true,
+      message: 'Cập nhật thông tin và ảnh đại diện thành công!',
+      user: updatedUser,
+    });
+  } catch (err) {
+    console.error('apiUpdateProfile error:', err);
+    return res.status(500).json({ success: false, message: 'Lỗi hệ thống khi cập nhật hồ sơ cá nhân.' });
+  }
+}
+
 module.exports = {
   apiLogin,
   apiRegister,
@@ -523,6 +654,7 @@ module.exports = {
   apiVerifyOtp,
   apiResetPassword,
   apiUpdatePassword,
+  apiUpdateProfile,
   apiMe,
   apiLogout,
 };

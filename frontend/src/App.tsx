@@ -647,8 +647,32 @@ const AppContent: React.FC = () => {
                 addToast(`Bắt đầu bài thi Listening: ${match.source}`, 'success');
               }
             }}
-            onUpdateUser={(updated) => {
-              login({ ...user, ...updated });
+            onUpdateUser={async (updated) => {
+              if (!user) return;
+              const mergedUser = { ...user, ...updated };
+              login(mergedUser);
+
+              try {
+                const res = await fetch('/api/auth/update-profile', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({
+                    email: user.email,
+                    newEmail: updated.email,
+                    full_name: updated.full_name !== undefined ? updated.full_name : user.full_name,
+                    phone: updated.phone !== undefined ? updated.phone : user.phone,
+                    avatar: updated.avatar !== undefined ? updated.avatar : user.avatar,
+                  }),
+                });
+                const data = await res.json();
+                if (data.success && data.user) {
+                  login({ ...mergedUser, ...data.user });
+                } else if (!data.success) {
+                  console.warn('Lỗi lưu thông tin lên database:', data.message);
+                }
+              } catch (err) {
+                console.error('Lỗi kết nối khi cập nhật hồ sơ:', err);
+              }
             }}
             onViewCertificate={(title) => handleViewCertificate(title)}
             onNotify={addToast}

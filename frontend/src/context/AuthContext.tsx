@@ -63,6 +63,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   }, [user]);
 
+  // Đồng bộ thông tin người dùng mới nhất từ server khi ứng dụng tải
+  useEffect(() => {
+    fetch('/api/auth/me')
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.success && data.user) {
+          setUser((prev) => (prev ? { ...prev, ...data.user } : data.user));
+        }
+      })
+      .catch(() => {});
+  }, []);
+
   const login = (userData: User, isNewRegistration?: boolean) => {
     setUser(userData);
     setAuthModalConfig((prev) => ({ ...prev, isOpen: false }));
