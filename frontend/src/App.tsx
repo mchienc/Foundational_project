@@ -114,16 +114,15 @@ const AppContent: React.FC = () => {
     syncWithUser(user);
   }, [user, syncWithUser]);
 
-  // Navigation Screen State: Chỉ vào thẳng /dictation nếu học viên đã đăng nhập
+  // Navigation Screen State: Mặc định luôn tải trang Landing Page đầu tiên khi truy cập (kể cả đã đăng nhập)
   const [currentScreen, setCurrentScreen] = useState<Screen>(() => {
-    const saved = typeof window !== 'undefined' ? localStorage.getItem('eduflow_current_user') : null;
-    if (!saved) {
-      return 'landing';
-    }
     if (typeof window !== 'undefined' && window.location.pathname.startsWith('/dictation')) {
-      return 'dictation';
+      const saved = localStorage.getItem('eduflow_current_user');
+      if (saved) {
+        return 'dictation';
+      }
     }
-    return 'reading';
+    return 'landing';
   });
 
   useEffect(() => {
