@@ -92,7 +92,22 @@ app.listen(PORT, async () => {
     const db = require('./config/db');
     await db.query('ALTER TABLE users ADD COLUMN IF NOT EXISTS avatar LONGTEXT');
     await db.query('ALTER TABLE users ADD COLUMN IF NOT EXISTS phone VARCHAR(50)');
-    console.log('[DB] Đã kiểm tra và đảm bảo bảng users có cột avatar, phone.');
+    await db.query(`
+      CREATE TABLE IF NOT EXISTS user_cambridge_test_attempts (
+        id VARCHAR(100) PRIMARY KEY,
+        user_id VARCHAR(100) NOT NULL,
+        book VARCHAR(50) NOT NULL,
+        test_number INT NOT NULL,
+        skill VARCHAR(20) NOT NULL,
+        band_score FLOAT NOT NULL,
+        correct_count INT NOT NULL,
+        total_questions INT NOT NULL,
+        completed_at VARCHAR(50) NOT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        INDEX idx_user_history (user_id)
+      ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+    `);
+    console.log('[DB] Đã kiểm tra và đảm bảo bảng users & user_cambridge_test_attempts sẵn sàng.');
   } catch (err) {
     console.warn('[DB Check] Bỏ qua kiểm tra cấu trúc bảng users:', err.message);
   }

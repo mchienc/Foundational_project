@@ -504,15 +504,18 @@ const AppContent: React.FC = () => {
               window.scrollTo({ top: 0, behavior: 'smooth' });
             }}
             onSubmitComplete={(result) => {
-              saveTestAttempt({
-                book: listeningTest.book,
-                testNumber: listeningTest.testNumber,
-                skill: 'listening',
-                bandScore: result.bandScore,
-                correctCount: result.correctCount,
-                totalQuestions: result.totalCount,
-                completedAt: new Date().toLocaleDateString('vi-VN'),
-              });
+              saveTestAttempt(
+                {
+                  book: listeningTest.book,
+                  testNumber: listeningTest.testNumber,
+                  skill: 'listening',
+                  bandScore: result.bandScore,
+                  correctCount: result.correctCount,
+                  totalQuestions: result.totalCount,
+                  completedAt: new Date().toLocaleDateString('vi-VN'),
+                },
+                user?.id ? String(user.id) : undefined
+              );
               setListeningExamResult(result);
               setCurrentScreen('listening-review');
               window.scrollTo({ top: 0, behavior: 'smooth' });

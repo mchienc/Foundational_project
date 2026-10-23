@@ -13,17 +13,20 @@ import {
 import {
   getTestHistory,
   getAttemptForTest,
+  fetchUserTestHistoryFromServer,
   TestAttempt,
 } from '../../services/testHistoryStorage';
-import { Screen } from '../../types';
+import { Screen, User } from '../../types';
 
 export interface CambridgeTestHistoryTableProps {
+  currentUser?: User | null;
   onNavigateScreen?: (screen: Screen) => void;
   onStartReadingTest?: (book: string, testNumber: 1 | 2 | 3 | 4, mode?: 'full' | 'single') => void;
   onStartListeningTest?: (book: string, testNumber: 1 | 2 | 3 | 4, mode?: 'exam' | 'practice') => void;
 }
 
 export const CambridgeTestHistoryTable: React.FC<CambridgeTestHistoryTableProps> = ({
+  currentUser,
   onNavigateScreen,
   onStartReadingTest,
   onStartListeningTest,
@@ -39,20 +42,34 @@ export const CambridgeTestHistoryTable: React.FC<CambridgeTestHistoryTableProps>
     'Cambridge 13',
   ];
 
+  const currentUserId = currentUser?.id ? String(currentUser.id) : undefined;
   const [selectedBook, setSelectedBook] = useState<string>('Cambridge 18');
-  const [history, setHistory] = useState<TestAttempt[]>(() => getTestHistory());
+  const [history, setHistory] = useState<TestAttempt[]>(() => getTestHistory(currentUserId));
   const [activeDropdown, setActiveDropdown] = useState<{
     testNum: 1 | 2 | 3 | 4;
     skill: 'reading' | 'listening';
   } | null>(null);
 
+  // Đồng bộ lịch sử riêng của tài khoản hiện tại từ database
   useEffect(() => {
-    const handleUpdate = () => {
-      setHistory(getTestHistory());
+    setHistory(getTestHistory(currentUserId));
+    if (currentUserId) {
+      fetchUserTestHistoryFromServer(currentUserId).then((serverData) => {
+        if (serverData) setHistory(serverData);
+      });
+    }
+  }, [currentUserId]);
+
+  useEffect(() => {
+    const handleUpdate = (e: any) => {
+      const eventUserId = e?.detail?.userId;
+      if (!eventUserId || eventUserId === currentUserId) {
+        setHistory(getTestHistory(currentUserId));
+      }
     };
     window.addEventListener('cambridge-history-updated', handleUpdate);
     return () => window.removeEventListener('cambridge-history-updated', handleUpdate);
-  }, []);
+  }, [currentUserId]);
 
   // Đóng dropdown khi click ra ngoài
   useEffect(() => {

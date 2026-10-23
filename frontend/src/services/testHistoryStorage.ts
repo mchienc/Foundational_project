@@ -1,5 +1,6 @@
 // frontend/src/services/testHistoryStorage.ts
 // Service quản lý lịch sử làm bài thi Cambridge IELTS (Reading & Listening) & tính Band/9.0
+// TÁCH BIỆT DỮ LIỆU ĐỘC LẬP CHO TỪNG TÀI KHOẢN NGƯỜI DÙNG & QUẢN TRỊ VIÊN
 
 export interface TestAttempt {
   id: string;
@@ -12,65 +13,74 @@ export interface TestAttempt {
   completedAt: string; // "23/10/2026"
 }
 
-const STORAGE_KEY = 'eng4u_cambridge_test_history_v1';
+const STORAGE_PREFIX = 'eduflow_cambridge_history_';
 
-// Dữ liệu mẫu ban đầu trực quan (khớp với ảnh người dùng: Test 1 Reading Band 6.5)
-const DEFAULT_ATTEMPTS: TestAttempt[] = [
-  {
-    id: 'cam-18-t1-reading',
-    book: 'Cambridge 18',
-    testNumber: 1,
-    skill: 'reading',
-    bandScore: 6.5,
-    correctCount: 27,
-    totalQuestions: 40,
-    completedAt: '22/10/2026',
-  },
-  {
-    id: 'cam-19-t1-listening',
-    book: 'Cambridge 19',
-    testNumber: 1,
-    skill: 'listening',
-    bandScore: 7.0,
-    correctCount: 30,
-    totalQuestions: 40,
-    completedAt: '23/10/2026',
-  },
-  {
-    id: 'cam-20-t1-reading',
-    book: 'Cambridge 20',
-    testNumber: 1,
-    skill: 'reading',
-    bandScore: 7.5,
-    correctCount: 33,
-    totalQuestions: 40,
-    completedAt: '23/10/2026',
-  },
-];
-
-export function getTestHistory(): TestAttempt[] {
+// Dọn dẹp key dùng chung cũ nếu còn tồn tại
+if (typeof window !== 'undefined') {
   try {
-    const raw = localStorage.getItem(STORAGE_KEY);
+    localStorage.removeItem('eng4u_cambridge_test_history_v1');
+  } catch {}
+}
+
+/**
+ * Lấy ID của người dùng hiện tại đang đăng nhập
+ */
+export function getCurrentUserId(): string {
+  if (typeof window === 'undefined') return 'guest';
+  try {
+    const raw = localStorage.getItem('eduflow_current_user');
+    if (raw) {
+      const u = JSON.parse(raw);
+      if (u?.id) return String(u.id);
+      if (u?.email) return u.email.toLowerCase();
+    }
+  } catch {}
+  return 'guest';
+}
+
+/**
+ * Tạo key lưu trữ riêng biệt theo ID người dùng
+ */
+export function getStorageKey(userId?: string): string {
+  const uid = userId || getCurrentUserId();
+  return `${STORAGE_PREFIX}${uid}`;
+}
+
+/**
+ * Lấy danh sách lịch sử làm bài riêng của người dùng
+ * (Nếu người dùng mới chưa làm bài nào thì trả về mảng rỗng [])
+ */
+export function getTestHistory(userId?: string): TestAttempt[] {
+  if (typeof window === 'undefined') return [];
+  try {
+    const key = getStorageKey(userId);
+    const raw = localStorage.getItem(key);
     if (!raw) {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(DEFAULT_ATTEMPTS));
-      return DEFAULT_ATTEMPTS;
+      return [];
     }
     return JSON.parse(raw);
   } catch (err) {
     console.error('Lỗi đọc test history từ localStorage:', err);
-    return DEFAULT_ATTEMPTS;
+    return [];
   }
 }
 
-export function saveTestAttempt(attempt: Omit<TestAttempt, 'id'>): TestAttempt[] {
+/**
+ * Lưu kết quả bài thi vào kho dữ liệu riêng của người dùng
+ */
+export function saveTestAttempt(
+  attempt: Omit<TestAttempt, 'id'>,
+  userId?: string
+): TestAttempt[] {
+  const uid = userId || getCurrentUserId();
   try {
-    const history = getTestHistory();
+    const history = getTestHistory(uid);
     const id = `${attempt.book.toLowerCase().replace(/\s+/g, '-')}-t${attempt.testNumber}-${attempt.skill}`;
     const newAttempt: TestAttempt = { ...attempt, id };
 
     // Tìm và cập nhật nếu đã làm trước đó, hoặc thêm mới
     const existingIndex = history.findIndex(
-      (h) => h.book === attempt.book && h.testNumber === attempt.testNumber && h.skill === attempt.skill
+      (h) => h.book.toLowerCase() === attempt.book.toLowerCase() && h.testNumber === attempt.testNumber && h.skill === attempt.skill
     );
 
     let updated: TestAttempt[];
@@ -81,13 +91,58 @@ export function saveTestAttempt(attempt: Omit<TestAttempt, 'id'>): TestAttempt[]
       updated = [newAttempt, ...history];
     }
 
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
-    window.dispatchEvent(new Event('cambridge-history-updated'));
+    if (typeof window !== 'undefined') {
+      localStorage.setItem(getStorageKey(uid), JSON.stringify(updated));
+      window.dispatchEvent(
+        new CustomEvent('cambridge-history-updated', { detail: { userId: uid } })
+      );
+    }
+
+    // Tự động lưu lên MySQL database theo user_id nếu không phải khách vãng lai
+    if (uid !== 'guest' && typeof fetch !== 'undefined') {
+      fetch('/api/cambridge/user-history', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId: uid, ...attempt }),
+      }).catch((err) => {
+        console.warn('Không thể đồng bộ lịch sử bài thi lên MySQL:', err);
+      });
+    }
+
     return updated;
   } catch (err) {
     console.error('Lỗi lưu test attempt:', err);
-    return getTestHistory();
+    return getTestHistory(uid);
   }
+}
+
+/**
+ * Đồng bộ lịch sử làm bài từ MySQL database về máy client cho người dùng cụ thể
+ */
+export async function fetchUserTestHistoryFromServer(userId?: string): Promise<TestAttempt[]> {
+  const uid = userId || getCurrentUserId();
+  if (uid === 'guest' || typeof fetch === 'undefined') {
+    return getTestHistory(uid);
+  }
+
+  try {
+    const res = await fetch(`/api/cambridge/user-history?userId=${encodeURIComponent(uid)}`);
+    const data = await res.json();
+    if (data.success && Array.isArray(data.data)) {
+      const serverAttempts: TestAttempt[] = data.data;
+      if (typeof window !== 'undefined') {
+        localStorage.setItem(getStorageKey(uid), JSON.stringify(serverAttempts));
+        window.dispatchEvent(
+          new CustomEvent('cambridge-history-updated', { detail: { userId: uid } })
+        );
+      }
+      return serverAttempts;
+    }
+  } catch (err) {
+    console.warn('Không thể lấy lịch sử thi từ server:', err);
+  }
+
+  return getTestHistory(uid);
 }
 
 export function getAttemptForTest(

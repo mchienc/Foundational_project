@@ -22,4 +22,8 @@ router.get('/anki/cards', cambridgeController.getAnkiCards);
 router.post('/anki/cards', cambridgeController.createAnkiCard);
 router.post('/anki/cards/:id/review', cambridgeController.reviewAnkiCard);
 
+// 4. Lịch sử làm bài thi theo từng người dùng (cách ly hoàn toàn giữa các user)
+router.get('/user-history', cambridgeController.getUserTestHistory);
+router.post('/user-history', cambridgeController.saveUserTestAttempt);
+
 module.exports = router;

@@ -351,6 +351,7 @@ export const Profile: React.FC<ProfileProps> = ({
         {/* Tab 0: Cambridge Test History */}
         {tab === 'history' && (
           <CambridgeTestHistoryTable
+            currentUser={user}
             onNavigateScreen={onNavigateScreen}
             onStartReadingTest={onStartReadingTest}
             onStartListeningTest={onStartListeningTest}

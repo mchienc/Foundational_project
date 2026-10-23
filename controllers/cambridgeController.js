@@ -3,6 +3,9 @@
 
 const db = require('../config/db');
 
+// In-memory fallback lưu lịch sử làm bài theo userId khi MySQL offline: userId -> TestAttempt[]
+const memoryUserAttempts = new Map();
+
 // Tính IELTS Band Score chuẩn Cambridge Reading
 function calculateIeltsBand(correct, total) {
   const ratio = correct / total;
@@ -463,5 +466,109 @@ exports.reviewAnkiCard = async (req, res) => {
   } catch (error) {
     console.error('Lỗi reviewAnkiCard:', error);
     res.status(500).json({ success: false, message: 'Lỗi máy chủ khi cập nhật thẻ Anki.' });
+  }
+};
+
+// ==================== 4. LỊCH SỬ LÀM BÀI CỦA TỪNG USER ====================
+
+// Lấy lịch sử làm bài thi của từng người dùng
+exports.getUserTestHistory = async (req, res) => {
+  try {
+    const sessionUserId = req.session && req.session.user && req.session.user.id;
+    const userId = req.query.userId || sessionUserId;
+
+    if (!userId) {
+      return res.json({ success: true, count: 0, data: [] });
+    }
+
+    try {
+      const [rows] = await db.query(
+        'SELECT id, book, test_number AS testNumber, skill, band_score AS bandScore, correct_count AS correctCount, total_questions AS totalQuestions, completed_at AS completedAt FROM user_cambridge_test_attempts WHERE user_id = ? ORDER BY created_at DESC',
+        [String(userId)]
+      );
+      return res.json({ success: true, count: rows.length, data: rows });
+    } catch (dbErr) {
+      console.warn('MySQL getUserTestHistory warning, fallback to memory:', dbErr.message);
+    }
+
+    const mem = memoryUserAttempts.get(String(userId)) || [];
+    return res.json({ success: true, count: mem.length, data: mem });
+  } catch (error) {
+    console.error('Lỗi getUserTestHistory:', error);
+    res.status(500).json({ success: false, message: 'Lỗi máy chủ khi lấy lịch sử làm bài.' });
+  }
+};
+
+// Lưu lịch sử làm bài thi cho người dùng cụ thể
+exports.saveUserTestAttempt = async (req, res) => {
+  try {
+    const sessionUserId = req.session && req.session.user && req.session.user.id;
+    const { userId: bodyUserId, book, testNumber, skill, bandScore, correctCount, totalQuestions, completedAt } = req.body;
+    const userId = bodyUserId || sessionUserId;
+
+    if (!userId) {
+      return res.status(400).json({ success: false, message: 'Thiếu thông tin người dùng.' });
+    }
+
+    if (!book || !testNumber || !skill) {
+      return res.status(400).json({ success: false, message: 'Thiếu thông tin bài thi (book, testNumber, skill).' });
+    }
+
+    const cleanBook = book.trim();
+    const cleanSkill = skill.toLowerCase();
+    const id = `${String(userId)}_${cleanBook.toLowerCase().replace(/\\s+/g, '-')}-t${testNumber}-${cleanSkill}`;
+    const cleanCompletedAt = completedAt || new Date().toLocaleDateString('vi-VN');
+
+    const attempt = {
+      id,
+      book: cleanBook,
+      testNumber: Number(testNumber),
+      skill: cleanSkill,
+      bandScore: Number(bandScore) || 0,
+      correctCount: Number(correctCount) || 0,
+      totalQuestions: Number(totalQuestions) || 40,
+      completedAt: cleanCompletedAt
+    };
+
+    try {
+      await db.query(
+        `INSERT INTO user_cambridge_test_attempts 
+          (id, user_id, book, test_number, skill, band_score, correct_count, total_questions, completed_at)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+         ON DUPLICATE KEY UPDATE
+          band_score = VALUES(band_score),
+          correct_count = VALUES(correct_count),
+          total_questions = VALUES(total_questions),
+          completed_at = VALUES(completed_at)`,
+        [
+          id,
+          String(userId),
+          cleanBook,
+          Number(testNumber),
+          cleanSkill,
+          attempt.bandScore,
+          attempt.correctCount,
+          attempt.totalQuestions,
+          cleanCompletedAt
+        ]
+      );
+    } catch (dbErr) {
+      console.warn('MySQL saveUserTestAttempt warning, using in-memory store:', dbErr.message);
+    }
+
+    // Cập nhật in-memory store
+    const list = memoryUserAttempts.get(String(userId)) || [];
+    const existingIdx = list.findIndex(a => a.book === cleanBook && a.testNumber === Number(testNumber) && a.skill === cleanSkill);
+    if (existingIdx >= 0) {
+      list[existingIdx] = attempt;
+    } else {
+      list.unshift(attempt);
+    }
+    memoryUserAttempts.set(String(userId), list);
+
+    return res.json({ success: true, message: 'Đã lưu lịch sử làm bài thành công!', data: attempt });
+  } catch (error) {
+    console.error('Lỗi saveUserTestAttempt:', error);
+    res.status(500).json({ success: false, message: 'Lỗi máy chủ khi lưu kết quả bài thi.' });
   }
 };
