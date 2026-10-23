@@ -55,7 +55,7 @@ class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundarySta
   }
 
   componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
-    console.error('EduFlow ErrorBoundary caught:', error, errorInfo);
+    console.error('eng4u ErrorBoundary caught:', error, errorInfo);
   }
 
   render() {
@@ -317,7 +317,7 @@ const AppContent: React.FC = () => {
         newCourseData.image ||
         'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=800&auto=format&fit=crop&q=80',
       instructor: {
-        name: user?.full_name || 'Đội ngũ EduFlow',
+        name: user?.full_name || 'Đội ngũ eng4u',
         role: 'Ban chuyên môn',
         avatar:
           'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=120&auto=format&fit=crop&q=80',
@@ -769,9 +769,9 @@ const AppContent: React.FC = () => {
       {/* Global Toast Notifications Container */}
       <ToastContainer toasts={toasts} onDismiss={removeToast} />
 
-      {/* Global EduFlow Pro Upgrade Modal */}
+      {/* Global eng4u Pro Upgrade Modal */}
       <UpgradeModal
-        onSuccess={() => addToast('Thanh toán thành công! Đã kích hoạt EduFlow Pro.', 'success')}
+        onSuccess={() => addToast('Thanh toán thành công! Đã kích hoạt eng4u Pro.', 'success')}
         onNavigateHome={() => {
           // Nếu đã đăng nhập, giữ nguyên trong không gian học tập LMS của học viên (không đá ra landing page)
           if (!user) {

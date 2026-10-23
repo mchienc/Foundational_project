@@ -617,7 +617,7 @@ export const AcademicAuthModal: React.FC<AcademicAuthModalProps> = ({
                       type="email"
                       value={loginEmail}
                       onChange={(e) => setLoginEmail(e.target.value)}
-                      placeholder="ten@eduflow.vn"
+                      placeholder="ten@eng4u.vn"
                       className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-stone-300 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-[#D97706] focus:border-[#064E3B] transition-all"
                       required
                     />
@@ -767,7 +767,7 @@ export const AcademicAuthModal: React.FC<AcademicAuthModalProps> = ({
                           type="email"
                           value={forgotEmail}
                           onChange={(e) => setForgotEmail(e.target.value)}
-                          placeholder="ten@eduflow.vn"
+                          placeholder="ten@eng4u.vn"
                           className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-stone-300 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-[#D97706] transition-all"
                           required
                           autoFocus

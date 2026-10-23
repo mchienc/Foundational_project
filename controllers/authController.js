@@ -20,7 +20,7 @@ const fallbackUsers = [
   },
   {
     id: '2',
-    full_name: 'Học Viên EduFlow',
+    full_name: 'Học Viên eng4u',
     email: 'student@example.com',
     passwordHash: bcrypt.hashSync('123456', 10),
     role: 'student',
@@ -336,7 +336,7 @@ async function apiForgotPassword(req, res) {
 
     otpStore.set(trimmedEmail, { otp, expiresAt });
 
-    console.log(`[EduFlow Auth] Mã OTP đặt lại mật khẩu cho ${trimmedEmail}: ${otp}`);
+    console.log(`[eng4u Auth] Mã OTP đặt lại mật khẩu cho ${trimmedEmail}: ${otp}`);
 
     // Gửi email thật qua HTTP REST API (cổng 443) hoặc Gmail SMTP
     const emailDispatch = await sendOtpEmail(trimmedEmail, otp);

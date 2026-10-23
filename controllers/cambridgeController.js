@@ -368,7 +368,7 @@ exports.createAnkiCard = async (req, res) => {
       meaningEn = '',
       meaningVi = '',
       contextSentence = '',
-      source = 'EduFlow Cambridge',
+      source = 'eng4u Cambridge',
       deckId = 'deck-personal'
     } = req.body;
 

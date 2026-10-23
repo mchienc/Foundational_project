@@ -349,7 +349,7 @@ export const UpgradeModal: React.FC<UpgradeModalProps> = ({
 
             <div className="flex items-center gap-2">
               <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/20 border border-amber-400/40 text-amber-300 text-xs font-semibold">
-                <span>NÂNG CẤP EDUFLOW PRO</span>
+                <span>NÂNG CẤP ENG4U PRO</span>
               </span>
               <span className="inline-flex items-center gap-1 text-[11px] text-emerald-200">
                 <ShieldCheck size={13} />
@@ -360,7 +360,7 @@ export const UpgradeModal: React.FC<UpgradeModalProps> = ({
             <h3 className="text-xl sm:text-2xl font-serif font-bold text-white tracking-tight mt-2">
               {step === 'select' && 'Chọn Gói Học & Bứt Phá Band Điểm IELTS'}
               {step === 'payment' && 'Quét Mã VietQR Ngân Hàng (Tự Động Kích Hoạt)'}
-              {step === 'success' && 'Tài Khoản Đã Kích Hoạt EduFlow Pro!'}
+              {step === 'success' && 'Tài Khoản Đã Kích Hoạt eng4u Pro!'}
             </h3>
             <p className="text-xs sm:text-sm text-emerald-100/90 mt-0.5">
               {step === 'select' && 'Luyện Viết & Luyện Nói không giới hạn cùng Giám khảo AI Cambridge'}
@@ -686,7 +686,7 @@ export const UpgradeModal: React.FC<UpgradeModalProps> = ({
                     Thanh Toán &amp; Kích Hoạt Thành Công!
                   </h4>
                   <p className="text-xs text-stone-600 mt-1 max-w-md mx-auto leading-relaxed">
-                    Tài khoản của bạn đã được nâng cấp lên <strong>EduFlow Pro ({planName})</strong>. Đang tự động chuyển bạn về Trang Chủ trong giây lát...
+                    Tài khoản của bạn đã được nâng cấp lên <strong>eng4u Pro ({planName})</strong>. Đang tự động chuyển bạn về Trang Chủ trong giây lát...
                   </p>
                 </div>
 

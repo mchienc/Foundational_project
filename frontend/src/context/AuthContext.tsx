@@ -133,7 +133,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       actionName
         ? `Đăng nhập để: ${actionName}`
         : 'Đăng nhập để bắt đầu học và lưu kết quả',
-      'Bạn cần đăng nhập tài khoản EduFlow để truy cập đầy đủ các bài luyện thi Cambridge IELTS, nghe chép chính tả và lưu kết quả học tập.'
+      'Bạn cần đăng nhập tài khoản eng4u để truy cập đầy đủ các bài luyện thi Cambridge IELTS, nghe chép chính tả và lưu kết quả học tập.'
     );
 
     return false;

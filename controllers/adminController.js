@@ -203,7 +203,7 @@ exports.updateUserProStatus = async (req, res) => {
     res.json({
       success: true,
       message: booleanPro
-        ? `Đã cấp tư cách EduFlow Pro (${selectedPackage}) thành công!`
+        ? `Đã cấp tư cách eng4u Pro (${selectedPackage}) thành công!`
         : 'Đã hủy tư cách Pro, chuyển về tài khoản miễn phí.',
       data: updated,
     });
@@ -217,7 +217,7 @@ exports.updateUserProStatus = async (req, res) => {
 exports.setProByEmail = async (email, planName, expiryDate) => {
   if (!email) return null;
   const cleanEmail = email.trim().toLowerCase();
-  const pkgName = planName || 'EduFlow Pro';
+  const pkgName = planName || 'eng4u Pro';
   const exp = expiryDate || '30 ngày';
 
   try {

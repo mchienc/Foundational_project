@@ -1,11 +1,11 @@
 // controllers/chatController.js
-// Bộ xử lý Trợ Lý AI EduFlow - Hỏi gì đáp đó chuyên sâu Tiếng Anh & Luyện thi Cambridge IELTS
+// Bộ xử lý Trợ Lý AI eng4u - Hỏi gì đáp đó chuyên sâu Tiếng Anh & Luyện thi Cambridge IELTS
 // Giới hạn phạm vi nghiêm ngặt trong lĩnh vực Tiếng Anh & IELTS (Từ chối câu hỏi ngoài luồng)
 // Giao tiếp trực tiếp với Google Gemini qua HTTPS (Port 443) - Hoạt động ổn định trên cả Local và Render
 
 const { getLiveApiKey } = require('./ankiAiController');
 
-const AI_TUTOR_SYSTEM_PROMPT = `Bạn là Trợ lý Học tập AI của EduFlow (EduFlow IELTS Tutor) — gia sư chuyên sâu về Tiếng Anh và luyện thi Cambridge IELTS.
+const AI_TUTOR_SYSTEM_PROMPT = `Bạn là Trợ lý Học tập AI của eng4u (eng4u IELTS Tutor) — gia sư chuyên sâu về Tiếng Anh và luyện thi Cambridge IELTS.
 
 ================ PHẠM VI HỖ TRỢ NGHIÊM NGẶT (STRICT DOMAIN BOUNDARY) ================
 1. BẠN CHỈ ĐƯỢC PHÉP TRẢ LỜI CÁC CÂU HỎI LIÊN QUAN ĐẾN:
@@ -19,7 +19,7 @@ const AI_TUTOR_SYSTEM_PROMPT = `Bạn là Trợ lý Học tập AI của EduFlow
 
 2. TỪ CHỐI CÁC CÂU HỎI NGOÀI PHẠM VI (TUYỆT ĐỐI TUÂN THỦ):
    - Nếu người dùng hỏi các chủ đề KHÔNG thuộc phạm vi học tiếng Anh/IELTS (ví dụ: lập trình, viết code phần mềm, chính trị, thể thao giải trí, ẩm thực, tình cảm cá nhân, thời tiết ngoài lề...), bạn PHẢI TỪ CHỐI LỊCH SỰ bằng câu trả lời tương tự như sau:
-   "Dạ, mình là Trợ lý Học tập của EduFlow, chuyên hỗ trợ bạn về học tiếng Anh và luyện thi Cambridge IELTS. Bạn vui lòng đặt câu hỏi liên quan đến từ vựng, ngữ pháp, các kỹ năng IELTS (Reading, Listening, Writing, Speaking) hoặc mẹo làm bài thi để mình hỗ trợ bạn tốt nhất nhé! 😊"
+   "Dạ, mình là Trợ lý Học tập của eng4u, chuyên hỗ trợ bạn về học tiếng Anh và luyện thi Cambridge IELTS. Bạn vui lòng đặt câu hỏi liên quan đến từ vựng, ngữ pháp, các kỹ năng IELTS (Reading, Listening, Writing, Speaking) hoặc mẹo làm bài thi để mình hỗ trợ bạn tốt nhất nhé! 😊"
 
 ================ NGUYÊN TẮC PHẢN HỒI (HỎI GÌ ĐÁP ĐÓ) ================
 - Phong cách: Thân thiện, gần gũi, đi thẳng vào trọng tâm câu hỏi của người học ("hỏi gì đáp đó").
@@ -91,7 +91,7 @@ function buildSmartFallbackReply(lastUserText) {
   // 1. Kiểm tra ngoài phạm vi (Domain restriction)
   if (isOffTopicQuery(lastUserText)) {
     return {
-      reply: `Dạ, mình là Trợ lý Học tập của EduFlow, chuyên hỗ trợ bạn về học tiếng Anh và luyện thi Cambridge IELTS.
+      reply: `Dạ, mình là Trợ lý Học tập của eng4u, chuyên hỗ trợ bạn về học tiếng Anh và luyện thi Cambridge IELTS.
 
 Bạn vui lòng đặt câu hỏi liên quan đến từ vựng, ngữ pháp, các kỹ năng IELTS (Reading, Listening, Writing, Speaking) hoặc mẹo làm đề thi để mình hỗ trợ tốt nhất nhé! 😊`,
       vocabItems: [],
@@ -192,7 +192,7 @@ Bạn có thể bấm nút **+ Lưu vào Flashcard Anki** bên dưới để h�
 
   // 5. Câu hỏi tiếng Anh thông thường
   return {
-    reply: `Mình đã nhận được câu hỏi của bạn! Là trợ lý chuyên sâu về tiếng Anh và luyện thi IELTS của EduFlow, mình có thể giúp bạn:
+    reply: `Mình đã nhận được câu hỏi của bạn! Là trợ lý chuyên sâu về tiếng Anh và luyện thi IELTS của eng4u, mình có thể giúp bạn:
 
 • Giải thích ngữ pháp và sửa lỗi câu tiếng Anh.
 • Nâng cấp câu văn đơn giản lên các mức Band 6.5, 7.5 và 8.5+.

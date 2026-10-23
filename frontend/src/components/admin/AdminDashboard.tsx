@@ -639,7 +639,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate, onNo
             </span>
           </div>
           <h1 className="text-2xl sm:text-3xl font-extrabold text-stone-900 tracking-tight font-serif">
-            EduFlow Admin Console
+            eng4u Admin Console
           </h1>
           <p className="text-xs text-stone-500 mt-1">
             Kiểm soát quyền truy cập của người dùng, phân cấp Quản trị viên - Học viên, bật/tắt đề thi và đính chính ngân hàng câu hỏi.
@@ -652,7 +652,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate, onNo
               <button
                 onClick={() => onNavigate('landing')}
                 className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold bg-white border border-stone-200 hover:bg-stone-50 text-stone-700 transition-colors shadow-xs cursor-pointer"
-                title="Quay về trang chủ giới thiệu EduFlow"
+                title="Quay về trang chủ giới thiệu eng4u"
               >
                 <Globe size={14} className="text-[#064E3B]" />
                 <span>Trang Giới Thiệu</span>
@@ -976,7 +976,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate, onNo
                             <div className="inline-flex flex-col">
                               <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold bg-amber-50 text-amber-900 border border-amber-300 shadow-xs">
                                 <Shield size={11} className="text-amber-600" />
-                                <span>{user.pro_package || 'EduFlow PRO'}</span>
+                                <span>{user.pro_package || 'eng4u PRO'}</span>
                               </span>
                               {user.pro_expiry && (
                                 <span className="text-[10px] text-stone-500 font-mono mt-0.5 ml-1 flex items-center gap-1">
@@ -1016,7 +1016,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate, onNo
                                   setSelectedPackage('6months');
                                 }}
                                 className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl text-xs font-bold bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-300 transition-colors cursor-pointer shadow-xs"
-                                title="Cấp quyền EduFlow Pro cho học viên"
+                                title="Cấp quyền eng4u Pro cho học viên"
                               >
                                 <Shield size={12} className="text-amber-600" />
                                 <span>Cấp PRO</span>
@@ -1362,7 +1362,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate, onNo
                   <Crown size={20} />
                 </div>
                 <div>
-                  <h3 className="font-serif font-bold text-stone-900 text-lg">Cấp Quyền EduFlow PRO</h3>
+                  <h3 className="font-serif font-bold text-stone-900 text-lg">Cấp Quyền eng4u PRO</h3>
                   <p className="text-xs text-stone-500">
                     Dành cho học viên <strong className="text-stone-800">{proModalUser.full_name}</strong>
                   </p>

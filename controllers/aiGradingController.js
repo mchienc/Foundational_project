@@ -167,7 +167,7 @@ exports.gradeWriting = async (req, res) => {
       const fallbackData = generateWritingFallback(taskType, prompt, essayContent);
       return res.json({
         success: true,
-        source: 'EduFlow AI Academic Engine (Offline Mode)',
+        source: 'eng4u AI Academic Engine (Offline Mode)',
         data: fallbackData
       });
     }
@@ -280,7 +280,7 @@ ${essayContent}`;
     const fallbackData = generateWritingFallback(taskType, prompt, essayContent);
     return res.json({
       success: true,
-      source: 'EduFlow AI Academic Engine (Intelligent Local Analysis)',
+      source: 'eng4u AI Academic Engine (Intelligent Local Analysis)',
       data: fallbackData
     });
   } catch (error) {
@@ -309,7 +309,7 @@ exports.gradeSpeaking = async (req, res) => {
       const fallbackData = generateSpeakingFallback(part, topic, question, transcript, durationSeconds);
       return res.json({
         success: true,
-        source: 'EduFlow AI Speaking Coach (Offline Mode)',
+        source: 'eng4u AI Speaking Coach (Offline Mode)',
         data: fallbackData
       });
     }
@@ -413,7 +413,7 @@ BẢN GỠ BĂNG CÂU TRẢ LỜI CỦA HỌC VIÊN:
     const fallbackData = generateSpeakingFallback(part, topic, question, transcript, durationSeconds);
     return res.json({
       success: true,
-      source: 'EduFlow AI Speaking Coach (Intelligent Local Analysis)',
+      source: 'eng4u AI Speaking Coach (Intelligent Local Analysis)',
       data: fallbackData
     });
   } catch (error) {

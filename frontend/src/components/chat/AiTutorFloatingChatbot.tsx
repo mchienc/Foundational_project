@@ -247,7 +247,7 @@ export const AiTutorFloatingChatbot: React.FC<AiTutorFloatingChatbotProps> = ({
         pos: item.pos,
         definitionVi: item.meaningVi,
         contextSentence: item.exampleSentence,
-        source: 'Trợ Lý AI EduFlow',
+        source: 'Trợ Lý AI eng4u',
       });
 
       saveAiGeneratedWord({
@@ -256,7 +256,7 @@ export const AiTutorFloatingChatbot: React.FC<AiTutorFloatingChatbotProps> = ({
         backExtra: item.meaningVi,
         tags: 'AI-Tutor',
         contextSentence: item.exampleSentence,
-        sourceArticleTitle: 'Trợ Lý AI EduFlow',
+        sourceArticleTitle: 'Trợ Lý AI eng4u',
         ipa: item.ipa,
         pos: item.pos,
         contextMeaning: item.meaningVi,

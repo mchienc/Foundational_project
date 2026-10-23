@@ -45,10 +45,10 @@ export const AnkiExportPanel: React.FC = () => {
       }
 
       // Field 3: Tags
-      const articleTitleTag = (item.sourceArticleTitle || 'EduFlow_Vocab').replace(/\s+/g, '_');
+      const articleTitleTag = (item.sourceArticleTitle || 'eng4u_Vocab').replace(/\s+/g, '_');
       const tags = item.tags 
         ? `${item.tags} ${articleTitleTag}`.trim()
-        : `EduFlow Cambridge IELTS_Band_7 ${articleTitleTag}`;
+        : `eng4u Cambridge IELTS_Band_7 ${articleTitleTag}`;
 
       // Escape tabs in fields (newlines in Cloze are HTML <br> or spaces)
       const cleanFront = front.replace(/\t/g, ' ').replace(/\n/g, ' ');
@@ -71,7 +71,7 @@ export const AnkiExportPanel: React.FC = () => {
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `EduFlow_Vocabulary_${new Date().toISOString().slice(0,10)}.txt`;
+      a.download = `eng4u_Vocabulary_${new Date().toISOString().slice(0,10)}.txt`;
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
@@ -92,14 +92,14 @@ export const AnkiExportPanel: React.FC = () => {
 
     try {
       const csvContent = generateCSVContent();
-      const readmeContent = `EduFlow Anki Export\n====================\n\nThis package contains your saved vocabulary from EduFlow.\n\nTo import into Anki:\n1. Open Anki and go to File > Import...\n2. Select the 'anki_import.txt' file in this folder.\n3. Make sure to choose 'Cloze' as the note type.\n4. Map Field 1 to Text, Field 2 to Back, and Field 3 to Tags.\n5. Click Import.\n\nHappy learning!`;
+      const readmeContent = `eng4u Anki Export\n====================\n\nThis package contains your saved vocabulary from eng4u.\n\nTo import into Anki:\n1. Open Anki and go to File > Import...\n2. Select the 'anki_import.txt' file in this folder.\n3. Make sure to choose 'Cloze' as the note type.\n4. Map Field 1 to Text, Field 2 to Back, and Field 3 to Tags.\n5. Click Import.\n\nHappy learning!`;
       
       const instructionsHTML = `
 <!DOCTYPE html>
 <html>
 <head>
 <meta charset="utf-8">
-<title>EduFlow Anki Import Instructions</title>
+<title>eng4u Anki Import Instructions</title>
 <style>
   body { font-family: sans-serif; line-height: 1.6; max-width: 800px; margin: 0 auto; padding: 20px; color: #333; }
   h1 { color: #064E3B; }
@@ -107,7 +107,7 @@ export const AnkiExportPanel: React.FC = () => {
 </style>
 </head>
 <body>
-  <h1>Hướng Dẫn Import EduFlow Vocabulary Vào Anki</h1>
+  <h1>Hướng Dẫn Import eng4u Vocabulary Vào Anki</h1>
   <p>Làm theo các bước sau để thêm từ vựng của bạn vào Anki:</p>
   
   <div class="step">
@@ -129,7 +129,7 @@ export const AnkiExportPanel: React.FC = () => {
     <h3>Bước 4: Cấu hình Import</h3>
     <ul>
       <li><strong>Type (Loại thẻ):</strong> Phải chọn là <strong>Cloze</strong> (Điền khuyết).</li>
-      <li><strong>Deck (Bộ bài):</strong> Chọn bộ bài bạn muốn thêm từ vào (ví dụ: EduFlow IELTS).</li>
+      <li><strong>Deck (Bộ bài):</strong> Chọn bộ bài bạn muốn thêm từ vào (ví dụ: eng4u IELTS).</li>
       <li><strong>Fields separated by:</strong> Tabs (Dấu Tab).</li>
       <li><strong>Field 1:</strong> Chọn ánh xạ vào thẻ Text.</li>
       <li><strong>Field 2:</strong> Chọn ánh xạ vào thẻ Back/Extra.</li>
@@ -149,7 +149,7 @@ export const AnkiExportPanel: React.FC = () => {
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `EduFlow_Anki_Deck_${new Date().toISOString().slice(0,10)}.apkg`;
+      a.download = `eng4u_Anki_Deck_${new Date().toISOString().slice(0,10)}.apkg`;
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);

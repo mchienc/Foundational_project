@@ -86,7 +86,7 @@ export const CertificateModal: React.FC<CertificateModalProps> = ({
                 Certificate of Completion
               </div>
               <div className="text-white font-bold text-base tracking-tight">
-                EduFlow Learning Management Platform
+                eng4u Learning Management Platform
               </div>
             </div>
 
@@ -159,7 +159,7 @@ export const CertificateModal: React.FC<CertificateModalProps> = ({
 
             {/* Footer */}
             <div className="bg-slate-50 border-t border-slate-100 px-6 py-3 text-center text-[11px] font-mono text-slate-400 print:hidden">
-              Chứng chỉ có giá trị xác thực trực tuyến tại eduflow.local • Lưu hoặc in định dạng PDF
+              Chứng chỉ có giá trị xác thực trực tuyến tại eng4u.vn • Lưu hoặc in định dạng PDF
             </div>
           </motion.div>
         </div>

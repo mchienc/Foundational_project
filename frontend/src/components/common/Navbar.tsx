@@ -379,7 +379,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                 className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-amber-300 hover:bg-forest-900/60 border-t border-emerald-900/80 pt-2 cursor-pointer transition-colors"
               >
                 <BookOpen size={14} />
-                Giới thiệu EduFlow
+                Giới thiệu eng4u
               </button>
             )}
           </motion.div>
