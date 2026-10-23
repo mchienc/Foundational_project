@@ -252,21 +252,6 @@ export const UpgradeModal: React.FC<UpgradeModalProps> = ({
     }
   };
 
-  // Nút giả lập thanh toán phục vụ đánh giá đồ án (không cần chuyển tiền thật)
-  const handleSimulateTransfer = async () => {
-    if (!orderData?.orderCode) return;
-    try {
-      await fetch('/api/payment/simulate-transfer', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ orderCode: orderData.orderCode }),
-      });
-      // Polling sẽ tự động đón nhận ngay trong 1-2 giây kế tiếp!
-    } catch (e) {
-      console.error('Simulation error:', e);
-    }
-  };
-
   // Nút người dùng xác nhận đã chuyển khoản thành công
   const handleConfirmPaidByUser = async () => {
     setIsConfirmingPaid(true);
@@ -677,19 +662,11 @@ export const UpgradeModal: React.FC<UpgradeModalProps> = ({
                   </p>
                 </div>
 
-                {/* Dev / Test helper and cancel button */}
-                <div className="flex items-center justify-between pt-2 text-xs">
-                  <button
-                    onClick={handleSimulateTransfer}
-                    className="text-[11px] text-stone-400 hover:text-emerald-700 underline cursor-pointer"
-                    title="Bắn giao dịch mẫu để kiểm thử tính năng tự động kích hoạt không mất tiền thật"
-                  >
-                    ⚡ [Kiểm thử đồ án] Bắn giao dịch mẫu
-                  </button>
-
+                {/* Action footer */}
+                <div className="flex items-center justify-center pt-2 text-xs">
                   <button
                     onClick={handleClose}
-                    className="text-stone-500 hover:text-stone-800 cursor-pointer font-medium"
+                    className="text-stone-500 hover:text-stone-800 cursor-pointer font-medium hover:underline transition-colors"
                   >
                     Để sau, tiếp tục học tập
                   </button>
