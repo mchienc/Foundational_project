@@ -133,36 +133,24 @@ export const AcademicFooter: React.FC<AcademicFooterProps> = ({ currentUser, onR
           </ul>
         </div>
 
-        {/* Col 4: Platform & Methodology */}
+        {/* Col 4: Contact Info */}
         <div className="space-y-3 text-xs">
           <h4 className="font-sans font-bold text-white uppercase tracking-normal text-sm border-b border-forest-800 pb-1.5">
-            Phương Pháp Học
+            Thông Tin Liên Hệ
           </h4>
-          <ul className="space-y-2 font-sans text-stone-400">
-            <li className="leading-relaxed">
-              <strong className="text-stone-300">Luyện thi thực chiến:</strong> Thi trực tiếp trên máy tính với đồng hồ bấm giờ chuẩn kỳ thi IELTS thật.
-            </li>
-            <li className="leading-relaxed">
-              <strong className="text-stone-300">Tra từ &amp; Lưu nhanh:</strong> Bấm vào bất kỳ từ mới nào trong bài đọc để xem nghĩa và lưu vào Flashcard.
-            </li>
-            <li className="leading-relaxed">
-              <strong className="text-stone-300">Lặp lại ngắt quãng:</strong> Ôn tập theo thuật toán khoa học giúp từ vựng ghi sâu vào trí nhớ dài hạn.
-            </li>
-          </ul>
-
-          <div className="pt-2 text-stone-400 text-[11px] space-y-1">
-            <div className="flex items-center gap-1.5">
-              <MapPin className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+          <div className="space-y-3 text-stone-300 font-sans text-xs pt-1">
+            <div className="flex items-start gap-2.5">
+              <MapPin className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
               <span>Hà Nội, Việt Nam</span>
             </div>
-            <div className="flex items-center gap-1.5">
-              <Mail className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+            <div className="flex items-center gap-2.5">
+              <Mail className="w-4 h-4 text-amber-400 shrink-0" />
               <a href="mailto:dangchien2005@gmail.com" className="hover:text-amber-300 transition-colors">
                 dangchien2005@gmail.com
               </a>
             </div>
-            <div className="flex items-center gap-1.5">
-              <Phone className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+            <div className="flex items-center gap-2.5">
+              <Phone className="w-4 h-4 text-amber-400 shrink-0" />
               <span>Hỗ trợ học viên: 0912 345 678</span>
             </div>
           </div>
