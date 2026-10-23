@@ -12,11 +12,14 @@ import {
   Camera,
   Upload,
   Trash2,
+  Crown,
+  Sparkles,
 } from 'lucide-react';
 import { User, UserStats, Course, Screen } from '../../types';
 import { Button } from '../common/Button';
 import { Card } from '../common/Card';
 import { CambridgeTestHistoryTable } from './CambridgeTestHistoryTable';
+import { useProStore } from '../../modules/pro/useProStore';
 
 export type ProfileTab = 'history' | 'info' | 'password' | 'support';
 
@@ -45,6 +48,11 @@ export const Profile: React.FC<ProfileProps> = ({
   onNotify,
 }) => {
   const [tab, setTab] = useState<ProfileTab>(initialTab);
+
+  const isProStore = useProStore((state) => state.isPro);
+  const planName = useProStore((state) => state.planName);
+  const isProUser = Boolean(user.isPro) || isProStore;
+  const proPackageTitle = user.proPackage || planName || 'eng4u PRO';
 
   // Sync tab if initialTab prop changes from Navbar
   useEffect(() => {
@@ -228,7 +236,11 @@ export const Profile: React.FC<ProfileProps> = ({
 
             <div
               onClick={() => fileInputRef.current?.click()}
-              className="w-20 h-20 rounded-full overflow-hidden bg-gradient-to-tr from-[#064E3B] to-emerald-700 text-amber-300 flex items-center justify-center text-2xl font-bold shadow-md shadow-emerald-950/20 border-2 border-amber-400/50 cursor-pointer relative transition-transform hover:scale-105"
+              className={`w-20 h-20 rounded-full overflow-hidden bg-gradient-to-tr from-[#064E3B] to-emerald-700 text-amber-300 flex items-center justify-center text-2xl font-bold shadow-md shadow-emerald-950/20 cursor-pointer relative transition-transform hover:scale-105 ${
+                isProUser
+                  ? 'border-2 border-amber-400 ring-4 ring-amber-400/50'
+                  : 'border-2 border-amber-400/50'
+              }`}
               title="Nhấn để đổi ảnh đại diện"
             >
               {user.avatar ? (
@@ -257,11 +269,28 @@ export const Profile: React.FC<ProfileProps> = ({
             >
               <Camera size={13} />
             </button>
+
+            {/* Floating crown on top-left of avatar for PRO */}
+            {isProUser && (
+              <div
+                title="Tài khoản PRO VIP"
+                className="absolute -top-2 -left-1 px-1.5 py-0.5 rounded-full bg-gradient-to-tr from-amber-500 via-amber-400 to-yellow-300 text-stone-950 text-[10px] font-black shadow-md border border-white flex items-center gap-0.5 select-none"
+              >
+                <span>👑</span>
+                <span>VIP</span>
+              </div>
+            )}
           </div>
 
           <div className="space-y-1">
             <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2">
               <h2 className="text-xl font-bold text-stone-900 font-sans">{user.full_name}</h2>
+              {isProUser && (
+                <span className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full text-xs font-sans font-black bg-gradient-to-r from-amber-400 via-amber-300 to-yellow-400 text-stone-950 shadow-xs border border-amber-300">
+                  <Crown size={13} className="fill-stone-950 text-stone-950" />
+                  <span>PRO VIP</span>
+                </span>
+              )}
               <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-mono font-bold border border-amber-300 bg-amber-50 text-amber-900">
                 <span
                   className={`w-2 h-2 rounded-full ${
@@ -286,7 +315,20 @@ export const Profile: React.FC<ProfileProps> = ({
           </div>
         </div>
 
-        <div className="flex items-center gap-3 shrink-0">
+        <div className="flex flex-col sm:flex-row items-center gap-3 shrink-0">
+          {isProUser && (
+            <div className="flex flex-col items-center sm:items-end gap-1">
+              <span className="text-[11px] font-mono text-amber-800 uppercase tracking-wide font-bold flex items-center gap-1">
+                <Sparkles size={12} className="text-amber-600" />
+                Gói dịch vụ
+              </span>
+              <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-mono font-bold border border-amber-300 bg-gradient-to-r from-amber-50 to-yellow-50 text-amber-950 shadow-2xs">
+                <Crown size={14} className="text-amber-600 fill-amber-400" />
+                {proPackageTitle}
+              </span>
+            </div>
+          )}
+
           <div className="flex flex-col items-center sm:items-end gap-1">
             <span className="text-[11px] font-mono text-stone-500 uppercase tracking-wide">Mục tiêu cá nhân</span>
             <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-mono font-bold border border-emerald-300 bg-emerald-50 text-[#064E3B]">
