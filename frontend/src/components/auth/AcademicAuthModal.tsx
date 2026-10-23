@@ -14,6 +14,7 @@ import {
   } from 'lucide-react';
 import { User } from '../../types';
 import { modalScaleVariants } from '../../styles/motion';
+import { Logo } from '../common/Logo';
 
 declare global {
   interface Window {
@@ -483,7 +484,7 @@ export const AcademicAuthModal: React.FC<AcademicAuthModalProps> = ({
             {/* Header */}
             <div className="space-y-2 text-center pt-1">
               <div className="w-12 h-12 rounded-2xl overflow-hidden bg-white p-0.5 border border-amber-400/60 shadow-md mx-auto">
-                <img src="/logo.jpg" alt="EduFlow Logo" className="w-full h-full object-cover rounded-xl" />
+                <Logo variant="icon" size="md" />
               </div>
 
               <h3 className="text-xl sm:text-2xl font-sans font-bold text-[#064E3B] tracking-normal leading-snug">

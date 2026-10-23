@@ -1,6 +1,7 @@
 import React from 'react';
 import { ShieldCheck, Phone, Mail, MapPin } from 'lucide-react';
 import { Screen, User } from '../../types';
+import { Logo } from '../common/Logo';
 
 interface AcademicFooterProps {
   currentUser?: User | null;
@@ -22,19 +23,7 @@ export const AcademicFooter: React.FC<AcademicFooterProps> = ({ currentUser, onR
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 md:grid-cols-4 gap-10 text-left">
         {/* Col 1: Brand Identity */}
         <div className="space-y-4">
-          <div className="flex items-center gap-2.5">
-            <div className="w-9 h-9 rounded-xl overflow-hidden bg-white p-1 border border-amber-400/40 shadow-xs flex items-center justify-center shrink-0">
-              <img src="/logo.jpg" alt="EduFlow Logo" className="w-full h-full object-contain" />
-            </div>
-            <div>
-              <span className="text-lg font-sans font-bold text-white tracking-normal block leading-none">
-                EduFlow
-              </span>
-              <span className="text-[10px] font-sans text-amber-300 tracking-wide mt-1 block">
-                Cambridge IELTS • Chép chính tả YouTube • Flashcard Anki
-              </span>
-            </div>
-          </div>
+          <Logo variant="full" theme="dark" showBadge={false} />
 
           <p className="text-xs text-stone-400 leading-relaxed font-sans">
             Luyện thi IELTS thực chiến: 28 Đề thi Cam 10–20, chép chính tả video YouTube và học từ vựng Flashcard Anki.

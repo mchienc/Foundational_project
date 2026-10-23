@@ -22,6 +22,7 @@ import {
 } from 'lucide-react';
 import { Screen, UserStats, User } from '../../types';
 import { Button } from './Button';
+import { Logo } from './Logo';
 
 interface NavbarProps {
   currentScreen: Screen;
@@ -94,31 +95,11 @@ export const Navbar: React.FC<NavbarProps> = ({
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
         {/* Brand Logo - Left Aligned */}
         <div className="flex items-center shrink-0">
-          <button
+          <Logo
+            variant="full"
+            theme="dark"
             onClick={() => onSelectScreen('landing')}
-            className="flex items-center gap-2.5 group cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 rounded-lg select-none text-left"
-          >
-            <div className="relative w-9 h-9 sm:w-10 sm:h-10 rounded-xl overflow-hidden bg-white p-1 border border-amber-400/40 shadow-sm group-hover:border-amber-400 group-hover:shadow-amber-400/20 group-hover:scale-105 transition-all duration-200 shrink-0 flex items-center justify-center">
-              <img
-                src="/logo.jpg"
-                alt="EduFlow Logo"
-                className="w-full h-full object-contain"
-              />
-            </div>
-            <div className="flex flex-col justify-center min-w-0">
-              <div className="flex items-center gap-2">
-                <span className="text-base sm:text-lg font-sans font-bold tracking-tight text-white leading-tight">
-                  EduFlow
-                </span>
-                <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[9px] sm:text-[10px] font-semibold bg-[#032B20]/90 text-amber-300 border border-amber-400/30 whitespace-nowrap leading-none tracking-wide shadow-xs">
-                  Cambridge &amp; Flashcard
-                </span>
-              </div>
-              <span className="text-[10px] sm:text-[11px] text-emerald-200/80 font-sans tracking-normal leading-tight whitespace-nowrap mt-0.5 hidden sm:block">
-                Luyện thi Cambridge IELTS &amp; Học từ vựng Flashcard
-              </span>
-            </div>
-          </button>
+          />
         </div>
 
         {/* Desktop Navigation Tabs - Perfectly Centered */}

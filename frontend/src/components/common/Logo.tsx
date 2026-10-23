@@ -1,0 +1,250 @@
+import React from 'react';
+
+export interface LogoProps {
+  variant?: 'full' | 'icon' | 'wordmark';
+  size?: 'sm' | 'md' | 'lg';
+  theme?: 'dark' | 'light' | 'auto';
+  showBadge?: boolean;
+  showSlogan?: boolean;
+  className?: string;
+  onClick?: () => void;
+}
+
+/**
+ * eng4u Logo - Official Brand Vector Component
+ *
+ * Visual Elements:
+ * 1. Shield Icon:
+ *    - Emerald green protection shield (#10B981 / #059669)
+ *    - Pure white natural open book inside (no number 4)
+ *    - Miniature graduation cap on crest with amber gold tassel
+ *    - Symmetrical laurel wreath framing both sides and tied with a gold ribbon
+ * 2. Wordmark:
+ *    - "eng": rounded modern sans, bold
+ *    - "4": amber-gold accent (#FBBF24 / #F59E0B)
+ *    - "u": matching primary font
+ *    - Subtitle/Slogan: "IELTS & Academic English" or "Cambridge & Flashcard"
+ */
+export const Logo: React.FC<LogoProps> = ({
+  variant = 'full',
+  size = 'md',
+  theme = 'dark',
+  showBadge = true,
+  showSlogan = true,
+  className = '',
+  onClick,
+}) => {
+  // SVG Icon Vector
+  const renderSvgIcon = (pixelSize: number = 36) => (
+    <svg
+      viewBox="0 0 100 100"
+      width={pixelSize}
+      height={pixelSize}
+      className="shrink-0 overflow-visible select-none"
+      aria-label="eng4u Shield Logo"
+    >
+      <defs>
+        <linearGradient id="eng4uShieldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor="#10B981" />
+          <stop offset="100%" stopColor="#059669" />
+        </linearGradient>
+        <linearGradient id="eng4uGoldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor="#FBBF24" />
+          <stop offset="100%" stopColor="#F59E0B" />
+        </linearGradient>
+        <linearGradient id="eng4uWreathGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+          <stop offset="0%" stopColor="#34D399" />
+          <stop offset="100%" stopColor="#059669" />
+        </linearGradient>
+      </defs>
+
+      {/* 1. Laurel Wreath (Vòng lá nguyệt quế đối xứng ôm 2 bên và đáy) */}
+      <g strokeLinecap="round" strokeLinejoin="round">
+        {/* Left Stem */}
+        <path
+          d="M 50 91 C 30 91 17 76 17 52 C 17 38 23 27 27 22"
+          fill="none"
+          stroke="url(#eng4uWreathGrad)"
+          strokeWidth="2"
+        />
+        {/* Right Stem */}
+        <path
+          d="M 50 91 C 70 91 83 76 83 52 C 83 38 77 27 73 22"
+          fill="none"
+          stroke="url(#eng4uWreathGrad)"
+          strokeWidth="2"
+        />
+
+        {/* Left Leaves */}
+        <path d="M 42 88 C 36 91 32 91 37 94 C 42 94 44 90 42 88 Z" fill="#059669" />
+        <path d="M 45 86 C 41 84 37 87 40 90 C 44 91 46 87 45 86 Z" fill="#10B981" />
+        <path d="M 30 81 C 23 83 19 83 23 87 C 28 88 31 83 30 81 Z" fill="#059669" />
+        <path d="M 32 77 C 27 75 23 78 26 82 C 30 83 33 79 32 77 Z" fill="#10B981" />
+        <path d="M 21 68 C 14 69 11 72 15 75 C 20 76 22 71 21 68 Z" fill="#059669" />
+        <path d="M 23 64 C 18 61 14 65 17 69 C 22 70 24 66 23 64 Z" fill="#10B981" />
+        <path d="M 17 52 C 9 52 8 57 13 60 C 18 60 19 55 17 52 Z" fill="#059669" />
+        <path d="M 19 47 C 14 43 11 47 14 51 C 18 53 20 49 19 47 Z" fill="#10B981" />
+        <path d="M 17 37 C 10 35 10 40 14 44 C 19 44 20 39 17 37 Z" fill="#059669" />
+        <path d="M 20 32 C 16 28 12 31 16 36 C 21 37 22 34 20 32 Z" fill="#10B981" />
+        <path d="M 22 23 C 17 19 19 14 23 17 C 27 20 25 24 22 23 Z" fill="#34D399" />
+        <path d="M 26 22 C 24 17 21 19 23 23 C 26 25 28 24 26 22 Z" fill="#10B981" />
+
+        {/* Right Leaves (Symmetric) */}
+        <path d="M 58 88 C 64 91 68 91 63 94 C 58 94 56 90 58 88 Z" fill="#059669" />
+        <path d="M 55 86 C 59 84 63 87 60 90 C 56 91 54 87 55 86 Z" fill="#10B981" />
+        <path d="M 70 81 C 77 83 81 83 77 87 C 72 88 69 83 70 81 Z" fill="#059669" />
+        <path d="M 68 77 C 73 75 77 78 74 82 C 70 83 67 79 68 77 Z" fill="#10B981" />
+        <path d="M 79 68 C 86 69 89 72 85 75 C 80 76 78 71 79 68 Z" fill="#059669" />
+        <path d="M 77 64 C 82 61 86 65 83 69 C 78 70 76 66 77 64 Z" fill="#10B981" />
+        <path d="M 83 52 C 91 52 92 57 87 60 C 82 60 81 55 83 52 Z" fill="#059669" />
+        <path d="M 81 47 C 86 43 89 47 86 51 C 82 53 80 49 81 47 Z" fill="#10B981" />
+        <path d="M 83 37 C 90 35 90 40 86 44 C 81 44 80 39 83 37 Z" fill="#059669" />
+        <path d="M 80 32 C 84 28 88 31 84 36 C 79 37 78 34 80 32 Z" fill="#10B981" />
+        <path d="M 78 23 C 83 19 81 14 77 17 C 73 20 75 24 78 23 Z" fill="#34D399" />
+        <path d="M 74 22 C 76 17 79 19 77 23 C 74 25 72 24 74 22 Z" fill="#10B981" />
+
+        {/* Ribbon Knot at bottom center */}
+        <path d="M 47 89 C 45 92 41 96 38 98 C 42 97 46 94 48 91 Z" fill="#F59E0B" />
+        <path d="M 53 89 C 55 92 59 96 62 98 C 58 97 54 94 52 91 Z" fill="#F59E0B" />
+        <circle cx="50" cy="90.5" r="3" fill="url(#eng4uGoldGrad)" />
+      </g>
+
+      {/* 2. Shield (Chiếc khiên bảo vệ) */}
+      <g>
+        <path
+          d="M 50 24 C 63 24 73 22 74 28 C 74 53 66 70 50 82 C 34 70 26 53 26 28 C 27 22 37 24 50 24 Z"
+          fill="url(#eng4uShieldGrad)"
+          stroke="#34D399"
+          strokeWidth="1.5"
+        />
+        <path
+          d="M 50 27 C 61 27 69 25 70 30 C 70 51 63 66 50 77 C 37 66 30 51 30 30 C 31 25 39 27 50 27 Z"
+          fill="none"
+          stroke="#FFFFFF"
+          strokeWidth="0.8"
+          strokeOpacity="0.4"
+        />
+      </g>
+
+      {/* 3. Open Book Inside Shield (Cuốn sách mở tự nhiên màu trắng) */}
+      <g transform="translate(0, 4)">
+        <path
+          d="M 50 58 C 44 54 37 53 33 55 L 33 66 C 37 64 44 65 50 69 C 56 65 63 64 67 66 L 67 55 C 63 53 56 54 50 58 Z"
+          fill="#047857"
+          opacity="0.3"
+        />
+        {/* Left Page */}
+        <path
+          d="M 50 55 C 44 51 37 50 34 52 L 34 64 C 38 62 45 63 50 67 Z"
+          fill="#FFFFFF"
+        />
+        <line x1="38" y1="55.5" x2="47" y2="57.5" stroke="#A7F3D0" strokeWidth="1" strokeLinecap="round" />
+        <line x1="38" y1="58.5" x2="47" y2="60.5" stroke="#A7F3D0" strokeWidth="1" strokeLinecap="round" />
+        <line x1="38" y1="61.5" x2="45" y2="63.5" stroke="#A7F3D0" strokeWidth="1" strokeLinecap="round" />
+
+        {/* Right Page */}
+        <path
+          d="M 50 55 C 56 51 63 50 66 52 L 66 64 C 62 62 55 63 50 67 Z"
+          fill="#F0FDF4"
+        />
+        <line x1="53" y1="57.5" x2="62" y2="55.5" stroke="#A7F3D0" strokeWidth="1" strokeLinecap="round" />
+        <line x1="53" y1="60.5" x2="62" y2="58.5" stroke="#A7F3D0" strokeWidth="1" strokeLinecap="round" />
+        <line x1="55" y1="63.5" x2="62" y2="61.5" stroke="#A7F3D0" strokeWidth="1" strokeLinecap="round" />
+
+        {/* Spine Fold */}
+        <path d="M 50 55 L 50 67" stroke="#059669" strokeWidth="1.2" strokeLinecap="round" />
+      </g>
+
+      {/* 4. Graduation Cap on top of Shield (Mũ cử nhân cách điệu) */}
+      <g>
+        <path
+          d="M 42 16 L 42 19 C 42 22 50 24 58 21 L 58 18"
+          fill="#047857"
+          stroke="#064E3B"
+          strokeWidth="0.8"
+        />
+        <polygon
+          points="50,9 66,15 50,21 34,15"
+          fill="#065F46"
+          stroke="#34D399"
+          strokeWidth="1"
+        />
+        <polygon
+          points="50,10.5 63,15 50,19.5 37,15"
+          fill="#047857"
+        />
+        <circle cx="50" cy="15" r="1.5" fill="#FBBF24" />
+        <path
+          d="M 50 15 C 57 16 63 19 63 24"
+          fill="none"
+          stroke="#F59E0B"
+          strokeWidth="1.2"
+          strokeLinecap="round"
+        />
+        <polygon
+          points="61.5,23.5 64.5,23.5 64,27 62,27"
+          fill="#FBBF24"
+          stroke="#D97706"
+          strokeWidth="0.5"
+        />
+      </g>
+    </svg>
+  );
+
+  if (variant === 'icon') {
+    return (
+      <div
+        onClick={onClick}
+        className={`inline-flex items-center justify-center ${onClick ? 'cursor-pointer' : ''} ${className}`}
+      >
+        {renderSvgIcon(size === 'sm' ? 28 : size === 'lg' ? 48 : 36)}
+      </div>
+    );
+  }
+
+  const isDark = theme === 'dark';
+
+  return (
+    <div
+      onClick={onClick}
+      className={`flex items-center gap-2.5 select-none text-left ${onClick ? 'cursor-pointer group' : ''} ${className}`}
+    >
+      {/* 1. Shield Icon inside polished badge */}
+      <div className="relative w-9 h-9 sm:w-10 sm:h-10 rounded-xl overflow-hidden bg-white p-1 border border-amber-400/40 shadow-sm group-hover:border-amber-400 group-hover:shadow-amber-400/20 group-hover:scale-105 transition-all duration-200 shrink-0 flex items-center justify-center">
+        {renderSvgIcon(30)}
+      </div>
+
+      {/* 2. Brand Wordmark & Tagline */}
+      <div className="flex flex-col justify-center min-w-0">
+        <div className="flex items-center gap-2">
+          {/* eng4u wordmark */}
+          <span className="text-base sm:text-lg font-sans font-bold tracking-tight leading-tight flex items-baseline">
+            <span className={isDark ? 'text-white' : 'text-[#064E3B]'}>eng</span>
+            <span className="text-[#FBBF24] font-black drop-shadow-2xs">4</span>
+            <span className={isDark ? 'text-white' : 'text-[#064E3B]'}>u</span>
+          </span>
+
+          {/* Badge */}
+          {showBadge && (
+            <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[9px] sm:text-[10px] font-semibold bg-[#032B20]/90 text-amber-300 border border-amber-400/30 whitespace-nowrap leading-none tracking-wide shadow-xs">
+              Cambridge &amp; Flashcard
+            </span>
+          )}
+        </div>
+
+        {/* Subtitle / Slogan */}
+        {showSlogan && (
+          <span
+            className={`text-[10px] sm:text-[11px] font-sans tracking-normal leading-tight whitespace-nowrap mt-0.5 hidden sm:block ${
+              isDark ? 'text-emerald-200/80' : 'text-stone-500'
+            }`}
+          >
+            Luyện thi Cambridge IELTS &amp; Học từ vựng Flashcard
+          </span>
+        )}
+      </div>
+    </div>
+  );
+};
+
+export default Logo;

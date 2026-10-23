@@ -31,6 +31,7 @@ import { WritingWorkspace } from './modules/writing/WritingWorkspace';
 import { SpeakingRandomStudio } from './modules/speaking/SpeakingRandomStudio';
 import { UpgradeModal } from './components/common/UpgradeModal';
 import { useProStore } from './modules/pro/useProStore';
+import { Logo } from './components/common/Logo';
 
 // Error Boundary to prevent white screen crashes
 interface ErrorBoundaryProps {
@@ -702,7 +703,7 @@ const AppContent: React.FC = () => {
         <footer className="mt-auto border-t border-stone-200/80 bg-white/85 backdrop-blur-md py-8">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-stone-500">
             <div className="flex items-center gap-3 font-sans">
-              <span className="font-bold text-forest-950">EduFlow</span>
+              <Logo variant="full" theme="light" showBadge={false} showSlogan={false} />
               <span>•</span>
               <span className="font-sans">Luyện thi Cambridge IELTS &amp; Học từ vựng Flashcard</span>
             </div>
