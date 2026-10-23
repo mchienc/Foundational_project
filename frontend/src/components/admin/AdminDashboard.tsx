@@ -20,7 +20,7 @@ import {
   EyeOff,
   Filter,
   Globe,
-  Sparkles,
+  
   Crown,
   Check,
   Calendar,
@@ -975,7 +975,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate, onNo
                           {user.is_pro ? (
                             <div className="inline-flex flex-col">
                               <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold bg-amber-50 text-amber-900 border border-amber-300 shadow-xs">
-                                <Sparkles size={11} className="text-amber-600" />
+                                <Shield size={11} className="text-amber-600" />
                                 <span>{user.pro_package || 'EduFlow PRO'}</span>
                               </span>
                               {user.pro_expiry && (
@@ -1018,7 +1018,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate, onNo
                                 className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl text-xs font-bold bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-300 transition-colors cursor-pointer shadow-xs"
                                 title="Cấp quyền EduFlow Pro cho học viên"
                               >
-                                <Sparkles size={12} className="text-amber-600" />
+                                <Shield size={12} className="text-amber-600" />
                                 <span>Cấp PRO</span>
                               </button>
                             )}
@@ -1433,7 +1433,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate, onNo
                 disabled={isUpdatingPro}
                 className="flex-1 py-2.5 rounded-xl bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold transition-all shadow-md shadow-amber-600/20 cursor-pointer flex items-center justify-center gap-1.5"
               >
-                <Sparkles size={14} />
+                <Shield size={14} />
                 <span>{isUpdatingPro ? 'Đang kích hoạt...' : 'Xác Nhận Cấp PRO'}</span>
               </button>
             </div>

@@ -18,7 +18,7 @@ import {
   Minimize2,
   X,
   FileText,
-  Sparkles,
+  
   Highlighter,
   Info,
 } from 'lucide-react';
@@ -324,7 +324,7 @@ export const IELTSListeningExamRoom: React.FC<IELTSListeningExamRoomProps> = ({
                 }`}
                 title="Đổi trạng thái kiểm tra đáp án & giải thích ngay lập tức"
               >
-                <Sparkles size={13} />
+                <CheckCircle2 size={13} />
                 <span className="hidden md:inline">
                   {showInstantAnswers ? 'Đang hiện Đáp Án' : 'Check Đáp Án Ngay'}
                 </span>

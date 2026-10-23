@@ -32,6 +32,7 @@ import { SpeakingRandomStudio } from './modules/speaking/SpeakingRandomStudio';
 import { UpgradeModal } from './components/common/UpgradeModal';
 import { useProStore } from './modules/pro/useProStore';
 import { Logo } from './components/common/Logo';
+import { saveTestAttempt } from './services/testHistoryStorage';
 
 // Error Boundary to prevent white screen crashes
 interface ErrorBoundaryProps {
@@ -503,6 +504,15 @@ const AppContent: React.FC = () => {
               window.scrollTo({ top: 0, behavior: 'smooth' });
             }}
             onSubmitComplete={(result) => {
+              saveTestAttempt({
+                book: listeningTest.book,
+                testNumber: listeningTest.testNumber,
+                skill: 'listening',
+                bandScore: result.bandScore,
+                correctCount: result.correctCount,
+                totalQuestions: result.totalCount,
+                completedAt: new Date().toLocaleDateString('vi-VN'),
+              });
               setListeningExamResult(result);
               setCurrentScreen('listening-review');
               window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -587,6 +597,57 @@ const AppContent: React.FC = () => {
             stats={stats}
             courses={courses}
             initialTab={profileInitialTab}
+            onNavigateScreen={handleScreenNavigate}
+            onStartReadingTest={(book, testNumber, mode) => {
+              if (mode === 'single') {
+                const match =
+                  mockReadingPassages.find((p) => p.source.toLowerCase().includes(book.toLowerCase())) ||
+                  mockReadingPassages[0];
+                setSelectedPassageId(match.id);
+                setReadingSession({
+                  mode: 'single',
+                  passageId: match.id,
+                  testTitle: `${book} Test ${testNumber}`,
+                });
+                setCurrentScreen('reading-test');
+              } else {
+                const group: CambridgeTestGroup = {
+                  id: `${book.toLowerCase().replace(/\s+/g, '-')}-t${testNumber}-reading`,
+                  source: `${book} - Test ${testNumber}`,
+                  bookTitle: book,
+                  testNumber: `Test ${testNumber}`,
+                  sourceType: 'cambridge',
+                  passages: mockReadingPassages.slice(0, 3),
+                  totalQuestions: 40,
+                  totalWords: 2450,
+                  topics: ['Khoa học ứng dụng', 'Lịch sử & Khảo cổ', 'Môi trường & Công nghệ'],
+                };
+                setSelectedComputerExamGroup(group);
+                setCurrentScreen('computer-exam');
+              }
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+              addToast(`Bắt đầu bài thi Reading: ${book} Test ${testNumber}`, 'success');
+            }}
+            onStartListeningTest={(book, testNumber, mode) => {
+              if (mode === 'practice') {
+                setCurrentScreen('dictation');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+                addToast('Mở phòng luyện chép chính tả Dictation', 'info');
+              } else {
+                const match =
+                  mockListeningFullTests.find(
+                    (t) => t.book.toLowerCase() === book.toLowerCase() && t.testNumber === testNumber
+                  ) ||
+                  mockListeningFullTests.find((t) => t.book.toLowerCase() === book.toLowerCase()) ||
+                  mockListeningFullTests[0];
+
+                setSelectedListeningFullTestId(match.id);
+                setListeningExamMode('exam');
+                setCurrentScreen('listening-exam');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+                addToast(`Bắt đầu bài thi Listening: ${match.source}`, 'success');
+              }
+            }}
             onUpdateUser={(updated) => {
               login({ ...user, ...updated });
             }}

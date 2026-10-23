@@ -5,8 +5,7 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   X,
-  Sparkles,
-  Check,
+Check,
   Award,
   RefreshCw,
   QrCode,
@@ -365,7 +364,6 @@ export const UpgradeModal: React.FC<UpgradeModalProps> = ({
 
             <div className="flex items-center gap-2">
               <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/20 border border-amber-400/40 text-amber-300 text-xs font-semibold">
-                <Sparkles size={13} className="animate-pulse" />
                 <span>NÂNG CẤP EDUFLOW PRO</span>
               </span>
               <span className="inline-flex items-center gap-1 text-[11px] text-emerald-200">

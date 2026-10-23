@@ -6,13 +6,13 @@ import {
   Layers,
   ArrowRight,
   CheckCircle2,
-  Bookmark,
-  Sparkles,
-  ChevronLeft,
+ChevronLeft,
   ChevronRight,
   Youtube,
   Volume2,
   FileCheck,
+  PenTool,
+  Mic,
 } from 'lucide-react';
 import { Screen, User } from '../../types';
 
@@ -64,7 +64,7 @@ export const AcademicChaptersScrolly: React.FC<AcademicChaptersScrollyProps> = (
       title: 'Luyện Nghe Listening (Cam 13–20)',
       subtitle: '4 phần nghe liên tục, 40 câu hỏi & Transcript dẫn chứng',
       discipline: 'Luyện Listening',
-      screen: 'listening-exam' as Screen,
+      screen: 'listening' as Screen,
       ctaLabel: 'Làm bài nghe ngay',
       icon: <Headphones className="w-5 h-5 text-amber-300" />,
       tag: 'Âm Thanh Chuẩn • 4 Phần • Xem Lại Transcript',
@@ -87,6 +87,58 @@ export const AcademicChaptersScrolly: React.FC<AcademicChaptersScrollyProps> = (
     {
       id: 'chapter-3',
       number: 'Phần 3',
+      title: 'Luyện Viết Task 1 AI Studio',
+      subtitle: 'Gợi ý cụm từ nối học thuật & nâng cấp câu Band 8.5',
+      discipline: 'Luyện Viết',
+      screen: 'writing' as Screen,
+      ctaLabel: 'Luyện viết Task 1 ngay',
+      icon: <PenTool className="w-5 h-5 text-amber-300" />,
+      tag: 'Đề Cam 18-19 • Cụm Nối Học Thuật • Nâng Cấp Band 8.5',
+      description:
+        'Không gian thực hành IELTS Writing Task 1 với các dạng biểu đồ thực tế từ Cambridge 18 và 19. Tích hợp thanh công cụ chèn từ nối xu hướng, bộ nâng cấp câu theo từng Band điểm và tính năng kiểm tra tự động câu tổng quan (Overview).',
+      features: [
+        'Đề thi biểu đồ thực tế: Line graph, Bar chart kèm đồng hồ đếm ngược 20 phút',
+        'Thanh cụm từ liên kết một chạm: Gợi ý nhanh các động từ mô tả xu hướng và cấu trúc so sánh',
+        'Nâng cấp câu tức thì (Sentence Upgrader): Gợi ý câu viết học thuật từ Band 6.5 đến Band 8.5',
+      ],
+      previewBadge: 'Writing Studio • Cam 18 & 19',
+      mockType: 'writing-task1',
+      mockVisual: {
+        taskTitle: 'Cambridge 18 Test 1: Internet usage in European countries (2005–2020)',
+        originalSentence: 'Older people used the internet less.',
+        upgradedBand85: 'Band 8.5: "In stark contrast, the over-65 cohort recorded significantly lower daily internet usage..."',
+        overviewStatus: 'Đã phát hiện câu Overview đạt chuẩn • 172 từ đã viết',
+      },
+    },
+    {
+      id: 'chapter-4',
+      number: 'Phần 4',
+      title: 'Luyện Nói Speaking Mock Test',
+      subtitle: 'Khảo thí giọng Anh-Anh, đo tốc độ WPM & phát hiện từ đệm',
+      discipline: 'Luyện Nói',
+      screen: 'speaking' as Screen,
+      ctaLabel: 'Thi thử Speaking ngay',
+      icon: <Mic className="w-5 h-5 text-amber-300" />,
+      tag: 'Khảo Thí Giọng UK • Nhận Diện Giọng Nói • Đo Tốc Độ WPM',
+      description:
+        'Phòng thi Speaking mô phỏng sát phòng thi thật với 3 Part chuẩn format Cambridge. Giám khảo AI đọc đề bằng phát âm Anh-Anh chuẩn, hệ thống tự động ghi âm câu trả lời, đo tốc độ WPM và chẩn đoán từ đệm thừa.',
+      features: [
+        'Cấu trúc trọn vẹn 3 Part: Phỏng vấn Part 1, Thẻ Cue Card 60s chuẩn bị Part 2 & Thảo luận Part 3',
+        'Công nghệ nhận diện giọng nói chuẩn xác: Lưu lại bản ghi âm và transcript bài nói của bạn',
+        'Báo cáo chẩn đoán sau thi: Đo WPM, phát hiện từ đệm (uhm, like) và bảng gợi ý từ vựng học thuật',
+      ],
+      previewBadge: 'Speaking Room • Đầy Đủ 3 Part',
+      mockType: 'speaking-mock',
+      mockVisual: {
+        topic: 'Cambridge 18 Test 1: Environment & Technology',
+        examinerQuestion: 'Examiner: "To what extent should governments be responsible for protecting the environment?"',
+        candidateVoice: 'Candidate: "In my perspective, governmental legislation plays an indispensable role..."',
+        diagnosticReport: 'Tốc độ: 135 WPM (Tự nhiên) • Từ đệm: 0 • Từ nâng cao: indispensable, legislation',
+      },
+    },
+    {
+      id: 'chapter-5',
+      number: 'Phần 5',
       title: 'Chép Chính Tả Video YouTube',
       subtitle: 'Luyện nghe câu ngắn, tự động lặp & kiểm tra từng từ',
       discipline: 'Chép chính tả',
@@ -112,10 +164,10 @@ export const AcademicChaptersScrolly: React.FC<AcademicChaptersScrollyProps> = (
       },
     },
     {
-      id: 'chapter-4',
-      number: 'Phần 4',
+      id: 'chapter-6',
+      number: 'Phần 6',
       title: 'Học Từ Vựng Flashcard Anki',
-      subtitle: 'Thẻ lật thông minh, nhắc ôn đúng lúc & tạo thẻ với AI',
+      subtitle: 'Thẻ lật thông minh, nhắc ôn đúng lúc & xuất file .apkg',
       discipline: 'Học từ vựng',
       screen: 'anki' as Screen,
       ctaLabel: 'Học từ vựng ngay',
@@ -178,94 +230,86 @@ export const AcademicChaptersScrolly: React.FC<AcademicChaptersScrollyProps> = (
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-14 pb-6 border-b border-stone-200">
           <div className="space-y-2 text-left">
             <div className="inline-flex items-center gap-2 text-amber-800 text-xs font-sans font-bold tracking-normal">
-              <Bookmark className="w-3.5 h-3.5 text-amber-700" />
-              <span>Tính Năng Nổi Bật</span>
+              <span>HỆ THỐNG 6 PHẦN LUYỆN THI CHUYÊN SÂU</span>
             </div>
-            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-sans font-bold text-[#064E3B] tracking-tight leading-tight">
-              Luyện Tập Toàn Diện 4 Kỹ Năng
-            </h2>
+            <h3 className="text-2xl sm:text-4xl font-serif font-bold text-[#064E3B] tracking-tight">
+              Khám Phá Các Tính Năng Luyện Thi
+            </h3>
+            <p className="text-xs sm:text-sm text-stone-600 font-sans max-w-xl">
+              Chọn từng phần bên dưới để xem chi tiết cách học và trải nghiệm giao diện luyện tập thực tế.
+            </p>
           </div>
-          <p className="text-xs text-stone-600 font-sans max-w-md leading-relaxed">
-            Kết hợp luyện đề Reading và Listening Cambridge, luyện nghe chép chính tả qua video YouTube
-            và ghi nhớ từ vựng với Flashcard Anki.
-          </p>
+
+          {/* Navigation Controls */}
+          <div className="flex items-center gap-2 shrink-0">
+            <button
+              onClick={handlePrev}
+              className="p-2.5 rounded-full border border-stone-300 bg-white text-stone-700 hover:text-stone-900 hover:border-amber-400 hover:bg-amber-50/50 shadow-2xs transition-colors cursor-pointer"
+              title="Phần trước"
+            >
+              <ChevronLeft size={18} />
+            </button>
+            <button
+              onClick={handleNext}
+              className="p-2.5 rounded-full border border-stone-300 bg-white text-stone-700 hover:text-stone-900 hover:border-amber-400 hover:bg-amber-50/50 shadow-2xs transition-colors cursor-pointer"
+              title="Phần tiếp theo"
+            >
+              <ChevronRight size={18} />
+            </button>
+          </div>
         </div>
 
-        {/* 2-Column Responsive Layout */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-start">
-          {/* LEFT COLUMN: Navigation */}
-          <div className="lg:col-span-5 space-y-4">
-            <div className="flex items-center justify-between">
-              <p className="text-[11px] font-sans font-bold uppercase tracking-normal text-stone-500">
-                — Chọn Phần Luyện Tập —
-              </p>
-              {/* Prev / Next Chevrons and Counter */}
-              <div className="flex items-center gap-2">
-                <span className="text-[11px] font-mono font-bold text-stone-600">
-                  {activeChapterIndex + 1} / {chapters.length}
-                </span>
-                <div className="inline-flex rounded-lg border border-stone-200 bg-white p-0.5 shadow-2xs">
-                  <button
-                    onClick={handlePrev}
-                    aria-label="Phần trước"
-                    className="p-1 rounded text-stone-600 hover:text-stone-900 hover:bg-stone-100 transition-colors cursor-pointer"
-                  >
-                    <ChevronLeft size={16} />
-                  </button>
-                  <button
-                    onClick={handleNext}
-                    aria-label="Phần kế tiếp"
-                    className="p-1 rounded text-stone-600 hover:text-stone-900 hover:bg-stone-100 transition-colors cursor-pointer"
-                  >
-                    <ChevronRight size={16} />
-                  </button>
-                </div>
-              </div>
-            </div>
-
-            {/* Chapter Selection Tabs */}
-            <div className="space-y-3">
-              {chapters.map((ch, idx) => {
-                const isActive = activeChapterIndex === idx;
+        {/* 2-Column Split: Master Navigation (Left) + Dossier Sheet (Right) */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start text-left">
+          {/* LEFT COLUMN: Chapter Menu (5 Cols) */}
+          <div className="lg:col-span-5 space-y-3">
+            <div className="space-y-2">
+              {chapters.map((chap, idx) => {
+                const isActive = idx === activeChapterIndex;
                 return (
                   <button
-                    key={ch.id}
-                    type="button"
+                    key={chap.id}
                     onClick={() => setActiveChapterIndex(idx)}
-                    className={`w-full text-left p-4 sm:p-5 rounded-2xl transition-all duration-300 border cursor-pointer ${
+                    className={`w-full p-4 rounded-2xl text-left transition-all duration-200 flex items-start gap-3.5 cursor-pointer border ${
                       isActive
-                        ? 'bg-[#064E3B] text-white border-amber-500 shadow-lg translate-x-1 sm:translate-x-2 ring-2 ring-amber-400/20'
-                        : 'bg-white/85 backdrop-blur-md border-stone-200 hover:border-stone-300 hover:bg-white text-stone-800 shadow-xs'
+                        ? 'bg-white border-[#064E3B] shadow-md ring-1 ring-[#064E3B]/20'
+                        : 'bg-white/70 hover:bg-white border-stone-200/80 hover:border-stone-300 shadow-2xs'
                     }`}
                   >
-                    <div className="flex items-center justify-between gap-2 mb-1.5">
-                      <span
-                        className={`text-xs font-mono font-bold uppercase tracking-normal ${
-                          isActive ? 'text-amber-300' : 'text-stone-500'
-                        }`}
-                      >
-                        {ch.number}
-                      </span>
-                      <span
-                        className={`text-[10px] px-2 py-0.5 rounded-md font-mono ${
-                          isActive
-                            ? 'bg-amber-400/20 text-amber-200 border border-amber-400/40'
-                            : 'bg-stone-100 text-stone-600 border border-stone-200'
-                        }`}
-                      >
-                        {ch.discipline}
-                      </span>
-                    </div>
-
-                    <h3
-                      className={`text-sm sm:text-base leading-snug tracking-normal ${
+                    <div
+                      className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 transition-colors shadow-2xs ${
                         isActive
-                          ? 'font-sans font-bold text-white'
-                          : 'font-sans font-semibold text-stone-800'
+                          ? 'bg-[#064E3B] text-amber-300'
+                          : 'bg-stone-100 text-stone-600'
                       }`}
                     >
-                      {ch.title}
-                    </h3>
+                      {chap.icon}
+                    </div>
+
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center justify-between gap-2">
+                        <span
+                          className={`text-[10px] font-mono font-bold tracking-normal uppercase ${
+                            isActive ? 'text-amber-800' : 'text-stone-600'
+                          }`}
+                        >
+                          {chap.number}
+                        </span>
+                        {isActive && (
+                          <span className="w-2 h-2 rounded-full bg-emerald-600 animate-pulse" />
+                        )}
+                      </div>
+                      <h4
+                        className={`text-sm font-sans font-bold leading-tight truncate ${
+                          isActive ? 'text-[#064E3B]' : 'text-stone-800'
+                        }`}
+                      >
+                        {chap.title}
+                      </h4>
+                      <p className="text-[11px] text-stone-600 font-sans truncate mt-0.5">
+                        {chap.subtitle}
+                      </p>
+                    </div>
                   </button>
                 );
               })}
@@ -274,16 +318,16 @@ export const AcademicChaptersScrolly: React.FC<AcademicChaptersScrollyProps> = (
             {/* Micro Citation Badge */}
             <div className="p-4 rounded-xl bg-amber-50/80 border border-amber-200 text-xs text-amber-950 space-y-1.5 shadow-2xs">
               <span className="font-bold flex items-center gap-1.5 text-amber-900">
-                <Sparkles className="w-4 h-4 text-amber-700" />
-                Cách học hiệu quả tại EduFlow:
+                <CheckCircle2 className="w-4 h-4 text-emerald-700" />
+                Cách học hiệu quả tại eng4u:
               </span>
               <p className="text-[11px] text-stone-700 leading-relaxed font-sans">
-                Luyện đề đọc &amp; nghe ➔ Tra từ vựng và lưu vào Flashcard ➔ Luyện nghe chép chính tả qua video ➔ Ôn tập ngắt quãng để nhớ từ lâu hơn.
+                Luyện đề đọc &amp; nghe ➔ Tra từ vựng và lưu vào Flashcard ➔ Thực hành viết &amp; nói phản xạ ➔ Nghe chép chính tả video ➔ Ôn tập ngắt quãng để nhớ từ lâu hơn.
               </p>
             </div>
           </div>
 
-          {/* RIGHT COLUMN: Detail Card */}
+          {/* RIGHT COLUMN: Detail Card (7 Cols) */}
           <div className="lg:col-span-7 w-full">
             <AnimatePresence mode="wait">
               <motion.div
@@ -312,7 +356,6 @@ export const AcademicChaptersScrolly: React.FC<AcademicChaptersScrollyProps> = (
                     </div>
 
                     <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-50 border border-amber-200/80 text-[11px] font-bold text-amber-800 shrink-0 self-start sm:self-auto">
-                      <Sparkles className="w-3.5 h-3.5 text-amber-600" />
                       <span>{currentChapter.tag}</span>
                     </div>
                   </div>
@@ -376,7 +419,44 @@ export const AcademicChaptersScrolly: React.FC<AcademicChaptersScrollyProps> = (
                     </div>
                   )}
 
-                  {/* Chapter 3: YouTube Dictation Mockup */}
+                  {/* Chapter 3: Writing Task 1 Mockup */}
+                  {currentChapter.mockType === 'writing-task1' && (
+                    <div className="space-y-2 pt-1">
+                      <div className="text-xs text-stone-700 font-serif font-bold text-[#064E3B]">
+                        {currentChapter.mockVisual.taskTitle}
+                      </div>
+                      <div className="p-2.5 rounded-lg bg-stone-100 border border-stone-200 text-xs text-stone-600 font-mono">
+                        Câu gốc học viên: "{currentChapter.mockVisual.originalSentence}"
+                      </div>
+                      <div className="p-2.5 rounded-xl bg-emerald-950 text-amber-300 text-xs font-sans leading-relaxed border border-emerald-800">
+                        {currentChapter.mockVisual.upgradedBand85}
+                      </div>
+                      <div className="text-[11px] text-emerald-800 font-mono bg-emerald-50 p-2 rounded-lg border border-emerald-200 flex items-center gap-1.5">
+                        <CheckCircle2 size={13} className="text-emerald-700" />
+                        <span>{currentChapter.mockVisual.overviewStatus}</span>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Chapter 4: Speaking Mockup */}
+                  {currentChapter.mockType === 'speaking-mock' && (
+                    <div className="space-y-2 pt-1">
+                      <div className="text-xs text-stone-700 font-serif font-bold text-[#064E3B]">
+                        {currentChapter.mockVisual.topic}
+                      </div>
+                      <div className="p-2.5 rounded-xl bg-[#064E3B] text-stone-100 text-xs font-serif italic">
+                        {currentChapter.mockVisual.examinerQuestion}
+                      </div>
+                      <div className="p-2.5 rounded-lg bg-amber-50/70 border border-amber-200 text-xs text-stone-800 font-sans">
+                        {currentChapter.mockVisual.candidateVoice}
+                      </div>
+                      <div className="text-[11px] text-emerald-900 font-mono bg-emerald-50 p-2 rounded-lg border border-emerald-200">
+                        {currentChapter.mockVisual.diagnosticReport}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Chapter 5: YouTube Dictation Mockup */}
                   {currentChapter.mockType === 'youtube-dictation' && (
                     <div className="space-y-2 pt-1">
                       <div className="flex items-center justify-between text-xs text-stone-700 font-serif">
@@ -400,7 +480,7 @@ export const AcademicChaptersScrolly: React.FC<AcademicChaptersScrollyProps> = (
                     </div>
                   )}
 
-                  {/* Chapter 4: Anki Flashcard Mockup */}
+                  {/* Chapter 6: Anki Flashcard Mockup */}
                   {currentChapter.mockType === 'anki-ai' && (
                     <div className="space-y-2 pt-1">
                       <div className="flex items-center justify-between text-xs font-bold text-[#064E3B]">

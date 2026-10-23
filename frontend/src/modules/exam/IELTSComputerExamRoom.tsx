@@ -5,6 +5,7 @@ import { useExamStore } from '../../store/useExamStore';
 import { CambridgeReadingPassage } from '../../types';
 import { getReadingPassageById } from '../../services/cambridgeApi';
 import { useSmoothScroll } from '../../context/SmoothScrollProvider';
+import { saveTestAttempt } from '../../services/testHistoryStorage';
 import { ExamTopbar } from './ExamTopbar';
 import { ExamReadingPanel } from './ExamReadingPanel';
 import { ExamQuestionsPanel } from './ExamQuestionsPanel';
@@ -99,12 +100,36 @@ export const IELTSComputerExamRoom = ({
     return () => clearInterval(interval);
   }, [tickTimer]);
 
-  // When exam is submitted, display the modal
+  // When exam is submitted, display the modal and save result to history
   useEffect(() => {
     if (isSubmitted && examResult) {
       setShowResultModal(true);
+
+      let book = 'Cambridge 18';
+      let testNumber: 1 | 2 | 3 | 4 = 1;
+      const bMatch = testTitle.match(/Cambridge\s*(?:IELTS\s*)?(\d+)/i);
+      if (bMatch) {
+        book = `Cambridge ${bMatch[1]}`;
+      }
+      const tMatch = testTitle.match(/Test\s*(\d+)/i);
+      if (tMatch) {
+        const num = parseInt(tMatch[1], 10);
+        if (num >= 1 && num <= 4) {
+          testNumber = num as 1 | 2 | 3 | 4;
+        }
+      }
+
+      saveTestAttempt({
+        book,
+        testNumber,
+        skill: 'reading',
+        bandScore: examResult.bandScore,
+        correctCount: examResult.correctCount,
+        totalQuestions: examResult.totalQuestions,
+        completedAt: new Date().toLocaleDateString('vi-VN'),
+      });
     }
-  }, [isSubmitted, examResult]);
+  }, [isSubmitted, examResult, testTitle]);
 
   // Fullscreen toggle
   const toggleFullscreen = async () => {

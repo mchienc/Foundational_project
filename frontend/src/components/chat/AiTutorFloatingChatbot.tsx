@@ -6,7 +6,7 @@ import {
   Send,
   Mic,
   MicOff,
-  Sparkles,
+  Bot,
   Plus,
   Check,
   Volume2,
@@ -317,7 +317,7 @@ export const AiTutorFloatingChatbot: React.FC<AiTutorFloatingChatbotProps> = ({
           title="Mở Trợ Lý Học Tập AI"
         >
           <div className="relative">
-            <Sparkles className="w-5 h-5 text-amber-300 transition-transform duration-500 group-hover:rotate-180" />
+            <Bot className="w-5 h-5 text-amber-300" />
             <span className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping" />
             <span className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-emerald-400" />
           </div>
@@ -341,7 +341,7 @@ export const AiTutorFloatingChatbot: React.FC<AiTutorFloatingChatbotProps> = ({
             <div className="bg-[#064E3B] px-4 py-3.5 flex items-center justify-between text-white shrink-0 border-b border-emerald-900/60">
               <div className="flex items-center gap-2.5">
                 <div className="w-8 h-8 rounded-xl bg-[#022C22] text-amber-300 border border-amber-400/40 flex items-center justify-center shadow-xs">
-                  <Sparkles size={16} />
+                  <Bot size={16} />
                 </div>
                 <div>
                   <h3 className="text-sm font-bold font-serif tracking-tight text-white flex items-center gap-1.5">
@@ -384,7 +384,7 @@ export const AiTutorFloatingChatbot: React.FC<AiTutorFloatingChatbotProps> = ({
                 <div className="h-full flex flex-col justify-between py-2">
                   <div className="bg-white border border-stone-200/90 rounded-2xl p-4 shadow-2xs space-y-2">
                     <div className="flex items-center gap-2 text-xs font-bold text-[#064E3B]">
-                      <Sparkles size={15} className="text-amber-600" />
+                      <Bot size={15} className="text-amber-600" />
                       <span>Gia sư AI luôn sẵn sàng hỗ trợ bạn</span>
                     </div>
                     <p className="text-xs text-stone-600 leading-relaxed font-sans">
@@ -513,7 +513,7 @@ export const AiTutorFloatingChatbot: React.FC<AiTutorFloatingChatbotProps> = ({
                   {/* Trạng thái AI đang suy nghĩ */}
                   {isLoading && (
                     <div className="flex items-center gap-2 text-xs text-stone-500 bg-white border border-stone-200/80 rounded-2xl px-3.5 py-2 w-fit shadow-2xs">
-                      <Sparkles size={13} className="text-amber-600 animate-spin" />
+                      <Bot size={13} className="text-amber-600" />
                       <span className="font-sans">Trợ lý AI đang suy nghĩ câu trả lời...</span>
                     </div>
                   )}

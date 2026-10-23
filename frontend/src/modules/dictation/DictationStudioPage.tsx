@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import {
   Youtube,
-  Sparkles,
+  
   Play,
   Clock,
   BookOpen,
@@ -311,7 +311,7 @@ export const DictationStudioPage: React.FC = () => {
                   type="submit"
                   className="px-6 py-3.5 rounded-2xl bg-[#064E3B] hover:bg-[#043327] text-white text-sm font-bold flex items-center justify-center gap-2 shadow-sm transition-all cursor-pointer shrink-0"
                 >
-                  <Sparkles size={16} className="text-[#D97706]" />
+                  <Headphones size={16} className="text-[#D97706]" />
                   <span>Bắt Đầu Chép</span>
                   <ArrowRight size={16} />
                 </button>

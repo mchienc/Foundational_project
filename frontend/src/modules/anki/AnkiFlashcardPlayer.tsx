@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import {
   ArrowLeft,
-  Sparkles,
+  Award,
   CheckCircle2,
 } from 'lucide-react';
 import { useAnki } from '../../context/AnkiContext';
@@ -157,7 +157,7 @@ export const AnkiFlashcardPlayer: React.FC<AnkiFlashcardPlayerProps> = ({
     return (
       <div className="max-w-2xl mx-auto px-4 py-16 text-center space-y-6 animate-in fade-in zoom-in-95 duration-200">
         <div className="w-20 h-20 rounded-3xl bg-[#064E3B] text-amber-300 flex items-center justify-center mx-auto shadow-lg shadow-emerald-950/20">
-          <Sparkles size={36} className="animate-pulse" />
+          <Award size={36} className="text-amber-400" />
         </div>
 
         <div className="space-y-2">

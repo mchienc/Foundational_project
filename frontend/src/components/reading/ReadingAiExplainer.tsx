@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import {
-  Sparkles,
+  BookOpen,
   Target,
   ArrowRight,
   AlertTriangle,
@@ -9,7 +9,6 @@ import {
   ChevronDown,
   ChevronUp,
   Loader2,
-  BookOpen,
 } from 'lucide-react';
 import {
   fetchReadingQuestionAiExplanation,
@@ -140,7 +139,7 @@ export const ReadingAiExplainer: React.FC<ReadingAiExplainerProps> = ({
             {isLoading ? (
               <Loader2 size={15} className="animate-spin" />
             ) : (
-              <Sparkles size={15} />
+              <BookOpen size={15} />
             )}
           </div>
           <div>
@@ -272,7 +271,7 @@ export const ReadingAiExplainer: React.FC<ReadingAiExplainerProps> = ({
                 <div className="p-3 rounded-xl bg-emerald-950 text-white space-y-2.5 shadow-xs">
                   <div className="flex items-center justify-between gap-2">
                     <span className="text-[11px] font-mono font-bold uppercase tracking-wider text-amber-300 flex items-center gap-1">
-                      <Sparkles size={12} /> Thẻ Anki Từ Cụm Dẫn Chứng:
+                      <BookOpen size={12} /> Thẻ Anki Từ Cụm Dẫn Chứng:
                     </span>
                     <button
                       type="button"

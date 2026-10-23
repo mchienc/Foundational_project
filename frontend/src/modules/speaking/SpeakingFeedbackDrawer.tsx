@@ -2,10 +2,11 @@
 // Bảng nhận xét chi tiết bài thi Speaking từ Giám khảo AI (Gemini)
 
 import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import {
+  motion,
+  AnimatePresence } from 'framer-motion';
 import {
   X,
-  Sparkles,
   CheckCircle,
   AlertCircle,
   Volume2,
@@ -13,6 +14,7 @@ import {
   ArrowRight,
   Copy,
   Check,
+  Award,
 } from 'lucide-react';
 
 export interface SpeakingFeedbackData {
@@ -89,7 +91,7 @@ export const SpeakingFeedbackDrawer: React.FC<SpeakingFeedbackDrawerProps> = ({
           <div className="bg-[#064E3B] text-white px-6 py-5 flex items-center justify-between shrink-0 border-b border-emerald-800">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-xl bg-amber-500/20 text-amber-300 flex items-center justify-center border border-amber-400/30">
-                <Sparkles size={20} />
+                <Award size={20} />
               </div>
               <div>
                 <div className="flex items-center gap-2">

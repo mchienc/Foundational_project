@@ -8,10 +8,10 @@ import {
   Compass,
   X,
   CheckCircle2,
-  Sparkles,
   Layers,
   Laptop,
   Lock,
+  Award,
 } from 'lucide-react';
 import { mockReadingPassages } from '../../data/cambridgeMockData';
 import { getReadingPassages } from '../../services/cambridgeApi';
@@ -206,7 +206,7 @@ export const ReadingLibrary: React.FC<ReadingLibraryProps> = ({
               <span>28 Full Tests • 84 Passages • ~1,140 Câu Hỏi</span>
             </span>
             <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-stone-100 border border-stone-200 text-stone-700">
-              <Sparkles size={13} className="text-amber-700" />
+              <Award size={13} className="text-amber-700" />
               <span>Từ Điển Anh–Việt &amp; Đồng Bộ Anki SRS</span>
             </span>
           </div>
@@ -376,7 +376,7 @@ export const ReadingLibrary: React.FC<ReadingLibraryProps> = ({
                     className="py-2.5 px-3.5 rounded-2xl bg-amber-50 hover:bg-amber-100 text-amber-950 border border-amber-300 font-sans font-bold text-xs flex items-center justify-center gap-1.5 transition-all cursor-pointer active:scale-98"
                     title="Chế độ Luyện Tập: Không giới hạn thời gian, quét chữ tra từ điển Anh-Việt & xem đáp án ngay"
                   >
-                    <Sparkles size={14} className="text-amber-700 shrink-0" />
+                    <Award size={14} className="text-amber-700 shrink-0" />
                     <span>Luyện Tập &amp; Tra Từ Điển</span>
                   </button>
                 </div>
@@ -474,7 +474,7 @@ export const ReadingLibrary: React.FC<ReadingLibraryProps> = ({
                       <span className="px-2.5 py-0.5 rounded-lg bg-amber-500 text-stone-950 text-[10px] font-mono font-bold uppercase">
                         Nhánh 2 • Không Giới Hạn Giờ
                       </span>
-                      <Sparkles size={16} className="text-amber-700" />
+                      <Award size={16} className="text-amber-700" />
                     </div>
                     <h4 className="text-lg font-serif font-bold text-amber-950">
                       Phòng Luyện Tập &amp; Tra Từ

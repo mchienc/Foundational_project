@@ -23,15 +23,15 @@ export const AcademicFooter: React.FC<AcademicFooterProps> = ({ currentUser, onR
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 md:grid-cols-4 gap-10 text-left">
         {/* Col 1: Brand Identity */}
         <div className="space-y-4">
-          <Logo variant="full" theme="dark" showBadge={false} />
+          <Logo variant="full" theme="dark" showBadge={false} wrapSlogan={true} />
 
           <p className="text-xs text-stone-400 leading-relaxed font-sans">
-            Luyện thi IELTS thực chiến: 28 Đề thi Cam 10–20, chép chính tả video YouTube và học từ vựng Flashcard Anki.
+            Luyện thi IELTS thực chiến: 28 Đề thi Cam 10–20, 4 kỹ năng toàn diện, chép chính tả video YouTube và học từ vựng Flashcard Anki.
           </p>
 
           <div className="flex items-center gap-2 text-xs text-amber-300 font-sans">
             <ShieldCheck className="w-4 h-4 text-amber-400 shrink-0" />
-            <span>28 Đề Cambridge • 84 Bài Đọc • 7 Đề Nghe Full Test</span>
+            <span>28 Đề Cambridge • 4 Kỹ Năng • Chép Chính Tả Video</span>
           </div>
         </div>
 
@@ -51,10 +51,26 @@ export const AcademicFooter: React.FC<AcademicFooterProps> = ({ currentUser, onR
             </li>
             <li>
               <button
-                onClick={() => handleNav('listening-exam', 'Luyện Nghe Listening Cam 13 - 20')}
+                onClick={() => handleNav('listening', 'Luyện Nghe Listening Cam 13 - 20')}
                 className="hover:text-amber-300 transition-colors text-left cursor-pointer"
               >
                 Luyện Nghe Listening (Cam 13–20)
+              </button>
+            </li>
+            <li>
+              <button
+                onClick={() => handleNav('writing', 'Luyện Viết IELTS Writing Task 1')}
+                className="hover:text-amber-300 transition-colors text-left cursor-pointer"
+              >
+                Luyện Viết Writing Task 1
+              </button>
+            </li>
+            <li>
+              <button
+                onClick={() => handleNav('speaking', 'Luyện Nói IELTS Speaking Mock Room')}
+                className="hover:text-amber-300 transition-colors text-left cursor-pointer"
+              >
+                Luyện Nói Speaking Mock Test
               </button>
             </li>
             <li>
@@ -63,9 +79,6 @@ export const AcademicFooter: React.FC<AcademicFooterProps> = ({ currentUser, onR
                 className="hover:text-amber-300 transition-colors text-left cursor-pointer flex items-center gap-1.5"
               >
                 <span>Chép chính tả YouTube</span>
-                <span className="px-1.5 py-0.2 rounded bg-amber-400 text-amber-950 font-mono text-[9px] font-bold">
-                  MỚI
-                </span>
               </button>
             </li>
             <li>
@@ -103,55 +116,67 @@ export const AcademicFooter: React.FC<AcademicFooterProps> = ({ currentUser, onR
             </li>
             <li>
               <button
-                onClick={() => handleNav('reading', 'Cambridge IELTS 13 - 14')}
+                onClick={() => handleNav('reading', 'Cambridge IELTS 10 - 14')}
                 className="hover:text-amber-300 transition-colors text-left cursor-pointer"
               >
-                Cambridge IELTS 13–14
+                Cambridge IELTS 10–14
               </button>
             </li>
             <li>
               <button
-                onClick={() => handleNav('reading', 'Cambridge IELTS 10 - 12')}
+                onClick={() => handleNav('dictation', 'Video Ted & BBC')}
                 className="hover:text-amber-300 transition-colors text-left cursor-pointer"
               >
-                Cambridge IELTS 10–12
+                Chép Chính Tả Video Chọn Lọc
               </button>
             </li>
           </ul>
         </div>
 
-        {/* Col 4: Support & Contact */}
+        {/* Col 4: Platform & Methodology */}
         <div className="space-y-3 text-xs">
           <h4 className="font-sans font-bold text-white uppercase tracking-normal text-sm border-b border-forest-800 pb-1.5">
-            Hỗ Trợ Học Viên
+            Phương Pháp Học
           </h4>
-          <ul className="space-y-2.5 font-sans text-stone-400">
-            <li className="flex items-center gap-2">
-              <Phone className="w-3.5 h-3.5 text-amber-400 shrink-0" />
-              <span>Hotline / Zalo: 0976 294 907 (08:00 - 21:00)</span>
+          <ul className="space-y-2 font-sans text-stone-400">
+            <li className="leading-relaxed">
+              <strong className="text-stone-300">Luyện thi thực chiến:</strong> Thi trực tiếp trên máy tính với đồng hồ bấm giờ chuẩn kỳ thi IELTS thật.
             </li>
-            <li className="flex items-center gap-2">
-              <Mail className="w-3.5 h-3.5 text-amber-400 shrink-0" />
-              <span>dangchien2005@gmail.com</span>
+            <li className="leading-relaxed">
+              <strong className="text-stone-300">Tra từ &amp; Lưu nhanh:</strong> Bấm vào bất kỳ từ mới nào trong bài đọc để xem nghĩa và lưu vào Flashcard.
             </li>
-            <li className="flex items-start gap-2">
-              <MapPin className="w-3.5 h-3.5 text-amber-400 shrink-0 mt-0.5" />
-              <span>Hà Nội, Việt Nam</span>
+            <li className="leading-relaxed">
+              <strong className="text-stone-300">Lặp lại ngắt quãng:</strong> Ôn tập theo thuật toán khoa học giúp từ vựng ghi sâu vào trí nhớ dài hạn.
             </li>
           </ul>
+
+          <div className="pt-2 text-stone-400 text-[11px] space-y-1">
+            <div className="flex items-center gap-1.5">
+              <MapPin className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+              <span>Hà Nội, Việt Nam</span>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <Mail className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+              <a href="mailto:dangchien2005@gmail.com" className="hover:text-amber-300 transition-colors">
+                dangchien2005@gmail.com
+              </a>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <Phone className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+              <span>Hỗ trợ học viên: 0912 345 678</span>
+            </div>
+          </div>
         </div>
       </div>
 
-      {/* Bottom */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-12 pt-6 border-t border-forest-900 flex flex-col sm:flex-row items-center justify-between text-[11px] text-stone-400 font-sans gap-3">
-        <p>© 2026 EduFlow. Nền tảng luyện thi IELTS &amp; Học từ vựng Flashcard.</p>
-        <div className="flex items-center gap-4">
-          <span>Học trực tuyến miễn phí</span>
-          <span>•</span>
-          <span>Đề thi chuẩn Cambridge</span>
-          <span>•</span>
-          <span>Hỗ trợ 24/7</span>
-        </div>
+      {/* Bottom Legal bar */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-12 pt-8 border-t border-emerald-950 flex flex-col sm:flex-row items-center justify-between text-xs text-stone-400 gap-4">
+        <p className="font-sans">
+          © {new Date().getFullYear()} eng4u. Nền tảng luyện thi Cambridge IELTS &amp; Học từ vựng Flashcard.
+        </p>
+        <p className="text-[11px] font-sans text-stone-400">
+          Thiết kế theo chuẩn học thuật Cambridge • Tối ưu hóa trải nghiệm học viên
+        </p>
       </div>
     </footer>
   );

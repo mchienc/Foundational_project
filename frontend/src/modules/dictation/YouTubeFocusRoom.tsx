@@ -15,7 +15,7 @@ import {
   Eye,
   Volume2,
   Award,
-  Sparkles,
+  
   Keyboard,
   FileText,
   HelpCircle,
@@ -932,7 +932,7 @@ export const YouTubeFocusRoom: React.FC<YouTubeFocusRoomProps> = ({
 
                   {diffResult.isPassed ? (
                     <span className="text-xs font-bold text-[#064E3B] flex items-center gap-1">
-                      <Sparkles size={14} className="text-[#D97706]" />
+                      <CheckCircle2 size={14} className="text-[#D97706]" />
                       Đã vượt mốc 90%! Nhấn Enter để sang câu kế tiếp.
                     </span>
                   ) : (

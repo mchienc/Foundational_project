@@ -6,6 +6,7 @@ export interface LogoProps {
   theme?: 'dark' | 'light' | 'auto';
   showBadge?: boolean;
   showSlogan?: boolean;
+  wrapSlogan?: boolean;
   className?: string;
   onClick?: () => void;
 }
@@ -31,6 +32,7 @@ export const Logo: React.FC<LogoProps> = ({
   theme = 'dark',
   showBadge = true,
   showSlogan = true,
+  wrapSlogan = false,
   className = '',
   onClick,
 }) => {
@@ -235,7 +237,11 @@ export const Logo: React.FC<LogoProps> = ({
         {/* Subtitle / Slogan */}
         {showSlogan && (
           <span
-            className={`text-[10px] sm:text-[11px] font-sans tracking-normal leading-tight whitespace-nowrap mt-0.5 hidden sm:block ${
+            className={`text-[10px] sm:text-[11px] font-sans tracking-normal leading-tight mt-0.5 ${
+              wrapSlogan
+                ? 'whitespace-normal max-w-[210px] block'
+                : 'whitespace-nowrap hidden sm:block'
+            } ${
               isDark ? 'text-emerald-200/80' : 'text-stone-500'
             }`}
           >

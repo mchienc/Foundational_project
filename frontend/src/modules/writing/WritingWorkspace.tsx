@@ -8,7 +8,7 @@ import {
   Play,
   Pause,
   RotateCcw,
-  Sparkles,
+  
   AlertCircle,
   CheckCircle2,
   PlusCircle,
@@ -382,7 +382,7 @@ export const WritingWorkspace: React.FC<WritingWorkspaceProps> = ({ onNotify }) 
                 </h1>
                 {isPro ? (
                   <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-800 border border-amber-300">
-                    <Sparkles size={11} />
+                    <PenTool size={11} />
                     PRO Không giới hạn
                   </span>
                 ) : (
@@ -451,7 +451,7 @@ export const WritingWorkspace: React.FC<WritingWorkspaceProps> = ({ onNotify }) 
                 onClick={openUpgradeModal}
                 className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold bg-amber-500 hover:bg-amber-600 text-white shadow-xs transition-colors cursor-pointer"
               >
-                <Sparkles size={13} />
+                <PenTool size={13} />
                 <span>Nâng cấp Pro</span>
               </button>
             )}
@@ -626,7 +626,7 @@ export const WritingWorkspace: React.FC<WritingWorkspaceProps> = ({ onNotify }) 
                       </>
                     ) : (
                       <>
-                        <Sparkles size={16} className="text-amber-300" />
+                        <PenTool size={16} className="text-amber-300" />
                         <span>Nộp bài &amp; Chấm AI (Gemini)</span>
                       </>
                     )}

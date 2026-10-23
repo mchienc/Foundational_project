@@ -2,7 +2,7 @@ import React, { useRef } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { useGSAP } from '@gsap/react';
-import { BookOpen, Youtube, Sparkles, Layers } from 'lucide-react';
+import { BookOpen, Youtube, Layers, Award } from 'lucide-react';
 
 gsap.registerPlugin(ScrollTrigger, useGSAP);
 
@@ -18,7 +18,7 @@ export const AcademicMetrics: React.FC = () => {
       const counters = [
         { ref: val1Ref, target: 28, suffix: ' đề' },
         { ref: val2Ref, target: 100, suffix: '%' },
-        { ref: val3Ref, target: 84, suffix: ' bài' },
+        { ref: val3Ref, target: 4, suffix: ' kỹ năng' },
         { ref: val4Ref, target: 4, suffix: ' mức' },
       ];
 
@@ -97,16 +97,16 @@ export const AcademicMetrics: React.FC = () => {
           {/* Metric 3 */}
           <div className="metric-column-cell p-6 text-center space-y-3 bg-white border border-stone-200 rounded-2xl shadow-sm hover:shadow-md hover:border-amber-400/60 transition-all duration-300 opacity-100">
             <div className="w-10 h-10 rounded-xl bg-amber-50 border border-amber-200/60 text-amber-800 flex items-center justify-center mx-auto shadow-2xs">
-              <Sparkles className="w-5 h-5 text-amber-800" />
+              <Award className="w-5 h-5 text-amber-800" />
             </div>
             <div className="font-sans font-bold text-3xl sm:text-4xl text-[#064E3B] tracking-tight font-mono">
-              <span ref={val3Ref}>84 bài</span>
+              <span ref={val3Ref}>4 kỹ năng</span>
             </div>
             <p className="text-xs font-bold text-[#064E3B] uppercase tracking-normal">
-              Bài Đọc Reading
+              Luyện Thi Toàn Diện
             </p>
             <p className="text-[11px] text-stone-600 font-sans leading-relaxed">
-              Làm bài như thi thật trên máy tính kèm tra từ điển nhanh 1 chạm
+              Reading, Listening, Writing Task 1 Studio &amp; Speaking Mock Room
             </p>
           </div>
 

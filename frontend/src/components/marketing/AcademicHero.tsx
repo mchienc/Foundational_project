@@ -9,7 +9,9 @@ import {
   Youtube,
   Headphones,
   Layers,
-  Sparkles,
+  PenTool,
+  Mic,
+  ShieldCheck,
 } from 'lucide-react';
 import { Screen, User } from '../../types';
 
@@ -44,6 +46,14 @@ export const AcademicHero: React.FC<AcademicHeroProps> = ({
     { scope: containerRef }
   );
 
+  const handlePillClick = (screen: Screen, label: string) => {
+    if (currentUser && onNavigateScreen) {
+      onNavigateScreen(screen);
+    } else {
+      onOpenAuth('login', `Đăng nhập để trải nghiệm: ${label}`);
+    }
+  };
+
   return (
     <section
       ref={containerRef}
@@ -56,8 +66,8 @@ export const AcademicHero: React.FC<AcademicHeroProps> = ({
         {/* Discipline Badge */}
         <div>
           <div className="hero-badge inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#064E3B] border border-amber-500/40 text-amber-300 text-xs font-sans font-bold tracking-normal shadow-xs">
-            <Sparkles className="w-3.5 h-3.5 text-amber-300" />
-            <span>Luyện Thi Cambridge IELTS • Chép Chính Tả YouTube &amp; Flashcard Anki</span>
+            <ShieldCheck className="w-3.5 h-3.5 text-amber-300" />
+            <span>Nền Tảng Luyện Thi IELTS Toàn Diện: 4 Kỹ Năng &amp; Flashcard Anki</span>
           </div>
         </div>
 
@@ -72,8 +82,8 @@ export const AcademicHero: React.FC<AcademicHeroProps> = ({
 
         {/* Lead */}
         <p className="hero-lead text-base sm:text-lg text-stone-600 leading-relaxed font-sans font-normal max-w-2xl mx-auto">
-          Luyện thi IELTS thực chiến với trọn bộ đề Cambridge (Reading 10–20 &amp; Listening 13–20),
-          luyện nghe chép chính tả qua video YouTube và ghi nhớ từ vựng nhanh với Flashcard Anki.
+          Luyện thi thực chiến trọn bộ đề Cambridge IELTS (Reading, Listening, Writing, Speaking),
+          nghe chép chính tả video YouTube và ghi nhớ từ vựng phản xạ với Flashcard Anki.
         </p>
 
         {/* Action CTAs */}
@@ -105,9 +115,6 @@ export const AcademicHero: React.FC<AcademicHeroProps> = ({
           >
             <Youtube className="w-4 h-4 text-amber-300 group-hover:scale-110 transition-transform" />
             <span>Chép chính tả YouTube</span>
-            <span className="px-1.5 py-0.5 rounded bg-amber-400 text-amber-950 font-mono text-[10px] font-bold">
-              MỚI
-            </span>
           </button>
 
           <button
@@ -118,24 +125,55 @@ export const AcademicHero: React.FC<AcademicHeroProps> = ({
           </button>
         </div>
 
-        {/* Highlight Feature Pills */}
-        <div className="hero-pills pt-3 flex flex-wrap items-center justify-center gap-2 sm:gap-3 text-xs font-semibold">
-          <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white border border-stone-200 text-stone-700 shadow-2xs">
+        {/* Highlight Feature Pills - All 6 Core Disciplines */}
+        <div className="hero-pills pt-3 flex flex-wrap items-center justify-center gap-2 sm:gap-2.5 text-xs font-semibold">
+          <button
+            onClick={() => handlePillClick('reading', 'Luyện Đọc Cam 10–20')}
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white border border-stone-200 text-stone-700 hover:border-emerald-600 hover:text-[#064E3B] transition-colors shadow-2xs cursor-pointer"
+          >
             <BookOpen className="w-3.5 h-3.5 text-[#064E3B]" />
-            Luyện Đọc Cam 10–20 (60 phút)
-          </span>
-          <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white border border-stone-200 text-stone-700 shadow-2xs">
+            <span>Luyện Đọc Cam 10–20</span>
+          </button>
+
+          <button
+            onClick={() => handlePillClick('listening', 'Luyện Nghe Cam 13–20')}
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white border border-stone-200 text-stone-700 hover:border-emerald-600 hover:text-[#064E3B] transition-colors shadow-2xs cursor-pointer"
+          >
             <Headphones className="w-3.5 h-3.5 text-[#064E3B]" />
-            Luyện Nghe Cam 13–20 (4 phần)
-          </span>
-          <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white border border-stone-200 text-stone-700 shadow-2xs">
+            <span>Luyện Nghe Cam 13–20</span>
+          </button>
+
+          <button
+            onClick={() => handlePillClick('writing', 'Luyện Viết Task 1')}
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white border border-stone-200 text-stone-700 hover:border-emerald-600 hover:text-[#064E3B] transition-colors shadow-2xs cursor-pointer"
+          >
+            <PenTool className="w-3.5 h-3.5 text-[#064E3B]" />
+            <span>Luyện Viết Task 1</span>
+          </button>
+
+          <button
+            onClick={() => handlePillClick('speaking', 'Luyện Nói Speaking')}
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white border border-stone-200 text-stone-700 hover:border-emerald-600 hover:text-[#064E3B] transition-colors shadow-2xs cursor-pointer"
+          >
+            <Mic className="w-3.5 h-3.5 text-[#064E3B]" />
+            <span>Luyện Nói Speaking</span>
+          </button>
+
+          <button
+            onClick={() => handlePillClick('dictation', 'Chép chính tả video YouTube')}
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white border border-stone-200 text-stone-700 hover:border-rose-500 hover:text-rose-700 transition-colors shadow-2xs cursor-pointer"
+          >
             <Youtube className="w-3.5 h-3.5 text-rose-600" />
-            Chép chính tả video YouTube
-          </span>
-          <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white border border-stone-200 text-stone-700 shadow-2xs">
+            <span>Chép chính tả YouTube</span>
+          </button>
+
+          <button
+            onClick={() => handlePillClick('anki', 'Ôn từ vựng Flashcard Anki')}
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white border border-stone-200 text-stone-700 hover:border-amber-500 hover:text-amber-800 transition-colors shadow-2xs cursor-pointer"
+          >
             <Layers className="w-3.5 h-3.5 text-[#D97706]" />
-            Ôn từ vựng Flashcard Anki
-          </span>
+            <span>Ôn Flashcard &amp; Xuất Anki</span>
+          </button>
         </div>
 
         {/* Footnote */}

@@ -5,7 +5,7 @@ import React, { useState, useEffect, useRef, useMemo } from 'react';
 import {
   X,
   Youtube,
-  Sparkles,
+  
   FileText,
   Upload,
   Play,
@@ -389,7 +389,7 @@ export const CustomVideoImporterModal: React.FC<CustomVideoImporterModalProps> =
             <div className="bg-white rounded-2xl border border-[#E7E5E4] p-4 space-y-3">
               <div className="flex items-center justify-between border-b border-stone-100 pb-2.5">
                 <div className="flex items-center gap-2">
-                  <Sparkles size={15} className="text-[#D97706]" />
+                  <Youtube size={15} className="text-[#D97706]" />
                   <span className="text-xs font-bold text-[#064E3B]">
                     Danh Sách Đoạn Đã Trích Xuất ({activeSentences.length} đoạn)
                   </span>
@@ -472,7 +472,7 @@ export const CustomVideoImporterModal: React.FC<CustomVideoImporterModalProps> =
               {/* Hướng dẫn sao chép siêu tốc từ YouTube */}
               <div className="p-3 rounded-2xl bg-amber-50/80 border border-amber-300/80 text-[11px] text-amber-950 space-y-1 leading-relaxed">
                 <span className="font-bold text-xs text-[#064E3B] flex items-center gap-1.5">
-                  <Sparkles size={14} className="text-[#D97706]" />
+                  <Youtube size={14} className="text-[#D97706]" />
                   Mẹo lấy phụ đề YouTube chuẩn 100% trong 5 giây (Bỏ qua giới hạn Cloud Render):
                 </span>
                 <p className="text-stone-700">

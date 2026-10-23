@@ -11,7 +11,7 @@ import {
   Sliders,
   X,
   CheckCircle2,
-  Sparkles,
+  
   Volume2,
 } from 'lucide-react';
 import { mockListeningTests } from '../../data/cambridgeMockData';
@@ -439,7 +439,7 @@ export const ListeningLibrary: React.FC<ListeningLibraryProps> = ({
                         </span>
                       </li>
                       <li className="flex items-start gap-2">
-                        <Sparkles size={14} className="text-amber-700 shrink-0 mt-0.5" />
+                        <CheckCircle2 size={14} className="text-amber-700 shrink-0 mt-0.5" />
                         <span>
                           Mở <strong>Transcript tương tác</strong> và bấm <strong>Check đáp án ngay</strong> từng Part.
                         </span>

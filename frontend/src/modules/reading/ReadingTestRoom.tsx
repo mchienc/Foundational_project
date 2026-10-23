@@ -7,7 +7,7 @@ import {
   CheckCircle2,
   XCircle,
   X,
-  Sparkles,
+  
   Check,
   Flag,
   Award,
@@ -659,7 +659,7 @@ export const ReadingTestRoom: React.FC<ReadingTestRoomProps> = ({
                 className="hidden md:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-[#064E3B] border border-emerald-300 text-xs font-sans font-bold cursor-pointer transition-colors"
                 title="Hiện hoặc ẩn toàn bộ đáp án & giải thích của Passage này"
               >
-                <Sparkles size={13} className="text-amber-600" />
+                <CheckCircle2 size={13} className="text-amber-600" />
                 <span>
                   {(currentPassage.questions || []).every((q) => checkedQuestions[q.id])
                     ? 'Ẩn Đáp Án'
@@ -824,7 +824,7 @@ export const ReadingTestRoom: React.FC<ReadingTestRoomProps> = ({
                 {currentPassage.wordCount} từ
               </span>
               <div className="flex items-center gap-1.5 px-3 py-1 rounded-lg bg-amber-50 border border-amber-300/80 text-amber-950 text-xs font-sans font-semibold">
-                <Sparkles size={13} className="text-amber-600 shrink-0" />
+                <CheckCircle2 size={13} className="text-amber-600 shrink-0" />
                 <span>
                   Hỗ trợ Tra Từ: Quét chọn bất kỳ từ mới nào trong bài đọc để xem nghĩa tiếng Việt, phiên âm IPA &amp; lưu vào Anki
                 </span>
@@ -1431,9 +1431,9 @@ export const ReadingTestRoom: React.FC<ReadingTestRoomProps> = ({
                 <Award size={36} className="text-amber-400" />
               </div>
               <div className="flex items-center justify-center gap-2 text-xs uppercase tracking-widest text-amber-300 font-bold mb-1">
-                <Sparkles size={14} />
+                <CheckCircle2 size={14} />
                 <span>Hoàn Thành Bài Thi Thật</span>
-                <Sparkles size={14} />
+                <CheckCircle2 size={14} />
               </div>
               <h2 className="text-xl font-serif font-bold text-white">
                 {isFullTest ? `${sessionConfig?.testTitle || currentPassage.source} (Full Test)` : currentPassage.title}

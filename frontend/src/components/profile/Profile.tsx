@@ -1,25 +1,24 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   User as UserIcon,
   Lock,
   Award,
   Save,
-  Settings,
   HelpCircle,
   Phone,
   Mail,
-  Volume2,
   Target,
-  Bell,
-  CheckCircle2,
-  Clock,
-  Sparkles,
+  ClipboardList,
+  Camera,
+  Upload,
+  Trash2,
 } from 'lucide-react';
-import { User, UserStats, Course } from '../../types';
+import { User, UserStats, Course, Screen } from '../../types';
 import { Button } from '../common/Button';
 import { Card } from '../common/Card';
+import { CambridgeTestHistoryTable } from './CambridgeTestHistoryTable';
 
-export type ProfileTab = 'info' | 'settings' | 'password' | 'certs' | 'support';
+export type ProfileTab = 'history' | 'info' | 'password' | 'support';
 
 interface ProfileProps {
   user: User;
@@ -27,16 +26,22 @@ interface ProfileProps {
   courses?: Course[];
   initialTab?: ProfileTab;
   onUpdateUser: (updated: Partial<User>) => void;
-  onViewCertificate: (courseTitle: string) => void;
+  onViewCertificate?: (courseTitle: string) => void;
   onNotify: (msg: string, type?: 'success' | 'error' | 'info') => void;
+  onNavigateScreen?: (screen: Screen) => void;
+  onStartReadingTest?: (book: string, testNumber: 1 | 2 | 3 | 4, mode?: 'full' | 'single') => void;
+  onStartListeningTest?: (book: string, testNumber: 1 | 2 | 3 | 4, mode?: 'exam' | 'practice') => void;
 }
 
 export const Profile: React.FC<ProfileProps> = ({
   user,
-  stats,
-  initialTab = 'info',
+  stats: _stats,
+  initialTab = 'history',
+  onNavigateScreen,
+  onStartReadingTest,
+  onStartListeningTest,
   onUpdateUser,
-  onViewCertificate,
+  onViewCertificate: _onViewCertificate,
   onNotify,
 }) => {
   const [tab, setTab] = useState<ProfileTab>(initialTab);
@@ -52,16 +57,74 @@ export const Profile: React.FC<ProfileProps> = ({
   const [fullName, setFullName] = useState<string>(user.full_name || '');
   const [email, setEmail] = useState<string>(user.email || '');
   const [phone, setPhone] = useState<string>(user.phone || '0976294907');
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // Tab 2: Settings states
-  const [targetBand, setTargetBand] = useState<string>(user.targetBand || '7.0+');
-  const [preferredAccent, setPreferredAccent] = useState<'uk' | 'us'>(user.preferredAccent || 'uk');
-  const [audioSpeed, setAudioSpeed] = useState<number>(user.audioSpeed || 1.0);
-  const [dailyReminder, setDailyReminder] = useState<boolean>(
-    user.dailyReminder !== undefined ? user.dailyReminder : true
-  );
+  // Nén ảnh đại diện tự động để tối ưu dung lượng và sắc nét khung tròn
+  const compressAvatar = (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const img = new Image();
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          const size = 256;
+          canvas.width = size;
+          canvas.height = size;
+          const ctx = canvas.getContext('2d');
+          if (!ctx) {
+            resolve(e.target?.result as string);
+            return;
+          }
 
-  // Tab 3: Password states
+          // Cắt vuông tâm ảnh (Center square crop)
+          const minDim = Math.min(img.width, img.height);
+          const sx = (img.width - minDim) / 2;
+          const sy = (img.height - minDim) / 2;
+
+          ctx.drawImage(img, sx, sy, minDim, minDim, 0, 0, size, size);
+          const compressed = canvas.toDataURL('image/jpeg', 0.88);
+          resolve(compressed);
+        };
+        img.onerror = reject;
+        img.src = e.target?.result as string;
+      };
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+  };
+
+  const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith('image/')) {
+      onNotify('Vui lòng chọn tệp định dạng hình ảnh (PNG, JPG, WebP).', 'error');
+      return;
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      onNotify('Dung lượng ảnh tối đa là 5MB.', 'error');
+      return;
+    }
+
+    try {
+      const compressed = await compressAvatar(file);
+      onUpdateUser({ avatar: compressed });
+      onNotify('Đã cập nhật ảnh đại diện thành công!', 'success');
+    } catch (err) {
+      console.error('Lỗi tải ảnh đại diện:', err);
+      onNotify('Không thể xử lý ảnh đại diện. Vui lòng thử lại với ảnh khác.', 'error');
+    } finally {
+      if (e.target) e.target.value = '';
+    }
+  };
+
+  const handleRemoveAvatar = () => {
+    onUpdateUser({ avatar: '' });
+    onNotify('Đã gỡ ảnh đại diện, chuyển về biểu tượng ký tự mặc định.', 'info');
+  };
+
+  // Password states
   const [currentPassword, setCurrentPassword] = useState<string>('');
   const [newPassword, setNewPassword] = useState<string>('');
   const [confirmPassword, setConfirmPassword] = useState<string>('');
@@ -81,18 +144,6 @@ export const Profile: React.FC<ProfileProps> = ({
       phone: phone.trim(),
     });
     onNotify('Đã cập nhật thông tin cá nhân thành công!', 'success');
-  };
-
-  // Handle Save Learning Settings
-  const handleSaveSettings = (e: React.FormEvent) => {
-    e.preventDefault();
-    onUpdateUser({
-      targetBand,
-      preferredAccent,
-      audioSpeed,
-      dailyReminder,
-    });
-    onNotify(`Đã lưu cài đặt học tập (Mục tiêu Band ${targetBand}) thành công!`, 'success');
   };
 
   // Handle Change Password
@@ -148,79 +199,111 @@ export const Profile: React.FC<ProfileProps> = ({
           Tài khoản học viên
         </span>
         <h1 className="text-2xl sm:text-3xl font-serif font-extrabold text-[#064E3B] tracking-tight">
-          Hồ Sơ &amp; Cài Đặt Học Tập
+          Hồ Sơ Học Viên &amp; Lịch Sử Thi
         </h1>
         <p className="text-xs sm:text-sm text-stone-500 mt-1 font-sans">
-          Quản lý thông tin tài khoản, mục tiêu Band điểm và tùy chỉnh âm thanh luyện thi Cambridge IELTS.
+          Quản lý thông tin tài khoản cá nhân, lịch sử làm bài thi Cambridge IELTS và bảo mật mật khẩu.
         </p>
       </div>
 
-      {/* Top Banner: User Avatar & Quick Stats */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Avatar Card */}
-        <Card className="p-6 flex flex-col items-center text-center space-y-3 bg-white border border-stone-200 shadow-xs">
-          <div className="relative">
-            <div className="w-20 h-20 rounded-full bg-gradient-to-tr from-[#064E3B] to-emerald-700 text-amber-300 flex items-center justify-center text-2xl font-bold shadow-md shadow-emerald-950/20 border-2 border-amber-400/40">
-              {user.full_name.charAt(0).toUpperCase()}
+      {/* Top Banner: Student Profile Card (Clean & Focused) */}
+      <Card className="p-6 sm:p-7 bg-white border border-stone-200 shadow-xs rounded-2xl flex flex-col sm:flex-row items-center sm:items-center justify-between gap-6">
+        <div className="flex flex-col sm:flex-row items-center sm:items-center gap-5 text-center sm:text-left">
+          {/* Avatar with Upload Capability */}
+          <div className="relative shrink-0 group">
+            <input
+              type="file"
+              ref={fileInputRef}
+              accept="image/png,image/jpeg,image/webp,image/gif"
+              className="hidden"
+              onChange={handleAvatarUpload}
+            />
+
+            <div
+              onClick={() => fileInputRef.current?.click()}
+              className="w-20 h-20 rounded-full overflow-hidden bg-gradient-to-tr from-[#064E3B] to-emerald-700 text-amber-300 flex items-center justify-center text-2xl font-bold shadow-md shadow-emerald-950/20 border-2 border-amber-400/50 cursor-pointer relative transition-transform hover:scale-105"
+              title="Nhấn để đổi ảnh đại diện"
+            >
+              {user.avatar ? (
+                <img
+                  src={user.avatar}
+                  alt={user.full_name}
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <span>{user.full_name.charAt(0).toUpperCase()}</span>
+              )}
+
+              {/* Hover overlay with Camera */}
+              <div className="absolute inset-0 bg-black/45 backdrop-blur-[1px] opacity-0 group-hover:opacity-100 flex flex-col items-center justify-center text-white transition-opacity">
+                <Camera size={18} />
+                <span className="text-[9px] font-sans font-semibold mt-0.5">Đổi ảnh</span>
+              </div>
             </div>
-            <span className="absolute bottom-0 right-0 w-5 h-5 rounded-full bg-emerald-500 border-2 border-white flex items-center justify-center text-[10px] text-white">
-              ✓
-            </span>
+
+            {/* Quick action button at bottom-right */}
+            <button
+              type="button"
+              onClick={() => fileInputRef.current?.click()}
+              className="absolute -bottom-1 -right-1 w-7 h-7 rounded-full bg-[#064E3B] hover:bg-emerald-700 border-2 border-white text-white flex items-center justify-center shadow-md transition-colors cursor-pointer"
+              title="Tải ảnh đại diện lên"
+            >
+              <Camera size={13} />
+            </button>
           </div>
 
-          <div className="w-full">
-            <h2 className="text-lg font-bold text-stone-900 font-sans truncate">{user.full_name}</h2>
-            <p className="text-xs text-stone-500 font-mono truncate">{user.email}</p>
+          <div className="space-y-1">
+            <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2">
+              <h2 className="text-xl font-bold text-stone-900 font-sans">{user.full_name}</h2>
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-mono font-bold border border-amber-300 bg-amber-50 text-amber-900">
+                <span
+                  className={`w-2 h-2 rounded-full ${
+                    user.role === 'admin' ? 'bg-purple-600' : 'bg-emerald-600'
+                  }`}
+                />
+                {user.role === 'admin' ? 'Quản trị viên' : 'Học viên chính thức'}
+              </span>
+            </div>
+            <p className="text-xs text-stone-500 font-mono flex items-center justify-center sm:justify-start gap-2">
+              <span>{user.email}</span>
+              {user.phone && (
+                <>
+                  <span className="text-stone-300">•</span>
+                  <span>{user.phone}</span>
+                </>
+              )}
+            </p>
+            <p className="text-xs text-stone-400 font-sans pt-0.5">
+              Hệ thống theo dõi tiến độ luyện đề Cambridge IELTS Academic chuẩn quốc tế.
+            </p>
           </div>
+        </div>
 
-          <div className="flex flex-wrap items-center justify-center gap-1.5 pt-1">
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-mono font-bold border border-amber-300 bg-amber-50 text-amber-900">
-              <span
-                className={`w-2 h-2 rounded-full ${
-                  user.role === 'admin' ? 'bg-purple-600' : 'bg-emerald-600'
-                }`}
-              />
-              {user.role === 'admin' ? 'Quản trị viên' : 'Học viên'}
-            </span>
-            <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-mono font-bold border border-emerald-300 bg-emerald-50 text-[#064E3B]">
-              <Target size={12} className="text-[#064E3B]" />
+        <div className="flex items-center gap-3 shrink-0">
+          <div className="flex flex-col items-center sm:items-end gap-1">
+            <span className="text-[11px] font-mono text-stone-500 uppercase tracking-wide">Mục tiêu cá nhân</span>
+            <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-mono font-bold border border-emerald-300 bg-emerald-50 text-[#064E3B]">
+              <Target size={14} className="text-[#064E3B]" />
               Band {user.targetBand || '7.0+'}
             </span>
           </div>
-        </Card>
-
-        {/* 4 Stats Cards */}
-        <div className="lg:col-span-2 grid grid-cols-2 sm:grid-cols-4 gap-4">
-          <Card className="p-4 space-y-1 bg-white border border-stone-200">
-            <div className="text-2xl font-bold font-mono text-stone-900">
-              {stats.coursesEnrolled || 12}
-            </div>
-            <div className="text-xs text-stone-500">Đề Reading đã làm</div>
-          </Card>
-          <Card className="p-4 space-y-1 bg-white border border-stone-200">
-            <div className="text-2xl font-bold font-mono text-emerald-700">
-              {stats.coursesCompleted || 8}
-            </div>
-            <div className="text-xs text-stone-500">Bài Listening xong</div>
-          </Card>
-          <Card className="p-4 space-y-1 bg-white border border-stone-200">
-            <div className="text-2xl font-bold font-mono text-amber-600">
-              186
-            </div>
-            <div className="text-xs text-stone-500">Từ vựng Flashcard</div>
-          </Card>
-          <Card className="p-4 space-y-1 bg-white border border-stone-200">
-            <div className="text-2xl font-bold font-mono text-purple-700">
-              {stats.certificatesEarned || 2}
-            </div>
-            <div className="text-xs text-stone-500">Chứng nhận đạt</div>
-          </Card>
         </div>
-      </div>
+      </Card>
 
       {/* Tabs Navigation */}
       <div className="space-y-6">
         <div className="flex flex-wrap gap-2 border-b border-stone-200 pb-3">
+          <button
+            onClick={() => setTab('history')}
+            className={`px-4 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-2 ${
+              tab === 'history'
+                ? 'bg-[#064E3B] text-amber-300 border border-amber-500/40 shadow-xs'
+                : 'bg-white text-stone-600 border border-stone-200 hover:bg-stone-50 hover:text-stone-900'
+            }`}
+          >
+            <ClipboardList size={14} />
+            Lịch Sử Làm Bài Cambridge
+          </button>
           <button
             onClick={() => setTab('info')}
             className={`px-4 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-2 ${
@@ -231,18 +314,6 @@ export const Profile: React.FC<ProfileProps> = ({
           >
             <UserIcon size={14} />
             Hồ Sơ Cá Nhân
-          </button>
-
-          <button
-            onClick={() => setTab('settings')}
-            className={`px-4 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-2 ${
-              tab === 'settings'
-                ? 'bg-[#064E3B] text-amber-300 border border-amber-500/40 shadow-xs'
-                : 'bg-white text-stone-600 border border-stone-200 hover:bg-stone-50 hover:text-stone-900'
-            }`}
-          >
-            <Settings size={14} />
-            Cài Đặt Học Tập &amp; Mục Tiêu
           </button>
 
           <button
@@ -258,18 +329,6 @@ export const Profile: React.FC<ProfileProps> = ({
           </button>
 
           <button
-            onClick={() => setTab('certs')}
-            className={`px-4 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-2 ${
-              tab === 'certs'
-                ? 'bg-[#064E3B] text-amber-300 border border-amber-500/40 shadow-xs'
-                : 'bg-white text-stone-600 border border-stone-200 hover:bg-stone-50 hover:text-stone-900'
-            }`}
-          >
-            <Award size={14} />
-            Chứng Nhận Hoàn Thành
-          </button>
-
-          <button
             onClick={() => setTab('support')}
             className={`px-4 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-2 ${
               tab === 'support'
@@ -282,6 +341,15 @@ export const Profile: React.FC<ProfileProps> = ({
           </button>
         </div>
 
+        {/* Tab 0: Cambridge Test History */}
+        {tab === 'history' && (
+          <CambridgeTestHistoryTable
+            onNavigateScreen={onNavigateScreen}
+            onStartReadingTest={onStartReadingTest}
+            onStartListeningTest={onStartListeningTest}
+          />
+        )}
+
         {/* Tab 1: Info */}
         {tab === 'info' && (
           <Card className="p-6 sm:p-8 max-w-2xl space-y-6 bg-white border border-stone-200">
@@ -290,6 +358,50 @@ export const Profile: React.FC<ProfileProps> = ({
               <p className="text-xs text-stone-500 mt-0.5">
                 Cập nhật họ tên, địa chỉ email và số điện thoại liên hệ để nhận hỗ trợ học tập khi cần.
               </p>
+            </div>
+
+            {/* Avatar Management Row */}
+            <div className="flex items-center gap-4 pb-4 border-b border-stone-200">
+              <div
+                onClick={() => fileInputRef.current?.click()}
+                className="w-16 h-16 rounded-full overflow-hidden bg-gradient-to-tr from-[#064E3B] to-emerald-700 text-amber-300 flex items-center justify-center text-xl font-bold border-2 border-amber-400/50 shadow-xs shrink-0 cursor-pointer relative group transition-transform hover:scale-105"
+                title="Đổi ảnh đại diện"
+              >
+                {user.avatar ? (
+                  <img src={user.avatar} alt={user.full_name} className="w-full h-full object-cover" />
+                ) : (
+                  <span>{user.full_name.charAt(0).toUpperCase()}</span>
+                )}
+                <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center text-white transition-opacity">
+                  <Camera size={16} />
+                </div>
+              </div>
+              <div className="space-y-1.5 flex-1">
+                <div className="text-xs font-bold text-stone-800">Ảnh đại diện tài khoản</div>
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => fileInputRef.current?.click()}
+                    className="px-3 py-1.5 rounded-lg border border-stone-300 hover:bg-stone-50 text-xs font-semibold text-stone-700 inline-flex items-center gap-1.5 cursor-pointer transition-colors shadow-2xs"
+                  >
+                    <Upload size={13} className="text-[#064E3B]" />
+                    <span>Tải ảnh mới</span>
+                  </button>
+                  {user.avatar && (
+                    <button
+                      type="button"
+                      onClick={handleRemoveAvatar}
+                      className="px-3 py-1.5 rounded-lg border border-rose-200 hover:bg-rose-50 text-xs font-semibold text-rose-600 inline-flex items-center gap-1.5 cursor-pointer transition-colors"
+                    >
+                      <Trash2 size={13} />
+                      <span>Gỡ ảnh</span>
+                    </button>
+                  )}
+                </div>
+                <p className="text-[11px] text-stone-400 font-sans">
+                  Hỗ trợ PNG, JPG, WebP. Hệ thống tự động cắt khung vuông tròn sắc nét.
+                </p>
+              </div>
             </div>
 
             <form onSubmit={handleSaveInfo} className="space-y-4">
@@ -335,149 +447,7 @@ export const Profile: React.FC<ProfileProps> = ({
           </Card>
         )}
 
-        {/* Tab 2: Settings (Học tập & Mục tiêu) */}
-        {tab === 'settings' && (
-          <Card className="p-6 sm:p-8 max-w-2xl space-y-6 bg-white border border-stone-200">
-            <div>
-              <h3 className="text-base font-bold text-stone-900 font-sans">Cài đặt học tập &amp; Mục tiêu Band điểm</h3>
-              <p className="text-xs text-stone-500 mt-0.5">
-                Thiết lập mục tiêu IELTS và tùy biến âm thanh bài nghe để tối ưu hiệu quả ôn thi.
-              </p>
-            </div>
-
-            <form onSubmit={handleSaveSettings} className="space-y-6">
-              {/* Mục tiêu Band điểm */}
-              <div className="space-y-2">
-                <label className="text-xs font-semibold text-stone-700 flex items-center gap-1.5">
-                  <Target size={14} className="text-[#064E3B]" />
-                  Mục tiêu Band IELTS mong muốn
-                </label>
-                <div className="grid grid-cols-3 sm:grid-cols-6 gap-2">
-                  {['6.0', '6.5', '7.0', '7.5', '8.0', '8.5+'].map((band) => (
-                    <button
-                      type="button"
-                      key={band}
-                      onClick={() => setTargetBand(band)}
-                      className={`py-2 px-3 rounded-xl text-xs font-mono font-bold border transition-all cursor-pointer ${
-                        targetBand === band
-                          ? 'bg-[#064E3B] text-amber-300 border-amber-500/50 shadow-xs ring-1 ring-amber-400/40'
-                          : 'bg-stone-50 text-stone-700 border-stone-200 hover:bg-stone-100'
-                      }`}
-                    >
-                      {band}
-                    </button>
-                  ))}
-                </div>
-                <p className="text-[11px] text-stone-500 font-sans">
-                  Hệ thống sẽ gợi ý các đề thi Cambridge và bài chép chính tả phù hợp với trình độ mục tiêu của bạn.
-                </p>
-              </div>
-
-              {/* Giọng phát âm ưu tiên */}
-              <div className="space-y-2">
-                <label className="text-xs font-semibold text-stone-700 flex items-center gap-1.5">
-                  <Volume2 size={14} className="text-[#064E3B]" />
-                  Ưu tiên giọng đọc phát âm (Listening &amp; Flashcard)
-                </label>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  <button
-                    type="button"
-                    onClick={() => setPreferredAccent('uk')}
-                    className={`p-3 rounded-xl border text-left flex items-start gap-3 transition-all cursor-pointer ${
-                      preferredAccent === 'uk'
-                        ? 'bg-emerald-50/70 border-emerald-600/50 text-[#064E3B] ring-1 ring-emerald-500'
-                        : 'bg-stone-50 border-stone-200 text-stone-700 hover:bg-stone-100'
-                    }`}
-                  >
-                    <span className="text-lg">🇬🇧</span>
-                    <div>
-                      <div className="text-xs font-bold">Anh - Anh (British English - UK)</div>
-                      <div className="text-[11px] text-stone-500 mt-0.5 font-sans">
-                        Chuẩn khảo thí Đại học Cambridge, phổ biến nhất trong đề thi IELTS.
-                      </div>
-                    </div>
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => setPreferredAccent('us')}
-                    className={`p-3 rounded-xl border text-left flex items-start gap-3 transition-all cursor-pointer ${
-                      preferredAccent === 'us'
-                        ? 'bg-emerald-50/70 border-emerald-600/50 text-[#064E3B] ring-1 ring-emerald-500'
-                        : 'bg-stone-50 border-stone-200 text-stone-700 hover:bg-stone-100'
-                    }`}
-                  >
-                    <span className="text-lg">🇺🇸</span>
-                    <div>
-                      <div className="text-xs font-bold">Anh - Mỹ (American English - US)</div>
-                      <div className="text-[11px] text-stone-500 mt-0.5 font-sans">
-                        Phát âm tiếng Anh Bắc Mỹ, thực tế và dễ tiếp cận.
-                      </div>
-                    </div>
-                  </button>
-                </div>
-              </div>
-
-              {/* Tốc độ audio mặc định */}
-              <div className="space-y-2">
-                <label className="text-xs font-semibold text-stone-700 flex items-center gap-1.5">
-                  <Clock size={14} className="text-[#064E3B]" />
-                  Tốc độ phát audio mặc định
-                </label>
-                <div className="grid grid-cols-3 gap-2">
-                  {[
-                    { value: 0.9, label: '0.9x', desc: 'Chậm & Rõ âm' },
-                    { value: 1.0, label: '1.0x', desc: 'Chuẩn phòng thi' },
-                    { value: 1.1, label: '1.1x', desc: 'Thử thách phản xạ' },
-                  ].map((spd) => (
-                    <button
-                      type="button"
-                      key={spd.value}
-                      onClick={() => setAudioSpeed(spd.value)}
-                      className={`p-2.5 rounded-xl border text-center transition-all cursor-pointer ${
-                        audioSpeed === spd.value
-                          ? 'bg-[#064E3B] text-amber-300 border-amber-500/50 shadow-xs'
-                          : 'bg-stone-50 text-stone-700 border-stone-200 hover:bg-stone-100'
-                      }`}
-                    >
-                      <div className="text-xs font-mono font-bold">{spd.label}</div>
-                      <div className="text-[10px] text-stone-400 mt-0.5">{spd.desc}</div>
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              {/* Nhắc nhở Flashcard hàng ngày */}
-              <div className="pt-2 border-t border-stone-200">
-                <div className="flex items-center justify-between p-3.5 rounded-xl bg-stone-50 border border-stone-200">
-                  <div className="flex items-start gap-3">
-                    <Bell size={18} className="text-amber-600 mt-0.5 shrink-0" />
-                    <div>
-                      <div className="text-xs font-bold text-stone-800">Nhắc nhở ôn tập Flashcard Anki mỗi ngày</div>
-                      <div className="text-[11px] text-stone-500 mt-0.5">
-                        Duy trì chuỗi ghi nhớ ngắt quãng SRS (20 từ vựng mỗi ngày để đạt hiệu quả cao nhất).
-                      </div>
-                    </div>
-                  </div>
-                  <input
-                    type="checkbox"
-                    checked={dailyReminder}
-                    onChange={(e) => setDailyReminder(e.target.checked)}
-                    className="w-4 h-4 rounded text-[#064E3B] focus:ring-[#064E3B] cursor-pointer"
-                  />
-                </div>
-              </div>
-
-              <div className="pt-2">
-                <Button variant="primary" size="md" type="submit" icon={<Save size={15} />}>
-                  Lưu Cài Đặt Học Tập
-                </Button>
-              </div>
-            </form>
-          </Card>
-        )}
-
-        {/* Tab 3: Password */}
+        {/* Tab 2: Password */}
         {tab === 'password' && (
           <Card className="p-6 sm:p-8 max-w-xl space-y-5 bg-white border border-stone-200">
             {isGoogleAccount ? (
@@ -588,74 +558,11 @@ export const Profile: React.FC<ProfileProps> = ({
           </Card>
         )}
 
-        {/* Tab 4: Certificates */}
-        {tab === 'certs' && (
-          <div className="space-y-4 max-w-3xl">
-            <div>
-              <h3 className="text-base font-bold text-stone-900 font-sans">Chứng nhận hoàn thành kỹ năng</h3>
-              <p className="text-xs text-stone-500 mt-0.5">
-                Các chứng chỉ được cấp sau khi bạn hoàn thành đầy đủ bài thi Cambridge Reading &amp; Listening trên hệ thống EduFlow.
-              </p>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {[
-                {
-                  id: 'cert-cambridge-reading',
-                  title: 'Cambridge IELTS Academic Reading Mastery',
-                  subtitle: 'Hoàn thành 28 đề thi Full Tests & 84 Passages học thuật',
-                  date: 'Tháng 10, 2026',
-                  score: 'Band 7.5',
-                },
-                {
-                  id: 'cert-dictation-listening',
-                  title: 'IELTS Contextual Dictation & Fluency',
-                  subtitle: 'Đạt độ chính xác nghe chép chính tả 95%+ chuẩn Cambridge',
-                  date: 'Tháng 10, 2026',
-                  score: 'Band 8.0',
-                },
-              ].map((c) => (
-                <Card key={c.id} className="p-5 flex flex-col justify-between gap-4 bg-white border border-stone-200 hover:border-amber-400/50 transition-colors">
-                  <div className="flex items-start gap-3">
-                    <div className="w-10 h-10 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center shrink-0 border border-amber-200">
-                      <Award size={20} />
-                    </div>
-                    <div className="min-w-0">
-                      <div className="flex items-center gap-2">
-                        <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-emerald-50 text-[#064E3B] border border-emerald-200">
-                          {c.score}
-                        </span>
-                        <span className="text-[10px] text-stone-400 font-mono">{c.date}</span>
-                      </div>
-                      <h4 className="text-sm font-bold text-stone-900 truncate mt-1">{c.title}</h4>
-                      <p className="text-xs text-stone-500 font-sans mt-0.5 leading-relaxed">{c.subtitle}</p>
-                    </div>
-                  </div>
-
-                  <div className="pt-2 border-t border-stone-100 flex items-center justify-between">
-                    <span className="text-[11px] text-emerald-700 font-semibold flex items-center gap-1">
-                      <CheckCircle2 size={13} />
-                      Đã xác thực
-                    </span>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => onViewCertificate(c.title)}
-                    >
-                      Xem Chứng Chỉ
-                    </Button>
-                  </div>
-                </Card>
-              ))}
-            </div>
-          </div>
-        )}
-
         {/* Tab 5: Support */}
         {tab === 'support' && (
           <Card className="p-6 sm:p-8 max-w-2xl space-y-6 bg-white border border-stone-200">
             <div>
-              <h3 className="text-base font-bold text-stone-900 font-sans">Trung tâm hỗ trợ học viên EduFlow</h3>
+              <h3 className="text-base font-bold text-stone-900 font-sans">Trung tâm hỗ trợ học viên eng4u</h3>
               <p className="text-xs text-stone-500 mt-0.5">
                 Đội ngũ trợ giảng và bộ phận kỹ thuật luôn sẵn sàng hỗ trợ bạn trong suốt quá trình luyện thi.
               </p>
@@ -694,7 +601,7 @@ export const Profile: React.FC<ProfileProps> = ({
             {/* AI Tutor Chatbot Banner */}
             <div className="p-4 rounded-2xl bg-stone-50 border border-stone-200 flex items-start gap-3">
               <div className="w-9 h-9 rounded-xl bg-[#064E3B] text-amber-300 flex items-center justify-center shrink-0">
-                <Sparkles size={18} />
+                <Award size={18} />
               </div>
               <div className="space-y-1">
                 <h4 className="text-xs font-bold text-stone-900">Trợ lý học tập AI Tutor (Bong bóng nổi)</h4>

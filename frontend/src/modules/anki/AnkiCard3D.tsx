@@ -6,7 +6,7 @@ import gsap from 'gsap';
 import { useGSAP } from '@gsap/react';
 import { AnkiCard, AnkiRating } from '../../types';
 import { AudioPlayButton } from '../../components/shared/AudioPlayButton';
-import { Sparkles, Tag } from 'lucide-react';
+import { Tag } from 'lucide-react';
 
 export interface AnkiCard3DProps {
   card: AnkiCard;
@@ -303,7 +303,7 @@ export const AnkiCard3D: React.FC<AnkiCard3DProps> = ({
               onClick={onFlip}
               className="w-full sm:w-64 py-3 px-4 rounded-2xl bg-[#064E3B] hover:bg-[#022C22] text-amber-300 hover:text-white font-sans font-bold text-xs uppercase tracking-wide flex items-center justify-center gap-2 transition-all shadow-xs cursor-pointer active:scale-95 border border-emerald-800"
             >
-              <Sparkles size={14} className="text-amber-400" />
+              
               <span>Hiện Đáp Án (Space)</span>
             </button>
             <span className="text-[11px] font-mono text-stone-400">

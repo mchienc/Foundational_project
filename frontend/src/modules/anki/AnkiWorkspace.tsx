@@ -10,7 +10,6 @@ import {
   Search,
   ArrowRight,
   Download,
-  Sparkles,
   Plus,
   Trash2,
   Library,
@@ -84,8 +83,7 @@ export const AnkiWorkspace: React.FC<AnkiWorkspaceProps> = ({
         return <BookOpen size={22} className="text-amber-300" />;
       case 'Layers':
         return <Layers size={22} className="text-amber-300" />;
-      case 'Sparkles':
-        return <Sparkles size={22} className="text-amber-300" />;
+      case 'Bookmark': return <Bookmark size={22} className="text-amber-300" />;
       case 'Flame':
         return <Flame size={22} className="text-amber-300" />;
       default:
@@ -131,7 +129,7 @@ export const AnkiWorkspace: React.FC<AnkiWorkspaceProps> = ({
                 : 'bg-white hover:bg-stone-100 border-stone-200 text-stone-700 shadow-xs'
             }`}
           >
-            <Sparkles size={16} className={showAiGenerator ? 'text-amber-300' : 'text-amber-600'} />
+            <Bookmark size={16} className={showAiGenerator ? "text-amber-300" : "text-amber-600"} />
             <span>{showAiGenerator ? 'Ẩn Trình Tạo AI' : '✨ Tạo Thẻ Bằng AI'}</span>
           </button>
           <button
@@ -415,7 +413,7 @@ export const AnkiWorkspace: React.FC<AnkiWorkspaceProps> = ({
                 onClick={() => setShowAiGenerator(true)}
                 className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#064E3B] text-amber-300 text-xs font-bold hover:bg-[#053d2e] cursor-pointer shadow-xs"
               >
-                <Sparkles size={14} />
+                <Bookmark size={14} />
                 <span>Tạo Thẻ Bằng AI</span>
               </button>
               {onNavigateReading && (
@@ -554,7 +552,7 @@ export const AnkiWorkspace: React.FC<AnkiWorkspaceProps> = ({
                   Biểu Tượng
                 </label>
                 <div className="flex items-center gap-2">
-                  {(['Bookmark', 'BookOpen', 'Layers', 'Sparkles', 'Flame'] as const).map((icon) => (
+                  {(['Bookmark', 'BookOpen', 'Layers', 'Flame'] as const).map((icon) => (
                     <button
                       key={icon}
                       type="button"

@@ -1,11 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import {
-  Sparkles,
+  BookOpen,
   Copy,
   Check,
   BookmarkPlus,
   Loader2,
-  BookOpen,
   Tag,
   AlertCircle,
 } from 'lucide-react';
@@ -165,7 +164,7 @@ export const GeminiAnkiCardGenerator: React.FC<GeminiAnkiCardGeneratorProps> = (
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-stone-200">
         <div className="flex items-start gap-3">
           <div className="p-3 rounded-2xl bg-amber-50 text-[#D97706] shrink-0 mt-0.5">
-            <Sparkles size={24} />
+            <BookOpen size={24} />
           </div>
           <div>
             <div className="flex items-center gap-2">
@@ -243,7 +242,7 @@ export const GeminiAnkiCardGenerator: React.FC<GeminiAnkiCardGeneratorProps> = (
             </>
           ) : (
             <>
-              <Sparkles size={16} className="text-amber-300" />
+              <BookOpen size={16} className="text-amber-300" />
               <span>Tạo Thẻ Flashcard</span>
             </>
           )}

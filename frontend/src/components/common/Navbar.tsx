@@ -10,15 +10,14 @@ import {
   BookOpen,
   Headphones,
   Layers,
-  Settings,
-  Award,
-  HelpCircle,
+  ClipboardList,
+  Lock,
+HelpCircle,
   Menu,
   X,
   Youtube,
   PenTool,
   Mic,
-  Sparkles,
 } from 'lucide-react';
 import { Screen, UserStats, User } from '../../types';
 import { Button } from './Button';
@@ -26,7 +25,7 @@ import { Logo } from './Logo';
 
 interface NavbarProps {
   currentScreen: Screen;
-  onSelectScreen: (screen: Screen, tab?: 'info' | 'settings' | 'password' | 'certs' | 'support') => void;
+  onSelectScreen: (screen: Screen, tab?: 'history' | 'info' | 'password' | 'support') => void;
   stats: UserStats;
   currentUser: User | null;
   onOpenAuth: (tab: 'login' | 'register') => void;
@@ -132,7 +131,6 @@ export const Navbar: React.FC<NavbarProps> = ({
                   <span>{link.label}</span>
                   {link.badge && (
                     <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-full text-[9px] font-bold bg-amber-400 text-stone-900 border border-amber-300 shadow-2xs leading-none">
-                      <Sparkles size={8} />
                       {link.badge}
                     </span>
                   )}
@@ -151,8 +149,16 @@ export const Navbar: React.FC<NavbarProps> = ({
                 onClick={() => setShowUserMenu(!showUserMenu)}
                 className="flex items-center gap-2 py-1 pl-1.5 pr-2.5 rounded-full hover:bg-emerald-900/60 border border-emerald-800/60 hover:border-emerald-700/80 transition-colors cursor-pointer select-none bg-emerald-950/40"
               >
-                <div className="w-8 h-8 rounded-full bg-[#022C22] ring-2 ring-amber-500/40 text-amber-300 flex items-center justify-center font-sans font-bold text-xs shadow-xs">
-                  {currentUser.full_name.charAt(0).toUpperCase()}
+                <div className="w-8 h-8 rounded-full bg-[#022C22] ring-2 ring-amber-500/40 text-amber-300 flex items-center justify-center font-sans font-bold text-xs shadow-xs overflow-hidden shrink-0">
+                  {currentUser.avatar ? (
+                    <img
+                      src={currentUser.avatar}
+                      alt={currentUser.full_name}
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <span>{currentUser.full_name.charAt(0).toUpperCase()}</span>
+                  )}
                 </div>
                 <span className="text-xs font-bold text-stone-100 hidden md:inline max-w-[110px] truncate">
                   {currentUser.full_name}
@@ -180,13 +186,28 @@ export const Navbar: React.FC<NavbarProps> = ({
                   >
                     {/* User Profile Header */}
                     <div className="px-4 py-3 bg-stone-100/70 rounded-t-2xl">
-                      <div className="flex items-center justify-between gap-2">
-                        <p className="font-bold text-forest-950 truncate font-sans text-sm">{currentUser.full_name}</p>
-                        <span className="shrink-0 px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-amber-100 text-amber-900 border border-amber-300">
-                          {currentUser.role === 'admin' ? 'Quản Trị' : 'Học Viên'}
-                        </span>
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-full overflow-hidden bg-gradient-to-tr from-[#064E3B] to-emerald-700 text-amber-300 flex items-center justify-center font-sans font-bold text-sm shrink-0 border border-amber-400/50 shadow-2xs">
+                          {currentUser.avatar ? (
+                            <img
+                              src={currentUser.avatar}
+                              alt={currentUser.full_name}
+                              className="w-full h-full object-cover"
+                            />
+                          ) : (
+                            <span>{currentUser.full_name.charAt(0).toUpperCase()}</span>
+                          )}
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <div className="flex items-center justify-between gap-1">
+                            <p className="font-bold text-forest-950 truncate font-sans text-sm">{currentUser.full_name}</p>
+                            <span className="shrink-0 px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-amber-100 text-amber-900 border border-amber-300">
+                              {currentUser.role === 'admin' ? 'Quản Trị' : 'Học Viên'}
+                            </span>
+                          </div>
+                          <p className="text-[11px] text-stone-500 font-mono truncate mt-0.5">{currentUser.email}</p>
+                        </div>
                       </div>
-                      <p className="text-[11px] text-stone-500 font-mono truncate mt-0.5">{currentUser.email}</p>
                       
                       {/* Target Band Pill */}
                       <div className="mt-2.5 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold bg-emerald-50 text-[#064E3B] border border-emerald-200">
@@ -210,24 +231,24 @@ export const Navbar: React.FC<NavbarProps> = ({
 
                       <button
                         onClick={() => {
-                          onSelectScreen('profile', 'settings');
+                          onSelectScreen('profile', 'history');
                           setShowUserMenu(false);
                         }}
                         className="w-full px-4 py-2 flex items-center gap-2.5 text-stone-700 hover:bg-stone-100 hover:text-forest-950 transition-colors cursor-pointer"
                       >
-                        <Settings size={14} className="text-amber-600" />
-                        <span>Cài đặt học tập &amp; Mục tiêu</span>
+                        <ClipboardList size={14} className="text-[#064E3B]" />
+                        <span>Lịch sử làm bài Cambridge</span>
                       </button>
 
                       <button
                         onClick={() => {
-                          onSelectScreen('profile', 'certs');
+                          onSelectScreen('profile', 'password');
                           setShowUserMenu(false);
                         }}
                         className="w-full px-4 py-2 flex items-center gap-2.5 text-stone-700 hover:bg-stone-100 hover:text-forest-950 transition-colors cursor-pointer"
                       >
-                        <Award size={14} className="text-emerald-700" />
-                        <span>Chứng nhận &amp; Thành tích</span>
+                        <Lock size={14} className="text-emerald-700" />
+                        <span>Bảo mật &amp; Mật khẩu</span>
                       </button>
 
                       <button
@@ -333,7 +354,6 @@ export const Navbar: React.FC<NavbarProps> = ({
                 </span>
                 {link.badge && (
                   <span className="inline-flex items-center gap-0.5 px-2 py-0.5 rounded-full text-[9px] font-bold bg-amber-400 text-stone-900 shrink-0">
-                    <Sparkles size={8} />
                     {link.badge}
                   </span>
                 )}
@@ -348,7 +368,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                 className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-amber-300 hover:bg-forest-900/60 border-t border-emerald-900/80 pt-2 cursor-pointer transition-colors"
               >
                 <UserIcon size={14} />
-                Hồ sơ &amp; Cài đặt học tập
+                Hồ sơ &amp; Lịch sử học tập
               </button>
             ) : (
               <button

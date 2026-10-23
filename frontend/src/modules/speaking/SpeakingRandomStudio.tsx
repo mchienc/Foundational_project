@@ -7,7 +7,7 @@ import {
   MicOff,
   Dices,
   Clock,
-  Sparkles,
+  
   RotateCcw,
   FileEdit,
 } from 'lucide-react';
@@ -254,7 +254,7 @@ export const SpeakingRandomStudio: React.FC<SpeakingRandomStudioProps> = ({ onNo
                 </h1>
                 {isPro ? (
                   <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-800 border border-amber-300">
-                    <Sparkles size={11} />
+                    <Mic size={11} />
                     PRO Không giới hạn
                   </span>
                 ) : (
@@ -315,7 +315,7 @@ export const SpeakingRandomStudio: React.FC<SpeakingRandomStudioProps> = ({ onNo
                 onClick={openUpgradeModal}
                 className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold bg-amber-500 hover:bg-amber-600 text-white shadow-xs transition-colors cursor-pointer"
               >
-                <Sparkles size={13} />
+                <Mic size={13} />
                 <span>Nâng cấp Pro</span>
               </button>
             )}
@@ -534,7 +534,7 @@ export const SpeakingRandomStudio: React.FC<SpeakingRandomStudioProps> = ({ onNo
                   </>
                 ) : (
                   <>
-                    <Sparkles size={16} className="text-amber-300" />
+                    <Mic size={16} className="text-amber-300" />
                     <span>Dừng &amp; Gửi chấm AI</span>
                   </>
                 )}

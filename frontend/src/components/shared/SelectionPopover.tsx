@@ -5,7 +5,6 @@ import {
   BookmarkPlus,
   BookOpen,
   X,
-  Sparkles,
   Loader2,
   Check,
   ChevronLeft,
@@ -448,7 +447,7 @@ export const SelectionPopover: React.FC<SelectionPopoverProps> = ({
           ) : (
             <div className="space-y-1.5 bg-[#FAFAF9] p-2.5 rounded-xl border border-stone-200/80">
               <div className="text-xs font-sans font-bold text-emerald-900 flex items-start gap-1.5">
-                <Sparkles size={13} className="text-amber-600 shrink-0 mt-0.5" />
+                <BookOpen size={13} className="text-amber-600 shrink-0 mt-0.5" />
                 <span>{lookup.definitionVi || `Từ vựng trong ${source}`}</span>
               </div>
               {lookup.definitionEn && (
@@ -490,7 +489,7 @@ export const SelectionPopover: React.FC<SelectionPopoverProps> = ({
                 </>
               ) : (
                 <>
-                  <Sparkles size={14} className="text-amber-300" />
+                  <BookOpen size={14} className="text-amber-300" />
                   <span>✨ Tạo thẻ Flashcard với AI</span>
                 </>
               )}
