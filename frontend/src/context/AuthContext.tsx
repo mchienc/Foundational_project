@@ -113,7 +113,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (user) return true;
 
     if (notifyHandler) {
-      notifyHandler('Vui lòng đăng nhập để tiếp tục tính năng này', 'info');
+      notifyHandler(`Vui lòng đăng nhập tài khoản học viên để sử dụng tính năng: ${actionName || 'này'}`, 'info');
     }
 
     openAuthModal(
@@ -121,7 +121,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       actionName
         ? `Đăng nhập để: ${actionName}`
         : 'Đăng nhập để bắt đầu học và lưu kết quả',
-      'Đăng nhập để lưu tiến độ làm bài và đồng bộ thẻ từ vựng Anki của bạn.'
+      'Bạn cần đăng nhập tài khoản EduFlow để truy cập đầy đủ các bài luyện thi Cambridge IELTS, nghe chép chính tả và lưu kết quả học tập.'
     );
 
     return false;

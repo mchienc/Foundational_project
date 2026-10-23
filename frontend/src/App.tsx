@@ -112,24 +112,42 @@ const AppContent: React.FC = () => {
     syncWithUser(user);
   }, [user, syncWithUser]);
 
-  // Navigation Screen State: Supports direct URL /dictation or /dictation/:id
+  // Navigation Screen State: Chỉ vào thẳng /dictation nếu học viên đã đăng nhập
   const [currentScreen, setCurrentScreen] = useState<Screen>(() => {
+    const saved = typeof window !== 'undefined' ? localStorage.getItem('eduflow_current_user') : null;
+    if (!saved) {
+      return 'landing';
+    }
     if (typeof window !== 'undefined' && window.location.pathname.startsWith('/dictation')) {
       return 'dictation';
     }
-    const saved = localStorage.getItem('eduflow_current_user');
-    return saved ? 'reading' : 'landing';
+    return 'reading';
   });
 
   useEffect(() => {
     const handlePopState = () => {
       if (window.location.pathname.startsWith('/dictation')) {
-        setCurrentScreen('dictation');
+        if (isAuthenticated) {
+          setCurrentScreen('dictation');
+        } else {
+          setCurrentScreen('landing');
+          requireAuth('Chép Chính Tả Video YouTube');
+        }
       }
     };
     window.addEventListener('popstate', handlePopState);
     return () => window.removeEventListener('popstate', handlePopState);
-  }, []);
+  }, [isAuthenticated, requireAuth]);
+
+  // Cưỡng chế về màn hình landing nếu tài khoản chưa đăng nhập
+  useEffect(() => {
+    if (!isAuthenticated && currentScreen !== 'landing') {
+      setCurrentScreen('landing');
+      if (typeof window !== 'undefined' && window.location.pathname.startsWith('/dictation')) {
+        window.history.replaceState({}, '', '/');
+      }
+    }
+  }, [isAuthenticated, currentScreen]);
 
   // Active Cambridge Reading Passage ID & Session Config (Single Passage vs Full Test)
   const [selectedPassageId, setSelectedPassageId] = useState<string>('cambridge-18-test-2-p2');
@@ -192,25 +210,43 @@ const AppContent: React.FC = () => {
     }
   };
 
-  // Protected screens requiring authentication
-  const protectedScreens: Screen[] = [
-    'reading',
-    'reading-test',
-    'computer-exam',
-    'listening',
-    'listening-test',
-    'listening-exam',
-    'listening-review',
-    'anki',
-    'profile',
-    'admin',
-  ];
-
-  // Auth Guard Navigation Handler
+  // Auth Guard Navigation Handler: Toàn bộ tính năng học tập (trừ landing) bắt buộc phải đăng nhập!
   const handleScreenNavigate = (screen: Screen, tab?: ProfileTab) => {
     if (screen === 'profile' && tab) {
       setProfileInitialTab(tab);
     }
+
+    if (screen === 'landing') {
+      if (typeof window !== 'undefined' && window.location.pathname.startsWith('/dictation')) {
+        window.history.pushState({}, '', '/');
+      }
+      setCurrentScreen('landing');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      return;
+    }
+
+    // TƯỜNG LỬA AUTH GUARD TOÀN DIỆN: CHẶN TẤT CẢ KHÁCH CHƯA ĐĂNG NHẬP
+    if (!isAuthenticated) {
+      const featureNames: Record<string, string> = {
+        'reading': 'Luyện Đọc Reading Cambridge (Cam 10–20)',
+        'reading-test': 'Phòng Thi Đọc Reading',
+        'computer-exam': 'Phòng Thi Reading Máy Tính',
+        'listening': 'Kho Đề Luyện Nghe IELTS',
+        'listening-test': 'Phòng Luyện Nghe Dictation',
+        'listening-exam': 'Phòng Thi Nghe Cambridge Full Test',
+        'listening-review': 'Xem Lại Transcript & Kết Quả Nghe',
+        'writing': 'Phòng Luyện Viết AI (Writing Studio)',
+        'speaking': 'Phòng Luyện Nói AI (Speaking Studio)',
+        'dictation': 'Chép Chính Tả Video YouTube',
+        'anki': 'Học Từ Vựng Flashcard Anki',
+        'profile': 'Trang Cá Nhân Học Viên',
+        'admin': 'Cổng Quản Trị Hệ Thống',
+      };
+      const title = featureNames[screen] || 'Tính năng học tập';
+      requireAuth(title);
+      return;
+    }
+
     if (screen === 'dictation') {
       if (typeof window !== 'undefined' && !window.location.pathname.startsWith('/dictation')) {
         window.history.pushState({}, '', '/dictation');
@@ -222,28 +258,6 @@ const AppContent: React.FC = () => {
 
     if (typeof window !== 'undefined' && window.location.pathname.startsWith('/dictation')) {
       window.history.pushState({}, '', '/');
-    }
-
-    if (screen === 'landing') {
-      setCurrentScreen('landing');
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-      return;
-    }
-
-    // Intercept if guest attempts to access protected screens
-    if (!isAuthenticated && protectedScreens.includes(screen)) {
-      requireAuth(
-        screen === 'reading' || screen === 'reading-test' || screen === 'computer-exam'
-          ? 'Luyện Đọc Reading Cambridge'
-          : screen === 'listening' || screen === 'listening-test' || screen === 'listening-exam'
-          ? 'Luyện Nghe IELTS'
-          : screen === 'anki'
-          ? 'Học từ vựng Flashcard (Anki)'
-          : screen === 'profile'
-          ? 'Trang cá nhân'
-          : 'Bài học'
-      );
-      return;
     }
 
     // Role-based Access Control (RBAC): Chặn học viên thường truy cập Cổng Quản Trị
@@ -346,6 +360,18 @@ const AppContent: React.FC = () => {
   };
 
   const renderScreen = () => {
+    // Tường lửa Auth Guard: Nếu chưa đăng nhập và không phải màn hình landing, luôn hiển thị AcademicLandingPage
+    if (!isAuthenticated && currentScreen !== 'landing') {
+      return (
+        <AcademicLandingPage
+          currentUser={user}
+          onOpenAuth={openAuthModal}
+          onRequireAuth={(feat) => requireAuth(feat)}
+          onNavigateScreen={handleScreenNavigate}
+        />
+      );
+    }
+
     switch (currentScreen) {
       case 'landing':
         return (
@@ -604,7 +630,7 @@ const AppContent: React.FC = () => {
       <SoftAtmosphereBackground />
 
       {/* Student LMS Navigation: Only displayed in authenticated workspace and outside of exam rooms */}
-      {currentScreen !== 'landing' && currentScreen !== 'computer-exam' && currentScreen !== 'listening-exam' && (
+      {isAuthenticated && currentScreen !== 'landing' && currentScreen !== 'computer-exam' && currentScreen !== 'listening-exam' && (
         <Navbar
           currentScreen={currentScreen}
           onSelectScreen={handleScreenNavigate}
@@ -672,7 +698,7 @@ const AppContent: React.FC = () => {
       <AiTutorFloatingChatbot currentScreen={currentScreen} onNotify={addToast} />
 
       {/* Student LMS Workspace Footer */}
-      {currentScreen !== 'landing' && currentScreen !== 'computer-exam' && currentScreen !== 'listening-exam' && (
+      {isAuthenticated && currentScreen !== 'landing' && currentScreen !== 'computer-exam' && currentScreen !== 'listening-exam' && (
         <footer className="mt-auto border-t border-stone-200/80 bg-white/85 backdrop-blur-md py-8">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-stone-500">
             <div className="flex items-center gap-3 font-sans">

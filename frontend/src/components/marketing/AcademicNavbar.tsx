@@ -9,7 +9,7 @@ import { User, Screen } from '../../types';
 
 interface AcademicNavbarProps {
   currentUser: User | null;
-  onOpenAuth: (tab: 'login' | 'register') => void;
+  onOpenAuth: (tab: 'login' | 'register', context?: string) => void;
   onNavigateScreen: (screen: Screen) => void;
 }
 
@@ -33,6 +33,10 @@ export const AcademicNavbar: React.FC<AcademicNavbarProps> = ({
     e.preventDefault();
     setMobileMenuOpen(false);
     if (item.screen) {
+      if (!currentUser) {
+        onOpenAuth('login', `Đăng nhập để: ${item.label}`);
+        return;
+      }
       onNavigateScreen(item.screen);
     } else if (item.href) {
       const target = document.querySelector(item.href);

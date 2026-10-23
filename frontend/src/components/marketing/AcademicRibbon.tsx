@@ -2,11 +2,12 @@ import React, { useState } from 'react';
 import { ArrowRight, X, BookOpen } from 'lucide-react';
 
 interface AcademicRibbonProps {
+  currentUser?: import('../../types').User | null;
   onOpenAuth: (tab: 'login' | 'register', context?: string) => void;
   onNavigateScreen?: (screen: import('../../types').Screen) => void;
 }
 
-export const AcademicRibbon: React.FC<AcademicRibbonProps> = ({ onOpenAuth, onNavigateScreen }) => {
+export const AcademicRibbon: React.FC<AcademicRibbonProps> = ({ currentUser, onOpenAuth, onNavigateScreen }) => {
   const [isVisible, setIsVisible] = useState<boolean>(true);
 
   if (!isVisible) return null;
@@ -29,10 +30,10 @@ export const AcademicRibbon: React.FC<AcademicRibbonProps> = ({ onOpenAuth, onNa
 
           <button
             onClick={() => {
-              if (onNavigateScreen) {
+              if (currentUser && onNavigateScreen) {
                 onNavigateScreen('dictation');
               } else {
-                onOpenAuth('register', 'Trải nghiệm chép chính tả YouTube');
+                onOpenAuth('login', 'Đăng nhập để chép chính tả YouTube');
               }
             }}
             className="inline-flex items-center gap-1 text-amber-300 hover:text-amber-200 font-bold underline underline-offset-4 decoration-amber-500/50 hover:decoration-amber-400 transition-colors cursor-pointer"

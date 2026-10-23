@@ -15,6 +15,7 @@ import {
 import { Screen } from '../../types';
 import { useAnki } from '../../context/AnkiContext';
 import { useVocabularyVault } from '../../context/VocabularyVaultContext';
+import { useAuth } from '../../context/AuthContext';
 
 export interface ChatVocabItem {
   word: string;
@@ -62,6 +63,7 @@ export const AiTutorFloatingChatbot: React.FC<AiTutorFloatingChatbotProps> = ({
   // Context lưu thẻ vào Anki
   const { addCardToPersonalDeck } = useAnki();
   const { saveAiGeneratedWord } = useVocabularyVault();
+  const { isAuthenticated, requireAuth } = useAuth();
 
   // Tự động cuộn xuống cuối khi có tin nhắn mới
   const scrollToBottom = () => {
@@ -116,6 +118,10 @@ export const AiTutorFloatingChatbot: React.FC<AiTutorFloatingChatbotProps> = ({
 
   // Gửi câu hỏi tới Backend /api/chat ("Hỏi gì đáp đó")
   const sendMessage = async (textToSend?: string) => {
+    if (!isAuthenticated) {
+      requireAuth('Trợ Lý Học Tập AI');
+      return;
+    }
     const cleanText = (textToSend !== undefined ? textToSend : inputText).trim();
     if (!cleanText || isLoading) return;
 
@@ -300,7 +306,13 @@ export const AiTutorFloatingChatbot: React.FC<AiTutorFloatingChatbotProps> = ({
       <div className="fixed bottom-6 right-6 z-40 select-none">
         <button
           type="button"
-          onClick={() => setIsOpen(!isOpen)}
+          onClick={() => {
+            if (!isAuthenticated) {
+              requireAuth('Trợ Lý Học Tập AI');
+              return;
+            }
+            setIsOpen(!isOpen);
+          }}
           className="group relative flex items-center gap-2.5 px-4 py-3 rounded-full bg-[#064E3B] text-white shadow-xl hover:shadow-2xl hover:scale-105 active:scale-95 border-2 border-amber-400/50 transition-all duration-300 cursor-pointer"
           title="Mở Trợ Lý Học Tập AI"
         >

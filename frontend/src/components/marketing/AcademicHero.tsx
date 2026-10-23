@@ -11,17 +11,19 @@ import {
   Layers,
   Sparkles,
 } from 'lucide-react';
-import { Screen } from '../../types';
+import { Screen, User } from '../../types';
 
 gsap.registerPlugin(useGSAP);
 
 interface AcademicHeroProps {
+  currentUser?: User | null;
   onOpenAuth: (tab: 'login' | 'register', context?: string) => void;
   onExploreChapters: () => void;
   onNavigateScreen?: (screen: Screen) => void;
 }
 
 export const AcademicHero: React.FC<AcademicHeroProps> = ({
+  currentUser,
   onOpenAuth,
   onExploreChapters,
   onNavigateScreen,
@@ -77,7 +79,13 @@ export const AcademicHero: React.FC<AcademicHeroProps> = ({
         {/* Action CTAs */}
         <div className="hero-actions flex flex-col sm:flex-row items-center justify-center gap-3.5 pt-2">
           <button
-            onClick={() => onOpenAuth('register', 'Bắt đầu luyện đề Cambridge')}
+            onClick={() => {
+              if (currentUser && onNavigateScreen) {
+                onNavigateScreen('reading');
+              } else {
+                onOpenAuth('login', 'Đăng nhập để luyện đề Cambridge');
+              }
+            }}
             className="w-full sm:w-auto px-7 py-3.5 rounded-xl bg-[#D97706] hover:bg-[#B45309] text-white text-sm font-bold tracking-normal shadow-md shadow-amber-600/25 active:scale-95 transition-all cursor-pointer flex items-center justify-center gap-2"
           >
             <Compass className="w-4 h-4 text-white" />
@@ -86,7 +94,13 @@ export const AcademicHero: React.FC<AcademicHeroProps> = ({
           </button>
 
           <button
-            onClick={() => onNavigateScreen?.('dictation')}
+            onClick={() => {
+              if (currentUser && onNavigateScreen) {
+                onNavigateScreen('dictation');
+              } else {
+                onOpenAuth('login', 'Đăng nhập để chép chính tả YouTube');
+              }
+            }}
             className="w-full sm:w-auto px-7 py-3.5 rounded-xl bg-[#064E3B] hover:bg-[#043327] text-white text-sm font-bold tracking-normal shadow-md active:scale-95 transition-all cursor-pointer flex items-center justify-center gap-2 group"
           >
             <Youtube className="w-4 h-4 text-amber-300 group-hover:scale-110 transition-transform" />

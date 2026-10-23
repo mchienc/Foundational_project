@@ -1,15 +1,16 @@
 import React from 'react';
 import { ShieldCheck, Phone, Mail, MapPin } from 'lucide-react';
-import { Screen } from '../../types';
+import { Screen, User } from '../../types';
 
 interface AcademicFooterProps {
+  currentUser?: User | null;
   onRequireAuth: (context: string) => void;
   onNavigateScreen?: (screen: Screen) => void;
 }
 
-export const AcademicFooter: React.FC<AcademicFooterProps> = ({ onRequireAuth, onNavigateScreen }) => {
+export const AcademicFooter: React.FC<AcademicFooterProps> = ({ currentUser, onRequireAuth, onNavigateScreen }) => {
   const handleNav = (screen: Screen, fallbackContext: string) => {
-    if (onNavigateScreen) {
+    if (currentUser && onNavigateScreen) {
       onNavigateScreen(screen);
     } else {
       onRequireAuth(fallbackContext);

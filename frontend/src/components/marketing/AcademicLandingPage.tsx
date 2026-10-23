@@ -39,6 +39,7 @@ export const AcademicLandingPage: React.FC<AcademicLandingPageProps> = ({
       <main className="flex-1">
         {/* Editorial Hero with Bento Dossier */}
         <AcademicHero
+          currentUser={currentUser}
           onOpenAuth={onOpenAuth}
           onExploreChapters={handleExploreChapters}
           onNavigateScreen={onNavigateScreen}
@@ -49,6 +50,7 @@ export const AcademicLandingPage: React.FC<AcademicLandingPageProps> = ({
 
         {/* 5 Chapters Scrollytelling with GSAP ScrollTrigger Pinning */}
         <AcademicChaptersScrolly
+          currentUser={currentUser}
           onRequireAuth={onRequireAuth}
           onNavigateScreen={onNavigateScreen}
         />
@@ -56,6 +58,7 @@ export const AcademicLandingPage: React.FC<AcademicLandingPageProps> = ({
 
       {/* 4. Academic Institution Footer */}
       <AcademicFooter
+        currentUser={currentUser}
         onRequireAuth={onRequireAuth}
         onNavigateScreen={onNavigateScreen}
       />

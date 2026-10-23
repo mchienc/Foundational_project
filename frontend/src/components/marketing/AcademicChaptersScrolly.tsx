@@ -14,14 +14,16 @@ import {
   Volume2,
   FileCheck,
 } from 'lucide-react';
-import { Screen } from '../../types';
+import { Screen, User } from '../../types';
 
 interface AcademicChaptersScrollyProps {
+  currentUser?: User | null;
   onRequireAuth: (chapterTitle: string) => void;
   onNavigateScreen?: (screen: Screen) => void;
 }
 
 export const AcademicChaptersScrolly: React.FC<AcademicChaptersScrollyProps> = ({
+  currentUser,
   onRequireAuth,
   onNavigateScreen,
 }) => {
@@ -157,7 +159,7 @@ export const AcademicChaptersScrolly: React.FC<AcademicChaptersScrollyProps> = (
   const currentChapter = chapters[activeChapterIndex];
 
   const handleAction = () => {
-    if (onNavigateScreen) {
+    if (currentUser && onNavigateScreen) {
       onNavigateScreen(currentChapter.screen);
     } else {
       onRequireAuth(currentChapter.title);
