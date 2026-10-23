@@ -1,7 +1,7 @@
 {
   "name": "online-learning-website",
   "version": "1.0.0",
-  "description": "EduFlow — Nền tảng luyện thi Cambridge IELTS & Anki SRS",
+  "description": "eng4u — Nền tảng luyện thi Cambridge IELTS toàn diện 4 kỹ năng & Học từ vựng Anki",
   "main": "app.js",
   "scripts": {
     "start": "node app.js",
