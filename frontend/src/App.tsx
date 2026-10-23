@@ -381,6 +381,7 @@ const AppContent: React.FC = () => {
             onOpenAuth={openAuthModal}
             onRequireAuth={(feat) => requireAuth(feat)}
             onNavigateScreen={handleScreenNavigate}
+            onLogout={handleLogout}
           />
         );
 

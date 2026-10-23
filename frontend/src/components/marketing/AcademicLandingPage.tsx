@@ -10,7 +10,8 @@ interface AcademicLandingPageProps {
   currentUser: User | null;
   onOpenAuth: (tab: 'login' | 'register', context?: string) => void;
   onRequireAuth: (chapterTitle: string) => void;
-  onNavigateScreen: (screen: Screen) => void;
+  onNavigateScreen: (screen: Screen, tab?: any) => void;
+  onLogout?: () => void;
 }
 
 export const AcademicLandingPage: React.FC<AcademicLandingPageProps> = ({
@@ -18,6 +19,7 @@ export const AcademicLandingPage: React.FC<AcademicLandingPageProps> = ({
   onOpenAuth,
   onRequireAuth,
   onNavigateScreen,
+  onLogout,
 }) => {
   const handleExploreChapters = () => {
     const el = document.getElementById('chapters');
@@ -33,6 +35,7 @@ export const AcademicLandingPage: React.FC<AcademicLandingPageProps> = ({
         currentUser={currentUser}
         onOpenAuth={onOpenAuth}
         onNavigateScreen={onNavigateScreen}
+        onLogout={onLogout}
       />
 
       {/* 3. Main Academic Content */}
