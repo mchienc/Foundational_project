@@ -683,7 +683,7 @@ export const Profile: React.FC<ProfileProps> = ({
                   Email Hỗ Trợ Học Vụ
                 </div>
                 <div className="text-base font-bold font-mono text-[#064E3B] truncate">
-                  support@eduflow.edu.vn
+                  dangchien2005@gmail.com
                 </div>
                 <p className="text-[11px] text-stone-600 font-sans leading-relaxed">
                   Tiếp nhận phản hồi và giải đáp học thuật chi tiết trong vòng 24 giờ.

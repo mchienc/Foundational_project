@@ -143,7 +143,7 @@ export const AcademicFooter: React.FC<AcademicFooterProps> = ({ currentUser, onR
             </li>
             <li className="flex items-center gap-2">
               <Mail className="w-3.5 h-3.5 text-amber-400 shrink-0" />
-              <span>hotro@eduflow.vn</span>
+              <span>dangchien2005@gmail.com</span>
             </li>
             <li className="flex items-start gap-2">
               <MapPin className="w-3.5 h-3.5 text-amber-400 shrink-0 mt-0.5" />
