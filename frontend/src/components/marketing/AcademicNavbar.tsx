@@ -40,6 +40,7 @@ export const AcademicNavbar: React.FC<AcademicNavbarProps> = ({
 
   const isProStore = useProStore((state) => state.isPro);
   const planName = useProStore((state) => state.planName);
+  const expiryDisplayText = useProStore((state) => state.expiryDisplayText);
   const isProUser = Boolean(currentUser?.isPro) || isProStore;
   const proPackageTitle = currentUser?.proPackage || planName || 'eng4u PRO';
 
@@ -263,8 +264,8 @@ export const AcademicNavbar: React.FC<AcademicNavbarProps> = ({
                             <Crown size={13} className="text-amber-700 fill-amber-500 shrink-0" />
                             <span className="text-[11px] font-bold text-amber-950 truncate">{proPackageTitle}</span>
                           </div>
-                          <span className="shrink-0 text-[9px] font-mono font-bold uppercase tracking-wider px-1.5 py-0.5 rounded bg-amber-500 text-white">
-                            Active
+                          <span className="shrink-0 text-[9px] font-mono font-bold px-1.5 py-0.5 rounded bg-amber-500 text-white shadow-2xs">
+                            {expiryDisplayText || 'Active'}
                           </span>
                         </div>
                       ) : (
@@ -453,7 +454,7 @@ export const AcademicNavbar: React.FC<AcademicNavbarProps> = ({
                     </div>
                     {isProUser ? (
                       <span className="px-2 py-0.5 rounded text-[10px] font-sans font-black bg-gradient-to-r from-amber-400 to-yellow-300 text-stone-950 shadow-xs border border-amber-300">
-                        PRO VIP
+                        {expiryDisplayText ? (expiryDisplayText.includes('(') ? expiryDisplayText.split('(')[0].trim() : expiryDisplayText) : 'PRO VIP'}
                       </span>
                     ) : (
                       <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-amber-400 text-stone-950">

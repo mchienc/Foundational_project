@@ -47,6 +47,7 @@ export const Navbar: React.FC<NavbarProps> = ({
 
   const isProStore = useProStore((state) => state.isPro);
   const planName = useProStore((state) => state.planName);
+  const expiryDisplayText = useProStore((state) => state.expiryDisplayText);
   const isProUser = Boolean(currentUser?.isPro) || isProStore;
   const proPackageTitle = currentUser?.proPackage || planName || 'eng4u PRO';
 
@@ -268,8 +269,8 @@ export const Navbar: React.FC<NavbarProps> = ({
                             <Crown size={13} className="text-amber-700 fill-amber-500 shrink-0" />
                             <span className="text-[11px] font-bold text-amber-950 truncate">{proPackageTitle}</span>
                           </div>
-                          <span className="shrink-0 text-[9px] font-mono font-bold uppercase tracking-wider px-1.5 py-0.5 rounded bg-amber-500 text-white">
-                            Active
+                          <span className="shrink-0 text-[9px] font-mono font-bold px-1.5 py-0.5 rounded bg-amber-500 text-white shadow-2xs">
+                            {expiryDisplayText || 'Active'}
                           </span>
                         </div>
                       ) : (

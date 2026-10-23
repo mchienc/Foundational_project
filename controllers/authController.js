@@ -36,6 +36,35 @@ const getAvatarByRole = (role, customAvatar) => {
     : 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=120&auto=format&fit=crop&q=80';
 };
 
+// Helper kiểm tra gói Pro đã hết hạn qua ngày hay chưa
+function isPackageExpired(expiryStr) {
+  if (!expiryStr) return false;
+  const str = String(expiryStr).trim().toLowerCase();
+  if (str.includes('vĩnh viễn') || str.includes('lifetime')) return false;
+
+  // Format DD/MM/YYYY
+  if (str.includes('/')) {
+    const parts = str.split('/');
+    if (parts.length === 3) {
+      const expDate = new Date(Number(parts[2]), Number(parts[1]) - 1, Number(parts[0]), 23, 59, 59);
+      if (!isNaN(expDate.getTime())) {
+        return Date.now() > expDate.getTime();
+      }
+    }
+  }
+
+  // Format YYYY-MM-DD
+  if (str.includes('-')) {
+    const expDate = new Date(str);
+    expDate.setHours(23, 59, 59, 999);
+    if (!isNaN(expDate.getTime())) {
+      return Date.now() > expDate.getTime();
+    }
+  }
+
+  return false;
+}
+
 // 1. API Đăng nhập
 async function apiLogin(req, res) {
   try {
@@ -53,6 +82,14 @@ async function apiLogin(req, res) {
         const dbUser = users[0];
         const isMatch = await bcrypt.compare(password, dbUser.password);
         if (isMatch) {
+          let isProActive = Boolean(dbUser.is_pro);
+          if (isProActive && isPackageExpired(dbUser.pro_expiry)) {
+            isProActive = false;
+            try {
+              await db.query('UPDATE users SET is_pro = 0 WHERE id = ?', [dbUser.id]);
+            } catch (e) {}
+          }
+
           user = {
             id: String(dbUser.id),
             full_name: dbUser.full_name,
@@ -60,9 +97,9 @@ async function apiLogin(req, res) {
             phone: dbUser.phone || '',
             role: dbUser.role || 'student',
             avatar: dbUser.avatar || getAvatarByRole(dbUser.role),
-            isPro: Boolean(dbUser.is_pro),
-            proPackage: dbUser.pro_package || null,
-            proExpiry: dbUser.pro_expiry || null,
+            isPro: isProActive,
+            proPackage: isProActive ? dbUser.pro_package : null,
+            proExpiry: isProActive ? dbUser.pro_expiry : 'Hết hạn',
           };
         }
       }
@@ -77,6 +114,12 @@ async function apiLogin(req, res) {
       const allMem = (adminCtrl && adminCtrl.getMemoryUsers ? adminCtrl.getMemoryUsers() : []).concat(fallbackUsers);
       const memUser = allMem.find((u) => u.email && u.email.toLowerCase() === trimmedEmail);
       if (memUser && (memUser.passwordHash ? bcrypt.compareSync(password, memUser.passwordHash) : (password === '123456' || memUser.id))) {
+        let isProActive = Boolean(memUser.is_pro);
+        if (isProActive && isPackageExpired(memUser.pro_expiry)) {
+          isProActive = false;
+          memUser.is_pro = false;
+        }
+
         user = {
           id: memUser.id,
           full_name: memUser.full_name,
@@ -84,9 +127,9 @@ async function apiLogin(req, res) {
           phone: memUser.phone || '',
           role: memUser.role,
           avatar: memUser.avatar || getAvatarByRole(memUser.role, memUser.avatar),
-          isPro: Boolean(memUser.is_pro),
-          proPackage: memUser.pro_package || null,
-          proExpiry: memUser.pro_expiry || null,
+          isPro: isProActive,
+          proPackage: isProActive ? memUser.pro_package : null,
+          proExpiry: isProActive ? memUser.pro_expiry : 'Hết hạn',
         };
       }
     }
@@ -455,6 +498,14 @@ async function apiMe(req, res) {
       const [rows] = await db.query('SELECT * FROM users WHERE id = ? OR LOWER(email) = ?', [u.id, (u.email || '').toLowerCase()]);
       if (rows && rows.length > 0) {
         const dbUser = rows[0];
+        let isProActive = Boolean(dbUser.is_pro);
+        if (isProActive && isPackageExpired(dbUser.pro_expiry)) {
+          isProActive = false;
+          try {
+            await db.query('UPDATE users SET is_pro = 0 WHERE id = ?', [dbUser.id]);
+          } catch (e) {}
+        }
+
         return res.json({
           success: true,
           user: {
@@ -464,9 +515,9 @@ async function apiMe(req, res) {
             phone: dbUser.phone || '',
             role: dbUser.role || 'student',
             avatar: dbUser.avatar || getAvatarByRole(dbUser.role),
-            isPro: Boolean(dbUser.is_pro),
-            proPackage: dbUser.pro_package || null,
-            proExpiry: dbUser.pro_expiry || null,
+            isPro: isProActive,
+            proPackage: isProActive ? dbUser.pro_package : null,
+            proExpiry: isProActive ? dbUser.pro_expiry : 'Hết hạn',
           },
         });
       }

@@ -4,6 +4,59 @@
 import { create } from 'zustand';
 import { User } from '../../types';
 
+export interface ProExpiryDetails {
+  isExpired: boolean;
+  isLifetime: boolean;
+  daysLeft: number;
+  displayText: string;
+}
+
+// Helper phân tích ngày hết hạn và tính chính xác số ngày còn lại (tự trừ khi qua ngày)
+export const getProExpiryDetails = (expiryStr?: string | null): ProExpiryDetails => {
+  if (!expiryStr || expiryStr === 'Hết hạn') {
+    return { isExpired: true, isLifetime: false, daysLeft: 0, displayText: 'Đã hết hạn' };
+  }
+  const str = String(expiryStr).trim().toLowerCase();
+  if (str.includes('vĩnh viễn') || str.includes('lifetime')) {
+    return { isExpired: false, isLifetime: true, daysLeft: 99999, displayText: 'Vĩnh viễn không giới hạn' };
+  }
+
+  let expDate: Date | null = null;
+  if (expiryStr.includes('/')) {
+    const parts = expiryStr.split('/');
+    if (parts.length === 3) {
+      expDate = new Date(Number(parts[2]), Number(parts[1]) - 1, Number(parts[0]), 23, 59, 59);
+    }
+  } else if (expiryStr.includes('-')) {
+    expDate = new Date(expiryStr);
+    expDate.setHours(23, 59, 59, 999);
+  }
+
+  if (!expDate || isNaN(expDate.getTime())) {
+    const numMatch = expiryStr.match(/(\d+)\s*ngày/);
+    if (numMatch) {
+      const days = parseInt(numMatch[1], 10);
+      return { isExpired: false, isLifetime: false, daysLeft: days, displayText: `Còn ${days} ngày` };
+    }
+    return { isExpired: false, isLifetime: false, daysLeft: 30, displayText: expiryStr };
+  }
+
+  const now = new Date();
+  const diffTime = expDate.getTime() - now.getTime();
+  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+  if (diffDays <= 0) {
+    return { isExpired: true, isLifetime: false, daysLeft: 0, displayText: 'Đã hết hạn' };
+  }
+
+  return {
+    isExpired: false,
+    isLifetime: false,
+    daysLeft: diffDays,
+    displayText: `Còn ${diffDays} ngày (${expiryStr})`,
+  };
+};
+
 interface ProState {
   currentUserEmail: string | null;
   isPro: boolean;
@@ -16,6 +69,8 @@ interface ProState {
   planName: string;
   packageId: string;
   packageExpiry: string;
+  daysLeft: number;
+  expiryDisplayText: string;
   lastOrderId: string;
 
   // Actions
@@ -58,8 +113,9 @@ const loadUserState = (email?: string | null, userObj?: User | null) => {
       const parsed = JSON.parse(raw);
       const isDailyNew = parsed.lastResetDate !== today;
 
-      // Giữ nguyên trạng thái Pro nếu tài khoản này đã có Pro (từ userObj hoặc từ lịch sử localStorage)
-      const effectiveIsPro = Boolean(userObj?.isPro) || Boolean(parsed?.isPro);
+      const rawExpiry = (userObj?.isPro && userObj?.proExpiry) || parsed?.packageExpiry;
+      const expiryInfo = getProExpiryDetails(rawExpiry);
+      const effectiveIsPro = (Boolean(userObj?.isPro) || Boolean(parsed?.isPro)) && !expiryInfo.isExpired;
 
       return {
         currentUserEmail: email ? email.trim().toLowerCase() : null,
@@ -70,7 +126,9 @@ const loadUserState = (email?: string | null, userObj?: User | null) => {
         isUpgradeModalOpen: false,
         planName: (userObj?.isPro && userObj?.proPackage) || parsed.planName || (effectiveIsPro ? 'eng4u Pro' : 'Tài khoản miễn phí'),
         packageId: (userObj?.isPro && userObj?.proPackage) || parsed.packageId || 'month',
-        packageExpiry: (userObj?.isPro && userObj?.proExpiry) || parsed.packageExpiry || (effectiveIsPro ? 'Vĩnh viễn' : 'Hết hạn'),
+        packageExpiry: effectiveIsPro ? (rawExpiry || '30 ngày') : 'Hết hạn',
+        daysLeft: effectiveIsPro ? expiryInfo.daysLeft : 0,
+        expiryDisplayText: effectiveIsPro ? expiryInfo.displayText : 'Hết hạn',
         lastOrderId: parsed.lastOrderId || '',
       };
     }
@@ -79,17 +137,22 @@ const loadUserState = (email?: string | null, userObj?: User | null) => {
   }
 
   // Nếu chưa có lịch sử, khởi tạo mặc định cho người dùng này
-  const effectiveIsPro = Boolean(userObj?.isPro);
+  const rawExpiry = userObj?.proExpiry;
+  const expiryInfo = getProExpiryDetails(rawExpiry);
+  const effectiveIsPro = Boolean(userObj?.isPro) && !expiryInfo.isExpired;
+
   return {
     currentUserEmail: email ? email.trim().toLowerCase() : null,
     isPro: effectiveIsPro,
-    writingQuotaLeft: 1,
-    speakingQuotaLeft: 1,
+    writingQuotaLeft: effectiveIsPro ? 999 : 1,
+    speakingQuotaLeft: effectiveIsPro ? 999 : 1,
     lastResetDate: today,
     isUpgradeModalOpen: false,
     planName: userObj?.proPackage || (effectiveIsPro ? 'eng4u Pro' : 'Tài khoản miễn phí'),
     packageId: userObj?.proPackage || 'month',
-    packageExpiry: userObj?.proExpiry || (effectiveIsPro ? 'Vĩnh viễn' : 'Hết hạn'),
+    packageExpiry: effectiveIsPro ? (rawExpiry || 'Vĩnh viễn') : 'Hết hạn',
+    daysLeft: effectiveIsPro ? expiryInfo.daysLeft : 0,
+    expiryDisplayText: effectiveIsPro ? expiryInfo.displayText : 'Hết hạn',
     lastOrderId: '',
   };
 };
@@ -157,10 +220,27 @@ export const useProStore = create<ProState>((set, get) => {
 
     checkAndResetDailyQuota: () => {
       const today = getTodayString();
+      const currentExpiry = get().packageExpiry;
+      const expiryInfo = getProExpiryDetails(currentExpiry);
+
+      // Nếu tài khoản Pro đã qua ngày hết hạn -> Tự động hạ cấp về Free
+      if (get().isPro && expiryInfo.isExpired) {
+        get().resetToFree();
+        return;
+      }
+
+      // Cập nhật lại số ngày còn lại (tự động giảm dần theo ngày)
+      if (get().isPro && !expiryInfo.isLifetime) {
+        set({
+          daysLeft: expiryInfo.daysLeft,
+          expiryDisplayText: expiryInfo.displayText,
+        });
+      }
+
       if (get().lastResetDate !== today) {
         const next = {
-          writingQuotaLeft: 1,
-          speakingQuotaLeft: 1,
+          writingQuotaLeft: get().isPro ? 999 : 1,
+          speakingQuotaLeft: get().isPro ? 999 : 1,
           lastResetDate: today,
         };
         set(next);
@@ -201,13 +281,29 @@ export const useProStore = create<ProState>((set, get) => {
     },
 
     activateProPackage: ({ packageId, planName, expiryDate, orderId }) => {
+      let resolvedExpiry = expiryDate;
+      if (!resolvedExpiry || resolvedExpiry === '30 ngày' || resolvedExpiry === '180 ngày' || resolvedExpiry === '365 ngày') {
+        if (packageId === 'lifetime') {
+          resolvedExpiry = 'Vĩnh viễn';
+        } else {
+          const now = new Date();
+          if (packageId === '6months') now.setDate(now.getDate() + 180);
+          else if (packageId === 'year') now.setDate(now.getDate() + 365);
+          else now.setDate(now.getDate() + 30);
+          resolvedExpiry = now.toLocaleDateString('vi-VN');
+        }
+      }
+
+      const expiryInfo = getProExpiryDetails(resolvedExpiry);
       const next = {
         isPro: true,
         writingQuotaLeft: 999,
         speakingQuotaLeft: 999,
         planName: planName || 'eng4u Pro',
         packageId: packageId || 'month',
-        packageExpiry: expiryDate || 'Vĩnh viễn',
+        packageExpiry: resolvedExpiry,
+        daysLeft: expiryInfo.daysLeft,
+        expiryDisplayText: expiryInfo.displayText,
         lastOrderId: orderId || '',
         isUpgradeModalOpen: false,
       };
@@ -223,6 +319,8 @@ export const useProStore = create<ProState>((set, get) => {
         planName: 'eng4u Pro VIP',
         packageId: 'lifetime',
         packageExpiry: 'Vĩnh viễn không giới hạn',
+        daysLeft: 99999,
+        expiryDisplayText: 'Vĩnh viễn không giới hạn',
         lastOrderId: 'DEMO-VIP',
         isUpgradeModalOpen: false,
       };
@@ -242,6 +340,8 @@ export const useProStore = create<ProState>((set, get) => {
         planName: 'Tài khoản miễn phí',
         packageId: '',
         packageExpiry: 'Hết hạn',
+        daysLeft: 0,
+        expiryDisplayText: 'Đã hết hạn',
         lastOrderId: '',
         isUpgradeModalOpen: false,
       };

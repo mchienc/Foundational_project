@@ -51,6 +51,7 @@ export const Profile: React.FC<ProfileProps> = ({
 
   const isProStore = useProStore((state) => state.isPro);
   const planName = useProStore((state) => state.planName);
+  const expiryDisplayText = useProStore((state) => state.expiryDisplayText);
   const isProUser = Boolean(user.isPro) || isProStore;
   const proPackageTitle = user.proPackage || planName || 'eng4u PRO';
 
@@ -324,7 +325,12 @@ export const Profile: React.FC<ProfileProps> = ({
               </span>
               <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-mono font-bold border border-amber-300 bg-gradient-to-r from-amber-50 to-yellow-50 text-amber-950 shadow-2xs">
                 <Crown size={14} className="text-amber-600 fill-amber-400" />
-                {proPackageTitle}
+                <span>{proPackageTitle}</span>
+                {expiryDisplayText && (
+                  <span className="text-[10px] px-1.5 py-0.5 rounded bg-amber-200/90 text-amber-950 font-sans font-bold">
+                    {expiryDisplayText}
+                  </span>
+                )}
               </span>
             </div>
           )}

@@ -138,8 +138,18 @@ export const UpgradeModal: React.FC<UpgradeModalProps> = ({
           const data = await res.json();
           if (data.success && data.status === 'completed') {
             clearInterval(pollInterval);
-            const expiry =
-              data.order?.expiryDate || (selectedPlan.id === 'lifetime' ? 'Vĩnh viễn' : '30 ngày');
+            let expiry = data.order?.expiryDate;
+            if (!expiry || expiry === '30 ngày' || expiry === '180 ngày' || expiry === '365 ngày') {
+              if (selectedPlan.id === 'lifetime') {
+                expiry = 'Vĩnh viễn';
+              } else {
+                const now = new Date();
+                if (selectedPlan.id === '6months') now.setDate(now.getDate() + 180);
+                else if (selectedPlan.id === 'year') now.setDate(now.getDate() + 365);
+                else now.setDate(now.getDate() + 30);
+                expiry = now.toLocaleDateString('vi-VN');
+              }
+            }
 
             activateProPackage({
               packageId: selectedPlan.id,
@@ -283,16 +293,18 @@ export const UpgradeModal: React.FC<UpgradeModalProps> = ({
         return;
       }
 
-      const expiry =
-        data.expiryDate ||
-        orderData.expiryDate ||
-        (selectedPlan.id === 'lifetime'
-          ? 'Vĩnh viễn'
-          : selectedPlan.id === 'year'
-          ? '365 ngày'
-          : selectedPlan.id === '6months'
-          ? '180 ngày'
-          : '30 ngày');
+      let expiry = data.expiryDate || orderData.expiryDate;
+      if (!expiry || expiry === '30 ngày' || expiry === '180 ngày' || expiry === '365 ngày') {
+        if (selectedPlan.id === 'lifetime') {
+          expiry = 'Vĩnh viễn';
+        } else {
+          const now = new Date();
+          if (selectedPlan.id === '6months') now.setDate(now.getDate() + 180);
+          else if (selectedPlan.id === 'year') now.setDate(now.getDate() + 365);
+          else now.setDate(now.getDate() + 30);
+          expiry = now.toLocaleDateString('vi-VN');
+        }
+      }
 
       activateProPackage({
         packageId: selectedPlan.id,
