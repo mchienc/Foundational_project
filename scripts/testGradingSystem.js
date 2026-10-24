@@ -300,6 +300,7 @@ async function runTestSuite() {
   console.log(`🎉 ALL ${passedTests} TEST SUITES PASSED STRICT ASSERTIONS!`);
   console.log('   All checks verified with node:assert/strict. Process will exit 0.');
   console.log('===============================================================\n');
+  process.exit(0);
 }
 
 runTestSuite().catch((err) => {
