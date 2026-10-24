@@ -136,12 +136,12 @@ export const AcademicNavbar: React.FC<AcademicNavbarProps> = ({
         </nav>
 
         {/* Right CTA Actions Area */}
-        <div className="hidden sm:flex items-center gap-2.5 shrink-0">
+        <div className="flex items-center gap-2 sm:gap-2.5 shrink-0">
           {currentUser ? (
             <div className="relative">
               <button
                 onClick={() => setShowUserMenu(!showUserMenu)}
-                className={`flex items-center gap-2 py-1 pl-1.5 pr-2.5 rounded-full transition-all cursor-pointer select-none ${
+                className={`flex items-center gap-1.5 sm:gap-2 py-1 pl-1.5 pr-2 sm:pr-2.5 rounded-full transition-all cursor-pointer select-none ${
                   isProUser
                     ? 'border-2 border-amber-400 bg-gradient-to-r from-emerald-950 via-[#063e30] to-amber-950/70 hover:to-amber-900/80 shadow-md shadow-amber-500/25 ring-1 ring-amber-300/40'
                     : 'hover:bg-emerald-900/60 border border-emerald-800/60 hover:border-emerald-700/80 bg-emerald-950/40'
@@ -150,7 +150,7 @@ export const AcademicNavbar: React.FC<AcademicNavbarProps> = ({
               >
                 <div className="relative shrink-0">
                   <div
-                    className={`w-8 h-8 rounded-full bg-[#022C22] flex items-center justify-center font-sans font-bold text-xs shadow-xs overflow-hidden ${
+                    className={`w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-[#022C22] flex items-center justify-center font-sans font-bold text-xs shadow-xs overflow-hidden ${
                       isProUser
                         ? 'ring-2 ring-amber-400 text-amber-300'
                         : 'ring-2 ring-amber-500/40 text-amber-300'
@@ -184,7 +184,7 @@ export const AcademicNavbar: React.FC<AcademicNavbarProps> = ({
                     {isProUser && <span className="text-[9px]">👑</span>}
                   </span>
                 ) : isProUser ? (
-                  <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-sans font-black bg-gradient-to-r from-amber-400 via-amber-300 to-yellow-400 text-stone-950 uppercase shadow-xs border border-amber-300">
+                  <span className="inline-flex items-center gap-1 px-2 py-0.5 sm:px-2.5 rounded-full text-[10px] font-sans font-black bg-gradient-to-r from-amber-400 via-amber-300 to-yellow-400 text-stone-950 uppercase shadow-xs border border-amber-300">
                     <Crown size={11} className="fill-stone-950 text-stone-950" />
                     <span>PRO</span>
                   </span>
@@ -354,33 +354,31 @@ export const AcademicNavbar: React.FC<AcademicNavbarProps> = ({
               </AnimatePresence>
             </div>
           ) : (
-            <div className="flex items-center gap-2.5">
+            <div className="flex items-center gap-1.5 sm:gap-2.5">
               <button
                 onClick={() => onOpenAuth('login')}
-                className="text-xs font-semibold text-stone-200 hover:text-amber-300 px-3 py-1.5 transition-colors cursor-pointer"
+                className="text-xs font-semibold text-stone-200 hover:text-amber-300 px-2 sm:px-3 py-1.5 transition-colors cursor-pointer"
               >
                 Đăng Nhập
               </button>
 
               <button
                 onClick={() => onOpenAuth('register')}
-                className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-[#D97706] hover:bg-[#B45309] text-white text-xs font-bold shadow-md hover:shadow-lg active:scale-95 transition-all cursor-pointer"
+                className="hidden sm:inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-[#D97706] hover:bg-[#B45309] text-white text-xs font-bold shadow-md hover:shadow-lg active:scale-95 transition-all cursor-pointer"
               >
                 <Compass className="w-3.5 h-3.5 text-white" />
                 <span>Bắt Đầu Học Ngay</span>
               </button>
             </div>
           )}
-        </div>
 
-        {/* Mobile Hamburger Toggle */}
-        <div className="md:hidden flex items-center gap-2">
+          {/* Mobile Hamburger Toggle */}
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="p-2 rounded-xl text-stone-300 hover:text-white hover:bg-emerald-900/60 transition-colors cursor-pointer"
+            className="md:hidden p-1.5 sm:p-2 rounded-xl text-stone-300 hover:text-white hover:bg-emerald-900/60 transition-colors cursor-pointer"
             aria-label="Toggle menu"
           >
-            {mobileMenuOpen ? <X size={22} /> : <Menu size={22} />}
+            {mobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
           </button>
         </div>
       </div>

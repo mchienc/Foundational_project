@@ -155,7 +155,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             <div className="relative">
               <button
                 onClick={() => setShowUserMenu(!showUserMenu)}
-                className={`flex items-center gap-2 py-1 pl-1.5 pr-2.5 rounded-full transition-all cursor-pointer select-none ${
+                className={`flex items-center gap-1.5 sm:gap-2 py-1 pl-1.5 pr-2 sm:pr-2.5 rounded-full transition-all cursor-pointer select-none ${
                   isProUser
                     ? 'border-2 border-amber-400 bg-gradient-to-r from-emerald-950 via-[#063e30] to-amber-950/70 hover:to-amber-900/80 shadow-md shadow-amber-500/25 ring-1 ring-amber-300/40'
                     : 'hover:bg-emerald-900/60 border border-emerald-800/60 hover:border-emerald-700/80 bg-emerald-950/40'
@@ -164,7 +164,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               >
                 <div className="relative shrink-0">
                   <div
-                    className={`w-8 h-8 rounded-full bg-[#022C22] flex items-center justify-center font-sans font-bold text-xs shadow-xs overflow-hidden ${
+                    className={`w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-[#022C22] flex items-center justify-center font-sans font-bold text-xs shadow-xs overflow-hidden ${
                       isProUser
                         ? 'ring-2 ring-amber-400 text-amber-300'
                         : 'ring-2 ring-amber-500/40 text-amber-300'
@@ -198,7 +198,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                     {isProUser && <span className="text-[9px]">👑</span>}
                   </span>
                 ) : isProUser ? (
-                  <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-sans font-black bg-gradient-to-r from-amber-400 via-amber-300 to-yellow-400 text-stone-950 uppercase shadow-xs border border-amber-300">
+                  <span className="inline-flex items-center gap-1 px-2 py-0.5 sm:px-2.5 rounded-full text-[10px] font-sans font-black bg-gradient-to-r from-amber-400 via-amber-300 to-yellow-400 text-stone-950 uppercase shadow-xs border border-amber-300">
                     <Crown size={11} className="fill-stone-950 text-stone-950" />
                     <span>PRO</span>
                   </span>
@@ -425,25 +425,95 @@ export const Navbar: React.FC<NavbarProps> = ({
               </button>
             ))}
             {currentUser ? (
-              <button
-                onClick={() => {
-                  onSelectScreen('profile', 'info');
-                  setShowMobileNav(false);
-                }}
-                className={`w-full flex items-center justify-between gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold border-t border-emerald-900/80 pt-2 cursor-pointer transition-colors ${
-                  isProUser ? 'text-amber-300 bg-amber-950/30' : 'text-amber-300 hover:bg-forest-900/60'
-                }`}
-              >
-                <span className="flex items-center gap-2">
-                  <UserIcon size={14} />
-                  <span>Hồ sơ &amp; Lịch sử học tập</span>
-                </span>
-                {isProUser && (
-                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-black bg-gradient-to-r from-amber-400 to-yellow-300 text-stone-950">
-                    <Crown size={10} className="fill-stone-950" /> PRO
-                  </span>
-                )}
-              </button>
+              <div className="space-y-2 pt-2 border-t border-emerald-900/80">
+                <div
+                  className={`p-3 rounded-2xl text-stone-100 ${
+                    isProUser
+                      ? 'bg-gradient-to-r from-emerald-950 via-[#063e30] to-amber-950/70 border-2 border-amber-400 shadow-md shadow-amber-500/20'
+                      : 'bg-emerald-950/60 border border-emerald-800/80'
+                  }`}
+                >
+                  <div className="flex items-center gap-2.5">
+                    <div className="relative shrink-0">
+                      <div
+                        className={`w-9 h-9 rounded-full bg-[#022C22] flex items-center justify-center font-bold text-xs overflow-hidden ${
+                          isProUser ? 'ring-2 ring-amber-400 text-amber-300' : 'ring-2 ring-amber-500/40 text-amber-300'
+                        }`}
+                      >
+                        {currentUser.avatar ? (
+                          <img
+                            src={currentUser.avatar}
+                            alt={currentUser.full_name}
+                            className="w-full h-full object-cover"
+                          />
+                        ) : (
+                          <span>{currentUser.full_name.charAt(0).toUpperCase()}</span>
+                        )}
+                      </div>
+                      {isProUser && (
+                        <span className="absolute -top-1.5 -right-1.5 w-4 h-4 rounded-full bg-gradient-to-tr from-amber-500 via-amber-400 to-yellow-300 text-stone-950 flex items-center justify-center text-[9px] shadow-xs font-black ring-1 ring-emerald-950">
+                          👑
+                        </span>
+                      )}
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-center gap-1.5">
+                        <p className="text-xs font-bold text-white truncate">{currentUser.full_name}</p>
+                        {isProUser && (
+                          <span className="inline-flex items-center gap-0.5 px-1.5 py-0.2 rounded text-[9px] font-black bg-gradient-to-r from-amber-400 to-yellow-300 text-stone-950">
+                            👑 PRO
+                          </span>
+                        )}
+                      </div>
+                      <p className="text-[10px] text-emerald-300 font-mono truncate">{currentUser.email}</p>
+                    </div>
+                    {isProUser ? (
+                      <span className="px-2 py-0.5 rounded text-[10px] font-sans font-black bg-gradient-to-r from-amber-400 to-yellow-300 text-stone-950 shadow-xs border border-amber-300">
+                        {expiryDisplayText ? (expiryDisplayText.includes('(') ? expiryDisplayText.split('(')[0].trim() : expiryDisplayText) : 'PRO VIP'}
+                      </span>
+                    ) : (
+                      <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-amber-400 text-stone-950">
+                        {currentUser.role === 'admin' ? 'Admin' : 'Học Viên'}
+                      </span>
+                    )}
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-2">
+                  <button
+                    onClick={() => {
+                      onSelectScreen('profile', 'info');
+                      setShowMobileNav(false);
+                    }}
+                    className="py-2 px-3 rounded-xl bg-emerald-900/40 border border-emerald-800 text-stone-200 text-xs font-semibold flex items-center justify-center gap-1.5 hover:bg-emerald-800/50 cursor-pointer"
+                  >
+                    <UserIcon size={13} className="text-amber-300" />
+                    <span>Hồ sơ cá nhân</span>
+                  </button>
+
+                  <button
+                    onClick={() => {
+                      onSelectScreen('profile', 'history');
+                      setShowMobileNav(false);
+                    }}
+                    className="py-2 px-3 rounded-xl bg-emerald-900/40 border border-emerald-800 text-stone-200 text-xs font-semibold flex items-center justify-center gap-1.5 hover:bg-emerald-800/50 cursor-pointer"
+                  >
+                    <ClipboardList size={13} className="text-amber-300" />
+                    <span>Lịch sử thi</span>
+                  </button>
+                </div>
+
+                <button
+                  onClick={() => {
+                    setShowMobileNav(false);
+                    onLogout();
+                  }}
+                  className="w-full py-2 px-3 rounded-xl bg-rose-950/40 border border-rose-900/60 text-rose-300 text-xs font-semibold flex items-center justify-center gap-1.5 hover:bg-rose-900/50 cursor-pointer"
+                >
+                  <LogOut size={13} />
+                  <span>Đăng Xuất</span>
+                </button>
+              </div>
             ) : (
               <button
                 onClick={() => {

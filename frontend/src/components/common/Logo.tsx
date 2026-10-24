@@ -228,7 +228,7 @@ export const Logo: React.FC<LogoProps> = ({
 
           {/* Badge */}
           {showBadge && (
-            <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[9px] sm:text-[10px] font-semibold bg-[#032B20]/90 text-amber-300 border border-amber-400/30 whitespace-nowrap leading-none tracking-wide shadow-xs">
+            <span className="hidden sm:inline-flex items-center px-2 py-0.5 rounded-full text-[9px] sm:text-[10px] font-semibold bg-[#032B20]/90 text-amber-300 border border-amber-400/30 whitespace-nowrap leading-none tracking-wide shadow-xs">
               Cambridge &amp; Flashcard
             </span>
           )}
