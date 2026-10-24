@@ -1,13 +1,164 @@
 // controllers/aiGradingController.js
 // Giám khảo khảo thí IELTS Senior Examiner chuẩn quốc tế (Cambridge / British Council / IDP)
 // Chấm điểm IELTS Writing & Speaking tự động chuyên sâu bằng Gemini AI
+// Tích hợp: 4 tiêu chí 25%, Đối chiếu số liệu gốc Task 1, Thesis check Task 2, Inline Corrections (grammar/vocab/cohesion), Deep Analytics (Complexity, Overused Words) & Paragraph Audit
 
 const { getLiveApiKey } = require('./ankiAiController');
 
+// Bản đồ từ vựng cơ bản và gợi ý từ vựng học thuật C1/C2 (Academic Synonyms)
+const ACADEMIC_WORDS_MAP = {
+  important: ['crucial', 'vital', 'paramount', 'indispensable', 'pivotal'],
+  good: ['beneficial', 'advantageous', 'favorable', 'commendable', 'salutary'],
+  bad: ['detrimental', 'adverse', 'deleterious', 'injurious'],
+  increase: ['escalate', 'proliferate', 'surge', 'witness an upward trajectory'],
+  decrease: ['diminish', 'plummet', 'experience a downturn', 'dwindle'],
+  people: ['individuals', 'citizens', 'the populace', 'inhabitants', 'cohorts'],
+  many: ['a myriad of', 'a multitude of', 'numerous', 'copious'],
+  big: ['substantial', 'considerable', 'monumental', 'extensive'],
+  small: ['negligible', 'marginal', 'inconsequential', 'modest'],
+  show: ['illustrate', 'demonstrate', 'depict', 'manifest', 'exemplify'],
+  think: ['contend', 'advocate', 'posit', 'maintain', 'concur'],
+  very: ['exceedingly', 'substantially', 'markedly', 'exceptionally']
+};
+
+// Hàm tính toán chỉ số học thuật chuyên sâu (Sentence Complexity, Overused Words, Paragraph Audit)
+function computeWritingAnalytics(essayContent, taskType) {
+  const text = essayContent || '';
+  const words = text.toLowerCase().match(/\b[a-z'-]+\b/g) || [];
+  const sentences = text.split(/(?<=[.?!])\s+/).filter(s => s.trim().length > 0);
+
+  // 1. Phân loại cấu trúc câu (Sentence Complexity Meter)
+  let complexCount = 0;
+  let compoundCount = 0;
+  let simpleCount = 0;
+
+  const complexTriggers = /\b(although|even though|though|because|since|whereas|while|whilst|which|that|who|whom|whose|if|unless|provided that|despite|in spite of|in order that|so that)\b/i;
+  const compoundTriggers = /\b(and|but|or|nor|for|yet|so|however|moreover|furthermore|nevertheless|consequently|in addition)\b/i;
+
+  for (const s of sentences) {
+    if (complexTriggers.test(s)) {
+      complexCount++;
+    } else if (compoundTriggers.test(s)) {
+      compoundCount++;
+    } else {
+      simpleCount++;
+    }
+  }
+
+  const totalSentences = sentences.length || 1;
+  const complexPct = Math.round((complexCount / totalSentences) * 100);
+  const compoundPct = Math.round((compoundCount / totalSentences) * 100);
+  const simplePct = Math.round((simpleCount / totalSentences) * 100);
+
+  let sentenceFeedback = '';
+  if (complexPct >= 40) {
+    sentenceFeedback = 'Cấu trúc câu rất đa dạng với tỷ lệ câu phức cao, đáp ứng tốt tiêu chuẩn Band 7.5+ Grammatical Range.';
+  } else if (complexPct >= 20) {
+    sentenceFeedback = 'Bài viết có sự phối hợp giữa câu đơn và câu ghép, nhưng nên bổ sung thêm mệnh đề quan hệ rút gọn hoặc đảo ngữ để đạt Band 7.0+.';
+  } else {
+    sentenceFeedback = 'Bài viết có tỷ lệ câu đơn cao (' + simplePct + '%). Cần chuyển một số câu đơn thành câu phức liên kết bằng "although, whereas, which" để nâng Band.';
+  }
+
+  // 2. Cảnh báo từ bị lặp quá nhiều & Gợi ý từ đồng nghĩa C1/C2
+  const wordFreq = {};
+  for (const w of words) {
+    if (ACADEMIC_WORDS_MAP[w]) {
+      wordFreq[w] = (wordFreq[w] || 0) + 1;
+    }
+  }
+
+  const overusedWords = [];
+  for (const [w, count] of Object.entries(wordFreq)) {
+    if (count >= 2) {
+      overusedWords.push({
+        word: w,
+        count: count,
+        suggestedSynonyms: ACADEMIC_WORDS_MAP[w]
+      });
+    }
+  }
+
+  // 3. Phân tích cấu trúc từng đoạn văn (Paragraph Structure Audit)
+  const rawParagraphs = text.split(/\n+/).map(p => p.trim()).filter(Boolean);
+  const paragraphAudit = rawParagraphs.map((para, idx) => {
+    let paraType = '';
+    let assessment = 'good';
+    let comment = '';
+
+    if (taskType === 'task1') {
+      if (idx === 0) {
+        paraType = 'Introduction (Mở bài)';
+        const hasParaphrase = /\b(shows|illustrates|depicts|presents|compares|gives information|demonstrates)\b/i.test(para);
+        assessment = hasParaphrase ? 'good' : 'warning';
+        comment = hasParaphrase
+          ? 'Đã mở bài bằng cách paraphrase đề bài tự nhiên.'
+          : 'Nên dùng các động từ học thuật như "illustrates", "demonstrates" để giới thiệu biểu đồ.';
+      } else if (idx === 1) {
+        paraType = 'Overview (Tổng quan)';
+        const hasOverview = /\b(overall|in general|it is noticeable|it is clear|notably)\b/i.test(para);
+        assessment = hasOverview ? 'good' : 'warning';
+        comment = hasOverview
+          ? 'Đã có câu Overview khái quát xu hướng chính hoặc nhóm nổi bật.'
+          : 'Thiếu liên từ nhận diện Overview ("Overall, it is clear that..."). Đây là yếu tố sống còn để vượt Band 5.0 Task Achievement!';
+      } else {
+        paraType = `Body Paragraph ${idx - 1} (Thân bài)`;
+        const hasData = /\d+%?|\b(percent|rose|increased|decreased|dropped|higher|lower)\b/i.test(para);
+        assessment = hasData ? 'good' : 'warning';
+        comment = hasData
+          ? 'Đã đưa số liệu minh họa và có cấu trúc so sánh tương quan.'
+          : 'Cần bổ sung các mốc số liệu cụ thể hoặc phần trăm từ biểu đồ để chứng minh.';
+      }
+    } else {
+      if (idx === 0) {
+        paraType = 'Introduction (Mở bài)';
+        const hasThesis = /\b(in my opinion|i believe|i agree|i disagree|this essay|i firmly contend|my view)\b/i.test(para);
+        assessment = hasThesis ? 'good' : 'warning';
+        comment = hasThesis
+          ? 'Đã có câu Thesis Statement thể hiện quan điểm rõ ràng.'
+          : 'Chưa thấy rõ câu Thesis Statement nêu lập trường cá nhân trong Mở bài.';
+      } else if (idx === rawParagraphs.length - 1 && rawParagraphs.length > 2) {
+        paraType = 'Conclusion (Kết luận)';
+        const hasConcl = /\b(in conclusion|to conclude|to sum up|in summary)\b/i.test(para);
+        assessment = hasConcl ? 'good' : 'warning';
+        comment = hasConcl
+          ? 'Có kết bài tóm tắt luận điểm và tái khẳng định quan điểm nhất quán.'
+          : 'Cần mở đầu đoạn kết bằng liên từ chuẩn mực ("In conclusion, ...").';
+      } else {
+        paraType = `Body Paragraph ${idx} (Thân bài)`;
+        const hasExample = /\b(for example|for instance|specifically|such as|evidence suggests|a case in point)\b/i.test(para);
+        assessment = hasExample ? 'good' : 'warning';
+        comment = hasExample
+          ? 'Có dẫn chứng cụ thể hỗ trợ cho luận điểm.'
+          : 'Nên bổ sung ví dụ thực tế ("For instance, ...") để luận điểm thuyết phục hơn.';
+      }
+    }
+
+    return {
+      paragraphIndex: idx + 1,
+      paragraphType: paraType,
+      wordCount: para.split(/\s+/).filter(Boolean).length,
+      assessment,
+      comment
+    };
+  });
+
+  return {
+    sentenceComplexity: {
+      totalSentences,
+      simpleCount,
+      compoundCount,
+      complexCount,
+      simplePct,
+      compoundPct,
+      complexPct,
+      feedback: sentenceFeedback
+    },
+    overusedWords,
+    paragraphAudit
+  };
+}
+
 // Hàm làm tròn điểm IELTS chính thức (IELTS Rounding Rule: làm tròn tới 0.5 gần nhất)
-// Nếu phần thập phân < 0.25 -> làm tròn xuống (.0)
-// Nếu phần thập phân >= 0.25 và < 0.75 -> làm tròn thành .5
-// Nếu phần thập phân >= 0.75 -> làm tròn lên (.0 tiếp theo)
 function roundIeltsBand(rawScore) {
   if (typeof rawScore !== 'number' || isNaN(rawScore)) return 6.0;
   const clamped = Math.max(0, Math.min(9.0, rawScore));
@@ -28,7 +179,7 @@ function calculateCompositeWritingBand(task1Band, task2Band) {
   return roundIeltsBand(weighted);
 }
 
-// Hàm làm sạch chuỗi JSON trả về từ Gemini (bỏ qua markdown code block ```json ... ```)
+// Hàm làm sạch chuỗi JSON trả về từ Gemini
 function extractJsonFromText(rawText) {
   if (!rawText) return null;
   let cleaned = rawText.trim();
@@ -65,7 +216,6 @@ function generateWritingFallback(taskType, prompt, essayContent, chartType, char
 
   const isTask1 = taskType === 'task1';
 
-  // Sample data verification check for Task 1
   const dataAccuracyCheck = isTask1 ? {
     status: "PASS",
     accuracyScore: 7.5,
@@ -81,7 +231,6 @@ function generateWritingFallback(taskType, prompt, essayContent, chartType, char
     ]
   } : null;
 
-  // Sample essay structure check for Task 2
   const essayStructureCheck = !isTask1 ? {
     detectedSubtype: essaySubtype || "Opinion / Discussion",
     hasClearThesis: true,
@@ -94,19 +243,24 @@ function generateWritingFallback(taskType, prompt, essayContent, chartType, char
     {
       original: isTask1 ? "The chart shows the number of people going up quickly." : "In the first place, people think that technology has bad effect on children.",
       corrected: isTask1 ? "The chart illustrates an exponential growth in the proportion of participants over the surveyed period." : "First and foremost, there is a widespread concern that digital technology exerts an adverse impact on children's cognitive development.",
-      explanation: isTask1 ? "Nâng cấp cụm 'going up quickly' thành 'exponential growth' và dùng từ 'illustrates' chuẩn Academic." : "Nâng cấp cụm 'bad effect' thành collocation học thuật 'exerts an adverse impact on' và mở rộng mệnh đề tự nhiên hơn."
+      explanation: isTask1 ? "Nâng cấp cụm 'going up quickly' thành 'exponential growth' và dùng từ 'illustrates' chuẩn Academic." : "Nâng cấp cụm 'bad effect' thành collocation học thuật 'exerts an adverse impact on' và mở rộng mệnh đề tự nhiên hơn.",
+      type: "vocabulary"
     },
     {
       original: isTask1 ? "France is bigger than Germany with 40%." : "Because of many reasons, education should be free for all students.",
       corrected: isTask1 ? "France surpassed Germany, accounting for approximately 40% of the aggregate total." : "For a multitude of socio-economic reasons, higher education should be publicly funded for all eligible students.",
-      explanation: isTask1 ? "Sử dụng cấu trúc so sánh học thuật 'surpassed..., accounting for...' thay vì câu đơn 'is bigger than'." : "Thay thế 'many reasons' bằng 'a multitude of socio-economic reasons' và 'free' bằng 'publicly funded'."
+      explanation: isTask1 ? "Sử dụng cấu trúc so sánh học thuật 'surpassed..., accounting for...' thay vì câu đơn 'is bigger than'." : "Thay thế 'many reasons' bằng 'a multitude of socio-economic reasons' và 'free' bằng 'publicly funded'.",
+      type: "grammar"
     },
     {
       original: isTask1 ? "To conclude, the line was the highest in 2020." : "To sum up, both sides have good points and bad points.",
       corrected: isTask1 ? "Overall, it is evident that the figure reached its pinnacle in 2020 before plateauing." : "In conclusion, while both viewpoints present valid arguments, I firmly believe that the long-term benefits outweigh the potential drawbacks.",
-      explanation: isTask1 ? "Dùng 'Overall, it is evident that...' và 'reached its pinnacle' chuẩn Band 8.0+ cho câu tổng quan." : "Tránh dùng từ ngữ informal 'good points and bad points' trong câu kết luận của IELTS Academic."
+      explanation: isTask1 ? "Dùng 'Overall, it is evident that...' và 'reached its pinnacle' chuẩn Band 8.0+ cho câu tổng quan." : "Tránh dùng từ ngữ informal 'good points and bad points' trong câu kết luận của IELTS Academic.",
+      type: "cohesion"
     }
   ];
+
+  const analytics = computeWritingAnalytics(essayContent, taskType);
 
   return {
     overallBand,
@@ -136,6 +290,8 @@ function generateWritingFallback(taskType, prompt, essayContent, chartType, char
     },
     dataAccuracyCheck,
     essayStructureCheck,
+    academicAnalytics: analytics,
+    paragraphAudit: analytics.paragraphAudit,
     overview: isTask1
       ? `Bài viết Task 1 đã truyền tải được bức tranh tổng thể của biểu đồ và phân tích số liệu tương đối chuẩn xác. Để đạt Band 7.5+, hãy sử dụng đa dạng hơn các cấu trúc báo cáo số liệu (proportions, figures, percentages) và kết nối các nhóm đối tượng logic hơn.`
       : `Bài viết Task 2 thể hiện tư duy phản biện tốt, lập luận có chiều sâu và bố cục chặt chẽ. Để bứt phá lên Band 8.0, hãy trau chuốt các liên kết ngầm giữa các ý và sử dụng cấu trúc đảo ngữ hoặc câu điều kiện hỗn hợp.`,
@@ -305,7 +461,6 @@ exports.gradeWriting = async (req, res) => {
       'gemini-3.5-flash'
     ];
 
-    // Xây dựng hướng dẫn chấm thi (System Instruction) tuân thủ nghiêm ngặt phương án chuẩn
     let specificGuidelines = '';
     if (isTask1) {
       specificGuidelines = `
@@ -397,16 +552,17 @@ ${specificGuidelines}
   "overview": "Tóm tắt ưu điểm nổi bật và điểm mấu chốt cần cải thiện để lên Band cao hơn (2-3 câu tiếng Việt súc tích).",
   "sentenceCorrections": [
     {
-      "original": "Câu tiếng Anh có lỗi sai hoặc diễn đạt chưa tự nhiên trích từ bài của học viên",
+      "original": "Đoạn/câu trích NGUYÊN VĂN từ bài học viên (để hệ thống highlight chính xác)",
       "corrected": "Câu đã được nâng cấp theo chuẩn Band 8.0+",
-      "explanation": "Giải thích ngắn gọn lý do sửa bằng tiếng Việt (ngữ pháp, từ vựng hoặc collocation)"
+      "explanation": "Giải thích ngắn gọn lý do sửa bằng tiếng Việt",
+      "type": "grammar" (lỗi ngữ pháp/thì/giới từ) HOẶC "vocabulary" (từ vựng cơ bản/lặp từ) HOẶC "cohesion" (liên kết câu/từ nối)
     }
   ],
   "modelAnswer": "Bài viết mẫu hoàn chỉnh đạt Band 8.5+ cho đúng đề bài này bằng tiếng Anh học thuật mẫu mực."
 }
 
 Quy tắc:
-- Hãy tìm ít nhất 3-5 câu cần cải thiện trong bài học viên để đưa vào sentenceCorrections.
+- Hãy tìm ít nhất 3-5 câu cần cải thiện trong bài học viên để đưa vào sentenceCorrections. Mỗi câu trích NGUYÊN VĂN từ bài viết học viên để hệ thống có thể đối chiếu và thay thế trực tiếp.
 - Chấm điểm công tâm, nghiêm túc, chuẩn theo IELTS Band Descriptors chính thức của Cambridge.`;
 
     const chartDetailsText = chartDetails
@@ -424,6 +580,8 @@ Dạng bài định hướng: ${essaySubtype || 'Tự động nhận diện'}`}
 
 === BÀI VIẾT CỦA HỌC VIÊN (${taskType.toUpperCase()}) ===
 ${essayContent}`;
+
+    const analytics = computeWritingAnalytics(essayContent, taskType);
 
     for (const model of candidateModels) {
       try {
@@ -457,7 +615,6 @@ ${essayContent}`;
           if (candidateText) {
             const parsed = extractJsonFromText(candidateText);
             if (parsed && (parsed.overallBand !== undefined || parsed.criteria)) {
-              // Đảm bảo overallBand được làm tròn chuẩn IELTS
               const criteriaBands = [
                 parsed.criteria?.taskAchievement?.band,
                 parsed.criteria?.coherenceCohesion?.band,
@@ -470,6 +627,21 @@ ${essayContent}`;
                 parsed.overallBand = roundIeltsBand(avg);
               } else if (parsed.overallBand) {
                 parsed.overallBand = roundIeltsBand(parsed.overallBand);
+              }
+
+              // Gắn kết quả Deep Analytics & Paragraph Audit
+              parsed.academicAnalytics = parsed.academicAnalytics || analytics;
+              parsed.paragraphAudit = parsed.paragraphAudit || analytics.paragraphAudit;
+
+              // Đảm bảo type phân loại lỗi ('grammar' | 'vocabulary' | 'cohesion')
+              if (Array.isArray(parsed.sentenceCorrections)) {
+                parsed.sentenceCorrections = parsed.sentenceCorrections.map((sc, idx) => {
+                  let t = sc.type;
+                  if (!t || !['grammar', 'vocabulary', 'cohesion'].includes(t)) {
+                    t = idx % 3 === 0 ? 'grammar' : idx % 3 === 1 ? 'vocabulary' : 'cohesion';
+                  }
+                  return { ...sc, type: t };
+                });
               }
 
               // Tính toán điểm Writing tổng hợp nếu có điểm của Task kia
@@ -500,7 +672,6 @@ ${essayContent}`;
       }
     }
 
-    // Nếu các model online đều không phản hồi, dùng fallback thông minh
     const fallbackData = generateWritingFallback(taskType, prompt, essayContent, chartType, chartDetails, essaySubtype);
     if (previousTaskBand) {
       const composite = calculateCompositeWritingBand(
@@ -701,8 +872,7 @@ BẢN GỠ BĂNG CÂU TRẢ LỜI CỦA HỌC VIÊN:
   }
 };
 
-// API tính điểm Writing tổng hợp (Composite Band Calculation)
-// Writing Band = round_0.5((T1 + 2 * T2) / 3)
+// API tính điểm Writing tổng hợp
 exports.calculateCompositeBand = (req, res) => {
   try {
     const { task1Band, task2Band } = req.body;

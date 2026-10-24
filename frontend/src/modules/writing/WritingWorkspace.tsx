@@ -1,5 +1,14 @@
 // frontend/src/modules/writing/WritingWorkspace.tsx
 // Phòng Luyện Viết tập trung (Split-Screen Writing Studio) tích hợp AI Examiner
+// Tích hợp: 
+// 1. Chữa bài trực quan ngay trên văn bản (Inline Highlighting & 1-Click Replace)
+// 2. Bảng phân tích chỉ số học thuật chuyên sâu (Sentence Complexity, Overused Words, Synonyms)
+// 3. Bộ kiểm tra cấu trúc từng đoạn văn (Paragraph Structure Audit)
+// 4. Bốn tiêu chí chuẩn IELTS 25% mỗi tiêu chí
+// 5. Đối chiếu số liệu gốc Task 1 & Lập trường Thesis Task 2
+// 6. Tính điểm Writing tổng hợp (Composite Band Calculator)
+// 7. Chế độ Viết lại lần 2 (Rewrite v2 & Version Tracking)
+// 8. Lịch sử bài viết phân tách riêng biệt cho từng người dùng
 
 import React, { useState, useEffect } from 'react';
 import {
@@ -8,21 +17,41 @@ import {
   Play,
   Pause,
   RotateCcw,
-  
   AlertCircle,
   CheckCircle2,
   PlusCircle,
   X,
+  History,
+  Sparkles,
+  BookOpen,
+  Trash2,
+  Edit3,
 } from 'lucide-react';
 import { mockWritingPrompts, WritingPrompt } from '../../data/mockWritingSpeakingPrompts';
 import { useProStore } from '../pro/useProStore';
+import { useAuth } from '../../context/AuthContext';
 import { WritingEvaluationModal, WritingEvaluationResult } from './WritingEvaluationModal';
+
+export interface WritingHistoryEntry {
+  id: string;
+  timestamp: string;
+  taskType: 'task1' | 'task2';
+  promptTitle: string;
+  promptText: string;
+  essayContent: string;
+  overallBand: number;
+  wordCount: number;
+  version: number;
+  evaluationData: WritingEvaluationResult;
+}
 
 interface WritingWorkspaceProps {
   onNotify?: (message: string, type: 'success' | 'error' | 'info') => void;
 }
 
 export const WritingWorkspace: React.FC<WritingWorkspaceProps> = ({ onNotify }) => {
+  const { user } = useAuth();
+
   // Pro Store
   const isPro = useProStore((state) => state.isPro);
   const writingQuotaLeft = useProStore((state) => state.writingQuotaLeft);
@@ -36,13 +65,37 @@ export const WritingWorkspace: React.FC<WritingWorkspaceProps> = ({ onNotify }) 
   const [isCustomModalOpen, setIsCustomModalOpen] = useState<boolean>(false);
   const [customPromptInput, setCustomPromptInput] = useState<string>('');
 
-  // Editor State
+  // Editor State & Version Tracking
   const [essayContent, setEssayContent] = useState<string>('');
+  const [essayVersion, setEssayVersion] = useState<number>(1);
+  const [previousVersionBand, setPreviousVersionBand] = useState<number | null>(null);
+  const [isRewriteMode, setIsRewriteMode] = useState<boolean>(false);
+
+  // Evaluation & Band Memory
   const [isEvaluating, setIsEvaluating] = useState<boolean>(false);
   const [evaluationResult, setEvaluationResult] = useState<WritingEvaluationResult | null>(null);
   const [isResultModalOpen, setIsResultModalOpen] = useState<boolean>(false);
   const [lastTask1Band, setLastTask1Band] = useState<number | null>(null);
   const [lastTask2Band, setLastTask2Band] = useState<number | null>(null);
+
+  // Per-user Writing History
+  const [isHistoryDrawerOpen, setIsHistoryDrawerOpen] = useState<boolean>(false);
+  const [historyList, setHistoryList] = useState<WritingHistoryEntry[]>([]);
+  const historyStorageKey = user?.id ? `eng4u_writing_history_${user.id}` : 'eng4u_writing_history_guest';
+
+  // Load history from localStorage
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem(historyStorageKey);
+      if (stored) {
+        setHistoryList(JSON.parse(stored));
+      } else {
+        setHistoryList([]);
+      }
+    } catch (e) {
+      console.warn('Cannot parse history:', e);
+    }
+  }, [historyStorageKey]);
 
   // Timer State
   const defaultMinutes = selectedTaskType === 'task1' ? 20 : 40;
@@ -69,11 +122,14 @@ export const WritingWorkspace: React.FC<WritingWorkspaceProps> = ({ onNotify }) 
     return () => clearInterval(interval);
   }, [isTimerRunning, secondsLeft, onNotify]);
 
-  // Reset timer when switching task
+  // Reset timer & editor when switching task
   const handleTaskTypeChange = (type: 'task1' | 'task2') => {
     setSelectedTaskType(type);
     setActivePromptIndex(0);
     setCustomPrompt(null);
+    setEssayVersion(1);
+    setPreviousVersionBand(null);
+    setIsRewriteMode(false);
     const newMins = type === 'task1' ? 20 : 40;
     setSecondsLeft(newMins * 60);
     setIsTimerRunning(false);
@@ -108,7 +164,49 @@ export const WritingWorkspace: React.FC<WritingWorkspaceProps> = ({ onNotify }) 
     setCustomPromptInput('');
   };
 
-  // Submission to Gemini AI Grading Backend
+  // 1-Click Apply Correction Handler
+  const handleApplyCorrection = (original: string, replacement: string) => {
+    setEssayContent((prev) => {
+      if (prev.includes(original)) return prev.replace(original, replacement);
+      const re = new RegExp(original.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i');
+      return prev.replace(re, replacement);
+    });
+    if (onNotify) onNotify('Đã áp dụng sửa câu vào bài viết!', 'success');
+  };
+
+  // Start Rewrite V2 Handler
+  const handleStartRewrite = (revisedContent: string) => {
+    setEssayContent(revisedContent);
+    setPreviousVersionBand(evaluationResult?.overallBand || null);
+    setEssayVersion((prev) => prev + 1);
+    setIsRewriteMode(true);
+    setIsTimerRunning(true);
+    if (onNotify) {
+      onNotify(`Đã nạp văn bản sửa! Bạn đang viết lại Phiên bản V${essayVersion + 1}.`, 'info');
+    }
+  };
+
+  // Clear Writing History
+  const handleClearHistory = () => {
+    if (window.confirm('Bạn có chắc chắn muốn xóa toàn bộ lịch sử làm bài viết của tài khoản này?')) {
+      localStorage.removeItem(historyStorageKey);
+      setHistoryList([]);
+      if (onNotify) onNotify('Đã xóa toàn bộ lịch sử viết bài.', 'info');
+    }
+  };
+
+  // Load entry from history
+  const handleLoadFromHistory = (entry: WritingHistoryEntry) => {
+    setEssayContent(entry.essayContent);
+    setSelectedTaskType(entry.taskType);
+    setEvaluationResult(entry.evaluationData);
+    setEssayVersion(entry.version || 1);
+    setIsHistoryDrawerOpen(false);
+    setIsResultModalOpen(true);
+    if (onNotify) onNotify(`Đã mở lại bài viết từ lịch sử (${entry.timestamp}).`, 'info');
+  };
+
+  // Submission to AI Grading Backend
   const handleSubmitForGrading = async () => {
     if (wordCount < 30) {
       if (onNotify) {
@@ -120,7 +218,7 @@ export const WritingWorkspace: React.FC<WritingWorkspaceProps> = ({ onNotify }) 
     // Check Freemium Quota
     const hasQuota = consumeWritingQuota();
     if (!hasQuota) {
-      return; // Modal Upgrade already triggered by store
+      return;
     }
 
     setIsEvaluating(true);
@@ -147,6 +245,35 @@ export const WritingWorkspace: React.FC<WritingWorkspaceProps> = ({ onNotify }) 
         } else {
           setLastTask2Band(resData.data.overallBand);
         }
+
+        // Save to Per-User Writing History
+        const newHistoryEntry: WritingHistoryEntry = {
+          id: `write-${Date.now()}`,
+          timestamp: new Date().toLocaleString('vi-VN', {
+            hour: '2-digit',
+            minute: '2-digit',
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric',
+          }),
+          taskType: selectedTaskType,
+          promptTitle: currentPrompt.title,
+          promptText: currentPrompt.prompt,
+          essayContent: essayContent,
+          overallBand: resData.data.overallBand,
+          wordCount: wordCount,
+          version: essayVersion,
+          evaluationData: resData.data,
+        };
+
+        const updatedHistory = [newHistoryEntry, ...historyList];
+        setHistoryList(updatedHistory);
+        try {
+          localStorage.setItem(historyStorageKey, JSON.stringify(updatedHistory));
+        } catch (err) {
+          console.warn('Storage save failed:', err);
+        }
+
         setIsResultModalOpen(true);
         if (onNotify) {
           onNotify(`Đã chấm xong! Điểm ước lượng: Band ${resData.data.overallBand}`, 'success');
@@ -164,7 +291,7 @@ export const WritingWorkspace: React.FC<WritingWorkspaceProps> = ({ onNotify }) 
     }
   };
 
-  // Render SVG / Diagram previews for Task 1
+  // Render Visual Diagrams for Task 1
   const renderTask1Diagram = () => {
     if (!currentPrompt.chartDetails) return null;
     const { chartType } = currentPrompt;
@@ -173,42 +300,30 @@ export const WritingWorkspace: React.FC<WritingWorkspaceProps> = ({ onNotify }) 
       const labels = currentPrompt.chartDetails.labels || [];
       const { series, unit } = currentPrompt.chartDetails;
       return (
-        <div className="bg-white p-4 rounded-2xl border border-stone-200 shadow-xs space-y-3">
+        <div className="bg-white p-4 rounded-2xl border border-stone-200 shadow-xs space-y-4">
           <div className="flex items-center justify-between text-xs text-stone-500">
-            <span className="font-semibold text-stone-800">Biểu đồ cột: {unit}</span>
+            <span className="font-semibold text-stone-800">Biểu đồ cột so sánh ({unit})</span>
             <div className="flex items-center gap-3">
               {series?.map((s, idx) => (
                 <div key={idx} className="flex items-center gap-1.5">
-                  <span className="w-3 h-3 rounded-xs" style={{ backgroundColor: s.color }} />
+                  <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: s.color }} />
                   <span className="text-[11px] font-medium">{s.name}</span>
                 </div>
               ))}
             </div>
           </div>
 
-          {/* SVG Bar Chart */}
-          <div className="h-44 w-full flex items-end justify-around gap-2 pt-4 px-2 border-b border-stone-200">
-            {labels.map((label, lIdx) => (
-              <div key={lIdx} className="flex-1 flex flex-col items-center gap-1 h-full justify-end">
-                <div className="flex items-end gap-1.5 h-32 w-full justify-center">
-                  {series?.map((s, sIdx) => {
-                    const heightPercent = Math.min(100, (s.values[lIdx] / 50) * 100);
-                    return (
-                      <div
-                        key={sIdx}
-                        className="w-4 sm:w-6 rounded-t transition-all duration-300 relative group"
-                        style={{ height: `${heightPercent}%`, backgroundColor: s.color }}
-                      >
-                        <span className="opacity-0 group-hover:opacity-100 absolute -top-6 left-1/2 -translate-x-1/2 bg-stone-900 text-white text-[10px] px-1 py-0.5 rounded whitespace-nowrap transition-opacity">
-                          {s.values[lIdx]}%
-                        </span>
-                      </div>
-                    );
-                  })}
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-2">
+            {labels.map((country, idx) => (
+              <div key={idx} className="p-3 rounded-xl bg-stone-50 border border-stone-200 text-center space-y-1.5">
+                <span className="text-xs font-bold text-stone-800 block truncate">{country}</span>
+                <div className="flex items-center justify-center gap-2 text-xs font-mono">
+                  {series?.map((s, sIdx) => (
+                    <span key={sIdx} className="font-bold" style={{ color: s.color }}>
+                      {s.values[idx]}%
+                    </span>
+                  ))}
                 </div>
-                <span className="text-[10px] sm:text-[11px] font-medium text-stone-600 truncate max-w-[80px] text-center">
-                  {label}
-                </span>
               </div>
             ))}
           </div>
@@ -236,7 +351,6 @@ export const WritingWorkspace: React.FC<WritingWorkspaceProps> = ({ onNotify }) 
             </div>
           </div>
 
-          {/* Simple Clean Table for Trend View */}
           <div className="overflow-x-auto">
             <table className="w-full text-xs text-left">
               <thead>
@@ -373,7 +487,7 @@ export const WritingWorkspace: React.FC<WritingWorkspaceProps> = ({ onNotify }) 
       );
     }
 
-        if (chartType === 'mixed' && currentPrompt.chartDetails?.mixedCharts) {
+    if (chartType === 'mixed' && currentPrompt.chartDetails?.mixedCharts) {
       const { mixedCharts } = currentPrompt.chartDetails;
       return (
         <div className="bg-white p-4 rounded-2xl border border-stone-200 shadow-xs space-y-4">
@@ -416,7 +530,7 @@ export const WritingWorkspace: React.FC<WritingWorkspaceProps> = ({ onNotify }) 
 
   return (
     <div className="min-h-screen bg-[#FAFAF9] text-stone-900 pb-16">
-      {/* Top Bar: Title & Quota */}
+      {/* Top Bar: Title, Quota & History */}
       <div className="bg-white border-b border-stone-200 sticky top-16 z-20 shadow-xs">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3 flex flex-wrap items-center justify-between gap-3">
           {/* Left Title & Task Switcher */}
@@ -467,8 +581,23 @@ export const WritingWorkspace: React.FC<WritingWorkspaceProps> = ({ onNotify }) 
             </button>
           </div>
 
-          {/* Right: Timer & Upgrade CTA */}
-          <div className="flex items-center gap-3">
+          {/* Right: History, Timer & Upgrade CTA */}
+          <div className="flex items-center gap-2.5">
+            {/* Writing History Button */}
+            <button
+              onClick={() => setIsHistoryDrawerOpen(true)}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-stone-100 hover:bg-stone-200 text-stone-700 border border-stone-200 transition-colors cursor-pointer"
+              title="Xem các bài viết đã nộp của tài khoản"
+            >
+              <History size={14} className="text-[#064E3B]" />
+              <span className="hidden sm:inline">Lịch sử bài viết</span>
+              {historyList.length > 0 && (
+                <span className="px-1.5 py-0.2 rounded-full text-[10px] font-bold bg-[#064E3B] text-white">
+                  {historyList.length}
+                </span>
+              )}
+            </button>
+
             {/* Timer Controller */}
             <div className="flex items-center gap-2 bg-stone-50 border border-stone-200 px-3 py-1.5 rounded-xl">
               <Clock size={15} className={secondsLeft < 300 ? 'text-rose-600 animate-pulse' : 'text-stone-500'} />
@@ -522,6 +651,9 @@ export const WritingWorkspace: React.FC<WritingWorkspaceProps> = ({ onNotify }) 
                 onClick={() => {
                   setActivePromptIndex(idx);
                   setCustomPrompt(null);
+                  setEssayVersion(1);
+                  setPreviousVersionBand(null);
+                  setIsRewriteMode(false);
                 }}
                 className={`px-3 py-1 rounded-lg text-xs font-medium shrink-0 transition-colors cursor-pointer ${
                   !customPrompt && activePromptIndex === idx
@@ -571,20 +703,19 @@ export const WritingWorkspace: React.FC<WritingWorkspaceProps> = ({ onNotify }) 
 
               {/* Academic Guidance Checklist */}
               <div className="p-3.5 rounded-2xl bg-emerald-50/60 border border-emerald-200 text-xs space-y-1.5">
-                <span className="font-bold text-[#064E3B] block">Gợi ý triển khai bài viết:</span>
+                <span className="font-bold text-[#064E3B] block">Quy chuẩn chấm Senior Examiner:</span>
                 <ul className="text-stone-600 space-y-1 list-disc pl-4 text-[11px] leading-relaxed">
                   {selectedTaskType === 'task1' ? (
                     <>
-                      <li>Đoạn 1: Paraphrase đề bài (Introduction).</li>
-                      <li>Đoạn 2: Overview nêu 2-3 đặc điểm nổi bật nhất (không đưa số liệu chi tiết vào đây).</li>
-                      <li>Đoạn 3 &amp; 4: Chi tiết số liệu và so sánh cụ thể giữa các nhóm.</li>
+                      <li><strong>4 Tiêu chí (25% mỗi tiêu chí)</strong>: Task Achievement, Coherence &amp; Cohesion, Lexical Resource, Grammatical Range.</li>
+                      <li><strong>Đối chiếu số liệu gốc</strong>: AI kiểm tra độ chuẩn xác của số liệu trích xuất từ biểu đồ, tránh nhầm lẫn hoặc tự suy diễn.</li>
+                      <li><strong>Cấu trúc chuẩn</strong>: Mở bài (Paraphrase) ➔ Overview (Đặc điểm nổi bật) ➔ 2 Thân bài phân tích và so sánh.</li>
                     </>
                   ) : (
                     <>
-                      <li>Mở bài: Paraphrase chủ đề và nêu rõ lập trường (Thesis Statement).</li>
-                      <li>Thân bài 1: Luận điểm thứ nhất + giải thích + ví dụ minh họa thực tế.</li>
-                      <li>Thân bài 2: Luận điểm phản biện hoặc chiều hướng thứ hai + phân tích sâu.</li>
-                      <li>Kết bài: Khẳng định lại quan điểm bằng cách diễn đạt mới.</li>
+                      <li><strong>4 Tiêu chí (25% mỗi tiêu chí)</strong>: Task Response, Coherence &amp; Cohesion, Lexical Resource, Grammatical Range.</li>
+                      <li><strong>Kiểm tra Thesis Statement</strong>: Lập trường cá nhân phải rõ ràng và nhất quán từ Mở bài đến Kết bài.</li>
+                      <li><strong>Phát triển ý có chiều sâu</strong>: Luận điểm cần đi kèm phân tích nguyên nhân - hệ quả và ví dụ thực tế.</li>
                     </>
                   )}
                 </ul>
@@ -594,7 +725,29 @@ export const WritingWorkspace: React.FC<WritingWorkspaceProps> = ({ onNotify }) 
 
           {/* Right Column: Writing Editor & Submission (7 cols) */}
           <div className="lg:col-span-7 space-y-4">
-            <div className="bg-white p-5 rounded-3xl border border-stone-200 shadow-xs flex flex-col min-h-[560px]">
+            <div className="bg-white p-5 rounded-3xl border border-stone-200 shadow-xs flex flex-col min-h-[580px]">
+              {/* Rewrite V2 Banner */}
+              {isRewriteMode && (
+                <div className="mb-3 p-3 rounded-2xl bg-amber-50 border border-amber-200 text-xs text-amber-950 flex items-center justify-between gap-3">
+                  <div className="flex items-center gap-2">
+                    <Edit3 size={15} className="text-amber-700 shrink-0" />
+                    <span>
+                      <strong>Phiên bản V{essayVersion} (Viết lại):</strong> Bài viết đã nạp các gợi ý sửa. Hãy trau chuốt thêm để vượt mốc Band {previousVersionBand?.toFixed(1) || 'cũ'}!
+                    </span>
+                  </div>
+                  <button
+                    onClick={() => {
+                      setIsRewriteMode(false);
+                      setEssayVersion(1);
+                      setPreviousVersionBand(null);
+                    }}
+                    className="text-[11px] font-semibold text-stone-500 hover:text-stone-800 underline"
+                  >
+                    Hủy chế độ viết lại
+                  </button>
+                </div>
+              )}
+
               {/* Editor Header: Word Count & Indicator */}
               <div className="flex items-center justify-between pb-3 border-b border-stone-200 shrink-0">
                 <div className="flex items-center gap-2">
@@ -647,36 +800,34 @@ export const WritingWorkspace: React.FC<WritingWorkspaceProps> = ({ onNotify }) 
 
               {/* Action Footer */}
               <div className="pt-4 border-t border-stone-200 flex flex-wrap items-center justify-between gap-3 shrink-0 mt-3">
-                <button
-                  onClick={() => {
-                    if (window.confirm('Bạn có chắc chắn muốn xóa toàn bộ nội dung vừa viết không?')) {
-                      setEssayContent('');
-                    }
-                  }}
-                  className="text-xs text-stone-500 hover:text-rose-600 transition-colors cursor-pointer"
-                >
-                  Xóa nội dung làm lại
-                </button>
+                <div className="flex items-center gap-2 text-xs text-stone-500">
+                  <Sparkles size={14} className="text-amber-500" />
+                  <span>AI Senior Examiner chấm theo đúng thang điểm chuẩn Cambridge</span>
+                </div>
 
                 <div className="flex items-center gap-3">
                   <button
+                    onClick={() => setEssayContent('')}
+                    disabled={!essayContent || isEvaluating}
+                    className="px-3.5 py-2 rounded-xl text-xs font-semibold text-stone-600 hover:bg-stone-100 disabled:opacity-50 transition-colors cursor-pointer"
+                  >
+                    Xóa trắng
+                  </button>
+
+                  <button
                     onClick={handleSubmitForGrading}
-                    disabled={isEvaluating}
-                    className={`px-6 py-3 rounded-xl font-bold text-xs sm:text-sm text-white shadow-md transition-all duration-200 flex items-center gap-2 cursor-pointer ${
-                      isEvaluating
-                        ? 'bg-stone-400 cursor-not-allowed'
-                        : 'bg-[#064E3B] hover:bg-[#043327] hover:shadow-lg'
-                    }`}
+                    disabled={isEvaluating || wordCount < 30}
+                    className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl font-bold text-xs bg-[#064E3B] hover:bg-[#043327] disabled:bg-stone-300 text-white shadow-sm transition-all cursor-pointer"
                   >
                     {isEvaluating ? (
                       <>
-                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                        <span>Giáo viên AI đang chấm bài...</span>
+                        <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                        <span>Giám khảo AI đang chấm...</span>
                       </>
                     ) : (
                       <>
-                        <PenTool size={16} className="text-amber-300" />
-                        <span>Nộp bài &amp; Chấm AI (Gemini)</span>
+                        <PenTool size={14} />
+                        <span>Nộp bài &amp; Chấm điểm AI</span>
                       </>
                     )}
                   </button>
@@ -687,34 +838,118 @@ export const WritingWorkspace: React.FC<WritingWorkspaceProps> = ({ onNotify }) 
         </div>
       </div>
 
+      {/* Slide-over Drawer: Lịch Sử Viết Bài (Tách riêng cho từng User) */}
+      {isHistoryDrawerOpen && (
+        <div className="fixed inset-0 z-50 flex justify-end bg-stone-900/50 backdrop-blur-xs">
+          <div className="w-full max-w-md bg-[#FAFAF9] h-full shadow-2xl flex flex-col border-l border-stone-200">
+            {/* Drawer Header */}
+            <div className="bg-[#064E3B] text-white p-5 flex items-center justify-between shrink-0">
+              <div className="flex items-center gap-2.5">
+                <History size={18} className="text-amber-300" />
+                <h3 className="text-base font-serif font-bold">Lịch Sử Làm Bài Viết</h3>
+              </div>
+              <button
+                onClick={() => setIsHistoryDrawerOpen(false)}
+                className="p-1 hover:bg-emerald-800 rounded-lg text-stone-300 hover:text-white"
+              >
+                <X size={18} />
+              </button>
+            </div>
+
+            {/* User identification badge */}
+            <div className="px-5 py-2.5 bg-white border-b border-stone-200 flex items-center justify-between text-xs text-stone-600 shrink-0">
+              <span>Tài khoản: <strong className="text-stone-900">{user?.full_name || user?.email || 'Khách'}</strong></span>
+              {historyList.length > 0 && (
+                <button
+                  onClick={handleClearHistory}
+                  className="text-rose-600 hover:text-rose-700 flex items-center gap-1 font-semibold"
+                >
+                  <Trash2 size={12} />
+                  <span>Xóa lịch sử</span>
+                </button>
+              )}
+            </div>
+
+            {/* List of Entries */}
+            <div className="flex-1 overflow-y-auto p-4 space-y-3">
+              {historyList.length > 0 ? (
+                historyList.map((entry) => (
+                  <div
+                    key={entry.id}
+                    className="p-4 rounded-2xl bg-white border border-stone-200 shadow-xs space-y-2.5 hover:border-emerald-300 transition-colors"
+                  >
+                    <div className="flex items-center justify-between text-xs">
+                      <span className="px-2 py-0.5 rounded-full font-bold uppercase text-[10px] bg-stone-100 text-stone-800">
+                        {entry.taskType.toUpperCase()}
+                      </span>
+                      <span className="text-stone-400 text-[11px]">{entry.timestamp}</span>
+                    </div>
+
+                    <h4 className="text-xs font-bold text-stone-900 line-clamp-1">
+                      {entry.promptTitle}
+                    </h4>
+
+                    <div className="flex items-center justify-between pt-1 border-t border-stone-100">
+                      <div className="flex items-baseline gap-1">
+                        <span className="text-[10px] font-semibold text-stone-500 uppercase">Band:</span>
+                        <span className="text-base font-bold text-[#064E3B]">
+                          {entry.overallBand.toFixed(1)}
+                        </span>
+                        <span className="text-[10px] text-stone-400">({entry.wordCount} từ)</span>
+                      </div>
+
+                      <button
+                        onClick={() => handleLoadFromHistory(entry)}
+                        className="px-3 py-1 rounded-lg text-xs font-semibold bg-emerald-50 hover:bg-emerald-100 text-[#064E3B] transition-colors cursor-pointer flex items-center gap-1"
+                      >
+                        <BookOpen size={12} />
+                        <span>Xem kết quả</span>
+                      </button>
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <div className="text-center py-12 text-stone-500 text-xs space-y-2">
+                  <History size={32} className="mx-auto text-stone-300" />
+                  <p className="font-semibold text-stone-700">Chưa có bài viết nào được lưu</p>
+                  <p className="text-[11px] text-stone-400">
+                    Mỗi khi bạn nộp bài và hoàn thành chấm điểm, bài viết sẽ tự động lưu vào đây để theo dõi tiến độ.
+                  </p>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Custom Prompt Modal */}
       {isCustomModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-stone-900/60 backdrop-blur-xs">
-          <div className="bg-white rounded-3xl p-6 w-full max-w-lg border border-stone-200 shadow-xl space-y-4">
-            <div className="flex items-center justify-between">
-              <h3 className="font-serif font-bold text-stone-900 text-lg">
-                Nhập đề bài IELTS của bạn
+          <div className="bg-white rounded-3xl p-6 max-w-lg w-full border border-stone-200 shadow-2xl space-y-4">
+            <div className="flex items-center justify-between pb-2 border-b border-stone-100">
+              <h3 className="font-serif font-bold text-stone-900 text-base">
+                Nhập đề bài IELTS Writing tự chọn
               </h3>
               <button
                 onClick={() => setIsCustomModalOpen(false)}
-                className="p-1.5 text-stone-400 hover:text-stone-700 rounded-full"
+                className="p-1 hover:bg-stone-100 rounded-lg text-stone-400"
               >
                 <X size={18} />
               </button>
             </div>
 
             <p className="text-xs text-stone-600">
-              Dán đề thi Writing thực tế từ sách Cambridge hoặc nguồn luyện thi khác để được AI chấm chữa chuyên sâu:
+              Dán toàn bộ đề bài IELTS {selectedTaskType === 'task1' ? 'Task 1' : 'Task 2'} của bạn vào ô dưới đây:
             </p>
 
             <textarea
               value={customPromptInput}
               onChange={(e) => setCustomPromptInput(e.target.value)}
-              placeholder="Dán toàn bộ câu hỏi và yêu cầu đề bài vào đây..."
-              className="w-full h-36 p-3 text-xs bg-stone-50 border border-stone-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#064E3B]"
+              placeholder="Ví dụ: Some people believe that universities should focus on providing job skills..."
+              className="w-full h-36 p-3 text-xs font-sans text-stone-800 bg-[#FAFAF9] border border-stone-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#064E3B] resize-none"
             />
 
-            <div className="flex items-center justify-end gap-2 pt-2">
+            <div className="flex justify-end gap-2 pt-2">
               <button
                 onClick={() => setIsCustomModalOpen(false)}
                 className="px-4 py-2 rounded-xl text-xs font-semibold text-stone-600 hover:bg-stone-100"
@@ -739,10 +974,15 @@ export const WritingWorkspace: React.FC<WritingWorkspaceProps> = ({ onNotify }) 
         evaluation={evaluationResult}
         taskType={selectedTaskType}
         taskTitle={currentPrompt.title}
+        initialEssayContent={essayContent}
         wordCount={wordCount}
         timeSpentSeconds={timeSpent}
         chartType={currentPrompt.chartType}
         questionType={currentPrompt.questionType}
+        version={essayVersion}
+        previousVersionBand={previousVersionBand}
+        onApplyCorrection={handleApplyCorrection}
+        onStartRewrite={handleStartRewrite}
       />
     </div>
   );
