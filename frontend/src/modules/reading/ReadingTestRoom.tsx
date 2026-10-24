@@ -24,6 +24,7 @@ import { useAnki } from '../../context/AnkiContext';
 import {
   getReadingPassageById,
   submitReadingExamToDatabase,
+  submitReadingFullExamToDatabase,
 } from '../../services/cambridgeApi';
 import { ReadingAiExplainer } from '../../components/reading/ReadingAiExplainer';
 import { useSmoothScroll } from '../../context/SmoothScrollProvider';
@@ -78,6 +79,7 @@ export const ReadingTestRoom: React.FC<ReadingTestRoomProps> = ({
     isFullTest ? 60 * 60 : (passage.estimatedMinutes || 20) * 60
   );
   const [isTimerRunning, setIsTimerRunning] = useState<boolean>(true);
+  const hasSubmittedRef = useRef<boolean>(false);
 
   useEffect(() => {
     if (isFullTest && sessionConfig?.passageIds) {
@@ -249,10 +251,21 @@ export const ReadingTestRoom: React.FC<ReadingTestRoomProps> = ({
   );
 
   // Timer effect
+  // Timer effect (R-03: Auto submit once when countdown reaches 0 in exam mode)
   useEffect(() => {
     if (!isTimerRunning || isSubmitted || isUntimed) return;
     const interval = setInterval(() => {
-      setSecondsRemaining((prev) => (prev > 0 ? prev - 1 : 0));
+      setSecondsRemaining((prev) => {
+        if (prev <= 1) {
+          clearInterval(interval);
+          if (!hasSubmittedRef.current) {
+            hasSubmittedRef.current = true;
+            setTimeout(() => handleSubmitExam(), 0);
+          }
+          return 0;
+        }
+        return prev - 1;
+      });
     }, 1000);
     return () => clearInterval(interval);
   }, [isTimerRunning, isSubmitted, isUntimed]);
@@ -448,18 +461,21 @@ export const ReadingTestRoom: React.FC<ReadingTestRoomProps> = ({
     });
   };
 
+  const normalizeReadingAns = (str: string): string => {
+    return (str || '').trim().toLowerCase().replace(/\\s+/g, ' ');
+  };
+
+  // R-04: So khớp câu trả lời chuẩn hóa và hỗ trợ acceptableAnswers cho mọi dạng câu hỏi
   const checkIsCorrect = (q: CambridgeReadingQuestion, answer: string): boolean => {
-    const cleanAns = (answer || '').trim().toLowerCase();
+    const cleanAns = normalizeReadingAns(answer);
     if (!cleanAns) return false;
 
-    if (q.type === 'summary_completion') {
-      const acceptable = [
-        q.correctAnswer.toLowerCase(),
-        ...(q.acceptableAnswers?.map((a) => a.toLowerCase()) || []),
-      ];
-      return acceptable.includes(cleanAns);
-    }
-    return cleanAns === q.correctAnswer.trim().toLowerCase();
+    const acceptable = [
+      normalizeReadingAns(q.correctAnswer),
+      ...(q.acceptableAnswers?.map(normalizeReadingAns) || []),
+    ].filter(Boolean);
+
+    return acceptable.includes(cleanAns);
   };
 
   const handleCheckPracticeQuestion = (q: CambridgeReadingQuestion) => {
@@ -470,20 +486,27 @@ export const ReadingTestRoom: React.FC<ReadingTestRoomProps> = ({
     }
   };
 
+  // Canonical IELTS Academic Reading Band Scale (R-01)
   const getIeltsBandScore = (correct: number, total: number): number => {
-    const ratio = correct / total;
-    if (ratio >= 0.92) return 9.0;
-    if (ratio >= 0.84) return 8.5;
-    if (ratio >= 0.76) return 8.0;
-    if (ratio >= 0.68) return 7.5;
-    if (ratio >= 0.60) return 7.0;
-    if (ratio >= 0.52) return 6.5;
-    if (ratio >= 0.44) return 6.0;
-    if (ratio >= 0.36) return 5.5;
-    if (ratio >= 0.28) return 5.0;
-    if (ratio >= 0.20) return 4.5;
-    if (ratio >= 0.12) return 4.0;
-    return 3.5;
+    if (!total || total <= 0) return 0.0;
+    const scaledCorrect = total === 40 ? Math.round(correct) : Math.round((correct / total) * 40);
+    const c = Math.max(0, Math.min(40, scaledCorrect));
+    if (c >= 39) return 9.0;
+    if (c >= 37) return 8.5;
+    if (c >= 35) return 8.0;
+    if (c >= 33) return 7.5;
+    if (c >= 30) return 7.0;
+    if (c >= 27) return 6.5;
+    if (c >= 23) return 6.0;
+    if (c >= 19) return 5.5;
+    if (c >= 15) return 5.0;
+    if (c >= 13) return 4.5;
+    if (c >= 10) return 4.0;
+    if (c >= 8) return 3.5;
+    if (c >= 6) return 3.0;
+    if (c >= 4) return 2.5;
+    if (c >= 1) return 2.0;
+    return 0.0;
   };
 
   const handleSubmitExam = () => {
@@ -512,12 +535,20 @@ export const ReadingTestRoom: React.FC<ReadingTestRoomProps> = ({
     // Lưu kết quả thi vào CSDL MySQL
     const totalEstSeconds = isFullTest ? 60 * 60 : ((currentPassage.estimatedMinutes || 20) * 60);
     const timeTaken = totalEstSeconds - secondsRemaining;
-    submitReadingExamToDatabase(currentPassage.id, userAnswers, timeTaken).catch((err) =>
-      console.warn('Lưu kết quả thi vào MySQL thất bại:', err)
-    );
+    if (isFullTest && allPassages.length > 0) {
+      const passageIds = allPassages.map((p) => p.id);
+      submitReadingFullExamToDatabase(passageIds, userAnswers, timeTaken, sessionConfig?.testTitle).catch((err) =>
+        console.warn('Lưu full test vào MySQL thất bại:', err)
+      );
+    } else {
+      submitReadingExamToDatabase(currentPassage.id, userAnswers, timeTaken).catch((err) =>
+        console.warn('Lưu kết quả thi vào MySQL thất bại:', err)
+      );
+    }
   };
 
   const handleResetExam = () => {
+    hasSubmittedRef.current = false;
     setUserAnswers({});
     setCheckedQuestions({});
     setFlaggedQuestions({});

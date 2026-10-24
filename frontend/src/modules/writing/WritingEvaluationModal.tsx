@@ -163,12 +163,15 @@ export const WritingEvaluationModal: React.FC<WritingEvaluationModalProps> = ({
   const [appliedCorrections, setAppliedCorrections] = useState<Record<string, boolean>>({});
   const [selectedCorrection, setSelectedCorrection] = useState<SentenceCorrectionItem | null>(null);
 
-  // Sync initial essay content when modal opens
+  // W-04: Only sync when modal transitions to open (isOpen === true)
+  // This prevents resetting appliedCorrections when parent state updates via onApplyCorrection
   useEffect(() => {
-    setLiveEssayContent(initialEssayContent);
-    setAppliedCorrections({});
-    setSelectedCorrection(null);
-  }, [initialEssayContent, isOpen]);
+    if (isOpen) {
+      setLiveEssayContent(initialEssayContent);
+      setAppliedCorrections({});
+      setSelectedCorrection(null);
+    }
+  }, [isOpen]);
 
   // Interactive Composite Calculator State
   const [calcT1, setCalcT1] = useState<number>(() => (taskType === 'task1' && evaluation ? evaluation.overallBand : 6.5));

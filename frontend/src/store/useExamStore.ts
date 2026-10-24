@@ -74,7 +74,8 @@ export const calculateIELTSBandScore = (correctCount: number): number => {
   if (correctCount >= 8) return 3.5;
   if (correctCount >= 6) return 3.0;
   if (correctCount >= 4) return 2.5;
-  return 2.0;
+  if (correctCount >= 1) return 2.0;
+  return 0.0;
 };
 
 const normalizeAnswer = (str: string): string => {

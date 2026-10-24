@@ -10,6 +10,7 @@ const readingAiController = require('../../controllers/readingAiController');
 router.get('/reading', cambridgeController.getReadingPassages);
 router.get('/reading/:id', cambridgeController.getReadingPassageById);
 router.post('/reading/:id/submit', cambridgeController.submitExam);
+router.post('/reading/full-test/submit', cambridgeController.submitReadingFullTest);
 router.post('/reading/explain-question', readingAiController.explainReadingQuestion);
 
 // 2. Phân hệ Cambridge Listening & Dictation

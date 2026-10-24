@@ -98,14 +98,14 @@ export function saveTestAttempt(
       );
     }
 
-    // Tự động lưu lên MySQL database theo user_id nếu không phải khách vãng lai
+    // SEC-01 & SEC-03: Đồng bộ lịch sử bài thi lên server nếu đã có session
     if (uid !== 'guest' && typeof fetch !== 'undefined') {
       fetch('/api/cambridge/user-history', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userId: uid, ...attempt }),
+        body: JSON.stringify({ ...attempt, attemptId: id }),
       }).catch((err) => {
-        console.warn('Không thể đồng bộ lịch sử bài thi lên MySQL:', err);
+        console.warn('Không thể đồng bộ lịch sử bài thi lên server:', err);
       });
     }
 
@@ -126,7 +126,11 @@ export async function fetchUserTestHistoryFromServer(userId?: string): Promise<T
   }
 
   try {
-    const res = await fetch(`/api/cambridge/user-history?userId=${encodeURIComponent(uid)}`);
+    const res = await fetch('/api/cambridge/user-history');
+    if (res.status === 401) {
+      // Guest or session expired: use local storage
+      return getTestHistory(uid);
+    }
     const data = await res.json();
     if (data.success && Array.isArray(data.data)) {
       const serverAttempts: TestAttempt[] = data.data;

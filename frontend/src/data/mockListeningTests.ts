@@ -636,7 +636,7 @@ export const mockListeningFullTests: ListeningFullTest[] = [
       [`20-T${t}S1.m4a`, `20-T${t}S2.m4a`, `20-T${t}S3.m4a`, `20-T${t}S4.m4a`],
       `c20-t${t}`
     ),
-    transcript: defaultTranscript,
+    transcript: [],
   })),
 
   // Cambridge 19 (Tests 1-4)
@@ -656,7 +656,7 @@ export const mockListeningFullTests: ListeningFullTest[] = [
       ],
       `c19-t${t}`
     ),
-    transcript: defaultTranscript,
+    transcript: [],
   })),
 
   // Cambridge 18 (Tests 1-4)
@@ -694,7 +694,7 @@ export const mockListeningFullTests: ListeningFullTest[] = [
       ],
       'c18-t2'
     ),
-    transcript: defaultTranscript,
+    transcript: [],
   },
   {
     id: 'c18-t3',
@@ -712,7 +712,7 @@ export const mockListeningFullTests: ListeningFullTest[] = [
       ],
       'c18-t3'
     ),
-    transcript: defaultTranscript,
+    transcript: [],
   },
   {
     id: 'c18-t4',
@@ -730,7 +730,7 @@ export const mockListeningFullTests: ListeningFullTest[] = [
       ],
       'c18-t4'
     ),
-    transcript: defaultTranscript,
+    transcript: [],
   },
 
   // Cambridge 16 (Tests 1-4)
@@ -750,7 +750,7 @@ export const mockListeningFullTests: ListeningFullTest[] = [
       ],
       `c16-t${t}`
     ),
-    transcript: defaultTranscript,
+    transcript: [],
   })),
 
   // Cambridge 15 (Tests 1-4)
@@ -770,7 +770,7 @@ export const mockListeningFullTests: ListeningFullTest[] = [
       ],
       `c15-t${t}`
     ),
-    transcript: defaultTranscript,
+    transcript: [],
   })),
 
   // Cambridge 14 (Test 4)
@@ -785,7 +785,7 @@ export const mockListeningFullTests: ListeningFullTest[] = [
       ['C14T4S1.mp3', 'C14T4S2.mp3', 'C14T4S3.mp3', 'C14T4S4.mp3'],
       'c14-t4'
     ),
-    transcript: defaultTranscript,
+    transcript: [],
   },
 
   // Cambridge 13 (Tests 1-4)
@@ -805,7 +805,7 @@ export const mockListeningFullTests: ListeningFullTest[] = [
       ],
       'c13-t1'
     ),
-    transcript: defaultTranscript,
+    transcript: [],
   },
   {
     id: 'c13-t2',
@@ -823,7 +823,7 @@ export const mockListeningFullTests: ListeningFullTest[] = [
       ],
       'c13-t2'
     ),
-    transcript: defaultTranscript,
+    transcript: [],
   },
   {
     id: 'c13-t3',
@@ -841,7 +841,7 @@ export const mockListeningFullTests: ListeningFullTest[] = [
       ],
       'c13-t3'
     ),
-    transcript: defaultTranscript,
+    transcript: [],
   },
   {
     id: 'c13-t4',
@@ -859,6 +859,6 @@ export const mockListeningFullTests: ListeningFullTest[] = [
       ],
       'c13-t4'
     ),
-    transcript: defaultTranscript,
+    transcript: [],
   },
 ];

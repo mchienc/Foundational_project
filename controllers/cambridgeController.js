@@ -6,19 +6,38 @@ const db = require('../config/db');
 // In-memory fallback lưu lịch sử làm bài theo userId khi MySQL offline: userId -> TestAttempt[]
 const memoryUserAttempts = new Map();
 
-// Tính IELTS Band Score chuẩn Cambridge Reading
-function calculateIeltsBand(correct, total) {
-  const ratio = correct / total;
-  if (ratio >= 0.92) return 9.0;
-  if (ratio >= 0.84) return 8.5;
-  if (ratio >= 0.76) return 8.0;
-  if (ratio >= 0.68) return 7.5;
-  if (ratio >= 0.60) return 7.0;
-  if (ratio >= 0.52) return 6.5;
-  if (ratio >= 0.44) return 6.0;
-  if (ratio >= 0.36) return 5.5;
-  if (ratio >= 0.28) return 5.0;
-  return 4.5;
+// Canonical IELTS Academic Reading Band Scale (0-40 questions)
+function calculateAcademicReadingBand(correctCount) {
+  const c = Math.max(0, Math.min(40, Math.round(Number(correctCount) || 0)));
+  if (c >= 39) return 9.0;
+  if (c >= 37) return 8.5;
+  if (c >= 35) return 8.0;
+  if (c >= 33) return 7.5;
+  if (c >= 30) return 7.0;
+  if (c >= 27) return 6.5;
+  if (c >= 23) return 6.0;
+  if (c >= 19) return 5.5;
+  if (c >= 15) return 5.0;
+  if (c >= 13) return 4.5;
+  if (c >= 10) return 4.0;
+  if (c >= 8) return 3.5;
+  if (c >= 6) return 3.0;
+  if (c >= 4) return 2.5;
+  if (c >= 1) return 2.0;
+  return 0.0;
+}
+
+// Band calculator for single passage or partial reading test (scaled proportionally to 40)
+function calculateEstimatedReadingBand(correct, total) {
+  if (!total || total <= 0) return 0.0;
+  if (total === 40) return calculateAcademicReadingBand(correct);
+  const scaledCorrect = Math.round((correct / total) * 40);
+  return calculateAcademicReadingBand(scaledCorrect);
+}
+
+// Helper hàm chuẩn hóa câu trả lời (trim, collapse whitespace, lowercase)
+function normalizeReadingAnswer(str) {
+  return String(str || '').trim().toLowerCase().replace(/\s+/g, ' ');
 }
 
 // ==================== 1. CAMBRIDGE READING ====================
@@ -140,17 +159,19 @@ exports.submitExam = async (req, res) => {
 
     let correctCount = 0;
     const evaluatedQuestions = questions.map((q) => {
-      const userAns = (userAnswers[q.id] || '').trim().toLowerCase();
+      const userNorm = normalizeReadingAnswer(userAnswers[q.id]);
       let isCorrect = false;
 
-      const acceptable = [
-        q.correct_answer.toLowerCase(),
-        ...(q.acceptable_answers ? (typeof q.acceptable_answers === 'string' ? JSON.parse(q.acceptable_answers) : q.acceptable_answers).map(a => a.toLowerCase()) : [])
-      ];
+      if (userNorm) {
+        const acceptable = [
+          normalizeReadingAnswer(q.correct_answer),
+          ...(q.acceptable_answers ? (typeof q.acceptable_answers === 'string' ? JSON.parse(q.acceptable_answers) : q.acceptable_answers).map(normalizeReadingAnswer) : [])
+        ].filter(Boolean);
 
-      if (userAns && acceptable.includes(userAns)) {
-        isCorrect = true;
-        correctCount++;
+        if (acceptable.includes(userNorm)) {
+          isCorrect = true;
+          correctCount++;
+        }
       }
 
       return {
@@ -165,7 +186,7 @@ exports.submitExam = async (req, res) => {
     });
 
     const totalCount = questions.length;
-    const bandScore = calculateIeltsBand(correctCount, totalCount);
+    const bandScore = calculateEstimatedReadingBand(correctCount, totalCount);
     const percentage = Math.round((correctCount / totalCount) * 100);
     const xpEarned = Math.max(30, correctCount * 10);
 
@@ -201,6 +222,113 @@ exports.submitExam = async (req, res) => {
   } catch (error) {
     console.error('Lỗi submitExam:', error);
     res.status(500).json({ success: false, message: 'Lỗi máy chủ khi chấm bài thi.' });
+  }
+};
+
+// Chấm điểm Full Test Reading (40 câu, nhiều Passage) trực tiếp trên server
+exports.submitReadingFullTest = async (req, res) => {
+  try {
+    const sessionUserId = req.session && req.session.user && req.session.user.id;
+    const { testId, passageIds = [], userAnswers = {}, timeTakenSeconds = 0, attemptId } = req.body;
+
+    if (!passageIds || !Array.isArray(passageIds) || passageIds.length === 0) {
+      return res.status(400).json({ success: false, message: 'Thiếu danh sách passageIds cho Full Test.' });
+    }
+
+    // Lấy toàn bộ câu hỏi của các passage thuộc test
+    const [questions] = await db.query(
+      'SELECT * FROM cambridge_reading_questions WHERE passage_id IN (?) ORDER BY passage_id ASC, question_number ASC',
+      [passageIds]
+    );
+
+    if (questions.length === 0) {
+      return res.status(404).json({ success: false, message: 'Không tìm thấy câu hỏi cho các bài đọc đã chọn.' });
+    }
+
+    let correctCount = 0;
+    const evaluatedQuestions = questions.map((q) => {
+      const rawUserAns = userAnswers[q.id] || '';
+      const userNorm = normalizeReadingAnswer(rawUserAns);
+      let isCorrect = false;
+
+      if (userNorm.length > 0) {
+        const correctNorm = normalizeReadingAnswer(q.correct_answer);
+        let acceptableList = [];
+        if (q.acceptable_answers) {
+          try {
+            acceptableList = (typeof q.acceptable_answers === 'string' ? JSON.parse(q.acceptable_answers) : q.acceptable_answers)
+              .map(normalizeReadingAnswer)
+              .filter(Boolean);
+          } catch (e) {}
+        }
+        const validAnswers = [correctNorm, ...acceptableList].filter(Boolean);
+        if (validAnswers.includes(userNorm)) {
+          isCorrect = true;
+          correctCount++;
+        }
+      }
+
+      return {
+        id: q.id,
+        passageId: q.passage_id,
+        number: q.question_number,
+        userAnswer: rawUserAns,
+        correctAnswer: q.correct_answer,
+        isCorrect,
+        academicExplanation: q.academic_explanation,
+        paragraphRef: q.paragraph_ref
+      };
+    });
+
+    const totalCount = questions.length;
+    const bandScore = totalCount === 40 
+      ? calculateAcademicReadingBand(correctCount)
+      : calculateEstimatedReadingBand(correctCount, totalCount);
+    const percentage = Math.round((correctCount / totalCount) * 100);
+    const xpEarned = Math.max(50, correctCount * 10);
+
+    const verifiedAttemptId = attemptId || `full-reading-${Date.now()}`;
+
+    // Lưu kết quả nếu user đã đăng nhập
+    if (sessionUserId) {
+      try {
+        await db.query(
+          `INSERT INTO user_cambridge_exam_results
+            (passage_id, user_id, correct_count, total_count, band_score, percentage, time_taken_seconds, user_answers, xp_earned)
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+          [
+            passageIds[0],
+            String(sessionUserId),
+            correctCount,
+            totalCount,
+            bandScore,
+            percentage,
+            timeTakenSeconds,
+            JSON.stringify(userAnswers),
+            xpEarned
+          ]
+        );
+      } catch (dbErr) {
+        console.warn('MySQL submitReadingFullTest warning:', dbErr.message);
+      }
+    }
+
+    return res.json({
+      success: true,
+      data: {
+        attemptId: verifiedAttemptId,
+        testId: testId || 'cambridge-full-reading',
+        correctCount,
+        totalCount,
+        bandScore,
+        percentage,
+        xpEarned,
+        evaluatedQuestions
+      }
+    });
+  } catch (error) {
+    console.error('Lỗi submitReadingFullTest:', error);
+    res.status(500).json({ success: false, message: 'Lỗi máy chủ khi chấm bài Full Test.' });
   }
 };
 
@@ -469,29 +597,35 @@ exports.reviewAnkiCard = async (req, res) => {
   }
 };
 
-// ==================== 4. LỊCH SỬ LÀM BÀI CỦA TỪNG USER ====================
+// ==================== 4. LỊCH SỬ LÀM BÀI CỦA TỪNG USER (BẢO MẬT & CÁCH LY) ====================
 
-// Lấy lịch sử làm bài thi của từng người dùng
+// Lấy lịch sử làm bài thi của chính người dùng hiện tại (Session-enforced, SEC-01)
 exports.getUserTestHistory = async (req, res) => {
   try {
-    const sessionUserId = req.session && req.session.user && req.session.user.id;
-    const userId = req.query.userId || sessionUserId;
+    const sessionUserId = (req.session && req.session.user && req.session.user.id) || (req.session && req.session.userId);
 
-    if (!userId) {
-      return res.json({ success: true, count: 0, data: [] });
+    // SEC-01: Chặn truy cập lịch sử của người khác - KHÔNG dùng req.query.userId
+    if (!sessionUserId) {
+      return res.status(401).json({
+        success: false,
+        errorCode: 'UNAUTHORIZED',
+        message: 'Vui lòng đăng nhập để xem lịch sử làm bài thi cá nhân.'
+      });
     }
+
+    const userId = String(sessionUserId);
 
     try {
       const [rows] = await db.query(
-        'SELECT id, book, test_number AS testNumber, skill, band_score AS bandScore, correct_count AS correctCount, total_questions AS totalQuestions, completed_at AS completedAt FROM user_cambridge_test_attempts WHERE user_id = ? ORDER BY created_at DESC',
-        [String(userId)]
+        'SELECT id, book, test_number AS testNumber, skill, band_score AS bandScore, correct_count AS correctCount, total_questions AS totalQuestions, completed_at AS completedAt, is_verified AS isVerified FROM user_cambridge_test_attempts WHERE user_id = ? ORDER BY created_at DESC',
+        [userId]
       );
       return res.json({ success: true, count: rows.length, data: rows });
     } catch (dbErr) {
       console.warn('MySQL getUserTestHistory warning, fallback to memory:', dbErr.message);
     }
 
-    const mem = memoryUserAttempts.get(String(userId)) || [];
+    const mem = memoryUserAttempts.get(userId) || [];
     return res.json({ success: true, count: mem.length, data: mem });
   } catch (error) {
     console.error('Lỗi getUserTestHistory:', error);
@@ -499,16 +633,22 @@ exports.getUserTestHistory = async (req, res) => {
   }
 };
 
-// Lưu lịch sử làm bài thi cho người dùng cụ thể
+// Lưu lịch sử làm bài thi cho người dùng đã xác thực (SEC-01 & SEC-03)
 exports.saveUserTestAttempt = async (req, res) => {
   try {
-    const sessionUserId = req.session && req.session.user && req.session.user.id;
-    const { userId: bodyUserId, book, testNumber, skill, bandScore, correctCount, totalQuestions, completedAt } = req.body;
-    const userId = bodyUserId || sessionUserId;
+    const sessionUserId = (req.session && req.session.user && req.session.user.id) || (req.session && req.session.userId);
 
-    if (!userId) {
-      return res.status(400).json({ success: false, message: 'Thiếu thông tin người dùng.' });
+    // SEC-01: Chỉ chấp nhận userId từ session xác thực, không tin cậy body.userId
+    if (!sessionUserId) {
+      return res.status(401).json({
+        success: false,
+        errorCode: 'UNAUTHORIZED',
+        message: 'Vui lòng đăng nhập để lưu kết quả bài thi.'
+      });
     }
+
+    const userId = String(sessionUserId);
+    const { attemptId, book, testNumber, skill, bandScore, correctCount, totalQuestions, completedAt } = req.body;
 
     if (!book || !testNumber || !skill) {
       return res.status(400).json({ success: false, message: 'Thiếu thông tin bài thi (book, testNumber, skill).' });
@@ -516,40 +656,44 @@ exports.saveUserTestAttempt = async (req, res) => {
 
     const cleanBook = book.trim();
     const cleanSkill = skill.toLowerCase();
-    const id = `${String(userId)}_${cleanBook.toLowerCase().replace(/\\s+/g, '-')}-t${testNumber}-${cleanSkill}`;
+    const safeAttemptId = attemptId ? String(attemptId).trim() : `${userId}_${cleanBook.toLowerCase().replace(/\s+/g, '-')}-t${testNumber}-${cleanSkill}-${Date.now()}`;
     const cleanCompletedAt = completedAt || new Date().toLocaleDateString('vi-VN');
 
+    // SEC-03: Đánh dấu kết quả do client gửi (chưa qua server verification)
     const attempt = {
-      id,
+      id: safeAttemptId,
       book: cleanBook,
       testNumber: Number(testNumber),
       skill: cleanSkill,
       bandScore: Number(bandScore) || 0,
       correctCount: Number(correctCount) || 0,
       totalQuestions: Number(totalQuestions) || 40,
-      completedAt: cleanCompletedAt
+      completedAt: cleanCompletedAt,
+      isVerified: false,
+      clientReported: true
     };
 
     try {
       await db.query(
         `INSERT INTO user_cambridge_test_attempts 
-          (id, user_id, book, test_number, skill, band_score, correct_count, total_questions, completed_at)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+          (id, user_id, book, test_number, skill, band_score, correct_count, total_questions, completed_at, is_verified)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
          ON DUPLICATE KEY UPDATE
           band_score = VALUES(band_score),
           correct_count = VALUES(correct_count),
           total_questions = VALUES(total_questions),
           completed_at = VALUES(completed_at)`,
         [
-          id,
-          String(userId),
+          safeAttemptId,
+          userId,
           cleanBook,
           Number(testNumber),
           cleanSkill,
           attempt.bandScore,
           attempt.correctCount,
           attempt.totalQuestions,
-          cleanCompletedAt
+          cleanCompletedAt,
+          0
         ]
       );
     } catch (dbErr) {
@@ -557,14 +701,14 @@ exports.saveUserTestAttempt = async (req, res) => {
     }
 
     // Cập nhật in-memory store
-    const list = memoryUserAttempts.get(String(userId)) || [];
-    const existingIdx = list.findIndex(a => a.book === cleanBook && a.testNumber === Number(testNumber) && a.skill === cleanSkill);
+    const list = memoryUserAttempts.get(userId) || [];
+    const existingIdx = list.findIndex(a => a.id === safeAttemptId || (a.book === cleanBook && a.testNumber === Number(testNumber) && a.skill === cleanSkill));
     if (existingIdx >= 0) {
       list[existingIdx] = attempt;
     } else {
       list.unshift(attempt);
     }
-    memoryUserAttempts.set(String(userId), list);
+    memoryUserAttempts.set(userId, list);
 
     return res.json({ success: true, message: 'Đã lưu lịch sử làm bài thành công!', data: attempt });
   } catch (error) {
@@ -572,3 +716,9 @@ exports.saveUserTestAttempt = async (req, res) => {
     res.status(500).json({ success: false, message: 'Lỗi máy chủ khi lưu kết quả bài thi.' });
   }
 };
+
+// Exports helper dùng chung cho unit tests và controllers khác
+exports.calculateAcademicReadingBand = calculateAcademicReadingBand;
+exports.calculateEstimatedReadingBand = calculateEstimatedReadingBand;
+exports.normalizeReadingAnswer = normalizeReadingAnswer;
+exports._getMemoryAttempts = () => memoryUserAttempts;

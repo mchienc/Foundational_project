@@ -20,12 +20,14 @@ import {
 } from 'lucide-react';
 
 export interface SpeakingFeedbackData {
-  estimatedBand: number;
+  status?: 'scored' | 'partial' | 'unavailable';
+  requiresAudioForOverallBand?: boolean;
+  estimatedBand: number | null;
   criteria: {
-    fluencyCoherence: { band: number; comment: string };
-    lexicalResource: { band: number; comment: string };
-    grammaticalRange: { band: number; comment: string };
-    pronunciationFeedback: { comment: string };
+    fluencyCoherence: { band?: number | null; comment: string };
+    lexicalResource: { band?: number | null; comment: string };
+    grammaticalRange: { band?: number | null; comment: string };
+    pronunciationFeedback: { band?: number | null; comment: string };
   };
   partAudit?: {
     partName: string;
@@ -145,10 +147,23 @@ export const SpeakingFeedbackDrawer: React.FC<SpeakingFeedbackDrawerProps> = ({
                 <span className="text-xs font-semibold text-stone-500 uppercase tracking-wider">
                   Band Nói Ước Lượng:
                 </span>
-                <span className="text-3xl font-serif font-bold text-[#064E3B]">
-                  {feedback.estimatedBand.toFixed(1)}
-                </span>
-                <span className="text-xs text-stone-400">/ 9.0</span>
+                {feedback.estimatedBand != null ? (
+                  <>
+                    <span className="text-3xl font-serif font-bold text-[#064E3B]">
+                      {feedback.estimatedBand.toFixed(1)}
+                    </span>
+                    <span className="text-xs text-stone-400">/ 9.0</span>
+                  </>
+                ) : (
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm font-serif font-bold px-2 py-1 rounded bg-amber-100 text-amber-900 border border-amber-300">
+                      N/A (Cần Audio)
+                    </span>
+                    <span className="text-[11px] text-stone-400">
+                      Cần file âm thanh để đo Pronunciation &amp; tính Overall Band
+                    </span>
+                  </div>
+                )}
               </div>
 
               <div className="h-6 w-px bg-stone-200 hidden sm:block" />
@@ -273,7 +288,7 @@ export const SpeakingFeedbackDrawer: React.FC<SpeakingFeedbackDrawerProps> = ({
                         <span className="text-[10px] text-emerald-700 bg-emerald-100 px-1 py-0.2 rounded font-semibold">25%</span>
                       </div>
                       <span className="px-2 py-0.5 rounded-full font-bold bg-emerald-100 text-emerald-900 text-[11px]">
-                        Band {feedback.criteria.fluencyCoherence.band.toFixed(1)}
+                        {feedback.criteria.fluencyCoherence.band != null ? `Band ${feedback.criteria.fluencyCoherence.band.toFixed(1)}` : "Đánh giá transcript"}
                       </span>
                     </div>
                     <p className="text-xs text-stone-600 leading-relaxed">
@@ -289,7 +304,7 @@ export const SpeakingFeedbackDrawer: React.FC<SpeakingFeedbackDrawerProps> = ({
                         <span className="text-[10px] text-blue-700 bg-blue-100 px-1 py-0.2 rounded font-semibold">25%</span>
                       </div>
                       <span className="px-2 py-0.5 rounded-full font-bold bg-emerald-100 text-emerald-900 text-[11px]">
-                        Band {feedback.criteria.lexicalResource.band.toFixed(1)}
+                        {feedback.criteria.lexicalResource.band != null ? `Band ${feedback.criteria.lexicalResource.band.toFixed(1)}` : "Đánh giá transcript"}
                       </span>
                     </div>
                     <p className="text-xs text-stone-600 leading-relaxed">
@@ -305,7 +320,7 @@ export const SpeakingFeedbackDrawer: React.FC<SpeakingFeedbackDrawerProps> = ({
                         <span className="text-[10px] text-purple-700 bg-purple-100 px-1 py-0.2 rounded font-semibold">25%</span>
                       </div>
                       <span className="px-2 py-0.5 rounded-full font-bold bg-emerald-100 text-emerald-900 text-[11px]">
-                        Band {feedback.criteria.grammaticalRange.band.toFixed(1)}
+                        {feedback.criteria.grammaticalRange.band != null ? `Band ${feedback.criteria.grammaticalRange.band.toFixed(1)}` : "Đánh giá transcript"}
                       </span>
                     </div>
                     <p className="text-xs text-stone-600 leading-relaxed">
@@ -321,7 +336,7 @@ export const SpeakingFeedbackDrawer: React.FC<SpeakingFeedbackDrawerProps> = ({
                         <span className="text-[10px] text-amber-700 bg-amber-100 px-1 py-0.2 rounded font-semibold">25%</span>
                       </div>
                       <span className="px-2 py-0.5 rounded-full font-bold bg-amber-100 text-amber-900 text-[11px]">
-                        Ngữ điệu
+                        {feedback.criteria.pronunciationFeedback.band != null ? `Band ${feedback.criteria.pronunciationFeedback.band.toFixed(1)}` : "Pronunciation: N/A"}
                       </span>
                     </div>
                     <p className="text-xs text-stone-600 leading-relaxed">

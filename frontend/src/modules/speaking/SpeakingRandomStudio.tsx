@@ -224,7 +224,11 @@ export const SpeakingRandomStudio: React.FC<SpeakingRandomStudioProps> = ({ onNo
         setFeedbackResult(resData.data);
         setIsFeedbackOpen(true);
         if (onNotify) {
-          onNotify(`Đã chấm xong! Band ước lượng: ${resData.data.estimatedBand}`, 'success');
+          if (resData.data.estimatedBand != null) {
+            onNotify(`Đã chấm xong! Band ước lượng: ${resData.data.estimatedBand}`, 'success');
+          } else {
+            onNotify('Đã phân tích ngôn ngữ từ transcript bài nói (Pronunciation: N/A).', 'success');
+          }
         }
       } else {
         throw new Error(resData.message || 'Không thể chấm bài');

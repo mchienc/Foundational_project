@@ -15,22 +15,38 @@ interface ListeningStore {
   resetExam: () => void;
 }
 
-const calculateBandScore = (score: number): number => {
-  if (score >= 39) return 9.0;
-  if (score >= 37) return 8.5;
-  if (score >= 35) return 8.0;
-  if (score >= 32) return 7.5;
-  if (score >= 30) return 7.0;
-  if (score >= 26) return 6.5;
-  if (score >= 23) return 6.0;
-  if (score >= 18) return 5.5;
-  if (score >= 16) return 5.0;
-  if (score >= 13) return 4.5;
-  if (score >= 11) return 4.0;
+// Canonical IELTS Listening 40-question band scale (L-04)
+export const calculateListeningBandScore = (score: number): number => {
+  const c = Math.max(0, Math.min(40, Math.round(Number(score) || 0)));
+  if (c >= 39) return 9.0;
+  if (c >= 37) return 8.5;
+  if (c >= 35) return 8.0;
+  if (c >= 32) return 7.5;
+  if (c >= 30) return 7.0;
+  if (c >= 26) return 6.5;
+  if (c >= 23) return 6.0;
+  if (c >= 18) return 5.5;
+  if (c >= 16) return 5.0;
+  if (c >= 13) return 4.5;
+  if (c >= 11) return 4.0;
+  if (c >= 8) return 3.5;
+  if (c >= 6) return 3.0;
+  if (c >= 4) return 2.5;
+  if (c >= 1) return 2.0;
   return 0.0;
 };
 
-const normalizeAnswer = (ans: string) => ans.trim().toLowerCase();
+export const normalizeListeningAnswer = (ans: string | undefined): string => {
+  return String(ans || '').trim().toLowerCase().replace(/\s+/g, ' ');
+};
+
+// L-01: Không chấm đúng câu bỏ trống
+export function matchesListeningAnswer(userAnswer: string | undefined, correct: string, alternatives: string[] = []): boolean {
+  const given = normalizeListeningAnswer(userAnswer);
+  if (!given) return false;
+  const valid = [correct, ...alternatives].map(normalizeListeningAnswer).filter(Boolean);
+  return valid.includes(given);
+}
 
 export const useListeningStore = create<ListeningStore>((set, get) => ({
   userAnswers: {},
@@ -63,10 +79,7 @@ export const useListeningStore = create<ListeningStore>((set, get) => ({
     const sectionScores = test.sections.map((section: ListeningSection) => {
       const sectionQuestions = section.questions;
       const correct = sectionQuestions.filter((q: ListeningQuestion) => {
-        const userAns = normalizeAnswer(userAnswers[q.id] || '');
-        const correctAns = normalizeAnswer(q.correctAnswer);
-        const acceptable = (q.acceptableAnswers || []).map(normalizeAnswer);
-        return userAns === correctAns || acceptable.includes(userAns);
+        return matchesListeningAnswer(userAnswers[q.id], q.correctAnswer, q.acceptableAnswers);
       }).length;
       correctCount += correct;
       totalQuestions += sectionQuestions.length;
@@ -80,7 +93,7 @@ export const useListeningStore = create<ListeningStore>((set, get) => ({
         userAnswers,
         correctCount,
         totalCount: totalQuestions,
-        bandScore: calculateBandScore(correctCount),
+        bandScore: calculateListeningBandScore(correctCount),
         sectionScores,
         completedAt: new Date().toISOString()
       }

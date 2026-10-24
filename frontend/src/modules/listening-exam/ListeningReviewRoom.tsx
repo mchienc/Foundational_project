@@ -1,5 +1,6 @@
 import React, { useRef, useState, useEffect } from 'react';
 import { ListeningFullTest, ListeningExamResult } from '../../types';
+import { matchesListeningAnswer } from '../../store/useListeningStore';
 import { ArrowLeft, Play, Pause, Info, CheckCircle2, XCircle } from 'lucide-react';
 
 interface ListeningReviewRoomProps {
@@ -19,6 +20,7 @@ export const ListeningReviewRoom: React.FC<ListeningReviewRoomProps> = ({
   const [currentTime, setCurrentTime] = useState(0);
   const [activeLineIndex, setActiveLineIndex] = useState(-1);
   const [selectedExplanation, setSelectedExplanation] = useState<{ id: string, text: string } | null>(null);
+  const [selectedSectionIndex, setSelectedSectionIndex] = useState<number>(0);
   
   const audioRef = useRef<HTMLAudioElement>(null);
   const transcriptRefs = useRef<(HTMLDivElement | null)[]>([]);
@@ -26,7 +28,11 @@ export const ListeningReviewRoom: React.FC<ListeningReviewRoomProps> = ({
   // transcript is on test.transcript
   const transcriptLines = test.transcript || [];
   const audioBase = (import.meta as any).env?.VITE_AUDIO_URL || 'https://pub-4dafa50b652e4874b46d808673d49f67.r2.dev/';
-  const audioUrl = test.sections[0]?.audioFile ? `${audioBase.replace(/\/$/, "")}/${encodeURIComponent(test.sections[0].audioFile)}` : "";
+  const activeSection = test.sections[selectedSectionIndex] || test.sections[0];
+  const audioUrl = activeSection?.audioFile ? `${audioBase.replace(/\/$/, "")}/${encodeURIComponent(activeSection.audioFile)}` : "";
+  // Transcript logic: only Section 1 has transcript in test.transcript (L-03)
+  const isSection1 = selectedSectionIndex === 0;
+  const currentTranscript = isSection1 ? (test.transcript || []) : [];
   
   const bandScore = result.bandScore || 0;
   let bandColorClass = 'text-red-500';
@@ -72,8 +78,7 @@ export const ListeningReviewRoom: React.FC<ListeningReviewRoomProps> = ({
   const allQuestions = test.sections.flatMap(s => s.questions);
   const details = allQuestions.map((q) => {
     const userAnswer = result.userAnswers[q.id] || '';
-    const isCorrect = userAnswer.trim().toLowerCase() === q.correctAnswer.toLowerCase() || 
-      (q.acceptableAnswers || []).some(a => a.toLowerCase() === userAnswer.trim().toLowerCase());
+    const isCorrect = matchesListeningAnswer(userAnswer, q.correctAnswer, q.acceptableAnswers);
     return {
       questionId: q.id,
       questionNumber: q.number,
@@ -197,8 +202,36 @@ export const ListeningReviewRoom: React.FC<ListeningReviewRoomProps> = ({
       {/* Right Column - Karaoke Transcript */}
       <div className="w-[45%] flex flex-col bg-[#FAFAF9] relative">
         <div className="sticky top-0 bg-[#FAFAF9] z-10 border-b border-gray-200 p-4 shadow-sm">
-          <h2 className="font-serif font-bold text-lg mb-1">Transcript</h2>
-          <p className="text-xs text-gray-500 mb-3">Click any line to jump to that moment</p>
+          <div className="flex items-center justify-between mb-2">
+            <div>
+              <h2 className="font-serif font-bold text-lg text-[#064E3B]">Transcript &amp; Audio Player</h2>
+              <p className="text-xs text-gray-500">Chọn Section để nghe lại bài thi (L-02)</p>
+            </div>
+            {/* Section Switcher Tabs */}
+            <div className="flex bg-stone-100 p-0.5 rounded-lg border border-stone-200">
+              {[0, 1, 2, 3].map((secIdx) => (
+                <button
+                  key={secIdx}
+                  onClick={() => {
+                    setSelectedSectionIndex(secIdx);
+                    setIsPlaying(false);
+                    setCurrentTime(0);
+                    if (audioRef.current) {
+                      audioRef.current.pause();
+                      audioRef.current.currentTime = 0;
+                    }
+                  }}
+                  className={`px-2.5 py-1 text-xs font-semibold rounded-md transition-colors ${
+                    selectedSectionIndex === secIdx
+                      ? 'bg-[#064E3B] text-white shadow-xs'
+                      : 'text-stone-600 hover:text-stone-900'
+                  }`}
+                >
+                  Sec {secIdx + 1}
+                </button>
+              ))}
+            </div>
+          </div>
           
           <div className="bg-white rounded-full p-2 pr-4 flex items-center gap-3 border border-gray-200 shadow-sm">
             <button 
@@ -228,7 +261,7 @@ export const ListeningReviewRoom: React.FC<ListeningReviewRoomProps> = ({
         </div>
 
         <div className="flex-1 overflow-y-auto overscroll-contain p-6 space-y-4" data-lenis-prevent="true">
-          {transcriptLines.map((line, idx) => {
+          {currentTranscript.map((line, idx) => {
             const isActive = idx === activeLineIndex;
             return (
               <div 
@@ -277,7 +310,7 @@ export const ListeningReviewRoom: React.FC<ListeningReviewRoomProps> = ({
               </div>
             );
           })}
-          {transcriptLines.length === 0 && (
+          {currentTranscript.length === 0 && (
             <div className="text-center py-10 text-gray-500 text-sm">
               Transcript not available for this section.
             </div>

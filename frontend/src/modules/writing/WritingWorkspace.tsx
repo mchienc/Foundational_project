@@ -38,6 +38,9 @@ export interface WritingHistoryEntry {
   taskType: 'task1' | 'task2';
   promptTitle: string;
   promptText: string;
+  promptId?: string;
+  chartType?: 'line' | 'bar' | 'pie' | 'table' | 'map' | 'process' | 'mixed';
+  chartDetails?: any;
   essayContent: string;
   overallBand: number;
   wordCount: number;
@@ -195,12 +198,35 @@ export const WritingWorkspace: React.FC<WritingWorkspaceProps> = ({ onNotify }) 
     }
   };
 
-  // Load entry from history
+  // Load entry from history (W-05: Khôi phục đầy đủ prompt, chart và task)
   const handleLoadFromHistory = (entry: WritingHistoryEntry) => {
     setEssayContent(entry.essayContent);
     setSelectedTaskType(entry.taskType);
     setEvaluationResult(entry.evaluationData);
     setEssayVersion(entry.version || 1);
+
+    // Phục hồi prompt gốc để chấm lại hoặc viết lại đúng ngữ cảnh
+    if (entry.promptId) {
+      const candidates = mockWritingPrompts.filter((p) => p.type === entry.taskType);
+      const foundIdx = candidates.findIndex((p) => p.id === entry.promptId);
+      if (foundIdx >= 0) {
+        setActivePromptIndex(foundIdx);
+        setCustomPrompt(null);
+      } else {
+        const restoredCustom: WritingPrompt = {
+          id: entry.promptId || 'custom-loaded',
+          type: entry.taskType,
+          title: entry.promptTitle,
+          prompt: entry.promptText,
+          chartType: entry.chartType || 'bar',
+          chartDetails: entry.chartDetails,
+          recommendedTimeMinutes: entry.taskType === 'task1' ? 20 : 40,
+          minWords: entry.taskType === 'task1' ? 150 : 250,
+        };
+        setCustomPrompt(restoredCustom);
+      }
+    }
+
     setIsHistoryDrawerOpen(false);
     setIsResultModalOpen(true);
     if (onNotify) onNotify(`Đã mở lại bài viết từ lịch sử (${entry.timestamp}).`, 'info');
@@ -259,6 +285,9 @@ export const WritingWorkspace: React.FC<WritingWorkspaceProps> = ({ onNotify }) 
           taskType: selectedTaskType,
           promptTitle: currentPrompt.title,
           promptText: currentPrompt.prompt,
+          promptId: currentPrompt.id,
+          chartType: currentPrompt.chartType,
+          chartDetails: currentPrompt.chartDetails,
           essayContent: essayContent,
           overallBand: resData.data.overallBand,
           wordCount: wordCount,

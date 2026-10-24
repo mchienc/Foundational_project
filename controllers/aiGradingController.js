@@ -52,11 +52,11 @@ function computeWritingAnalytics(essayContent, taskType) {
 
   let sentenceFeedback = '';
   if (complexPct >= 40) {
-    sentenceFeedback = 'Cấu trúc câu rất đa dạng với tỷ lệ câu phức cao, đáp ứng tốt tiêu chuẩn Band 7.5+ Grammatical Range.';
+    sentenceFeedback = 'Ước lượng cơ học: Bài viết có tỷ lệ câu phức cao (' + complexPct + '%). Lưu ý: Giám khảo IELTS đánh giá chất lượng và độ chuẩn xác của câu thay vì chỉ đếm từ nối.';
   } else if (complexPct >= 20) {
-    sentenceFeedback = 'Bài viết có sự phối hợp giữa câu đơn và câu ghép, nhưng nên bổ sung thêm mệnh đề quan hệ rút gọn hoặc đảo ngữ để đạt Band 7.0+.';
+    sentenceFeedback = 'Ước lượng cơ học: Bài viết có sự kết hợp giữa câu đơn và câu phức (' + complexPct + '%). Nên chú ý đa dạng hóa cấu trúc câu học thuật tự nhiên.';
   } else {
-    sentenceFeedback = 'Bài viết có tỷ lệ câu đơn cao (' + simplePct + '%). Cần chuyển một số câu đơn thành câu phức liên kết bằng "although, whereas, which" để nâng Band.';
+    sentenceFeedback = 'Ước lượng cơ học: Tỷ lệ câu đơn chiếm đa số (' + simplePct + '%). Nên sử dụng thêm các mệnh đề quan hệ và liên từ phụ thuộc để câu văn uyển chuyển hơn.';
   }
 
   // 2. Cảnh báo từ bị lặp quá nhiều & Gợi ý từ đồng nghĩa C1/C2
@@ -430,26 +430,24 @@ exports.gradeWriting = async (req, res) => {
     }
 
     const isTask1 = taskType === 'task1';
-    const apiKey = getLiveApiKey();
+    const apiKey = (req.body.customApiKey || getLiveApiKey() || '').trim();
 
-    if (!apiKey) {
-      const fallbackData = generateWritingFallback(taskType, prompt, essayContent, chartType, chartDetails, essaySubtype);
-      if (previousTaskBand) {
-        const composite = calculateCompositeWritingBand(
-          isTask1 ? fallbackData.overallBand : previousTaskBand,
-          isTask1 ? previousTaskBand : fallbackData.overallBand
-        );
-        fallbackData.compositeScore = {
-          task1Band: isTask1 ? fallbackData.overallBand : parseFloat(previousTaskBand),
-          task2Band: isTask1 ? parseFloat(previousTaskBand) : fallbackData.overallBand,
-          compositeBand: composite,
-          formula: "round_0.5((T1 + 2 * T2) / 3)"
-        };
-      }
-      return res.json({
-        success: true,
-        source: 'eng4u AI Academic Engine (Offline Mode)',
-        data: fallbackData
+    // W-01: BỎ HOÀN TOÀN FAKE BAND KHI KHÔNG CÓ KẾT NỐI GEMINI / OFFLINE
+    if (!apiKey || req.body.forceOffline) {
+      const wordCount = (essayContent || '').trim().split(/\s+/).filter(Boolean).length;
+      const analytics = computeWritingAnalytics(essayContent, taskType);
+      return res.status(503).json({
+        success: false,
+        status: 'unavailable',
+        errorCode: 'AI_GRADER_UNAVAILABLE',
+        retryable: true,
+        message: 'Chưa thể chấm bài bằng AI lúc này. Hệ thống không tạo điểm IELTS giả khi không có kết nối tới AI Examiner.',
+        automatedDiagnostics: {
+          wordCount,
+          sentenceComplexity: analytics.sentenceComplexity,
+          overusedWords: analytics.overusedWords,
+          paragraphAudit: analytics.paragraphAudit
+        }
       });
     }
 
@@ -614,54 +612,60 @@ ${essayContent}`;
           const candidateText = apiData?.candidates?.[0]?.content?.parts?.[0]?.text;
           if (candidateText) {
             const parsed = extractJsonFromText(candidateText);
-            if (parsed && (parsed.overallBand !== undefined || parsed.criteria)) {
-              const criteriaBands = [
-                parsed.criteria?.taskAchievement?.band,
-                parsed.criteria?.coherenceCohesion?.band,
-                parsed.criteria?.lexicalResource?.band,
-                parsed.criteria?.grammaticalRange?.band
-              ].filter(b => typeof b === 'number' && !isNaN(b));
+            if (parsed && parsed.criteria) {
+              const taBand = parsed.criteria?.taskAchievement?.band;
+              const ccBand = parsed.criteria?.coherenceCohesion?.band;
+              const lrBand = parsed.criteria?.lexicalResource?.band;
+              const graBand = parsed.criteria?.grammaticalRange?.band;
 
-              if (criteriaBands.length === 4) {
-                const avg = (criteriaBands[0] + criteriaBands[1] + criteriaBands[2] + criteriaBands[3]) / 4;
+              // W-02: Bắt buộc cả 4 criteria đều phải là số hữu hạn trong [0, 9]
+              const criteriaList = [taBand, ccBand, lrBand, graBand];
+              const isValidCriteria = criteriaList.every(
+                b => typeof b === 'number' && !isNaN(b) && b >= 0 && b <= 9
+              );
+
+              if (isValidCriteria) {
+                const avg = (taBand + ccBand + lrBand + graBand) / 4;
                 parsed.overallBand = roundIeltsBand(avg);
-              } else if (parsed.overallBand) {
-                parsed.overallBand = roundIeltsBand(parsed.overallBand);
-              }
 
-              // Gắn kết quả Deep Analytics & Paragraph Audit
-              parsed.academicAnalytics = parsed.academicAnalytics || analytics;
-              parsed.paragraphAudit = parsed.paragraphAudit || analytics.paragraphAudit;
+                // Gắn kết quả Deep Analytics & Paragraph Audit
+                parsed.academicAnalytics = parsed.academicAnalytics || analytics;
+                parsed.paragraphAudit = parsed.paragraphAudit || analytics.paragraphAudit;
 
-              // Đảm bảo type phân loại lỗi ('grammar' | 'vocabulary' | 'cohesion')
-              if (Array.isArray(parsed.sentenceCorrections)) {
-                parsed.sentenceCorrections = parsed.sentenceCorrections.map((sc, idx) => {
-                  let t = sc.type;
-                  if (!t || !['grammar', 'vocabulary', 'cohesion'].includes(t)) {
-                    t = idx % 3 === 0 ? 'grammar' : idx % 3 === 1 ? 'vocabulary' : 'cohesion';
+                // Đảm bảo type phân loại lỗi ('grammar' | 'vocabulary' | 'cohesion')
+                if (Array.isArray(parsed.sentenceCorrections)) {
+                  parsed.sentenceCorrections = parsed.sentenceCorrections.map((sc, idx) => {
+                    let t = sc.type;
+                    if (!t || !['grammar', 'vocabulary', 'cohesion'].includes(t)) {
+                      t = idx % 3 === 0 ? 'grammar' : idx % 3 === 1 ? 'vocabulary' : 'cohesion';
+                    }
+                    return { ...sc, type: t };
+                  });
+                }
+
+                // Tính toán điểm Writing tổng hợp nếu có điểm của Task kia
+                if (previousTaskBand) {
+                  const ptBand = parseFloat(previousTaskBand);
+                  if (!isNaN(ptBand) && ptBand >= 0 && ptBand <= 9) {
+                    const t1 = isTask1 ? parsed.overallBand : ptBand;
+                    const t2 = isTask1 ? ptBand : parsed.overallBand;
+                    const composite = calculateCompositeWritingBand(t1, t2);
+                    parsed.compositeScore = {
+                      task1Band: t1,
+                      task2Band: t2,
+                      compositeBand: composite,
+                      formula: "round_0.5((T1 + 2 * T2) / 3)"
+                    };
                   }
-                  return { ...sc, type: t };
+                }
+
+                return res.json({
+                  success: true,
+                  status: 'scored',
+                  source: `Gemini AI Senior Examiner (${model})`,
+                  data: parsed
                 });
               }
-
-              // Tính toán điểm Writing tổng hợp nếu có điểm của Task kia
-              if (previousTaskBand) {
-                const t1 = isTask1 ? parsed.overallBand : parseFloat(previousTaskBand);
-                const t2 = isTask1 ? parseFloat(previousTaskBand) : parsed.overallBand;
-                const composite = calculateCompositeWritingBand(t1, t2);
-                parsed.compositeScore = {
-                  task1Band: t1,
-                  task2Band: t2,
-                  compositeBand: composite,
-                  formula: "round_0.5((T1 + 2 * T2) / 3)"
-                };
-              }
-
-              return res.json({
-                success: true,
-                source: `Gemini AI Senior Examiner (${model})`,
-                data: parsed
-              });
             }
           }
         } else {
@@ -672,24 +676,20 @@ ${essayContent}`;
       }
     }
 
-    const fallbackData = generateWritingFallback(taskType, prompt, essayContent, chartType, chartDetails, essaySubtype);
-    if (previousTaskBand) {
-      const composite = calculateCompositeWritingBand(
-        isTask1 ? fallbackData.overallBand : previousTaskBand,
-        isTask1 ? previousTaskBand : fallbackData.overallBand
-      );
-      fallbackData.compositeScore = {
-        task1Band: isTask1 ? fallbackData.overallBand : parseFloat(previousTaskBand),
-        task2Band: isTask1 ? parseFloat(previousTaskBand) : fallbackData.overallBand,
-        compositeBand: composite,
-        formula: "round_0.5((T1 + 2 * T2) / 3)"
-      };
-    }
-
-    return res.json({
-      success: true,
-      source: 'eng4u AI Academic Engine (Intelligent Local Analysis)',
-      data: fallbackData
+    // W-01: BỎ HOÀN TOÀN FAKE BAND KHI GEMINI OFFLINE / LỖI
+    const wordCount = (essayContent || '').trim().split(/\s+/).filter(Boolean).length;
+    return res.status(503).json({
+      success: false,
+      status: 'unavailable',
+      errorCode: 'AI_GRADER_UNAVAILABLE',
+      retryable: true,
+      message: 'Chưa thể chấm bài bằng AI lúc này. Hệ thống không tạo điểm IELTS giả khi không có kết nối tới AI Examiner.',
+      automatedDiagnostics: {
+        wordCount,
+        sentenceComplexity: analytics.sentenceComplexity,
+        overusedWords: analytics.overusedWords,
+        paragraphAudit: analytics.paragraphAudit
+      }
     });
   } catch (error) {
     console.error('[gradeWriting error]', error);
@@ -700,10 +700,10 @@ ${essayContent}`;
   }
 };
 
-// Controller chấm bài Speaking chuyên sâu theo từng Part
+// Controller chấm bài Speaking chuyên sâu theo từng Part (S-01, S-02, S-03)
 exports.gradeSpeaking = async (req, res) => {
   try {
-    const { part, topic, question, transcript, durationSeconds, cueCardBullets } = req.body;
+    const { part, topic, question, transcript, durationSeconds, cueCardBullets, hasAudio, audioUrl } = req.body;
 
     if (!transcript || transcript.trim().length < 5) {
       return res.status(400).json({
@@ -713,14 +713,16 @@ exports.gradeSpeaking = async (req, res) => {
     }
 
     const partNum = parseInt(part, 10) || 1;
-    const apiKey = getLiveApiKey();
+    const apiKey = (req.body.customApiKey || getLiveApiKey() || '').trim();
 
-    if (!apiKey) {
-      const fallbackData = generateSpeakingFallback(partNum, topic, question, transcript, durationSeconds);
-      return res.json({
-        success: true,
-        source: 'eng4u AI Speaking Coach (Offline Mode)',
-        data: fallbackData
+    // S-01: Không tạo fake band khi không có kết nối AI
+    if (!apiKey || req.body.forceOffline) {
+      return res.status(503).json({
+        success: false,
+        status: 'unavailable',
+        errorCode: 'AI_GRADER_UNAVAILABLE',
+        retryable: true,
+        message: 'Hệ thống AI chấm bài nói hiện chưa khả dụng. Không tạo điểm IELTS ước tính khi không có kết nối tới AI Examiner.'
       });
     }
 
@@ -838,12 +840,29 @@ BẢN GỠ BĂNG CÂU TRẢ LỜI CỦA HỌC VIÊN:
           const candidateText = apiData?.candidates?.[0]?.content?.parts?.[0]?.text;
           if (candidateText) {
             const parsed = extractJsonFromText(candidateText);
-            if (parsed && (parsed.estimatedBand !== undefined || parsed.criteria)) {
-              if (parsed.estimatedBand) {
-                parsed.estimatedBand = roundIeltsBand(parsed.estimatedBand);
+            if (parsed && parsed.criteria) {
+              const isAudioAvailable = Boolean(hasAudio || audioUrl);
+
+              // S-01 & S-02: Khi chỉ có transcript (không có audio file)
+              if (!isAudioAvailable) {
+                parsed.status = 'partial';
+                parsed.requiresAudioForOverallBand = true;
+                parsed.estimatedBand = null;
+                parsed.criteria.pronunciationFeedback = {
+                  band: null,
+                  comment: 'Không có dữ liệu âm thanh để đánh giá phát âm (Pronunciation: N/A). Để có điểm phát âm chính xác và Overall Speaking Band, cần tải lên hoặc thu âm file audio trực tiếp.'
+                };
+                parsed.officialNote = 'Speaking IELTS chính thức yêu cầu đánh giá âm thanh trực tiếp. Đánh giá dưới đây là nhận xét ngôn ngữ (Vocabulary & Grammar) dựa trên transcript.';
+              } else {
+                parsed.status = 'scored';
+                if (parsed.estimatedBand) {
+                  parsed.estimatedBand = roundIeltsBand(parsed.estimatedBand);
+                }
               }
+
               return res.json({
                 success: true,
+                status: parsed.status,
                 source: `Gemini AI Speaking Coach (${model})`,
                 data: parsed
               });
@@ -857,11 +876,13 @@ BẢN GỠ BĂNG CÂU TRẢ LỜI CỦA HỌC VIÊN:
       }
     }
 
-    const fallbackData = generateSpeakingFallback(partNum, topic, question, transcript, durationSeconds);
-    return res.json({
-      success: true,
-      source: 'eng4u AI Speaking Coach (Intelligent Local Analysis)',
-      data: fallbackData
+    // S-01: Trả về trạng thái unavailable thay vì tạo điểm giả
+    return res.status(503).json({
+      success: false,
+      status: 'unavailable',
+      errorCode: 'AI_GRADER_UNAVAILABLE',
+      retryable: true,
+      message: 'Chưa thể kết nối tới dịch vụ AI Speaking Examiner. Không tạo điểm IELTS giả khi ngoại tuyến.'
     });
   } catch (error) {
     console.error('[gradeSpeaking error]', error);
@@ -872,17 +893,17 @@ BẢN GỠ BĂNG CÂU TRẢ LỜI CỦA HỌC VIÊN:
   }
 };
 
-// API tính điểm Writing tổng hợp
+// API tính điểm Writing tổng hợp (W-06)
 exports.calculateCompositeBand = (req, res) => {
   try {
     const { task1Band, task2Band } = req.body;
     const t1 = parseFloat(task1Band);
     const t2 = parseFloat(task2Band);
 
-    if (isNaN(t1) || isNaN(t2)) {
+    if (isNaN(t1) || isNaN(t2) || t1 < 0 || t1 > 9 || t2 < 0 || t2 > 9) {
       return res.status(400).json({
         success: false,
-        message: 'Vui lòng cung cấp cả Task 1 Band và Task 2 Band hợp lệ (0.0 - 9.0).'
+        message: 'Vui lòng cung cấp cả Task 1 Band và Task 2 Band hợp lệ (trong khoảng từ 0.0 đến 9.0).'
       });
     }
 
@@ -905,3 +926,11 @@ exports.calculateCompositeBand = (req, res) => {
     res.status(500).json({ success: false, message: 'Lỗi tính toán điểm tổng hợp.' });
   }
 };
+
+// Exports helper dùng chung cho unit tests và controllers khác
+exports.calculateCompositeWritingBand = calculateCompositeWritingBand;
+exports.roundIeltsBand = roundIeltsBand;
+exports.computeWritingAnalytics = computeWritingAnalytics;
+exports.generateWritingFallback = generateWritingFallback;
+exports.generateSpeakingFallback = generateSpeakingFallback;
+exports.extractJsonFromText = extractJsonFromText;

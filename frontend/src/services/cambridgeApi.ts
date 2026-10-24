@@ -212,7 +212,7 @@ export async function getReadingPassageById(id: string): Promise<CambridgeReadin
   }
 }
 
-// Chấm điểm bài thi ngầm ở server và lưu vào CSDL
+// Chấm điểm bài thi ngầm ở server và lưu vào CSDL (Single Passage)
 export async function submitReadingExamToDatabase(
   passageId: string,
   userAnswers: Record<string, string>,
@@ -238,6 +238,38 @@ export async function submitReadingExamToDatabase(
     return null;
   } catch (err) {
     console.warn('⚠️ Lỗi gửi bài thi lên server MySQL:', err);
+    return null;
+  }
+}
+
+// Chấm điểm Full Test Reading (40 câu, nhiều Passage) ngầm ở server (R-02)
+export async function submitReadingFullExamToDatabase(
+  passageIds: string[],
+  userAnswers: Record<string, string>,
+  timeTakenSeconds: number,
+  testTitle?: string
+): Promise<{
+  attemptId: string;
+  correctCount: number;
+  totalCount: number;
+  bandScore: number;
+  percentage: number;
+  xpEarned: number;
+} | null> {
+  try {
+    const res = await fetch(`${API_BASE}/reading/full-test/submit`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ passageIds, userAnswers, timeTakenSeconds, testId: testTitle }),
+    });
+    if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+    const json = await res.json();
+    if (json.success && json.data) {
+      return json.data;
+    }
+    return null;
+  } catch (err) {
+    console.warn('⚠️ Lỗi gửi bài thi Full Test lên server MySQL:', err);
     return null;
   }
 }
