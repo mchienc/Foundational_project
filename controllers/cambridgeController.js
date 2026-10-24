@@ -624,7 +624,7 @@ exports.getUserTestHistory = async (req, res) => {
 
     try {
       const [rows] = await db.query(
-        'SELECT id, book, test_number AS testNumber, skill, band_score AS bandScore, correct_count AS correctCount, total_questions AS totalQuestions, completed_at AS completedAt, is_verified AS isVerified FROM user_cambridge_test_attempts WHERE user_id = ? ORDER BY created_at DESC',
+        'SELECT id, book, test_number AS testNumber, skill, band_score AS bandScore, correct_count AS correctCount, total_questions AS totalQuestions, completed_at AS completedAt, is_verified AS isVerified, client_reported AS clientReported FROM user_cambridge_test_attempts WHERE user_id = ? ORDER BY created_at DESC',
         [userId]
       );
       return res.json({ success: true, count: rows.length, data: rows });
@@ -663,7 +663,12 @@ exports.saveUserTestAttempt = async (req, res) => {
 
     const cleanBook = book.trim();
     const cleanSkill = skill.toLowerCase();
-    const safeAttemptId = attemptId ? String(attemptId).trim() : `${userId}_${cleanBook.toLowerCase().replace(/\s+/g, '-')}-t${testNumber}-${cleanSkill}-${Date.now()}`;
+    // P1-06: Server-owned identity. Attempt ID is strictly scoped to the authenticated session userId.
+    // Client cannot forge or claim an attempt ID belonging to another user.
+    const clientProvidedSuffix = attemptId ? String(attemptId).trim().replace(/^[a-zA-Z0-9_\.-]+_/, '') : null;
+    const safeAttemptId = clientProvidedSuffix
+      ? `${userId}_${clientProvidedSuffix}`
+      : `${userId}_${cleanBook.toLowerCase().replace(/\s+/g, '-')}-t${testNumber}-${cleanSkill}-${Date.now()}`;
     const cleanCompletedAt = completedAt || new Date().toLocaleDateString('vi-VN');
 
     // SEC-03: Đánh dấu kết quả do client gửi (chưa qua server verification)
@@ -683,13 +688,14 @@ exports.saveUserTestAttempt = async (req, res) => {
     try {
       await db.query(
         `INSERT INTO user_cambridge_test_attempts 
-          (id, user_id, book, test_number, skill, band_score, correct_count, total_questions, completed_at, is_verified)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+          (id, user_id, book, test_number, skill, band_score, correct_count, total_questions, completed_at, is_verified, client_reported)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
          ON DUPLICATE KEY UPDATE
-          band_score = IF(is_verified = 1, band_score, VALUES(band_score)),
-          correct_count = IF(is_verified = 1, correct_count, VALUES(correct_count)),
-          total_questions = IF(is_verified = 1, total_questions, VALUES(total_questions)),
-          completed_at = IF(is_verified = 1, completed_at, VALUES(completed_at))`,
+          band_score = IF(is_verified = 1 OR user_id != VALUES(user_id), band_score, VALUES(band_score)),
+          correct_count = IF(is_verified = 1 OR user_id != VALUES(user_id), correct_count, VALUES(correct_count)),
+          total_questions = IF(is_verified = 1 OR user_id != VALUES(user_id), total_questions, VALUES(total_questions)),
+          completed_at = IF(is_verified = 1 OR user_id != VALUES(user_id), completed_at, VALUES(completed_at)),
+          client_reported = IF(is_verified = 1 OR user_id != VALUES(user_id), client_reported, 1)`,
         [
           safeAttemptId,
           userId,
@@ -700,7 +706,8 @@ exports.saveUserTestAttempt = async (req, res) => {
           attempt.correctCount,
           attempt.totalQuestions,
           cleanCompletedAt,
-          0
+          0,
+          1
         ]
       );
     } catch (dbErr) {

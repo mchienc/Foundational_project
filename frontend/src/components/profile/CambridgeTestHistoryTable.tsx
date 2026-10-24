@@ -297,6 +297,11 @@ export const CambridgeTestHistoryTable: React.FC<CambridgeTestHistoryTableProps>
                               {readingAttempt.totalQuestions} câu •{' '}
                               {readingAttempt.completedAt}
                             </span>
+                            <span className={`text-[9px] px-2 py-0.5 rounded-full font-medium mt-0.5 ${
+                              readingAttempt.isVerified ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'
+                            }`}>
+                              {readingAttempt.isVerified ? '✓ Đã xác thực' : 'Tự báo cáo'}
+                            </span>
                           </>
                         ) : (
                           <>
@@ -441,6 +446,11 @@ export const CambridgeTestHistoryTable: React.FC<CambridgeTestHistoryTableProps>
                               {listeningAttempt.correctCount}/
                               {listeningAttempt.totalQuestions} câu •{' '}
                               {listeningAttempt.completedAt}
+                            </span>
+                            <span className={`text-[9px] px-2 py-0.5 rounded-full font-medium mt-0.5 ${
+                              listeningAttempt.isVerified ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'
+                            }`}>
+                              {listeningAttempt.isVerified ? '✓ Đã xác thực' : 'Tự báo cáo'}
                             </span>
                           </>
                         ) : (

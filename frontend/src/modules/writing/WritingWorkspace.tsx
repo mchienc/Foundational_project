@@ -78,8 +78,6 @@ export const WritingWorkspace: React.FC<WritingWorkspaceProps> = ({ onNotify }) 
   const [isEvaluating, setIsEvaluating] = useState<boolean>(false);
   const [evaluationResult, setEvaluationResult] = useState<WritingEvaluationResult | null>(null);
   const [isResultModalOpen, setIsResultModalOpen] = useState<boolean>(false);
-  const [lastTask1Band, setLastTask1Band] = useState<number | null>(null);
-  const [lastTask2Band, setLastTask2Band] = useState<number | null>(null);
 
   // Per-user Writing History
   const [isHistoryDrawerOpen, setIsHistoryDrawerOpen] = useState<boolean>(false);
@@ -259,7 +257,8 @@ export const WritingWorkspace: React.FC<WritingWorkspaceProps> = ({ onNotify }) 
           chartType: currentPrompt.chartType,
           chartDetails: currentPrompt.chartDetails,
           essaySubtype: currentPrompt.questionType,
-          previousTaskBand: selectedTaskType === 'task1' ? lastTask2Band : lastTask1Band,
+          promptId: currentPrompt.id,
+          version: essayVersion,
         }),
       });
 
@@ -267,9 +266,7 @@ export const WritingWorkspace: React.FC<WritingWorkspaceProps> = ({ onNotify }) 
       if (resData.success && resData.data) {
         setEvaluationResult(resData.data);
         if (selectedTaskType === 'task1') {
-          setLastTask1Band(resData.data.overallBand);
         } else {
-          setLastTask2Band(resData.data.overallBand);
         }
 
         // Save to Per-User Writing History

@@ -90,29 +90,11 @@ app.listen(PORT, async () => {
   console.log(`Server đang chạy tại http://localhost:${PORT}`);
   try {
     const db = require('./config/db');
-    await db.query('ALTER TABLE users ADD COLUMN IF NOT EXISTS avatar LONGTEXT');
-    await db.query('ALTER TABLE users ADD COLUMN IF NOT EXISTS phone VARCHAR(50)');
-    await db.query(`
-      CREATE TABLE IF NOT EXISTS user_cambridge_test_attempts (
-        id VARCHAR(100) PRIMARY KEY,
-        user_id VARCHAR(100) NOT NULL,
-        book VARCHAR(50) NOT NULL,
-        test_number INT NOT NULL,
-        skill VARCHAR(20) NOT NULL,
-        band_score FLOAT NOT NULL,
-        correct_count INT NOT NULL,
-        total_questions INT NOT NULL,
-        completed_at VARCHAR(50) NOT NULL,
-        is_verified TINYINT(1) DEFAULT 0,
-        client_reported TINYINT(1) DEFAULT 1,
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        INDEX idx_user_history (user_id)
-      ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-    `);
-    await db.query('ALTER TABLE user_cambridge_test_attempts ADD COLUMN IF NOT EXISTS is_verified TINYINT(1) DEFAULT 0');
-    await db.query('ALTER TABLE user_cambridge_test_attempts ADD COLUMN IF NOT EXISTS client_reported TINYINT(1) DEFAULT 1');
-    console.log('[DB] Đã kiểm tra và đảm bảo bảng users & user_cambridge_test_attempts sẵn sàng.');
+    const { runStartupMigrations } = require('./config/dbMigrations');
+    await runStartupMigrations(db);
   } catch (err) {
+    console.warn('[DB Check] Bỏ qua kiểm tra cấu trúc bảng users:', err.message);
+  }
     console.warn('[DB Check] Bỏ qua kiểm tra cấu trúc bảng users:', err.message);
   }
 });

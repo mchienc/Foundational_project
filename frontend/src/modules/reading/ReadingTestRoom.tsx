@@ -5,6 +5,7 @@ import {
   HelpCircle,
   Bookmark,
   CheckCircle2,
+  AlertTriangle,
   XCircle,
   X,
   
@@ -162,12 +163,14 @@ export const ReadingTestRoom: React.FC<ReadingTestRoomProps> = ({
 
   // Exam submission state
   const [isSubmitted, setIsSubmitted] = useState<boolean>(false);
+  const [submissionStatus, setSubmissionStatus] = useState<'idle' | 'submitting' | 'verified' | 'provisional' | 'failed'>('idle');
   const [showSubmitModal, setShowSubmitModal] = useState<boolean>(false);
   const [examResult, setExamResult] = useState<{
     correctCount: number;
     totalCount: number;
     bandScore: number;
     percentage: number;
+    isServerVerified?: boolean;
   } | null>(null);
 
   // Text selection popover state
@@ -509,46 +512,76 @@ export const ReadingTestRoom: React.FC<ReadingTestRoomProps> = ({
     return 0.0;
   };
 
-  const handleSubmitExam = () => {
-    let correctCount = 0;
+  const handleSubmitExam = async () => {
+    if (submissionStatus === 'submitting') return;
+    hasSubmittedRef.current = true;
+    setSubmissionStatus('submitting');
+    setIsTimerRunning(false);
+
+    let localCorrectCount = 0;
     activeQuestions.forEach((q) => {
       if (checkIsCorrect(q, userAnswers[q.id] || '')) {
-        correctCount++;
+        localCorrectCount++;
       }
     });
 
-    const totalCount = activeQuestions.length;
-    const bandScore = getIeltsBandScore(correctCount, totalCount);
-    const percentage = Math.round((correctCount / totalCount) * 100);
+    const localTotalCount = activeQuestions.length;
+    const localBandScore = getIeltsBandScore(localCorrectCount, localTotalCount);
+    const localPercentage = Math.round((localCorrectCount / localTotalCount) * 100);
 
-    setExamResult({ correctCount, totalCount, bandScore, percentage });
+    const totalEstSeconds = isFullTest ? 60 * 60 : ((currentPassage.estimatedMinutes || 20) * 60);
+    const timeTaken = totalEstSeconds - secondsRemaining;
+
+    let serverResult = null;
+    try {
+      if (isFullTest && allPassages.length > 0) {
+        const passageIds = allPassages.map((p) => p.id);
+        serverResult = await submitReadingFullExamToDatabase(passageIds, userAnswers, timeTaken, sessionConfig?.testTitle);
+      } else {
+        serverResult = await submitReadingExamToDatabase(currentPassage.id, userAnswers, timeTaken);
+      }
+    } catch (err) {
+      console.warn('Lỗi kết nối máy chủ khi chấm bài Reading:', err);
+    }
+
+    let finalCorrect = localCorrectCount;
+    let finalTotal = localTotalCount;
+    let finalBand = localBandScore;
+    let finalPercentage = localPercentage;
+    let isServerVerified = false;
+
+    if (serverResult && typeof serverResult.correctCount === 'number') {
+      finalCorrect = serverResult.correctCount;
+      finalTotal = serverResult.totalCount || localTotalCount;
+      finalBand = serverResult.bandScore !== undefined ? serverResult.bandScore : localBandScore;
+      finalPercentage = serverResult.percentage !== undefined ? serverResult.percentage : Math.round((finalCorrect / finalTotal) * 100);
+      isServerVerified = true;
+      setSubmissionStatus('verified');
+      onNotify?.(`Hoàn thành bài thi! Đã xác thực trên hệ thống: ${finalCorrect}/${finalTotal} câu đúng (Band ${finalBand}).`, 'success');
+    } else {
+      setSubmissionStatus('provisional');
+      onNotify?.(`Hoàn thành bài thi (Điểm tạm tính: ${finalCorrect}/${finalTotal} câu đúng, Band ${finalBand}). Chưa kết nối server để xác minh.`, 'info');
+    }
+
+    setExamResult({
+      correctCount: finalCorrect,
+      totalCount: finalTotal,
+      bandScore: finalBand,
+      percentage: finalPercentage,
+      isServerVerified
+    });
     setIsSubmitted(true);
     setShowSubmitModal(true);
-    setIsTimerRunning(false);
 
     const examLabel = isFullTest
       ? `${sessionConfig?.testTitle || currentPassage.source} (Full Test 40 câu)`
       : `Cambridge ${currentPassage.source}`;
-    onEarnXp?.(0, `Hoàn thành bài thi ${examLabel} (Band ${bandScore})!`);
-    onNotify?.(`Hoàn thành bài thi! Đạt ${correctCount}/${totalCount} câu đúng (IELTS Band ${bandScore}).`, 'success');
-
-    // Lưu kết quả thi vào CSDL MySQL
-    const totalEstSeconds = isFullTest ? 60 * 60 : ((currentPassage.estimatedMinutes || 20) * 60);
-    const timeTaken = totalEstSeconds - secondsRemaining;
-    if (isFullTest && allPassages.length > 0) {
-      const passageIds = allPassages.map((p) => p.id);
-      submitReadingFullExamToDatabase(passageIds, userAnswers, timeTaken, sessionConfig?.testTitle).catch((err) =>
-        console.warn('Lưu full test vào MySQL thất bại:', err)
-      );
-    } else {
-      submitReadingExamToDatabase(currentPassage.id, userAnswers, timeTaken).catch((err) =>
-        console.warn('Lưu kết quả thi vào MySQL thất bại:', err)
-      );
-    }
+    onEarnXp?.(0, `Hoàn thành bài thi ${examLabel} (Band ${finalBand})!`);
   };
 
   const handleResetExam = () => {
     hasSubmittedRef.current = false;
+    setSubmissionStatus('idle');
     setUserAnswers({});
     setCheckedQuestions({});
     setFlaggedQuestions({});
@@ -1334,10 +1367,24 @@ export const ReadingTestRoom: React.FC<ReadingTestRoomProps> = ({
                     <button
                       type="button"
                       onClick={handleSubmitExam}
-                      className="w-full sm:w-auto px-6 py-3 rounded-2xl bg-[#064E3B] hover:bg-[#022C22] text-amber-300 hover:text-white font-sans font-bold text-xs uppercase tracking-wide shadow-md shadow-emerald-950/20 active:scale-95 transition-all cursor-pointer flex items-center justify-center gap-2"
+                      disabled={submissionStatus === 'submitting'}
+                      className={`w-full sm:w-auto px-6 py-3 rounded-2xl ${
+                        submissionStatus === 'submitting'
+                          ? 'bg-stone-400 text-stone-200 cursor-not-allowed'
+                          : 'bg-[#064E3B] hover:bg-[#022C22] text-amber-300 hover:text-white cursor-pointer active:scale-95'
+                      } font-sans font-bold text-xs uppercase tracking-wide shadow-md shadow-emerald-950/20 transition-all flex items-center justify-center gap-2`}
                     >
-                      <CheckCircle2 size={16} />
-                      <span>Nộp Bài Thi ({answeredCount}/{activeQuestions.length})</span>
+                      {submissionStatus === 'submitting' ? (
+                        <>
+                          <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-1" />
+                          <span>Đang chấm & xác thực...</span>
+                        </>
+                      ) : (
+                        <>
+                          <CheckCircle2 size={16} />
+                          <span>Nộp Bài Thi ({answeredCount}/{activeQuestions.length})</span>
+                        </>
+                      )}
                     </button>
                   ) : (
                     <button
@@ -1476,6 +1523,19 @@ export const ReadingTestRoom: React.FC<ReadingTestRoomProps> = ({
 
             {/* Modal Body */}
             <div className="p-6 space-y-6">
+              <div className="flex items-center justify-center mb-2">
+                {examResult.isServerVerified ? (
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-800 border border-emerald-300">
+                    <CheckCircle2 size={13} className="text-emerald-700" />
+                    ✓ Đã xác thực trên máy chủ
+                  </span>
+                ) : (
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-amber-100 text-amber-800 border border-amber-300">
+                    <AlertTriangle size={13} className="text-amber-700" />
+                    Điểm tạm tính (Chưa xác minh từ server)
+                  </span>
+                )}
+              </div>
               {/* Band Score Card */}
               <div className="text-center bg-white rounded-xl p-5 border border-stone-200 shadow-xs">
                 <span className="text-xs uppercase tracking-wider font-bold text-stone-600 font-sans">

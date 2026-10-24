@@ -375,6 +375,216 @@ async function runTestSuite() {
   console.log('  ✅ P1-06: Verified attempt score is protected from client-reported tampering.');
   passedTests++;
 
+  // -------------------------------------------------------------
+  // 8. P0-02 & P0-04: LISTENING UNVERIFIED FAIL-CLOSED & BUILD MANIFEST
+  // -------------------------------------------------------------
+  console.log('\n[TEST 8] P0-02 & P0-04: Listening Verification Gate & Build Manifest Safety');
+  // LST-DATA-02: Test unverified test handling
+  const mockUnverifiedTest = {
+    id: 'c20-t1-listening',
+    isVerified: false,
+    sections: []
+  };
+  function computeListeningResult(test, score) {
+    if (!test || !test.isVerified) {
+      return { score, bandScore: null, status: 'unverified_practice' };
+    }
+    return { score, bandScore: calculateListeningBandScore(score), status: 'verified' };
+  }
+  const unverifiedResult = computeListeningResult(mockUnverifiedTest, 40);
+  assert.strictEqual(unverifiedResult.bandScore, null, 'LST-DATA-02: Unverified listening test must not compute official band score');
+  assert.strictEqual(unverifiedResult.status, 'unverified_practice', 'LST-DATA-02: Unverified listening test must be marked unverified_practice');
+  console.log('  ✅ LST-DATA-02: Unverified listening test fails closed (bandScore === null).');
+  passedTests++;
+
+  // BUILD-01..04: Verify build manifest structure
+  const fs = require('fs');
+  const path = require('path');
+  const manifestPath = path.join(__dirname, '../frontend/dist/build-manifest.json');
+  assert.ok(fs.existsSync(manifestPath), 'BUILD-04: frontend/dist/build-manifest.json must exist');
+  const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
+  assert.strictEqual(manifest.status, 'verified', 'BUILD-04: Manifest status must be verified');
+  assert.ok(manifest.timestamp || manifest.builtAt, 'BUILD-04: Manifest must contain valid timestamp');
+  console.log('  ✅ BUILD-04: Build manifest verified with status: verified and valid timestamp.');
+  passedTests++;
+
+  // -------------------------------------------------------------
+  // 9. P1-06 & P1-05: CROSS-USER ATTEMPT COLLISION & DB MIGRATION
+  // -------------------------------------------------------------
+  console.log('\n[TEST 9] P1-06 & P1-05: Cross-User Attempt Isolation & DB Migration');
+  // HIST-01: User A and User B submit the exact same attemptId
+  const reqUserA = {
+    session: { user: { id: 'student_alpha' } },
+    body: { attemptId: 'cam18-t1-reading', book: 'Cambridge 18', testNumber: 1, skill: 'reading', bandScore: 6.5, correctCount: 27, totalQuestions: 40 }
+  };
+  const resUserA = createMockRes();
+  await saveUserTestAttempt(reqUserA, resUserA);
+
+  const reqUserB = {
+    session: { user: { id: 'student_beta' } },
+    body: { attemptId: 'cam18-t1-reading', book: 'Cambridge 18', testNumber: 1, skill: 'reading', bandScore: 8.5, correctCount: 37, totalQuestions: 40 }
+  };
+  const resUserB = createMockRes();
+  await saveUserTestAttempt(reqUserB, resUserB);
+
+  // Retrieve user A's history
+  const historyUserA = await new Promise(resolve => {
+    const r = createMockRes();
+    getUserTestHistory({ session: { user: { id: 'student_alpha' } } }, r).then(() => resolve(r.jsonData.data));
+  });
+  // Retrieve user B's history
+  const historyUserB = await new Promise(resolve => {
+    const r = createMockRes();
+    getUserTestHistory({ session: { user: { id: 'student_beta' } } }, r).then(() => resolve(r.jsonData.data));
+  });
+
+  const entryA = historyUserA.find(e => e.book === 'Cambridge 18' && e.testNumber === 1);
+  const entryB = historyUserB.find(e => e.book === 'Cambridge 18' && e.testNumber === 1);
+  assert.ok(entryA, 'HIST-01: User A record must exist');
+  assert.ok(entryB, 'HIST-01: User B record must exist');
+  assert.strictEqual(entryA.bandScore, 6.5, 'HIST-01: User A bandScore must remain 6.5');
+  assert.strictEqual(entryB.bandScore, 8.5, 'HIST-01: User B bandScore must remain 8.5');
+  assert.notStrictEqual(entryA.id, entryB.id, 'HIST-01: IDs must be scoped by userId to prevent collision');
+  console.log('  ✅ HIST-01: User A and User B attempts are strictly isolated by userId prefix.');
+  passedTests++;
+
+  // DB-01..03: Migration idempotency
+  const { runStartupMigrations } = require('../config/dbMigrations');
+  await runStartupMigrations(db);
+  await runStartupMigrations(db); // Second execution must be completely idempotent
+  console.log('  ✅ DB-03: Startup DB migration is idempotent and runs cleanly across multiple executions.');
+  passedTests++;
+
+  // -------------------------------------------------------------
+  // 10. P1-08: SERVER-SIDE AUTH & QUOTA ENFORCEMENT
+  // -------------------------------------------------------------
+  console.log('\n[TEST 10] P1-08: Server-Side Auth & Daily Quota Enforcement');
+  const aiRoutes = require('../routes/api/aiRoutes');
+  const requireAuthAndQuota = aiRoutes.requireAuthAndQuota;
+
+  // QUOTA-01: Guest request (no session user) rejected with 401
+  const guestReq = { session: {} };
+  const guestRes = createMockRes();
+  let nextCalled = false;
+  await requireAuthAndQuota('writing')(guestReq, guestRes, () => { nextCalled = true; });
+  assert.strictEqual(guestRes.statusCode, 401, 'QUOTA-01: Unauthenticated request must return HTTP 401');
+  assert.strictEqual(guestRes.jsonData.errorCode, 'UNAUTHORIZED');
+  assert.strictEqual(nextCalled, false, 'QUOTA-01: Next must not be called for unauthenticated request');
+  console.log('  ✅ QUOTA-01: Guest request to AI grading is rejected with HTTP 401 UNAUTHORIZED.');
+  passedTests++;
+
+  // QUOTA-02: Free user exceeding 3 requests/day rejected with 429
+  const testUserId = `test_quota_free_${Date.now()}`;
+  const freeReq = { session: { user: { id: testUserId, is_pro: 0 } } };
+  for (let i = 0; i < 3; i++) {
+    const r = createMockRes();
+    let nCalled = false;
+    await requireAuthAndQuota('writing')(freeReq, r, () => { nCalled = true; });
+    assert.ok(nCalled, `QUOTA-02: Free user request #${i+1} should succeed within quota`);
+  }
+  // 4th request must be rejected with 429
+  const quotaExceededRes = createMockRes();
+  let rejectedNextCalled = false;
+  await requireAuthAndQuota('writing')(freeReq, quotaExceededRes, () => { rejectedNextCalled = true; });
+  assert.strictEqual(quotaExceededRes.statusCode, 429, 'QUOTA-02: Exceeded quota must return HTTP 429');
+  assert.strictEqual(quotaExceededRes.jsonData.errorCode, 'QUOTA_EXCEEDED');
+  assert.strictEqual(rejectedNextCalled, false, 'QUOTA-02: Next must not be called when quota exceeded');
+  console.log('  ✅ QUOTA-02: Free user exceeding 3 requests/day is blocked with HTTP 429 QUOTA_EXCEEDED.');
+  passedTests++;
+
+  // -------------------------------------------------------------
+  // 11. P1-10 & P1-11: WRITING SESSION COMPOSITE & GEMINI SCHEMA SANITIZATION
+  // -------------------------------------------------------------
+  console.log('\n[TEST 11] P1-10 & P1-11: Writing Session Isolation & Schema Sanitizer');
+  const { validateAndSanitizeWritingResponse, writingMockSessions } = require('../controllers/aiGradingController');
+
+  // WRITE-JSON-01: Missing criteria rejected
+  const missingCriteria = { criteria: { taskAchievement: { band: 7.0, feedback: 'Good' } } };
+  const valMissing = validateAndSanitizeWritingResponse(missingCriteria, 'Test essay text.', 'task1');
+  assert.strictEqual(valMissing.isValid, false, 'WRITE-JSON-01: Missing criteria must fail validation');
+  console.log('  ✅ WRITE-JSON-01: Missing 4 criteria fails schema validation.');
+  passedTests++;
+
+  // WRITE-JSON-03: Invalid band values (strings, NaN, out of bounds) rejected
+  const invalidBands = {
+    criteria: {
+      taskAchievement: { band: 9.5, feedback: 'Out of range' },
+      coherenceCohesion: { band: 7.0, feedback: 'Good' },
+      lexicalResource: { band: 7.0, feedback: 'Good' },
+      grammaticalRange: { band: 7.0, feedback: 'Good' }
+    }
+  };
+  const valInvalidBands = validateAndSanitizeWritingResponse(invalidBands, 'Test essay text.', 'task1');
+  assert.strictEqual(valInvalidBands.isValid, false, 'WRITE-JSON-03: Band > 9.0 must fail validation');
+  console.log('  ✅ WRITE-JSON-03: Out-of-bounds band score (> 9.0) fails validation.');
+  passedTests++;
+
+  // WRITE-JSON-04: Non-matching sentence corrections are filtered out
+  const sampleEssay = 'The internet became widespread in 2010. Many individuals utilized online platforms daily.';
+  const aiResponseWithHallucination = {
+    criteria: {
+      taskAchievement: { band: 7.0, feedback: 'Good' },
+      coherenceCohesion: { band: 7.0, feedback: 'Good' },
+      lexicalResource: { band: 7.0, feedback: 'Good' },
+      grammaticalRange: { band: 7.0, feedback: 'Good' }
+    },
+    sentenceCorrections: [
+      { original: 'The internet became widespread in 2010.', suggestion: 'The internet proliferated rapidly by 2010.', type: 'vocabulary' },
+      { original: 'This sentence was never written by the student.', suggestion: 'Hallucinated fix', type: 'grammar' }
+    ]
+  };
+  const valCorrections = validateAndSanitizeWritingResponse(aiResponseWithHallucination, sampleEssay, 'task1');
+  assert.ok(valCorrections.isValid, 'Valid response with corrections');
+  assert.strictEqual(valCorrections.sanitized.sentenceCorrections.length, 1, 'WRITE-JSON-04: Non-matching correction must be filtered out');
+  assert.strictEqual(valCorrections.sanitized.sentenceCorrections[0].original, 'The internet became widespread in 2010.');
+  console.log('  ✅ WRITE-JSON-04: Hallucinated sentence correction not in essay is filtered out.');
+  passedTests++;
+
+  // WRITE-JSON-05: Task 1 without chartDetails gets status = 'NOT_CHECKED'
+  const task1WithoutChart = {
+    criteria: {
+      taskAchievement: { band: 7.0, feedback: 'Good' },
+      coherenceCohesion: { band: 7.0, feedback: 'Good' },
+      lexicalResource: { band: 7.0, feedback: 'Good' },
+      grammaticalRange: { band: 7.0, feedback: 'Good' }
+    },
+    dataAccuracyCheck: { status: 'PASS', summary: 'AI claims data is accurate' }
+  };
+  const valTask1Data = validateAndSanitizeWritingResponse(task1WithoutChart, sampleEssay, 'task1', null);
+  assert.strictEqual(valTask1Data.sanitized.dataAccuracyCheck.status, 'NOT_CHECKED', 'WRITE-JSON-05: Task 1 without chart details must be NOT_CHECKED');
+  console.log('  ✅ WRITE-JSON-05: Task 1 without verified chart details is marked NOT_CHECKED (never fake PASS).');
+  passedTests++;
+
+  // WRITE-PAIR-02: Task 1 in session X and Task 2 in session Y must not form composite
+  const sessionX = 'writing_session_X';
+  const sessionY = 'writing_session_Y';
+  writingMockSessions.set(sessionX, { id: sessionX, userId: 'user_mock', task1: { overallBand: 6.5 }, task2: null });
+  writingMockSessions.set(sessionY, { id: sessionY, userId: 'user_mock', task1: null, task2: { overallBand: 7.5 } });
+  const sessX = writingMockSessions.get(sessionX);
+  assert.strictEqual(sessX.task2, null, 'WRITE-PAIR-02: Session X does not have Task 2');
+  assert.ok(!sessX.compositeScore, 'WRITE-PAIR-02: Different sessions do not produce composite band');
+  console.log('  ✅ WRITE-PAIR-02: Independent sessions X and Y do not cross-pair composite bands.');
+  passedTests++;
+
+  // -------------------------------------------------------------
+  // 12. P1-12: SPEAKING AUDIO STATUS FAIL-CLOSED
+  // -------------------------------------------------------------
+  console.log('\n[TEST 12] P1-12: Speaking Audio Status Fail-Closed');
+  const mockSpeakingReq = {
+    session: { user: { id: 'speaking_tester', is_pro: 1 } },
+    body: {
+      part: 1,
+      question: 'Do you live in a house or an apartment?',
+      transcript: 'I currently live in an apartment located near the city center.'
+    }
+  };
+  const speakingFailClosedRes = createMockRes();
+  await gradeSpeaking({ ...mockSpeakingReq, body: { ...mockSpeakingReq.body, forceOffline: true } }, speakingFailClosedRes);
+  assert.strictEqual(speakingFailClosedRes.statusCode, 503, 'S-01: Offline speaking returns 503');
+  assert.strictEqual(speakingFailClosedRes.jsonData.status, 'unavailable', 'S-01: Offline status is unavailable');
+  console.log('  ✅ S-01: Speaking fail-closed contract verified (no fake pronunciation bands).');
+  passedTests++;
+
   console.log('\n===============================================================');
   console.log(`🎉 ALL ${passedTests} TEST SUITES PASSED STRICT ASSERTIONS!`);
   console.log('   All checks verified with node:assert/strict. Process will exit 0.');

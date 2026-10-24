@@ -50,7 +50,7 @@ export interface WritingEvaluationResult {
     grammaticalRange: { band: number; feedback: string };
   };
   dataAccuracyCheck?: {
-    status: 'PASS' | 'WARNING' | 'FAIL';
+    status: 'PASS' | 'WARNING' | 'FAIL' | 'NOT_CHECKED';
     accuracyScore: number;
     hasFactualErrors: boolean;
     summary: string;
@@ -950,6 +950,8 @@ export const WritingEvaluationModal: React.FC<WritingEvaluationModalProps> = ({
                               ? 'bg-emerald-100 text-emerald-800'
                               : evaluation.dataAccuracyCheck?.status === 'WARNING'
                               ? 'bg-amber-100 text-amber-800'
+                              : evaluation.dataAccuracyCheck?.status === 'NOT_CHECKED'
+                              ? 'bg-stone-200 text-stone-700'
                               : 'bg-red-100 text-red-800'
                           }`}
                         >
@@ -964,6 +966,8 @@ export const WritingEvaluationModal: React.FC<WritingEvaluationModalProps> = ({
                                   ? 'bg-emerald-100 text-emerald-800'
                                   : evaluation.dataAccuracyCheck?.status === 'WARNING'
                                   ? 'bg-amber-100 text-amber-800'
+                                  : evaluation.dataAccuracyCheck?.status === 'NOT_CHECKED'
+                                  ? 'bg-stone-200 text-stone-700'
                                   : 'bg-red-100 text-red-800'
                               }`}
                             >
@@ -971,6 +975,8 @@ export const WritingEvaluationModal: React.FC<WritingEvaluationModalProps> = ({
                                 ? 'CHÍNH XÁC (PASS)'
                                 : evaluation.dataAccuracyCheck?.status === 'WARNING'
                                 ? 'CÓ CHI TIẾT CẦN LƯU Ý (WARNING)'
+                                : evaluation.dataAccuracyCheck?.status === 'NOT_CHECKED'
+                                ? 'CHƯA ĐỐI SOÁT (KHÔNG CÓ DỮ LIỆU BIỂU ĐỒ GỐC)'
                                 : 'SAI LỆCH SỐ LIỆU (FAIL)'}
                             </span>
                           </h4>

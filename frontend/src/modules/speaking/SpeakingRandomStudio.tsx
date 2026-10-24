@@ -10,6 +10,7 @@ import {
   
   RotateCcw,
   FileEdit,
+  Volume2,
 } from 'lucide-react';
 import { mockSpeakingPrompts, SpeakingPrompt } from '../../data/mockWritingSpeakingPrompts';
 import { useProStore } from '../pro/useProStore';
@@ -40,6 +41,10 @@ export const SpeakingRandomStudio: React.FC<SpeakingRandomStudioProps> = ({ onNo
   const recognitionRef = useRef<any>(null);
   const isRecordingRef = useRef<boolean>(false);
   const timerIntervalRef = useRef<any>(null);
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+  const audioChunksRef = useRef<Blob[]>([]);
+  const streamRef = useRef<MediaStream | null>(null);
+  const [recordedAudioUrl, setRecordedAudioUrl] = useState<string | null>(null);
 
   // Part 2 Preparation State
   const [prepSecondsLeft, setPrepSecondsLeft] = useState<number>(60);
@@ -169,11 +174,48 @@ export const SpeakingRandomStudio: React.FC<SpeakingRandomStudioProps> = ({ onNo
     setScratchpadNote('');
   };
 
-  // Toggle Recording
-  const startRecording = () => {
-    if (!speechSupported) {
-      if (onNotify) onNotify('Trình duyệt của bạn không hỗ trợ Web Speech API. Bạn có thể nhập trực tiếp câu trả lời vào khung gỡ băng.', 'info');
+  // Toggle Recording with MediaRecorder & SpeechRecognition (P1-12)
+  const startRecording = async () => {
+    // 1. Capture real audio via MediaRecorder
+    audioChunksRef.current = [];
+    if (recordedAudioUrl) {
+      URL.revokeObjectURL(recordedAudioUrl);
+      setRecordedAudioUrl(null);
+    }
 
+    if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        streamRef.current = stream;
+        const recorder = new MediaRecorder(stream);
+        recorder.ondataavailable = (e) => {
+          if (e.data && e.data.size > 0) {
+            audioChunksRef.current.push(e.data);
+          }
+        };
+        recorder.onstop = () => {
+          if (audioChunksRef.current.length > 0) {
+            const blob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
+            const url = URL.createObjectURL(blob);
+            setRecordedAudioUrl(url);
+          }
+          if (streamRef.current) {
+            streamRef.current.getTracks().forEach((track) => track.stop());
+            streamRef.current = null;
+          }
+        };
+        recorder.start(100);
+        mediaRecorderRef.current = recorder;
+      } catch (micErr) {
+        console.warn('MediaRecorder initialization warning:', micErr);
+      }
+    }
+
+    // 2. Web Speech API live transcription
+    if (!speechSupported) {
+      if (onNotify) onNotify('Trình duyệt không hỗ trợ Web Speech API. Bạn có thể tự gõ văn bản câu trả lời.', 'info');
+      isRecordingRef.current = true;
+      setIsRecording(true);
       return;
     }
 
@@ -181,12 +223,9 @@ export const SpeakingRandomStudio: React.FC<SpeakingRandomStudioProps> = ({ onNo
       recognitionRef.current?.start();
       isRecordingRef.current = true;
       setIsRecording(true);
-
     } catch (e) {
-      // In case recognition already started
       isRecordingRef.current = true;
       setIsRecording(true);
-
     }
   };
 
@@ -195,8 +234,12 @@ export const SpeakingRandomStudio: React.FC<SpeakingRandomStudioProps> = ({ onNo
     setIsRecording(false);
     try {
       recognitionRef.current?.stop();
-    } catch (e) {
-      // Ignore
+    } catch (e) {}
+
+    if (mediaRecorderRef.current && mediaRecorderRef.current.state !== 'inactive') {
+      try {
+        mediaRecorderRef.current.stop();
+      } catch (e) {}
     }
   };
 
@@ -491,7 +534,18 @@ export const SpeakingRandomStudio: React.FC<SpeakingRandomStudioProps> = ({ onNo
             </div>
           </div>
 
-          {/* Real-time Transcribed Speech Box */}
+          {/* Audio Playback Preview (P1-12) */}
+            {recordedAudioUrl && (
+              <div className="p-3.5 bg-stone-100 rounded-2xl border border-stone-200 flex flex-col sm:flex-row items-center justify-between gap-3 shadow-2xs">
+                <div className="flex items-center gap-2 text-xs font-semibold text-stone-700">
+                  <Volume2 size={16} className="text-[#064E3B]" />
+                  <span>Bản thu âm của bạn ({durationSeconds}s):</span>
+                </div>
+                <audio controls src={recordedAudioUrl} className="h-8 w-full sm:max-w-xs" />
+              </div>
+            )}
+
+            {/* Real-time Transcribed Speech Box */}
           <div className="space-y-2">
             <div className="flex items-center justify-between text-xs">
               <span className="font-bold text-stone-700 uppercase tracking-wide flex items-center gap-1.5">

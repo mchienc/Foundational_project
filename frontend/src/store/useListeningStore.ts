@@ -86,6 +86,9 @@ export const useListeningStore = create<ListeningStore>((set, get) => ({
       return { section: section.sectionNumber, correct, total: sectionQuestions.length };
     });
 
+    const isVerified = test.isVerified === true;
+    const bandScore = isVerified ? calculateListeningBandScore(correctCount) : null;
+
     set({
       isExamFinished: true,
       examResult: {
@@ -93,8 +96,10 @@ export const useListeningStore = create<ListeningStore>((set, get) => ({
         userAnswers,
         correctCount,
         totalCount: totalQuestions,
-        bandScore: calculateListeningBandScore(correctCount),
+        bandScore,
         sectionScores,
+        isVerified,
+        status: isVerified ? 'verified' : 'unverified_practice',
         completedAt: new Date().toISOString()
       }
     });

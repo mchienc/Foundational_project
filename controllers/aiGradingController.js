@@ -203,6 +203,139 @@ function extractJsonFromText(rawText) {
   }
 }
 
+
+// Server-side Writing Mock Sessions Store (P1-10)
+const writingMockSessions = new Map();
+
+// Schema validation and sanitization for Writing AI Examiner response (P1-11)
+function validateAndSanitizeWritingResponse(parsed, essayContent, taskType, chartDetails) {
+  if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
+    return { isValid: false, error: 'INVALID_OBJECT_STRUCTURE' };
+  }
+
+  if (!parsed.criteria || typeof parsed.criteria !== 'object' || Array.isArray(parsed.criteria)) {
+    return { isValid: false, error: 'MISSING_CRITERIA_OBJECT' };
+  }
+
+  // Task 1 uses taskAchievement, Task 2 uses taskResponse
+  const taskCriterion = parsed.criteria.taskAchievement || parsed.criteria.taskResponse;
+  const cc = parsed.criteria.coherenceCohesion;
+  const lr = parsed.criteria.lexicalResource;
+  const gra = parsed.criteria.grammaticalRange;
+
+  if (!taskCriterion || !cc || !lr || !gra) {
+    return { isValid: false, error: 'MISSING_MANDATORY_CRITERIA' };
+  }
+
+  const bands = [taskCriterion.band, cc.band, lr.band, gra.band];
+  const allBandsValid = bands.every(
+    b => typeof b === 'number' && Number.isFinite(b) && !isNaN(b) && b >= 0 && b <= 9
+  );
+
+  if (!allBandsValid) {
+    return { isValid: false, error: 'INVALID_CRITERIA_BAND_RANGE' };
+  }
+
+  // Validate feedback strings
+  if (typeof taskCriterion.feedback !== 'string' || typeof cc.feedback !== 'string' ||
+      typeof lr.feedback !== 'string' || typeof gra.feedback !== 'string') {
+    return { isValid: false, error: 'INVALID_CRITERIA_FEEDBACK_TYPE' };
+  }
+
+  // Server authoritative overall band calculation (P1-11)
+  const avg = (taskCriterion.band + cc.band + lr.band + gra.band) / 4;
+  const serverOverallBand = roundIeltsBand(avg);
+
+  // P1-11: Filter sentenceCorrections: sc.original must exist verbatim in essayContent
+  let sanitizedCorrections = [];
+  if (Array.isArray(parsed.sentenceCorrections)) {
+    for (const sc of parsed.sentenceCorrections) {
+      if (!sc || typeof sc !== 'object') continue;
+      const original = typeof sc.original === 'string' ? sc.original.trim() : '';
+      const suggestion = typeof sc.suggestion === 'string' ? sc.suggestion.trim() : '';
+      if (!original || !suggestion) continue;
+
+      // Check verbatim existence in essayContent
+      if (!essayContent.includes(original)) {
+        continue;
+      }
+
+      const validTypes = ['grammar', 'vocabulary', 'cohesion'];
+      const type = validTypes.includes(sc.type) ? sc.type : 'grammar';
+
+      sanitizedCorrections.push({
+        original,
+        suggestion,
+        type,
+        explanation: typeof sc.explanation === 'string' ? sc.explanation : ''
+      });
+    }
+  }
+
+  // P1-11: Data accuracy check status for Task 1:
+  // Must be 'PASS' | 'WARNING' | 'FAIL' | 'NOT_CHECKED'.
+  // If task1 has no chartDetails or empty, status must be 'NOT_CHECKED'.
+  let dataAccuracyCheck = parsed.dataAccuracyCheck;
+  const isTask1 = taskType === 'task1';
+  const hasChartDetails = chartDetails && (
+    (typeof chartDetails === 'string' && chartDetails.trim().length > 0) ||
+    (typeof chartDetails === 'object' && Object.keys(chartDetails).length > 0)
+  );
+
+  if (isTask1) {
+    if (!hasChartDetails) {
+      dataAccuracyCheck = {
+        status: 'NOT_CHECKED',
+        accuracyScore: 0,
+        hasFactualErrors: false,
+        summary: 'Chưa có bộ dữ liệu biểu đồ nguồn được đối soát. Không thể cấp trạng thái PASS tự động.',
+        verifications: []
+      };
+    } else if (dataAccuracyCheck && typeof dataAccuracyCheck === 'object') {
+      const allowedStatuses = ['PASS', 'WARNING', 'FAIL', 'NOT_CHECKED'];
+      const currentStatus = allowedStatuses.includes(dataAccuracyCheck.status) ? dataAccuracyCheck.status : 'NOT_CHECKED';
+      dataAccuracyCheck = {
+        status: currentStatus,
+        accuracyScore: typeof dataAccuracyCheck.accuracyScore === 'number' ? dataAccuracyCheck.accuracyScore : 8.0,
+        hasFactualErrors: Boolean(dataAccuracyCheck.hasFactualErrors),
+        summary: typeof dataAccuracyCheck.summary === 'string' ? dataAccuracyCheck.summary : '',
+        verifications: Array.isArray(dataAccuracyCheck.verifications) ? dataAccuracyCheck.verifications : []
+      };
+    } else {
+      dataAccuracyCheck = {
+        status: 'NOT_CHECKED',
+        accuracyScore: 0,
+        hasFactualErrors: false,
+        summary: 'Không có dữ liệu đối soát độ chính xác từ mô hình AI.',
+        verifications: []
+      };
+    }
+  }
+
+  const modelAnswer = typeof parsed.modelAnswer === 'string' ? parsed.modelAnswer : '';
+  const overview = typeof parsed.overview === 'string' ? parsed.overview : '';
+
+  const sanitized = {
+    ...parsed,
+    criteria: {
+      taskAchievement: { band: taskCriterion.band, feedback: taskCriterion.feedback },
+      coherenceCohesion: { band: cc.band, feedback: cc.feedback },
+      lexicalResource: { band: lr.band, feedback: lr.feedback },
+      grammaticalRange: { band: gra.band, feedback: gra.feedback }
+    },
+    overallBand: serverOverallBand,
+    sentenceCorrections: sanitizedCorrections,
+    modelAnswer,
+    overview
+  };
+
+  if (isTask1) {
+    sanitized.dataAccuracyCheck = dataAccuracyCheck;
+  }
+
+  return { isValid: true, sanitized };
+}
+
 // Controller chấm bài Writing
 exports.gradeWriting = async (req, res) => {
   try {
@@ -405,61 +538,78 @@ ${essayContent}`;
           const apiData = await apiResponse.json();
           const candidateText = apiData?.candidates?.[0]?.content?.parts?.[0]?.text;
           if (candidateText) {
-            const parsed = extractJsonFromText(candidateText);
-            if (parsed && parsed.criteria) {
-              const taBand = parsed.criteria?.taskAchievement?.band;
-              const ccBand = parsed.criteria?.coherenceCohesion?.band;
-              const lrBand = parsed.criteria?.lexicalResource?.band;
-              const graBand = parsed.criteria?.grammaticalRange?.band;
+            const rawParsed = extractJsonFromText(candidateText);
+            const validation = validateAndSanitizeWritingResponse(
+              rawParsed,
+              essayContent,
+              isTask1 ? 'task1' : 'task2',
+              chartDetails
+            );
 
-              // W-02: Bắt buộc cả 4 criteria đều phải là số hữu hạn trong [0, 9]
-              const criteriaList = [taBand, ccBand, lrBand, graBand];
-              const isValidCriteria = criteriaList.every(
-                b => typeof b === 'number' && !isNaN(b) && b >= 0 && b <= 9
-              );
+            if (validation.isValid) {
+              const sanitized = validation.sanitized;
+              sanitized.academicAnalytics = sanitized.academicAnalytics || analytics;
+              sanitized.paragraphAudit = sanitized.paragraphAudit || analytics.paragraphAudit;
 
-              if (isValidCriteria) {
-                const avg = (taBand + ccBand + lrBand + graBand) / 4;
-                parsed.overallBand = roundIeltsBand(avg);
+              // P1-10: Server-side session mock pairing
+              const sessionUserId = (req.session && req.session.user && req.session.user.id) || (req.session && req.session.userId) || 'anon';
+              const { writingSessionId, promptId, version } = req.body;
 
-                // Gắn kết quả Deep Analytics & Paragraph Audit
-                parsed.academicAnalytics = parsed.academicAnalytics || analytics;
-                parsed.paragraphAudit = parsed.paragraphAudit || analytics.paragraphAudit;
-
-                // Đảm bảo type phân loại lỗi ('grammar' | 'vocabulary' | 'cohesion')
-                if (Array.isArray(parsed.sentenceCorrections)) {
-                  parsed.sentenceCorrections = parsed.sentenceCorrections.map((sc, idx) => {
-                    let t = sc.type;
-                    if (!t || !['grammar', 'vocabulary', 'cohesion'].includes(t)) {
-                      t = idx % 3 === 0 ? 'grammar' : idx % 3 === 1 ? 'vocabulary' : 'cohesion';
-                    }
-                    return { ...sc, type: t };
+              if (writingSessionId) {
+                let sess = writingMockSessions.get(writingSessionId);
+                if (sess && sess.userId && sess.userId !== String(sessionUserId)) {
+                  return res.status(403).json({
+                    success: false,
+                    message: 'Writing session ID không thuộc về tài khoản này.'
                   });
                 }
-
-                // Tính toán điểm Writing tổng hợp nếu có điểm của Task kia
-                if (previousTaskBand) {
-                  const ptBand = parseFloat(previousTaskBand);
-                  if (!isNaN(ptBand) && ptBand >= 0 && ptBand <= 9) {
-                    const t1 = isTask1 ? parsed.overallBand : ptBand;
-                    const t2 = isTask1 ? ptBand : parsed.overallBand;
-                    const composite = calculateCompositeWritingBand(t1, t2);
-                    parsed.compositeScore = {
-                      task1Band: t1,
-                      task2Band: t2,
-                      compositeBand: composite,
-                      formula: "round_0.5((T1 + 2 * T2) / 3)"
-                    };
-                  }
+                if (!sess) {
+                  sess = {
+                    id: writingSessionId,
+                    userId: String(sessionUserId),
+                    createdAt: Date.now(),
+                    task1: null,
+                    task2: null
+                  };
+                  writingMockSessions.set(writingSessionId, sess);
                 }
 
-                return res.json({
-                  success: true,
-                  status: 'scored',
-                  source: `Gemini AI Senior Examiner (${model})`,
-                  data: parsed
-                });
+                const taskRecord = {
+                  taskType: isTask1 ? 'task1' : 'task2',
+                  promptId: promptId || 'default-prompt',
+                  overallBand: sanitized.overallBand,
+                  version: version || 1,
+                  gradedAt: Date.now()
+                };
+
+                if (isTask1) {
+                  sess.task1 = taskRecord;
+                } else {
+                  sess.task2 = taskRecord;
+                }
+
+                // If both tasks are graded in the SAME session for this user:
+                if (sess.task1 && sess.task2 && typeof sess.task1.overallBand === 'number' && typeof sess.task2.overallBand === 'number') {
+                  const compositeBand = calculateCompositeWritingBand(sess.task1.overallBand, sess.task2.overallBand);
+                  sanitized.compositeScore = {
+                    sessionId: writingSessionId,
+                    task1Band: sess.task1.overallBand,
+                    task2Band: sess.task2.overallBand,
+                    compositeBand,
+                    formula: 'round_0.5((T1 + 2 * T2) / 3)',
+                    note: 'Ước lượng luyện tập mô phỏng từ cùng phiên thi Writing Full Mock. Không phải chứng chỉ IELTS chính thức.'
+                  };
+                }
               }
+
+              return res.json({
+                success: true,
+                status: 'scored',
+                source: `Gemini AI Senior Examiner (${model})`,
+                data: sanitized
+              });
+            } else {
+              console.warn(`[Gemini Writing] Schema validation failed for model ${model}:`, validation.error);
             }
           }
         } else {
@@ -716,6 +866,8 @@ exports.calculateCompositeBand = (req, res) => {
 
 // Exports helper dùng chung cho unit tests và controllers khác
 exports.calculateCompositeWritingBand = calculateCompositeWritingBand;
+exports.validateAndSanitizeWritingResponse = validateAndSanitizeWritingResponse;
+exports.writingMockSessions = writingMockSessions;
 exports.roundIeltsBand = roundIeltsBand;
 exports.computeWritingAnalytics = computeWritingAnalytics;
 exports.extractJsonFromText = extractJsonFromText;

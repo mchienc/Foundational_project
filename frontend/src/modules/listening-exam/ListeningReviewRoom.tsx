@@ -127,7 +127,12 @@ export const ListeningReviewRoom: React.FC<ListeningReviewRoomProps> = ({
             </div>
             <div className="text-right">
               <p className="text-gray-500 font-medium uppercase tracking-wider text-sm mb-1">Band Score</p>
-              <span className={`text-5xl font-bold ${bandColorClass}`}>{result.bandScore?.toFixed(1)}</span>
+              <span className={`text-5xl font-bold ${bandColorClass}`}>
+                {result.bandScore != null ? result.bandScore.toFixed(1) : 'N/A'}
+              </span>
+              {result.bandScore == null && (
+                <p className="text-xs text-amber-600 font-medium mt-1">Đề luyện tập (Chưa chấm band)</p>
+              )}
             </div>
           </div>
 

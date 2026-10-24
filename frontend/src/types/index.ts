@@ -333,7 +333,9 @@ export interface ListeningExamResult {
   userAnswers: Record<string, string>;
   correctCount: number;
   totalCount: number;
-  bandScore: number;
+  bandScore: number | null;
+  isVerified?: boolean;
+  status?: 'verified' | 'unverified_practice';
   sectionScores: { section: number; correct: number; total: number }[];
   completedAt: string;
 }
