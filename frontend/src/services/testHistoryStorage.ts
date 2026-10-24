@@ -11,6 +11,8 @@ export interface TestAttempt {
   correctCount: number; // e.g. 27
   totalQuestions: number; // e.g. 40
   completedAt: string; // "23/10/2026"
+  isVerified?: boolean;
+  clientReported?: boolean;
 }
 
 const STORAGE_PREFIX = 'eduflow_cambridge_history_';

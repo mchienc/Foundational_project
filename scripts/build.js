@@ -40,14 +40,12 @@ try {
   buildSucceeded = true;
   console.log('✅ [ENG4U BUILD] Frontend built successfully!');
 } catch (error) {
-  console.warn('\n⚠️ [ENG4U BUILD] Live frontend build failed or timed out (often caused by hosting memory limits).');
+  console.error('\n❌ [ENG4U BUILD] Live frontend build failed:', error.message);
   
-  if (fs.existsSync(distIndex)) {
-    console.log('✅ [ENG4U BUILD] Valid prebuilt frontend distribution found at frontend/dist/index.html.');
-    console.log('✅ [ENG4U BUILD] Serving committed prebuilt production assets. Deployment will proceed smoothly.\n');
-    buildSucceeded = true;
+  if (process.env.ALLOW_PREBUILT_FALLBACK === 'true' && fs.existsSync(distIndex)) {
+    console.warn('⚠️ [ENG4U BUILD] ALLOW_PREBUILT_FALLBACK is enabled. Using prebuilt assets.\n');
   } else {
-    console.error('❌ [ENG4U BUILD] FATAL: frontend/dist/index.html does not exist and live build failed.');
+    console.error('❌ [ENG4U BUILD] Strict build failed. Build runner will exit with code 1 to prevent deploying stale or broken bundles.\n');
     process.exit(1);
   }
 }

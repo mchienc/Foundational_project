@@ -462,7 +462,7 @@ export const ReadingTestRoom: React.FC<ReadingTestRoomProps> = ({
   };
 
   const normalizeReadingAns = (str: string): string => {
-    return (str || '').trim().toLowerCase().replace(/\\s+/g, ' ');
+    return (str || '').trim().toLowerCase().replace(/\s+/g, ' ');
   };
 
   // R-04: So khớp câu trả lời chuẩn hóa và hỗ trợ acceptableAnswers cho mọi dạng câu hỏi

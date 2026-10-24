@@ -232,6 +232,13 @@ export const ListeningReviewRoom: React.FC<ListeningReviewRoomProps> = ({
               ))}
             </div>
           </div>
+
+          {test.isVerified === false && (
+            <div className="bg-amber-50 border border-amber-200 rounded-xl p-3 text-amber-800 text-xs flex items-center gap-2">
+              <span>⚠️</span>
+              <span><strong>Dữ liệu đang đồng bộ:</strong> {test.verificationNote || 'Đáp án cho đề này đang chờ đối soát với bản in Cambridge gốc.'}</span>
+            </div>
+          )}
           
           <div className="bg-white rounded-full p-2 pr-4 flex items-center gap-3 border border-gray-200 shadow-sm">
             <button 

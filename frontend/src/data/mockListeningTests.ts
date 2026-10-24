@@ -637,6 +637,8 @@ export const mockListeningFullTests: ListeningFullTest[] = [
       `c20-t${t}`
     ),
     transcript: [],
+    isVerified: false,
+    verificationNote: 'Bộ câu hỏi và đáp án cho đề này đang chờ đồng bộ hóa dữ liệu gốc.',
   })),
 
   // Cambridge 19 (Tests 1-4)
@@ -657,12 +659,15 @@ export const mockListeningFullTests: ListeningFullTest[] = [
       `c19-t${t}`
     ),
     transcript: [],
+    isVerified: false,
+    verificationNote: 'Bộ câu hỏi và đáp án cho đề này đang chờ đồng bộ hóa dữ liệu gốc.',
   })),
 
   // Cambridge 18 (Tests 1-4)
   {
     id: 'c18-t1',
     source: 'Cambridge IELTS 18 Test 1',
+    isVerified: true,
     book: 'Cambridge 18',
     testNumber: 1,
     totalSections: 4,
@@ -695,6 +700,8 @@ export const mockListeningFullTests: ListeningFullTest[] = [
       'c18-t2'
     ),
     transcript: [],
+    isVerified: false,
+    verificationNote: 'Bộ câu hỏi và đáp án cho đề này đang chờ đồng bộ hóa dữ liệu gốc.',
   },
   {
     id: 'c18-t3',
@@ -713,6 +720,8 @@ export const mockListeningFullTests: ListeningFullTest[] = [
       'c18-t3'
     ),
     transcript: [],
+    isVerified: false,
+    verificationNote: 'Bộ câu hỏi và đáp án cho đề này đang chờ đồng bộ hóa dữ liệu gốc.',
   },
   {
     id: 'c18-t4',
@@ -731,6 +740,8 @@ export const mockListeningFullTests: ListeningFullTest[] = [
       'c18-t4'
     ),
     transcript: [],
+    isVerified: false,
+    verificationNote: 'Bộ câu hỏi và đáp án cho đề này đang chờ đồng bộ hóa dữ liệu gốc.',
   },
 
   // Cambridge 16 (Tests 1-4)
@@ -751,6 +762,8 @@ export const mockListeningFullTests: ListeningFullTest[] = [
       `c16-t${t}`
     ),
     transcript: [],
+    isVerified: false,
+    verificationNote: 'Bộ câu hỏi và đáp án cho đề này đang chờ đồng bộ hóa dữ liệu gốc.',
   })),
 
   // Cambridge 15 (Tests 1-4)
@@ -771,6 +784,8 @@ export const mockListeningFullTests: ListeningFullTest[] = [
       `c15-t${t}`
     ),
     transcript: [],
+    isVerified: false,
+    verificationNote: 'Bộ câu hỏi và đáp án cho đề này đang chờ đồng bộ hóa dữ liệu gốc.',
   })),
 
   // Cambridge 14 (Test 4)
@@ -786,6 +801,8 @@ export const mockListeningFullTests: ListeningFullTest[] = [
       'c14-t4'
     ),
     transcript: [],
+    isVerified: false,
+    verificationNote: 'Bộ câu hỏi và đáp án cho đề này đang chờ đồng bộ hóa dữ liệu gốc.',
   },
 
   // Cambridge 13 (Tests 1-4)
@@ -806,6 +823,8 @@ export const mockListeningFullTests: ListeningFullTest[] = [
       'c13-t1'
     ),
     transcript: [],
+    isVerified: false,
+    verificationNote: 'Bộ câu hỏi và đáp án cho đề này đang chờ đồng bộ hóa dữ liệu gốc.',
   },
   {
     id: 'c13-t2',
@@ -824,6 +843,8 @@ export const mockListeningFullTests: ListeningFullTest[] = [
       'c13-t2'
     ),
     transcript: [],
+    isVerified: false,
+    verificationNote: 'Bộ câu hỏi và đáp án cho đề này đang chờ đồng bộ hóa dữ liệu gốc.',
   },
   {
     id: 'c13-t3',
@@ -842,6 +863,8 @@ export const mockListeningFullTests: ListeningFullTest[] = [
       'c13-t3'
     ),
     transcript: [],
+    isVerified: false,
+    verificationNote: 'Bộ câu hỏi và đáp án cho đề này đang chờ đồng bộ hóa dữ liệu gốc.',
   },
   {
     id: 'c13-t4',
@@ -860,5 +883,7 @@ export const mockListeningFullTests: ListeningFullTest[] = [
       'c13-t4'
     ),
     transcript: [],
+    isVerified: false,
+    verificationNote: 'Bộ câu hỏi và đáp án cho đề này đang chờ đồng bộ hóa dữ liệu gốc.',
   },
 ];

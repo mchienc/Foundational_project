@@ -5,6 +5,7 @@ import {
   ListeningQuestion,
   ContrastMode,
 } from '../../types';
+import { matchesListeningAnswer } from '../../store/useListeningStore';
 
 interface ListeningSectionProps {
   section: IListeningSection;
@@ -138,10 +139,7 @@ export const ListeningSection: React.FC<ListeningSectionProps> = ({
   };
 
   const checkIsCorrect = (q: ListeningQuestion, val: string) => {
-    const clean = val.trim().toLowerCase();
-    if (!clean) return false;
-    if (clean === q.correctAnswer.toLowerCase()) return true;
-    return (q.acceptableAnswers || []).some((a) => a.toLowerCase() === clean);
+    return matchesListeningAnswer(val, q.correctAnswer, q.acceptableAnswers);
   };
 
   const renderInlineBlankQuestion = (q: ListeningQuestion) => {

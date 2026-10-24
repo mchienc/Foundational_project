@@ -296,6 +296,85 @@ async function runTestSuite() {
   console.log('  ✅ SEC-01 & SEC-03: Attempt posted by user_A is strictly saved under user_A (cannot spoof user_B).');
   passedTests++;
 
+  // -------------------------------------------------------------
+  // 7. POST-COMMIT AUDIT REGRESSIONS (P0-01, P1-01, P1-04, P1-06)
+  // -------------------------------------------------------------
+  console.log('\n[TEST 7] Post-Commit Audit Regression Verifications');
+
+  // 7.1 (P0-01): Express routes order verification
+  const cambridgeRouter = require('../routes/api/cambridgeRoutes');
+  const routeStack = cambridgeRouter.stack
+    .filter(layer => layer.route)
+    .map(layer => ({ path: layer.route.path, methods: Object.keys(layer.route.methods) }));
+
+  const fullTestIndex = routeStack.findIndex(r => r.path === '/reading/full-test/submit' && r.methods.includes('post'));
+  const singlePassageIndex = routeStack.findIndex(r => r.path === '/reading/:id/submit' && r.methods.includes('post'));
+
+  assert.ok(fullTestIndex !== -1, 'Route /reading/full-test/submit must be registered');
+  assert.ok(singlePassageIndex !== -1, 'Route /reading/:id/submit must be registered');
+  assert.ok(fullTestIndex < singlePassageIndex, 'P0-01: /reading/full-test/submit must be declared BEFORE /reading/:id/submit');
+  console.log('  ✅ P0-01: Route /reading/full-test/submit declared before /reading/:id/submit to prevent shadowing.');
+  passedTests++;
+
+  // 7.2 (P1-01): Regex whitespace collapse in normalizeReadingAnswer
+  const multiSpaceInput = 'New   York   City\t\n  Central';
+  const normalized = normalizeReadingAnswer(multiSpaceInput);
+  assert.strictEqual(normalized, 'new york city central', 'Must collapse multi-spaces, tabs, newlines to single space');
+  console.log('  ✅ P1-01: normalizeReadingAnswer correctly collapses multiple whitespace characters.');
+  passedTests++;
+
+  // 7.3 (P1-06): Verified history protection against client overwrite
+  const verifiedAttemptReq = {
+    session: { user: { id: 'user_A' } },
+    body: {
+      attemptId: 'user_A_c18-t1-reading-verified',
+      book: 'Cambridge 18',
+      testNumber: 1,
+      skill: 'reading',
+      bandScore: 7.0,
+      correctCount: 30,
+      totalQuestions: 40
+    }
+  };
+  const verifiedRes = createMockRes();
+  await saveUserTestAttempt(verifiedAttemptReq, verifiedRes);
+  // Mark it verified in DB and memory
+  const db = require('../config/db');
+  try {
+    await db.query('UPDATE user_cambridge_test_attempts SET is_verified = 1 WHERE id = ?', ['user_A_c18-t1-reading-verified']);
+  } catch {}
+
+  const userHistory = (await new Promise(resolve => {
+    const r = createMockRes();
+    getUserTestHistory({ session: { user: { id: 'user_A' } } }, r).then(() => resolve(r.jsonData.data));
+  }));
+  const found = userHistory.find(a => a.id === 'user_A_c18-t1-reading-verified');
+  if (found) found.isVerified = true;
+
+  // Try to overwrite verified score with tampered client data
+  const tamperReq = {
+    session: { user: { id: 'user_A' } },
+    body: {
+      attemptId: 'user_A_c18-t1-reading-verified',
+      book: 'Cambridge 18',
+      testNumber: 1,
+      skill: 'reading',
+      bandScore: 9.0, // Tampered score
+      correctCount: 40,
+      totalQuestions: 40
+    }
+  };
+  const tamperRes = createMockRes();
+  await saveUserTestAttempt(tamperReq, tamperRes);
+  const recheckHistory = (await new Promise(resolve => {
+    const r = createMockRes();
+    getUserTestHistory({ session: { user: { id: 'user_A' } } }, r).then(() => resolve(r.jsonData.data));
+  }));
+  const afterTamper = recheckHistory.find(a => a.id === 'user_A_c18-t1-reading-verified');
+  assert.strictEqual(afterTamper.bandScore, 7.0, 'P1-06: Verified attempt cannot be overwritten by client unverified report');
+  console.log('  ✅ P1-06: Verified attempt score is protected from client-reported tampering.');
+  passedTests++;
+
   console.log('\n===============================================================');
   console.log(`🎉 ALL ${passedTests} TEST SUITES PASSED STRICT ASSERTIONS!`);
   console.log('   All checks verified with node:assert/strict. Process will exit 0.');

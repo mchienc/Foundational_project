@@ -146,7 +146,8 @@ exports.getReadingPassageById = async (req, res) => {
 exports.submitExam = async (req, res) => {
   try {
     const { id } = req.params;
-    const { userAnswers = {}, timeTakenSeconds = 0, userId = 1 } = req.body;
+    const { userAnswers = {}, timeTakenSeconds = 0 } = req.body;
+    const sessionUserId = (req.session && req.session.user && req.session.user.id) || (req.session && req.session.userId) || null;
 
     const [questions] = await db.query(
       'SELECT * FROM cambridge_reading_questions WHERE passage_id = ? ORDER BY question_number ASC',
@@ -190,23 +191,29 @@ exports.submitExam = async (req, res) => {
     const percentage = Math.round((correctCount / totalCount) * 100);
     const xpEarned = Math.max(30, correctCount * 10);
 
-    // Lưu vào bảng user_cambridge_exam_results
-    await db.query(
-      `INSERT INTO user_cambridge_exam_results
-        (passage_id, user_id, correct_count, total_count, band_score, percentage, time_taken_seconds, user_answers, xp_earned)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-      [
-        id,
-        userId,
-        correctCount,
-        totalCount,
-        bandScore,
-        percentage,
-        timeTakenSeconds,
-        JSON.stringify(userAnswers),
-        xpEarned
-      ]
-    );
+    // P1-04: Lưu kết quả vào CSDL nếu người dùng đã đăng nhập (không gán bừa vào user_id = 1)
+    if (sessionUserId) {
+      try {
+        await db.query(
+          `INSERT INTO user_cambridge_exam_results
+            (passage_id, user_id, correct_count, total_count, band_score, percentage, time_taken_seconds, user_answers, xp_earned)
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+          [
+            id,
+            sessionUserId,
+            correctCount,
+            totalCount,
+            bandScore,
+            percentage,
+            timeTakenSeconds,
+            JSON.stringify(userAnswers),
+            xpEarned
+          ]
+        );
+      } catch (saveErr) {
+        console.warn('Lưu kết quả user_cambridge_exam_results thất bại:', saveErr.message);
+      }
+    }
 
     res.json({
       success: true,
@@ -679,10 +686,10 @@ exports.saveUserTestAttempt = async (req, res) => {
           (id, user_id, book, test_number, skill, band_score, correct_count, total_questions, completed_at, is_verified)
          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
          ON DUPLICATE KEY UPDATE
-          band_score = VALUES(band_score),
-          correct_count = VALUES(correct_count),
-          total_questions = VALUES(total_questions),
-          completed_at = VALUES(completed_at)`,
+          band_score = IF(is_verified = 1, band_score, VALUES(band_score)),
+          correct_count = IF(is_verified = 1, correct_count, VALUES(correct_count)),
+          total_questions = IF(is_verified = 1, total_questions, VALUES(total_questions)),
+          completed_at = IF(is_verified = 1, completed_at, VALUES(completed_at))`,
         [
           safeAttemptId,
           userId,
@@ -704,7 +711,9 @@ exports.saveUserTestAttempt = async (req, res) => {
     const list = memoryUserAttempts.get(userId) || [];
     const existingIdx = list.findIndex(a => a.id === safeAttemptId || (a.book === cleanBook && a.testNumber === Number(testNumber) && a.skill === cleanSkill));
     if (existingIdx >= 0) {
-      list[existingIdx] = attempt;
+      if (!list[existingIdx].isVerified) {
+        list[existingIdx] = attempt;
+      }
     } else {
       list.unshift(attempt);
     }

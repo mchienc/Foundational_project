@@ -103,10 +103,14 @@ app.listen(PORT, async () => {
         correct_count INT NOT NULL,
         total_questions INT NOT NULL,
         completed_at VARCHAR(50) NOT NULL,
+        is_verified TINYINT(1) DEFAULT 0,
+        client_reported TINYINT(1) DEFAULT 1,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         INDEX idx_user_history (user_id)
       ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
     `);
+    await db.query('ALTER TABLE user_cambridge_test_attempts ADD COLUMN IF NOT EXISTS is_verified TINYINT(1) DEFAULT 0');
+    await db.query('ALTER TABLE user_cambridge_test_attempts ADD COLUMN IF NOT EXISTS client_reported TINYINT(1) DEFAULT 1');
     console.log('[DB] Đã kiểm tra và đảm bảo bảng users & user_cambridge_test_attempts sẵn sàng.');
   } catch (err) {
     console.warn('[DB Check] Bỏ qua kiểm tra cấu trúc bảng users:', err.message);

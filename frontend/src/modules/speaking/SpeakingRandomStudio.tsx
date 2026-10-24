@@ -38,6 +38,7 @@ export const SpeakingRandomStudio: React.FC<SpeakingRandomStudioProps> = ({ onNo
   const [speechSupported, setSpeechSupported] = useState<boolean>(true);
   const [durationSeconds, setDurationSeconds] = useState<number>(0);
   const recognitionRef = useRef<any>(null);
+  const isRecordingRef = useRef<boolean>(false);
   const timerIntervalRef = useRef<any>(null);
 
   // Part 2 Preparation State
@@ -78,13 +79,14 @@ export const SpeakingRandomStudio: React.FC<SpeakingRandomStudioProps> = ({ onNo
         console.warn('Speech recognition error:', event.error);
         if (event.error === 'not-allowed') {
           if (onNotify) onNotify('Trình duyệt chưa được cấp quyền micro. Bạn có thể tự gõ văn bản để thử nghiệm.', 'error');
-          setIsRecording(false);
+          isRecordingRef.current = false;
+    setIsRecording(false);
         }
       };
 
       recognition.onend = () => {
         // Nếu user vẫn đang ở trạng thái recording, tự động khởi động lại (tránh ngắt kết nối trình duyệt)
-        if (isRecording) {
+        if (isRecordingRef.current) {
           try {
             recognition.start();
           } catch (e) {
@@ -112,6 +114,7 @@ export const SpeakingRandomStudio: React.FC<SpeakingRandomStudioProps> = ({ onNo
 
   // Duration Timer Effect
   useEffect(() => {
+    isRecordingRef.current = isRecording;
     if (isRecording) {
       timerIntervalRef.current = setInterval(() => {
         setDurationSeconds((prev) => prev + 1);
@@ -170,20 +173,25 @@ export const SpeakingRandomStudio: React.FC<SpeakingRandomStudioProps> = ({ onNo
   const startRecording = () => {
     if (!speechSupported) {
       if (onNotify) onNotify('Trình duyệt của bạn không hỗ trợ Web Speech API. Bạn có thể nhập trực tiếp câu trả lời vào khung gỡ băng.', 'info');
-      setIsRecording(true);
+
       return;
     }
 
     try {
       recognitionRef.current?.start();
+      isRecordingRef.current = true;
       setIsRecording(true);
+
     } catch (e) {
       // In case recognition already started
+      isRecordingRef.current = true;
       setIsRecording(true);
+
     }
   };
 
   const stopRecording = () => {
+    isRecordingRef.current = false;
     setIsRecording(false);
     try {
       recognitionRef.current?.stop();
@@ -214,6 +222,7 @@ export const SpeakingRandomStudio: React.FC<SpeakingRandomStudioProps> = ({ onNo
           part: selectedPart,
           topic: currentPrompt.topic,
           question: currentPrompt.question,
+          cueCardBullets: selectedPart === 2 ? currentPrompt.cueCardPoints || [] : [],
           transcript: transcript,
           durationSeconds: durationSeconds,
         }),

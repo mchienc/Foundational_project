@@ -203,212 +203,6 @@ function extractJsonFromText(rawText) {
   }
 }
 
-// Fallback thông minh cho bài thi Writing khi ngoại tuyến
-function generateWritingFallback(taskType, prompt, essayContent, chartType, chartDetails, essaySubtype) {
-  const words = (essayContent || '').trim().split(/\s+/).filter(Boolean);
-  const wordCount = words.length;
-
-  let overallBand = 6.5;
-  if (wordCount >= 260) overallBand = 7.0;
-  else if (wordCount >= 200) overallBand = 6.5;
-  else if (wordCount >= 140) overallBand = 6.0;
-  else overallBand = 5.5;
-
-  const isTask1 = taskType === 'task1';
-
-  const dataAccuracyCheck = isTask1 ? {
-    status: "PASS",
-    accuracyScore: 7.5,
-    hasFactualErrors: false,
-    summary: `Đối chiếu số liệu với dạng biểu đồ ${chartType || 'biểu đồ'}: Bạn đã trích xuất được xu hướng chính và các mốc số liệu tiêu biểu, không phát hiện số liệu bị sai lệch nghiêm trọng so với đề bài.`,
-    verifications: [
-      {
-        claimInEssay: "Xu hướng chính và các nhóm số liệu được báo cáo trong bài",
-        chartDataRef: "Dữ liệu đối chiếu từ đề bài",
-        isAccurate: true,
-        comment: "Số liệu được trích dẫn hợp lý, đã có sự so sánh giữa các mốc hoặc các hạng mục cao nhất/thấp nhất."
-      }
-    ]
-  } : null;
-
-  const essayStructureCheck = !isTask1 ? {
-    detectedSubtype: essaySubtype || "Opinion / Discussion",
-    hasClearThesis: true,
-    thesisConsistency: "Nhất quán",
-    argumentProgression: "Mạch lạc, có chia đoạn theo luận điểm",
-    feedback: "Bài viết đã thể hiện lập trường rõ ràng từ phần Mở bài đến Kết bài. Mỗi đoạn thân bài tập trung vào một luận điểm chính và có ví dụ hỗ trợ."
-  } : null;
-
-  const sampleCorrections = [
-    {
-      original: isTask1 ? "The chart shows the number of people going up quickly." : "In the first place, people think that technology has bad effect on children.",
-      corrected: isTask1 ? "The chart illustrates an exponential growth in the proportion of participants over the surveyed period." : "First and foremost, there is a widespread concern that digital technology exerts an adverse impact on children's cognitive development.",
-      explanation: isTask1 ? "Nâng cấp cụm 'going up quickly' thành 'exponential growth' và dùng từ 'illustrates' chuẩn Academic." : "Nâng cấp cụm 'bad effect' thành collocation học thuật 'exerts an adverse impact on' và mở rộng mệnh đề tự nhiên hơn.",
-      type: "vocabulary"
-    },
-    {
-      original: isTask1 ? "France is bigger than Germany with 40%." : "Because of many reasons, education should be free for all students.",
-      corrected: isTask1 ? "France surpassed Germany, accounting for approximately 40% of the aggregate total." : "For a multitude of socio-economic reasons, higher education should be publicly funded for all eligible students.",
-      explanation: isTask1 ? "Sử dụng cấu trúc so sánh học thuật 'surpassed..., accounting for...' thay vì câu đơn 'is bigger than'." : "Thay thế 'many reasons' bằng 'a multitude of socio-economic reasons' và 'free' bằng 'publicly funded'.",
-      type: "grammar"
-    },
-    {
-      original: isTask1 ? "To conclude, the line was the highest in 2020." : "To sum up, both sides have good points and bad points.",
-      corrected: isTask1 ? "Overall, it is evident that the figure reached its pinnacle in 2020 before plateauing." : "In conclusion, while both viewpoints present valid arguments, I firmly believe that the long-term benefits outweigh the potential drawbacks.",
-      explanation: isTask1 ? "Dùng 'Overall, it is evident that...' và 'reached its pinnacle' chuẩn Band 8.0+ cho câu tổng quan." : "Tránh dùng từ ngữ informal 'good points and bad points' trong câu kết luận của IELTS Academic.",
-      type: "cohesion"
-    }
-  ];
-
-  const analytics = computeWritingAnalytics(essayContent, taskType);
-
-  return {
-    overallBand,
-    criteria: {
-      taskAchievement: {
-        band: overallBand,
-        feedback: isTask1
-          ? (wordCount >= 150
-            ? `Bài viết đáp ứng tốt yêu cầu Task 1 (${wordCount} từ). Đã cung cấp câu Overview khái quát xu hướng/đặc điểm nổi bật và chọn lọc số liệu trọng tâm từ biểu đồ.`
-            : `Bài viết có ${wordCount} từ (chưa đạt tối thiểu 150 từ). Bạn cần báo cáo thêm các chi tiết so sánh giữa các nhóm số liệu.`)
-          : (wordCount >= 250
-            ? `Bài viết đáp ứng tốt yêu cầu Task 2 (${wordCount} từ). Luận điểm được phân tích có chiều sâu và giải quyết trọn vẹn câu hỏi của đề.`
-            : `Bài viết hiện có ${wordCount} từ (dưới 250 từ). Cần mở rộng dẫn chứng và phân tích sâu hơn để tránh bị trừ điểm Task Response.`)
-      },
-      coherenceCohesion: {
-        band: overallBand,
-        feedback: "Bố cục bài viết mạch lạc, chia đoạn khoa học (Mở bài - Tổng quan/Luận điểm 1 - Thân bài chi tiết - Kết luận). Các liên từ chuyển ý (Moreover, In stark contrast, Consequently) được sử dụng tự nhiên."
-      },
-      lexicalResource: {
-        band: overallBand,
-        feedback: "Vốn từ vựng tương đối phong phú, xuất hiện các từ học thuật phù hợp ngữ cảnh. Cần hạn chế lặp từ cơ bản bằng cách áp dụng thêm các từ đồng nghĩa và collocation trình độ C1."
-      },
-      grammaticalRange: {
-        band: overallBand,
-        feedback: "Sử dụng kết hợp câu đơn, câu ghép và câu phức linh hoạt. Kiểm soát tốt thì ngữ pháp và cấu trúc câu bị động/mệnh đề quan hệ."
-      }
-    },
-    dataAccuracyCheck,
-    essayStructureCheck,
-    academicAnalytics: analytics,
-    paragraphAudit: analytics.paragraphAudit,
-    overview: isTask1
-      ? `Bài viết Task 1 đã truyền tải được bức tranh tổng thể của biểu đồ và phân tích số liệu tương đối chuẩn xác. Để đạt Band 7.5+, hãy sử dụng đa dạng hơn các cấu trúc báo cáo số liệu (proportions, figures, percentages) và kết nối các nhóm đối tượng logic hơn.`
-      : `Bài viết Task 2 thể hiện tư duy phản biện tốt, lập luận có chiều sâu và bố cục chặt chẽ. Để bứt phá lên Band 8.0, hãy trau chuốt các liên kết ngầm giữa các ý và sử dụng cấu trúc đảo ngữ hoặc câu điều kiện hỗn hợp.`,
-    sentenceCorrections: sampleCorrections,
-    modelAnswer: isTask1
-      ? "The provided chart illustrates significant shifts across the surveyed categories over the specified timeframe. Overall, it is readily apparent that the primary indicator experienced substantial upward momentum, whereas the remaining figures displayed moderate fluctuations. Notably, the leading category established a dominant margin toward the latter half of the period, underscoring a decisive structural transformation in the measured metrics."
-      : "In contemporary discourse, the debate surrounding this issue remains highly contentious. While critics argue that prevailing conventions should be preserved, I advocate that progressive adaptations yield far superior societal advantages. On one hand, adherence to traditional frameworks provides stability; however, embracing innovation stimulates intellectual dynamism and equips future generations with indispensable analytical skills. Consequently, a balanced integration of both paradigms represents the optimal trajectory forward."
-  };
-}
-
-// Fallback thông minh cho bài thi Speaking theo từng Part
-function generateSpeakingFallback(part, topic, question, transcript, durationSeconds) {
-  const words = (transcript || '').trim().split(/\s+/).filter(Boolean);
-  const wordCount = words.length;
-
-  let estimatedBand = 6.5;
-  if (wordCount >= 90) estimatedBand = 7.0;
-  else if (wordCount >= 40) estimatedBand = 6.5;
-  else estimatedBand = 6.0;
-
-  const partNum = parseInt(part, 10) || 1;
-  let partAudit = {};
-
-  if (partNum === 1) {
-    partAudit = {
-      partName: "Part 1 - Phỏng vấn cá nhân (Personal Interview)",
-      focusEvaluation: "Phản xạ trả lời nhanh, câu trả lời tự nhiên, mở rộng ý vừa đủ (khoảng 3-4 câu/câu hỏi), không bị cụt lủn và không lan man.",
-      keyStrengths: [
-        "Phản xạ trả lời tức thì, trả lời thẳng vào trọng tâm câu hỏi mà giám khảo đưa ra.",
-        "Mở rộng câu trả lời bằng cách nêu thêm cảm nghĩ hoặc thói quen cá nhân.",
-        "Ngữ điệu tự nhiên, từ vựng giao tiếp đời sống gần gũi."
-      ],
-      keyWeaknesses: [
-        "Có xu hướng ngập ngừng nhẹ khi chuyển ý.",
-        "Nên bổ sung thêm các discourse markers tự nhiên như 'Well, to be honest', 'As a matter of fact'."
-      ],
-      timingFeedback: `Thời lượng nói ${durationSeconds}s là phù hợp cho câu hỏi Part 1.`
-    };
-  } else if (partNum === 2) {
-    partAudit = {
-      partName: "Part 2 - Long Turn (Bài nói dài theo Cue Card)",
-      focusEvaluation: "Kiểm tra khả năng nói dài có tổ chức, phát triển toàn diện các gợi ý trên Cue Card, duy trì mạch lạc và độ trôi chảy xuyên suốt bài nói.",
-      keyStrengths: [
-        "Bao quát được các luận điểm chính yêu cầu trên Cue Card.",
-        "Có cấu trúc rõ ràng: Giới thiệu bối cảnh -> Diễn biến câu chuyện -> Cảm nhận cá nhân.",
-        "Duy trì luồng nói liên tục, không bị gián đoạn quá lâu."
-      ],
-      keyWeaknesses: [
-        "Cần kiểm soát tốc độ nói đều đặn hơn giữa phần đầu và phần kết.",
-        "Có thể khai thác thêm các chi tiết mô tả sống động (sensory details) để gây ấn tượng với giám khảo."
-      ],
-      timingFeedback: `Thời lượng thực tế: ${durationSeconds}s. Thời lượng là dữ liệu hỗ trợ theo dõi, giám khảo đánh giá chất lượng phát triển chủ đề và độ trôi chảy.`
-    };
-  } else {
-    partAudit = {
-      partName: "Part 3 - Thảo luận chuyên sâu (Two-way Discussion)",
-      focusEvaluation: "Đánh giá khả năng phân tích vấn đề trừu tượng, tư duy phản biện, so sánh đa chiều và ứng biến linh hoạt trước các góc nhìn phức tạp.",
-      keyStrengths: [
-        "Tiếp cận câu hỏi từ góc nhìn xã hội vĩ mô, không bị bó hẹp trong phạm vi cá nhân.",
-        "Có khả năng so sánh giữa quá khứ - hiện tại hoặc các nhóm đối tượng khác nhau.",
-        "Sử dụng các cấu trúc lập luận học thuật như 'From a sociological perspective', 'It is widely acknowledged that'."
-      ],
-      keyWeaknesses: [
-        "Cần đào sâu hơn phần nguyên nhân - hệ quả của hiện tượng.",
-        "Nên sử dụng thêm các trạng từ chỉ mức độ (predominantly, substantially, arguably) để câu nói khách quan hơn."
-      ],
-      timingFeedback: `Thời lượng ${durationSeconds}s cho phép trình bày lập luận có chiều sâu.`
-    };
-  }
-
-  return {
-    estimatedBand,
-    criteria: {
-      fluencyCoherence: {
-        band: estimatedBand,
-        comment: "Tốc độ nói ổn định, mạch ý triển khai logic. Khả năng tự sửa lỗi tốt mà không làm đứt quãng dòng suy nghĩ quá lâu."
-      },
-      lexicalResource: {
-        band: estimatedBand,
-        comment: "Vốn từ vựng tương đối phong phú, diễn đạt được các ý niệm trừu tượng. Có thể bổ sung thêm các collocations và phrasal verbs tự nhiên."
-      },
-      grammaticalRange: {
-        band: estimatedBand,
-        comment: "Sử dụng được các cấu trúc câu ghép và câu phức. Cần lưu ý chia đúng thì quá khứ đơn trong các câu kể chuyện."
-      },
-      pronunciationFeedback: {
-        comment: "Phát âm rõ ràng, người nghe dễ hiểu. Ngữ điệu câu (intonation) và trọng âm từ (word stress) ở mức tốt. Chú ý các âm đuôi /s/, /z/, /t/."
-      }
-    },
-    partAudit,
-    officialNote: "Speaking IELTS chính thức được đánh giá tổng thể qua cả bài phỏng vấn. Bảng nhận xét này tập trung đánh giá chuyên sâu cho Part hiện tại.",
-    strengths: partAudit.keyStrengths,
-    weaknesses: partAudit.keyWeaknesses,
-    upgradedAnswer: `Well, speaking of ${topic || 'this matter'}, I would certainly argue that it plays a pivotal role in modern life. From my perspective, when individuals engage deeply with this subject, they not only broaden their horizons but also cultivate indispensable analytical skills. Looking ahead, I firmly believe that continued attention to this area will generate profound benefits for both individuals and the wider community.`,
-    keyVocabulary: [
-      {
-        word: "pivotal role",
-        ipa: "/ˈpɪv.ə.təl rəʊl/",
-        meaning: "Vai trò then chốt, mang tính quyết định",
-        exampleInAnswer: "plays a pivotal role in modern life"
-      },
-      {
-        word: "broaden one's horizons",
-        ipa: "/ˈbrɔː.dən wʌnz həˈraɪ.zənz/",
-        meaning: "Mở rộng tầm hiểu biết và trải nghiệm",
-        exampleInAnswer: "they not only broaden their horizons"
-      },
-      {
-        word: "cultivate indispensable skills",
-        ipa: "/ˈkʌl.tɪ.veɪt ˌɪn.dɪˈspen.sə.bəl skɪlz/",
-        meaning: "Trau dồi những kỹ năng không thể thiếu",
-        exampleInAnswer: "cultivate indispensable analytical skills"
-      }
-    ]
-  };
-}
-
 // Controller chấm bài Writing
 exports.gradeWriting = async (req, res) => {
   try {
@@ -841,24 +635,17 @@ BẢN GỠ BĂNG CÂU TRẢ LỜI CỦA HỌC VIÊN:
           if (candidateText) {
             const parsed = extractJsonFromText(candidateText);
             if (parsed && parsed.criteria) {
-              const isAudioAvailable = Boolean(hasAudio || audioUrl);
-
-              // S-01 & S-02: Khi chỉ có transcript (không có audio file)
-              if (!isAudioAvailable) {
-                parsed.status = 'partial';
-                parsed.requiresAudioForOverallBand = true;
-                parsed.estimatedBand = null;
-                parsed.criteria.pronunciationFeedback = {
-                  band: null,
-                  comment: 'Không có dữ liệu âm thanh để đánh giá phát âm (Pronunciation: N/A). Để có điểm phát âm chính xác và Overall Speaking Band, cần tải lên hoặc thu âm file audio trực tiếp.'
-                };
-                parsed.officialNote = 'Speaking IELTS chính thức yêu cầu đánh giá âm thanh trực tiếp. Đánh giá dưới đây là nhận xét ngôn ngữ (Vocabulary & Grammar) dựa trên transcript.';
-              } else {
-                parsed.status = 'scored';
-                if (parsed.estimatedBand) {
-                  parsed.estimatedBand = roundIeltsBand(parsed.estimatedBand);
-                }
-              }
+              // P0-03 & S-01 & S-02: Backend hiện tại chỉ chấm bài qua transcript text với Gemini.
+              // Không tin tưởng cờ hasAudio/audioUrl tự khai báo từ client để sinh Overall Band hoặc Pronunciation.
+              // Luôn trả status='partial', estimatedBand=null, pronunciationFeedback.band=null cho đến khi có pipeline xử lý audio binary.
+              parsed.status = 'partial';
+              parsed.requiresAudioForOverallBand = true;
+              parsed.estimatedBand = null;
+              parsed.criteria.pronunciationFeedback = {
+                band: null,
+                comment: 'Chưa có pipeline phân tích sóng âm thanh trên server (Pronunciation: N/A). Để có điểm phát âm và Overall Band chính thức, cần thi trực tiếp với giám khảo hoặc thẩm định file âm thanh.'
+              };
+              parsed.officialNote = 'Speaking IELTS chính thức bắt buộc phải thẩm định âm thanh thực tế. Điểm số từ vựng & ngữ pháp dưới đây chỉ mang tính chẩn đoán dựa trên transcript.';
 
               return res.json({
                 success: true,
@@ -931,6 +718,4 @@ exports.calculateCompositeBand = (req, res) => {
 exports.calculateCompositeWritingBand = calculateCompositeWritingBand;
 exports.roundIeltsBand = roundIeltsBand;
 exports.computeWritingAnalytics = computeWritingAnalytics;
-exports.generateWritingFallback = generateWritingFallback;
-exports.generateSpeakingFallback = generateSpeakingFallback;
 exports.extractJsonFromText = extractJsonFromText;

@@ -324,6 +324,8 @@ export interface ListeningFullTest {
   estimatedMinutes: number;
   sections: ListeningSection[];
   transcript: TranscriptLine[];
+  isVerified?: boolean;
+  verificationNote?: string;
 }
 
 export interface ListeningExamResult {
