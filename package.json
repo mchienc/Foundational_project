@@ -8,7 +8,7 @@
     "dev": "concurrently -n \"BACKEND,FRONTEND\" -c \"blue,green\" \"nodemon app.js\" \"npm --prefix frontend run dev\"",
     "client": "npm --prefix frontend run dev",
     "server": "nodemon app.js",
-    "build": "npm install && npm --prefix frontend install && npm --prefix frontend run build",
+    "build": "node scripts/build.js",
     "client:build": "npm --prefix frontend run build",
     "client:preview": "npm --prefix frontend run preview",
     "db:seed:cambridge": "node scripts/seedCambridgeData.js",
