@@ -1,7 +1,7 @@
 # Remaining P0/P1 Fix Report
 - Base SHA: `77bb6c143e855b2eba0d23ed1e1dba0a2ecfdce0`
 - Audited HEAD before patch: `77bb6c143e855b2eba0d23ed1e1dba0a2ecfdce0`
-- Final Commit: `1d29d1e9aa78fe0338d701b9f4d7c8c0e5c14574`
+- Final Commit: `8fa5eb5a`
 - Date / environment / Node / DB engine+version: 24/10/2026 | Windows 10/11 x64 | Node.js v24.20.0 | npm v11.19.0 | MySQL 10.4.32-MariaDB
 
 | Issue | Status | File:line | Red test trước sửa | Green test sau sửa | Lệnh + exit code | Bằng chứng còn thiếu |

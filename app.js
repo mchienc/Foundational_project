@@ -95,6 +95,4 @@ app.listen(PORT, async () => {
   } catch (err) {
     console.warn('[DB Check] Bỏ qua kiểm tra cấu trúc bảng users:', err.message);
   }
-    console.warn('[DB Check] Bỏ qua kiểm tra cấu trúc bảng users:', err.message);
-  }
 });
