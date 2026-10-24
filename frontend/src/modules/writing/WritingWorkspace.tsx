@@ -41,6 +41,8 @@ export const WritingWorkspace: React.FC<WritingWorkspaceProps> = ({ onNotify }) 
   const [isEvaluating, setIsEvaluating] = useState<boolean>(false);
   const [evaluationResult, setEvaluationResult] = useState<WritingEvaluationResult | null>(null);
   const [isResultModalOpen, setIsResultModalOpen] = useState<boolean>(false);
+  const [lastTask1Band, setLastTask1Band] = useState<number | null>(null);
+  const [lastTask2Band, setLastTask2Band] = useState<number | null>(null);
 
   // Timer State
   const defaultMinutes = selectedTaskType === 'task1' ? 20 : 40;
@@ -130,12 +132,21 @@ export const WritingWorkspace: React.FC<WritingWorkspaceProps> = ({ onNotify }) 
           taskType: selectedTaskType,
           prompt: currentPrompt.prompt,
           essayContent: essayContent,
+          chartType: currentPrompt.chartType,
+          chartDetails: currentPrompt.chartDetails,
+          essaySubtype: currentPrompt.questionType,
+          previousTaskBand: selectedTaskType === 'task1' ? lastTask2Band : lastTask1Band,
         }),
       });
 
       const resData = await response.json();
       if (resData.success && resData.data) {
         setEvaluationResult(resData.data);
+        if (selectedTaskType === 'task1') {
+          setLastTask1Band(resData.data.overallBand);
+        } else {
+          setLastTask2Band(resData.data.overallBand);
+        }
         setIsResultModalOpen(true);
         if (onNotify) {
           onNotify(`Đã chấm xong! Điểm ước lượng: Band ${resData.data.overallBand}`, 'success');
@@ -357,6 +368,44 @@ export const WritingWorkspace: React.FC<WritingWorkspaceProps> = ({ onNotify }) 
                 </div>
               </div>
             ))}
+          </div>
+        </div>
+      );
+    }
+
+        if (chartType === 'mixed' && currentPrompt.chartDetails?.mixedCharts) {
+      const { mixedCharts } = currentPrompt.chartDetails;
+      return (
+        <div className="bg-white p-4 rounded-2xl border border-stone-200 shadow-xs space-y-4">
+          <div className="space-y-2">
+            <span className="text-xs font-bold text-[#064E3B] block">
+              Biểu đồ 1: {mixedCharts.chart1Title} ({mixedCharts.chart1Type})
+            </span>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+              {mixedCharts.labels.map((country, idx) => (
+                <div key={idx} className="p-2.5 rounded-xl bg-stone-50 border border-stone-200 text-center">
+                  <span className="font-bold text-xs text-stone-800 block">{country}</span>
+                  <div className="text-[11px] text-stone-500 mt-1 space-y-0.5">
+                    <div>2000: <strong className="text-stone-700">{mixedCharts.series[0].values[idx]}</strong></div>
+                    <div>2020: <strong className="text-[#064E3B]">{mixedCharts.series[1].values[idx]}</strong></div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="border-t border-stone-200 pt-3 space-y-2">
+            <span className="text-xs font-bold text-[#D97706] block">
+              Biểu đồ 2: {mixedCharts.chart2Title} ({mixedCharts.chart2Type})
+            </span>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+              {mixedCharts.pieLabels.map((item, idx) => (
+                <div key={idx} className="p-2 rounded-xl bg-amber-50/70 border border-amber-200 text-center text-xs">
+                  <span className="font-semibold text-stone-800 text-[11px] block">{item}</span>
+                  <span className="font-bold text-amber-900 text-xs">{mixedCharts.pieValues[idx]}%</span>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       );
@@ -688,9 +737,12 @@ export const WritingWorkspace: React.FC<WritingWorkspaceProps> = ({ onNotify }) 
         isOpen={isResultModalOpen}
         onClose={() => setIsResultModalOpen(false)}
         evaluation={evaluationResult}
+        taskType={selectedTaskType}
         taskTitle={currentPrompt.title}
         wordCount={wordCount}
         timeSpentSeconds={timeSpent}
+        chartType={currentPrompt.chartType}
+        questionType={currentPrompt.questionType}
       />
     </div>
   );

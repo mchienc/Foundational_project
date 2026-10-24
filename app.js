@@ -49,7 +49,7 @@ app.use('/audio', (req, res) => {
 
 app.use(
   session({
-    secret: process.env.SESSION_SECRET || 'eduflow-academic-secret-key',
+    secret: process.env.SESSION_SECRET || 'eng4u-academic-secret-key',
     resave: false,
     saveUninitialized: false,
     cookie: { maxAge: 1000 * 60 * 60 * 2 },

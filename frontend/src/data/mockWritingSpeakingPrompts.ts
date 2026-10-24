@@ -4,7 +4,7 @@
 export interface WritingPrompt {
   id: string;
   type: 'task1' | 'task2';
-  chartType?: 'bar' | 'line' | 'pie' | 'table' | 'map' | 'process';
+  chartType?: 'bar' | 'line' | 'pie' | 'table' | 'map' | 'process' | 'mixed';
   category?: string;
   questionType?: string;
   title: string;
@@ -20,6 +20,16 @@ export interface WritingPrompt {
     mapComparison?: { before: string[]; after: string[] };
     tableHeaders?: string[];
     tableRows?: (string | number)[][];
+    mixedCharts?: {
+      chart1Title: string;
+      chart1Type: string;
+      labels: string[];
+      series: { name: string; values: number[]; color?: string }[];
+      chart2Title: string;
+      chart2Type: string;
+      pieLabels: string[];
+      pieValues: number[];
+    };
   };
 }
 
@@ -152,6 +162,32 @@ export const mockWritingPrompts: WritingPrompt[] = [
         { step: 4, title: 'Ép con lăn & Sấy khô', desc: 'Bột giấy đưa qua các trục ép nhiệt áp suất cao để loại bỏ độ ẩm.' },
         { step: 5, title: 'Cuộn thành phẩm', desc: 'Giấy thành phẩm được cuộn thành các cuộn lớn và phân phối đến xưởng in.' },
       ],
+    },
+  },
+  {
+    id: 'w-task1-mixed',
+    type: 'task1',
+    chartType: 'mixed',
+    title: 'Biểu đồ kết hợp: Tỷ lệ sinh và Cơ cấu dân số già hóa (Birth Rates & Aging Demographics)',
+    prompt:
+      'The bar chart below shows the crude birth rates in four European countries in 2000 and 2020, while the pie chart illustrates the proportion of the elderly population (aged 65 and over) in 2020.\n\nSummarise the information by selecting and reporting the main features, and make comparisons where relevant. Write at least 150 words.',
+    recommendedTimeMinutes: 20,
+    minWords: 150,
+    chartDetails: {
+      notes: 'Source: Eurostat Demographics Report',
+      mixedCharts: {
+        chart1Title: 'Tỷ lệ sinh trên 1.000 dân (Crude Birth Rates per 1,000)',
+        chart1Type: 'Cột (Bar Chart)',
+        labels: ['Italy', 'Spain', 'Germany', 'Sweden'],
+        series: [
+          { name: 'Năm 2000', values: [9.8, 10.2, 9.4, 11.5], color: '#94A3B8' },
+          { name: 'Năm 2020', values: [6.8, 7.1, 9.3, 11.1], color: '#064E3B' },
+        ],
+        chart2Title: 'Tỷ lệ dân số từ 65 tuổi trở lên năm 2020 (%)',
+        chart2Type: 'Tròn (Pie Chart)',
+        pieLabels: ['Italy (23.2%)', 'Spain (20.1%)', 'Germany (21.8%)', 'Sweden (19.9%)'],
+        pieValues: [23.2, 20.1, 21.8, 19.9],
+      },
     },
   },
 

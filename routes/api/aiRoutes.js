@@ -11,4 +11,7 @@ router.post('/grade-writing', aiGradingController.gradeWriting);
 // POST /api/ai/grade-speaking
 router.post('/grade-speaking', aiGradingController.gradeSpeaking);
 
+// POST /api/ai/composite-writing-band
+router.post('/composite-writing-band', aiGradingController.calculateCompositeBand);
+
 module.exports = router;
